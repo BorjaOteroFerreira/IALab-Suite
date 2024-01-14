@@ -99,29 +99,40 @@
     <script>hljs.highlightAll();</script>
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-
+        var content;
         function askAssistant() {
             var userInput = document.getElementById("userInput").value;
 
+            // Añadir mensaje del usuario al contenedor de mensajes
+            var chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += `<div class="message user-message">Usuario:<br> ${userInput}</div>`;
+
             // Envolvemos el código entre triples comillas
-            userInput = "'''\n" + userInput + "\n'''";
+            userInput = "\n" + userInput + "\n";
 
             $.post("/ask", { user_input: userInput }, function (data) {
-                document.getElementById("userInput").value = "";
+                document.getElementById("userInput").value = " ";
             });
         }
 
         socket.on('response', function(data){
-            var chatMessages = document.getElementById("chat-messages");
-            var content = data.content;
+        var chatMessages = document.getElementById("chat-messages");
+        content = data.content;
 
-            if (data.is_code) {
-                chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
-                hljs.highlightAll();  // Resaltar el código
+        
+
+        if (data.is_code) {
+            chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
+            hljs.highlightAll();  // Resaltar el código
+        } else {
+            // Modificación aquí: Eliminar "Usuario: undefined" de la respuesta del asistente
+            if (data.user_input !== undefined) {
+                chatMessages.innerHTML += `<div class="message">Asistente:<br> ${content}</div>`;
             } else {
-                chatMessages.innerHTML += `<div class="message">${content}</div>`;
+                chatMessages.innerHTML += `<div class="message">Asistente:<br> ${content}</div>`;
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>

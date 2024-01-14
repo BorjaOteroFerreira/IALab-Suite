@@ -1,4 +1,5 @@
 import time
+import platform  # Importa la biblioteca platform
 from llama_cpp import Llama
 
 class LlamaAssistant:
@@ -6,12 +7,25 @@ class LlamaAssistant:
         # Ruta al modelo local
         self.model_path = model_path
 
-        # Configuración específica para Metal (ajusta según sea necesario)
+        # Configuración específica para CUDA en Windows con una Nvidia
+        self.cuda_options = {
+            "device": "cuda",
+            "cuda_device_id": 0,  # El ID del dispositivo CUDA, ajusta según sea necesario
+        }
+
+        # Configuración específica para Metal en macOS
         self.metal_options = {
             "device": "metal",
             "metal_device_id": 0,
-            # Sustituir por torch en Windows para utilizar CUDA
         }
+
+        # Determina el sistema operativo actual y configura las opciones correspondientes
+        if platform.system() == 'Windows':
+            self.device_options = self.cuda_options
+        elif platform.system() == 'Darwin':  # 'Darwin' es la identificación de macOS
+            self.device_options = self.metal_options
+        else:
+            raise RuntimeError("Sistema operativo no compatible")
 
         # Inicializar el modelo Llama2
         self.llm = Llama(
@@ -19,13 +33,13 @@ class LlamaAssistant:
             verbose=True,
             n_gpu_layers=14,
             n_ctx=4096,
-            metal_options=self.metal_options,
+            **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
             chat_format="llama-2"
         )
 
         # Historial de conversación
         self.conversation_history = []
-        mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales"
+        mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan código no des explicaciones adicionales"
         self.conversation_history.append({"role": "system", "content": mensaje_sistema})
 
     def add_user_input(self, user_input):
