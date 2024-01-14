@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,7 +41,6 @@
 
         .user-message .message-content {
             background-color: #e6e6e6;
-            /* Bocadillo gris para mensajes del usuario */
             border-radius: 8px;
             padding: 10px;
             max-width: 70%;
@@ -52,7 +52,6 @@
 
         .assistant-message .message-content {
             background-color: #b9f6ca;
-            /* Bocadillo verde claro para respuestas del asistente */
             border-radius: 8px;
             padding: 10px;
             max-width: 70%;
@@ -60,13 +59,13 @@
         }
 
         #userInput {
-            width: 50%;
+            width: calc(100% - 20px);
             padding: 10px;
-            margin: 0 16px;
+            margin: 0 10px 0 0;
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-top: 10px;
-            bottom: 0;
+            box-sizing: border-box;
         }
 
         #sendButton {
@@ -85,64 +84,92 @@
             left: 0;
             width: 100%;
             display: flex;
-            justify-content: space-between;
             padding: 10px;
             background-color: #fff;
             border-top: 1px solid #ddd;
         }
+
+        /* Estilo para el botón deshabilitado */
+        #sendButton:disabled {
+            background-color: #ddd;
+            color: #888;
+            cursor: not-allowed;
+        }
     </style>
 </head>
+
 <body>
     <div id="chat-container">
-        <div id="chat-messages">
-        </div>
+        <div id="chat-messages"></div>
         <div id="footer">
-            <input type="text" id="userInput" placeholder="Ingresa tu mensaje">
+            <input type="text" id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)">
             <button id="sendButton" onclick="askAssistant()">Enviar</button>
         </div>
     </div>
 
-
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
     <script>
+        hljs.highlightAll();
+
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         var content;
+
         function askAssistant() {
             var userInput = document.getElementById("userInput").value;
 
+            if (userInput.trim() === "") {
+                return; // No enviar si el input está vacío
+            }
+
             // Añadir mensaje del usuario al contenedor de mensajes
             var chatMessages = document.getElementById("chat-messages");
-            chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'>Yo:<br> ${userInput}</div></div>`;
+            chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'><strong>Yo</strong><br> ${userInput}</div></div>`;
+            var newMessage = chatMessages.lastElementChild;
+            newMessage.scrollIntoView();
+            // Deshabilitar el botón y vaciar el input
+            document.getElementById("sendButton").disabled = true;
+            document.getElementById("userInput").value = "";
 
             // Envolvemos el código entre triples comillas
             userInput = "\n" + userInput + "\n";
 
             $.post("/ask", { user_input: userInput }, function (data) {
-                document.getElementById("userInput").value = " ";
+                // No se necesita realizar ninguna acción específica aquí
+
+                // Habilitar el botón después de recibir la respuesta
+                document.getElementById("sendButton").disabled = false;
             });
         }
 
-        socket.on('response', function(data){
-        var chatMessages = document.getElementById("chat-messages");
-        content = data.content;
+        socket.on('response', function (data) {
+            var chatMessages = document.getElementById("chat-messages");
+            content = data.content;
 
-        
-
-        if (data.is_code) {
-            chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
-            hljs.highlightAll();  // Resaltar el código
-        } else {
-            // Modificación aquí: Eliminar "Usuario: undefined" de la respuesta del asistente
-            if (data.user_input !== undefined) {
-                chatMessages.innerHTML += `<div class="message">Asistente:<br> ${content}</div>`;
+            if (data.is_code) {
+                chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
+                hljs.highlightAll(); // Resaltar el código
             } else {
-                chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content">Asistente:<br> ${content}</div></div>`;
+                if (data.user_input !== undefined) {
+                    chatMessages.innerHTML += `<div class="message">Asistente<br> ${content}</div>`;
+                } else {
+                    chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${content}</div></div>`;
+                }
+            }
+             // Hacer scroll hacia abajo
+            var newMessage = chatMessages.lastElementChild;
+            newMessage.scrollIntoView();
+
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
+                askAssistant();
             }
         }
-    });
-</script>
+    </script>
 </body>
+
 </html>
