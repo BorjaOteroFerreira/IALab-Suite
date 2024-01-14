@@ -11,9 +11,11 @@ Instalar llama2 > ver en <a href="https://github.com/abetlen/llama-cpp-python">r
 
 Modo de empleo : 
 
-Iniciar app.py: 
-cd ruta/a/carpeta/del/proyecto
-python3 ./app.py 
+<ul>
+  <li></li>Iniciar app.py: </li>
+  <li>cd ruta/a/carpeta/del/proyecto</li>
+  <li>python3 ./app.py </li>
+</ul>
 
 Se inicia el servidor en el localhost 127.0.0.1
 
