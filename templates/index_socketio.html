@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaz del Asistente</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        #chat-header {
+            background-color: #4CAF50;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #chat-messages {
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .user-message {
+            align-items: flex-end;
+        }
+
+        .message-content {
+            background-color: #e6e6e6;
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .code-window {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 5px;
+            white-space: pre-wrap;
+            color: #fff;
+            overflow-x: auto;
+        }
+
+        #userInput {
+            width: calc(100% - 32px);
+            padding: 10px;
+            margin: 0 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        #sendButton {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-header">Asistente de Programación</div>
+        <div id="chat-messages"></div>
+        <input type="text" id="userInput" placeholder="Ingresa tu mensaje">
+        <button id="sendButton" onclick="askAssistant()">Enviar</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        function askAssistant() {
+            var userInput = document.getElementById("userInput").value;
+
+            // Envolvemos el código entre triples comillas
+            userInput = "'''\n" + userInput + "\n'''";
+
+            $.post("/ask", { user_input: userInput }, function (data) {
+                document.getElementById("userInput").value = "";
+            });
+        }
+
+        socket.on('response', function(data){
+            var chatMessages = document.getElementById("chat-messages");
+            var content = data.content;
+
+            if (data.is_code) {
+                chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
+                hljs.highlightAll();  // Resaltar el código
+            } else {
+                chatMessages.innerHTML += `<div class="message">${content}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
