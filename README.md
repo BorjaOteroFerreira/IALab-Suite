@@ -1,5 +1,8 @@
 <h1> Proyecto de IA basado en LLama-2</h1>
 
+Actualmente en fase de desarollo, pensado para ejecutar en local
+para entornos en producción utilizar otro servidor wsgi
+
 Instalar dependencias
 con pip : 
 <ul>
