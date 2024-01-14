@@ -2,10 +2,14 @@
 
 Instalar dependencias
 con pip : 
+<ul>
+  <li>pip install Flask</li>
+  <li>pip install flask_socketio</li>
+  <li>pip instal CORS</li>
+</ul>
 
-pip install Flask
-pip install flask_socketio
-pip instal CORS
+
+
 
 Instalar llama2 > ver en <a href="https://github.com/abetlen/llama-cpp-python">repositorio oficial </a>
 
