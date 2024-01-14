@@ -148,37 +148,43 @@
         }
 
         socket.on('response', function (data) {
-        var chatMessages = document.getElementById("chat-messages");
-        content = data.content;
-        formattedResponse = content.replace("/", "").replace(">", "");
+    var chatMessages = document.getElementById("chat-messages");
+    content = data.content;
+    formattedResponse = content.replace("/", "").replace(">", "");
 
-        // Buscar y reemplazar solo en el primer y segundo conjunto de comillas triples
-        var firstTripleIndex = formattedResponse.indexOf("```");
-        var secondTripleIndex = formattedResponse.indexOf("```", firstTripleIndex + 3);
-        
-        if (firstTripleIndex !== -1 && secondTripleIndex !== -1) {
-            // Reemplazar solo en el primer y segundo conjunto de comillas triples
-            formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<textarea>" + 
-                                formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
-                                "</textarea>" + formattedResponse.substring(secondTripleIndex + 3);
-        }
+    // Buscar y reemplazar solo en el primer y segundo conjunto de comillas triples
+    var firstTripleIndex = formattedResponse.indexOf("```");
+    var secondTripleIndex = formattedResponse.indexOf("```", firstTripleIndex + 3);
+    
+    if (firstTripleIndex !== -1 && secondTripleIndex !== -1) {
+        // Reemplazar solo en el primer y segundo conjunto de comillas triples
+        formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<textarea>" + 
+                            formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
+                            "</textarea>" + formattedResponse.substring(secondTripleIndex + 3);
+    }
 
-        if (data.is_code) {
-            chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
-            hljs.highlightAll(); // Resaltar el código
+    if (data.is_code) {
+        chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
+        hljs.highlightAll(); // Resaltar el código
+    } else {
+        if (data.user_input !== undefined) {
+            chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
         } else {
-            if (data.user_input !== undefined) {
-                chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
-            } else {
-                
-                chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
-            }
-        }
+            // Contar el número de saltos de línea en el texto
+            var lineCount = (formattedResponse.match(/\n/g) || []).length + 1;
 
-        // Hacer scroll hacia abajo
-        var newMessage = chatMessages.lastElementChild;
-        newMessage.scrollIntoView();
-    });
+            // Establecer la altura del textarea en función del número de líneas
+            formattedResponse = formattedResponse.replace("```", `<textarea style="margin: 0px; height: ${lineCount * 20}px; width: 223px;">`);
+
+            chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
+        }
+    }
+
+    // Hacer scroll hacia abajo
+    var newMessage = chatMessages.lastElementChild;
+    newMessage.scrollIntoView();
+});
+
 
     function handleKeyPress(event) {
          if (event.key === "Enter") {
