@@ -135,8 +135,7 @@
             // Deshabilitar el botón y vaciar el input
             document.getElementById("sendButton").disabled = true;
             document.getElementById("userInput").value = "";
-
-            // Envolvemos el código entre triples comillas
+            
             userInput = "\n" + userInput + "\n";
 
             $.post("/ask", { user_input: userInput }, function (data) {
