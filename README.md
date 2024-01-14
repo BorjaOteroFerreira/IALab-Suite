@@ -12,7 +12,7 @@ Instalar llama2 > ver en <a href="https://github.com/abetlen/llama-cpp-python">r
 Modo de empleo : 
 
 <ul>
-  <li></li>Iniciar app.py: </li>
+  <li>Iniciar app.py: </li>
   <li>cd ruta/a/carpeta/del/proyecto</li>
   <li>python3 ./app.py </li>
 </ul>
