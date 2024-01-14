@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
-from llama2w import LlamaAssistant
+from llama2f import LlamaAssistant
 from flask_cors import CORS
 
 app = Flask(__name__)
