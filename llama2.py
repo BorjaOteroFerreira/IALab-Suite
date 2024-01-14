@@ -1,27 +1,53 @@
 import time
-import platform
+import platform  # Importa la biblioteca platform
 from llama_cpp import Llama
 
 class LlamaAssistant:
     def __init__(self, model_path):
-        # ... (código anterior)
+        # Ruta al modelo local
+        self.model_path = model_path
 
-        # Porcentaje máximo de capacidad del historial antes de comenzar a borrar
-        self.max_context_percentage = 0.8
+        # Configuración específica para CUDA en Windows con una Nvidia
+        self.cuda_options = {
+            "device": "cuda",
+            "cuda_device_id": 0,  # El ID del dispositivo CUDA, ajusta según sea necesario
+        }
 
-    def trim_context(self):
-        # Calcula el límite de mensajes a mantener
-        max_context_size = int(self.max_context_percentage * len(self.conversation_history))
-        # Mantén siempre el mensaje inicial del sistema
-        max_context_size = max(max_context_size, 1)
-        
-        # Elimina mensajes más antiguos para mantener el contexto dentro del límite
-        self.conversation_history = self.conversation_history[-max_context_size:]
+        # Configuración específica para Metal en macOS
+        self.metal_options = {
+            "device": "metal",
+            "metal_device_id": 0,
+        }
+
+        # Determina el sistema operativo actual y configura las opciones correspondientes
+        if platform.system() == 'Windows':
+            self.device_options = self.cuda_options
+        elif platform.system() == 'Darwin':  # 'Darwin' es la identificación de macOS
+            self.device_options = self.metal_options
+        else:
+            raise RuntimeError("Sistema operativo no compatible")
+
+        # Inicializar el modelo Llama2
+        self.llm = Llama(
+            model_path=self.model_path,
+            verbose=True,
+            n_gpu_layers=14,
+            n_ctx=4096,
+            **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
+            chat_format="llama-2"
+        )
+
+        # Historial de conversación
+        self.conversation_history = []
+        mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan código no des explicaciones adicionales, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
+        #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas"
+        #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
+
+        self.conversation_history.append({"role": "system", "content": mensaje_sistema})
 
     def add_user_input(self, user_input):
         # Añadir input del usuario al historial de la conversación
         self.conversation_history.append({"role": "user", "content": user_input})
-        self.trim_context()
 
     def get_assistant_response(self):
         last_user_input_time = time.time()
@@ -35,12 +61,8 @@ class LlamaAssistant:
         # Añadir la respuesta al historial de la conversación
         self.conversation_history.append({"role": "assistant", "content": response})
         elapsed_time = round(time.time() - last_user_input_time, 2)
-        response += " | " + str(elapsed_time) + "s"
-        self.trim_context()  # Limpia el contexto después de recibir la respuesta
-
+        response+=" | "+str(elapsed_time)+"s"
         return response
-
-# Resto del código (if __name__ == "__main__", etc.)
 
 if __name__ == "__main__":
     model_path = "./models/llama-2-7b-chat.Q8_0.gguf"
