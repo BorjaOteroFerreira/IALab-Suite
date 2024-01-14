@@ -15,10 +15,18 @@
         #chat-container {
             max-width: 600px;
             margin: 50px auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            padding-bottom: 10px;
+        }
+
+        .message-container {
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            clear: both;
+            height: 65%;
         }
 
         #chat-header {
@@ -30,52 +38,39 @@
             border-bottom: 1px solid #ddd;
         }
 
-        #chat-messages {
-            padding: 15px;
-            overflow-y: auto;
-            max-height: 400px;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .user-message {
-            align-items: flex-end;
-        }
-
-        .message-content {
+        .user-message .message-content {
             background-color: #e6e6e6;
+            /* Bocadillo gris para mensajes del usuario */
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+            align-self: flex-end;
+            float: right;
+            margin-bottom: 10px;
+        }
+
+        .assistant-message .message-content {
+            background-color: #b9f6ca;
+            /* Bocadillo verde claro para respuestas del asistente */
             border-radius: 8px;
             padding: 10px;
             max-width: 70%;
             word-wrap: break-word;
         }
 
-        .code-window {
-            background-color: #333;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 5px;
-            white-space: pre-wrap;
-            color: #fff;
-            overflow-x: auto;
-        }
-
         #userInput {
-            width: calc(100% - 32px);
+            width: 50%;
             padding: 10px;
             margin: 0 16px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            margin-bottom: 10px;
+            margin-top: 10px;
+            bottom: 0;
         }
 
         #sendButton {
-            width: 100%;
+            width: 70px;
             padding: 10px;
             background-color: #4CAF50;
             color: #fff;
@@ -83,15 +78,30 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
     <div id="chat-container">
-        <div id="chat-header">Asistente de Programación</div>
-        <div id="chat-messages"></div>
-        <input type="text" id="userInput" placeholder="Ingresa tu mensaje">
-        <button id="sendButton" onclick="askAssistant()">Enviar</button>
+        <div id="chat-messages">
+        </div>
+        <div id="footer">
+            <input type="text" id="userInput" placeholder="Ingresa tu mensaje">
+            <button id="sendButton" onclick="askAssistant()">Enviar</button>
+        </div>
     </div>
+
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
@@ -105,7 +115,7 @@
 
             // Añadir mensaje del usuario al contenedor de mensajes
             var chatMessages = document.getElementById("chat-messages");
-            chatMessages.innerHTML += `<div class="message user-message">Usuario:<br> ${userInput}</div>`;
+            chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'>Yo:<br> ${userInput}</div></div>`;
 
             // Envolvemos el código entre triples comillas
             userInput = "\n" + userInput + "\n";
@@ -129,7 +139,7 @@
             if (data.user_input !== undefined) {
                 chatMessages.innerHTML += `<div class="message">Asistente:<br> ${content}</div>`;
             } else {
-                chatMessages.innerHTML += `<div class="message">Asistente:<br> ${content}</div>`;
+                chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content">Asistente:<br> ${content}</div></div>`;
             }
         }
     });
