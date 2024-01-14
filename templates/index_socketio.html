@@ -95,6 +95,10 @@
             color: #888;
             cursor: not-allowed;
         }
+        textarea{
+            width:100%;
+            min-height:20px;
+        }
     </style>
 </head>
 
@@ -144,31 +148,44 @@
         }
 
         socket.on('response', function (data) {
-            var chatMessages = document.getElementById("chat-messages");
-            content = data.content;
+        var chatMessages = document.getElementById("chat-messages");
+        content = data.content;
+        formattedResponse = content.replace("/", "").replace(">", "");
 
-            if (data.is_code) {
-                chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
-                hljs.highlightAll(); // Resaltar el código
+        // Buscar y reemplazar solo en el primer y segundo conjunto de comillas triples
+        var firstTripleIndex = formattedResponse.indexOf("```");
+        var secondTripleIndex = formattedResponse.indexOf("```", firstTripleIndex + 3);
+        
+        if (firstTripleIndex !== -1 && secondTripleIndex !== -1) {
+            // Reemplazar solo en el primer y segundo conjunto de comillas triples
+            formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<textarea>" + 
+                                formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
+                                "</textarea>" + formattedResponse.substring(secondTripleIndex + 3);
+        }
+
+        if (data.is_code) {
+            chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
+            hljs.highlightAll(); // Resaltar el código
+        } else {
+            if (data.user_input !== undefined) {
+                chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
             } else {
-                if (data.user_input !== undefined) {
-                    chatMessages.innerHTML += `<div class="message">Asistente<br> ${content}</div>`;
-                } else {
-                    chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${content}</div></div>`;
-                }
-            }
-             // Hacer scroll hacia abajo
-            var newMessage = chatMessages.lastElementChild;
-            newMessage.scrollIntoView();
-
-        });
-
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
-                askAssistant();
+                
+                chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
             }
         }
+
+        // Hacer scroll hacia abajo
+        var newMessage = chatMessages.lastElementChild;
+        newMessage.scrollIntoView();
+    });
+
+    function handleKeyPress(event) {
+         if (event.key === "Enter") {
+            event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
+            askAssistant();
+        }
+    }
     </script>
 </body>
 
