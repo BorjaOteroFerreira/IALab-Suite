@@ -20,6 +20,6 @@ Modo de empleo :
   <li>python3 ./app.py </li>
 </ul>
 
-Se inicia el servidor en el localhost 127.0.0.1
+Se inicia el servidor en el localhost 127.0.0.1:5000
 
 abrir en el navegador :D 
