@@ -33,7 +33,11 @@ body {
     bottom: 0; /* Fija el footer en la parte inferior */
 }
 
-
+pre code {
+    white-space: pre-wrap;  /* Para mantener los saltos de línea y espacios en blanco */
+    overflow-x: auto; /* Permite desplazamiento horizontal */
+    max-width: 100%; /* Ancho máximo igual al contenedor padre */
+}
 
 
 .message-container {
@@ -127,5 +131,5 @@ body {
 }
 textarea{
     width:100%;
-    min-height:20px;
+    min-height:50px;
 }
