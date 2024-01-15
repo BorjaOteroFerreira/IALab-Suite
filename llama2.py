@@ -2,6 +2,7 @@ import time
 import platform  # Importa la biblioteca platform
 from llama_cpp import Llama
 
+
 class LlamaAssistant:
     def __init__(self, model_path):
         # Ruta al modelo local
@@ -39,11 +40,11 @@ class LlamaAssistant:
 
         # Historial de conversación
         self.conversation_history = []
-        mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan código no des explicaciones adicionales, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
+        self.mensaje_sistema = "Eres un asistente que solo sabe hablar en español, debes priorizar siempre el idioma español en tus respuestas"
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
 
-        self.conversation_history.append({"role": "system", "content": mensaje_sistema})
+        self.conversation_history.append({"role": "system", "content": self.mensaje_sistema})
 
     def add_user_input(self, user_input):
         # Añadir input del usuario al historial de la conversación
@@ -63,6 +64,13 @@ class LlamaAssistant:
         elapsed_time = round(time.time() - last_user_input_time, 2)
         response+=" | "+str(elapsed_time)+"s"
         return response
+    
+    def clear_context(self):
+        self.conversation_history.clear
+        self.conversation_history.append({"role": "system", "content": self.mensaje_sistema})
+        print("Se ha limpiado el historial de conversación ")
+        for mensaje in self.conversation_history: 
+            print(mensaje)
 
 if __name__ == "__main__":
     model_path = "./models/llama-2-7b-chat.Q8_0.gguf"

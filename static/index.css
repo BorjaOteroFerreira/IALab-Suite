@@ -1,0 +1,120 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+#chat-container {
+    max-width: 600px;
+    margin: 50px auto;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+.message-container {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    clear: both;
+    height: 65%;
+}
+
+#chat-header {
+    background-color: #4CAF50;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000; /* Ajusta el valor según sea necesario para evitar que se solape con otros elementos fijos */
+}
+
+#chat-messages {
+    margin-top: 120px;
+    clear:both; /* Ajusta el valor según sea necesario para evitar que el encabezado se superponga a la caja de mensajes */
+}
+
+.user-message .message-content {
+    background-color: #e6e6e6;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+    align-self: flex-end;
+    float: right;
+    margin-bottom: 10px;
+}
+
+.assistant-message .message-content {
+    background-color: #b9f6ca;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+#userInput {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 0 10px 0 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+#sendButton {
+    width: 70px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#clearContextButton {
+    width: 70px;
+    padding: 10px;
+    background-color: orange;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#clearContextButton:hover {
+    width: 68px;
+    padding: 10px;
+    background-color: #fff;
+    color:orange;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    padding: 10px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+}
+
+/* Estilo para el botón deshabilitado */
+#sendButton:disabled {
+    background-color: #ddd;
+    color: #888;
+    cursor: not-allowed;
+}
+textarea{
+    width:100%;
+    min-height:20px;
+}

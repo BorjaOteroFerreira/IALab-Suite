@@ -1,122 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+
     <title>Interfaz del Asistente</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-
-        #chat-container {
-            max-width: 600px;
-            margin: 50px auto;
-            overflow: hidden;
-            padding-bottom: 10px;
-        }
-
-        .message-container {
-            margin: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            clear: both;
-            height: 65%;
-        }
-
-        #chat-header {
-            background-color: #4CAF50;
-            color: #fff;
-            text-align: center;
-            padding: 15px;
-            font-size: 18px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .user-message .message-content {
-            background-color: #e6e6e6;
-            border-radius: 8px;
-            padding: 10px;
-            max-width: 70%;
-            word-wrap: break-word;
-            align-self: flex-end;
-            float: right;
-            margin-bottom: 10px;
-        }
-
-        .assistant-message .message-content {
-            background-color: #b9f6ca;
-            border-radius: 8px;
-            padding: 10px;
-            max-width: 70%;
-            word-wrap: break-word;
-        }
-
-        #userInput {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin: 0 10px 0 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-top: 10px;
-            box-sizing: border-box;
-        }
-
-        #sendButton {
-            width: 70px;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            padding: 10px;
-            background-color: #fff;
-            border-top: 1px solid #ddd;
-        }
-
-        /* Estilo para el botón deshabilitado */
-        #sendButton:disabled {
-            background-color: #ddd;
-            color: #888;
-            cursor: not-allowed;
-        }
-        textarea{
-            width:100%;
-            min-height:20px;
-        }
+       
     </style>
 </head>
-
 <body>
+    <div id="chat-header">
+        <!-- Nuevo botón en la cabecera -->
+        <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
+        <h1>Interfaz del Asistente</h1>
+    </div>
     <div id="chat-container">
+
         <div id="chat-messages"></div>
         <div id="footer">
             <input type="text" id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)">
             <button id="sendButton" onclick="askAssistant()">Enviar</button>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
     <script>
-        hljs.highlightAll();
 
+        hljs.highlightAll();
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         var content;
 
@@ -135,11 +48,10 @@
             // Deshabilitar el botón y vaciar el input
             document.getElementById("sendButton").disabled = true;
             document.getElementById("userInput").value = "";
-            
+
             userInput = "\n" + userInput + "\n";
 
             $.post("/ask", { user_input: userInput }, function (data) {
-                // No se necesita realizar ninguna acción específica aquí
 
                 // Habilitar el botón después de recibir la respuesta
                 document.getElementById("sendButton").disabled = false;
@@ -184,6 +96,26 @@
     newMessage.scrollIntoView();
 });
 
+function clear_context() {
+    // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
+    fetch("/clear_context", {
+        method: "POST",  // Puedes ajustar el método según lo que necesites en tu backend
+    })
+    .then(response => {
+        if (response.ok) {
+            var chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML = "";
+            console.log("Contexto limpiado correctamente");
+        }
+        else{
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+
+    })
+    .catch(error => {
+        console.error("Error al limpiar el contexto:", error);
+    });
+}
 
     function handleKeyPress(event) {
          if (event.key === "Enter") {
