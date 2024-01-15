@@ -11,3 +11,4 @@ models/.DS_Store
 __pycache__/llama2.cpython-311.pyc
 *.pyc
 *.gguf
+pruebas/p.py
