@@ -3,14 +3,38 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f9f9f9;
+    height: 100vh;
 }
 
 #chat-container {
-    max-width: 600px;
-    margin: 50px auto;
+    max-width: 800px;
+    margin: 10px auto;
     overflow: hidden;
-    padding-bottom: 10px;
+    background-image: url('/static/bg.png');
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
+
+#chat-messages-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 250px; /* Mueve el margen superior desde #chat-messages al #chat-messages-container */
+    padding:10px;
+}
+
+#footer {
+    display: flex;
+    padding: 10px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    position: sticky; /* Cambia a sticky para que el footer se adhiera al final de #chat-container */
+    bottom: 0; /* Fija el footer en la parte inferior */
+}
+
+
+
 
 .message-container {
     margin: 10px;
@@ -24,6 +48,7 @@ body {
 
 #chat-header {
     background-color: #4CAF50;
+    height:130px;
     color: #fff;
     text-align: center;
     padding: 15px;
@@ -35,10 +60,7 @@ body {
     z-index: 1000; /* Ajusta el valor según sea necesario para evitar que se solape con otros elementos fijos */
 }
 
-#chat-messages {
-    margin-top: 120px;
-    clear:both; /* Ajusta el valor según sea necesario para evitar que el encabezado se superponga a la caja de mensajes */
-}
+
 
 .user-message .message-content {
     background-color: #e6e6e6;
@@ -97,16 +119,7 @@ body {
     cursor: pointer;
 }
 
-#footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    padding: 10px;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-}
+
 
 /* Estilo para el botón deshabilitado */
 #sendButton:disabled {

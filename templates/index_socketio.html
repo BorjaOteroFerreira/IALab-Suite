@@ -14,15 +14,15 @@
     <div id="chat-header">
         <!-- Nuevo botón en la cabecera -->
         <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
-        <h1>Interfaz del Asistente</h1>
     </div>
     <div id="chat-container">
-
-        <div id="chat-messages"></div>
-        <div id="footer">
-            <input type="text" id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)">
-            <button id="sendButton" onclick="askAssistant()">Enviar</button>
+        <div id="chat-messages-container">
+            <div id="chat-messages"></div>
         </div>
+    </div>
+    <div id="footer">
+        <input type="text" id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)">
+        <button id="sendButton" onclick="askAssistant()">Enviar</button>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
@@ -92,7 +92,10 @@
     }
 
     // Hacer scroll hacia abajo
-    var newMessage = chatMessages.lastElementChild;
+    var chatMessagesContainer = document.getElementById("chat-messages-container");
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+    // Restaura el scroll en el body
+    document.body.style.overflow = 'auto';
     newMessage.scrollIntoView();
 });
 

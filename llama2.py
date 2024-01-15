@@ -40,7 +40,7 @@ class LlamaAssistant:
 
         # Historial de conversación
         self.conversation_history = []
-        self.mensaje_sistema = "Eres un asistente que solo sabe hablar en español, debes priorizar siempre el idioma español en tus respuestas"
+        self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
 
@@ -66,7 +66,7 @@ class LlamaAssistant:
         return response
     
     def clear_context(self):
-        self.conversation_history.clear
+        self.conversation_history.clear()
         self.conversation_history.append({"role": "system", "content": self.mensaje_sistema})
         print("Se ha limpiado el historial de conversación ")
         for mensaje in self.conversation_history: 
