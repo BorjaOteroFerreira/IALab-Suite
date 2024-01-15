@@ -15,7 +15,7 @@ def add_header(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
-    return response
+    return response 
 
 @app.route('/static/<path:filename>')
 def static_file(filename):
@@ -33,7 +33,7 @@ def clear_context():
 @app.route("/ask", methods=["POST"])
 def ask():
     user_input = request.form["user_input"]
-    # Añadir input del usuario al asistente de Llama
+    # Añadir input del usuario al asistente
     llama_assistant.add_user_input(user_input)
     print(user_input)
     # Obtener la respuesta del asistente
