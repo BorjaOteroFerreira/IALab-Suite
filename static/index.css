@@ -101,22 +101,20 @@ body {
     cursor: pointer;
 }
 #clearContextButton {
-    width: 70px;
-    padding: 10px;
+    height:30px;
+    width:150px;
+    padding: 5px;
     background-color: orange;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size:14px;
 }
 #clearContextButton:hover {
-    width: 68px;
-    padding: 10px;
     background-color: #fff;
     color:orange;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
 }
 
 

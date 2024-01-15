@@ -79,12 +79,10 @@ if __name__ == "__main__":
         user_input = input("Usuario: ")
         if user_input.lower() == 'exit':
             break
-
+        
         # Añadir input del usuario al historial de la conversación
         llama_assistant.add_user_input(user_input)
-
         # Obtener la respuesta del asistente
         response = llama_assistant.get_assistant_response()
-
         # Imprimir la respuesta
         print(f"Respuesta: {response}")
