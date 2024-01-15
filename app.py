@@ -30,7 +30,6 @@ def clear_context():
     llama_assistant.clear_context()
     return "Contexto limpiado"
 
-
 @app.route("/ask", methods=["POST"])
 def ask():
     user_input = request.form["user_input"]
