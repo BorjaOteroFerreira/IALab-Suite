@@ -8,7 +8,7 @@ body {
 
 #chat-container {
     max-width: 800px;
-    margin: 10px auto;
+    margin:  auto;
     overflow: hidden;
     background-image: url('/static/bg.png');
     background-size: cover;
@@ -20,7 +20,7 @@ body {
 #chat-messages-container {
     flex: 1;
     overflow-y: auto;
-    margin-top: 250px; /* Mueve el margen superior desde #chat-messages al #chat-messages-container */
+    margin-top: 20px; /* Mueve el margen superior desde #chat-messages al #chat-messages-container */
     padding:10px;
 }
 
@@ -81,7 +81,7 @@ pre code {
     background-color: #b9f6ca;
     border-radius: 8px;
     padding: 10px;
-    max-width: 70%;
+    max-width: 80%;
     word-wrap: break-word;
 }
 
@@ -106,14 +106,14 @@ pre code {
 }
 #clearContextButton {
     height:30px;
-    width:150px;
+    width:100%;
     padding: 5px;
     background-color: orange;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size:14px;
+    font-size:20px;
 }
 #clearContextButton:hover {
     background-color: #fff;

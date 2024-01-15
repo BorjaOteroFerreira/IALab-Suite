@@ -40,7 +40,8 @@ class LlamaAssistant:
 
         # Historial de conversación
         self.conversation_history = []
-        self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
+        self.mensaje_sistema = "Eres un asistente conversacional de habla española, solo puedes hablar español"
+        #self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
 
@@ -54,7 +55,7 @@ class LlamaAssistant:
         last_user_input_time = time.time()
 
         # Realizar la inferencia
-        output = self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=2048)
+        output = self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=8192)
 
         # Obtener la respuesta
         response = output['choices'][0]['message']['content']
@@ -79,7 +80,7 @@ if __name__ == "__main__":
         user_input = input("Usuario: ")
         if user_input.lower() == 'exit':
             break
-        
+
         # Añadir input del usuario al historial de la conversación
         llama_assistant.add_user_input(user_input)
         # Obtener la respuesta del asistente
