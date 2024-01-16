@@ -15,7 +15,7 @@ con pip :
 
 
 
-Instalar llama2 > ver en <a href="https://github.com/abetlen/llama-cpp-python">repositorio oficial </a>
+<span color="red>Instalar llama2 </span> > ver en <a href="https://github.com/abetlen/llama-cpp-python">repositorio oficial </a>
 
 Descargar <a href="https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true">modelo</a> y meterlo en la carpeta models.
 
