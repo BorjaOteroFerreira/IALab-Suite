@@ -46,6 +46,7 @@ class LlamaAssistant:
         Nombre completo: Borja Otero Ferreira;
         Fecha de nacimiento : 27-03-1989;
         Edad: 34 años;
+        Estado civil actual: En pareja.
         Ocupación actual: Estudiante;
         Centro de estudios: IES Chan Do Monte (Estudiando Ciclo superior de Desarrollo Multiplataforma);
         Direccion del centro de estudios:IES Chan do Monte,  Marín,  36900 (pontevedra);
