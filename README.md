@@ -9,6 +9,7 @@ con pip :
   <li>pip install Flask</li>
   <li>pip install flask_socketio</li>
   <li>pip instal CORS</li>
+  <li>pip install llama-cpp-python</li>
 </ul>
 
 
