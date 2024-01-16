@@ -5,7 +5,8 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.config['SECRET_KEY'] = 'abaregodoforongonsodoASDSADSADflpgjagierhtgl-dgnvm,rngwsef'
+socketio = SocketIO(app, async_mode='eventlet', ping_timeout=600 , ping_interval=60 ,cors_allowed_origins="*")
 # Instanciar el asistente de Llama
 model_path = "./models/llama-2-7b-chat.Q8_0.gguf"
 llama_assistant = LlamaAssistant(model_path=model_path)
@@ -44,6 +45,6 @@ def ask():
     return jsonify({"status": "success"})
 
 if __name__ == "__main__":
-    CORS(app)
+ 
     if __name__ == '__main__':
-        socketio.run(app, host='0.0.0.0', port=8080, debug=True)
+        socketio.run(app, host='0.0.0.0', port=5000, debug=True)
