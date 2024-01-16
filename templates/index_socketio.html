@@ -4,52 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-
     <title>Interfaz del Asistente</title>
-    <style>
-    #nightModeButton {
-        position: fixed;
-        top: 0;
-        left: 0;
-        padding: 10px;
-        background-color: #333;
-        color: #fff;
-        cursor: pointer;
-        z-index: 1001; /* Asegura que el botón esté por encima del chat-header */
-    }
-
-    #nightModeButton:hover {
-        background-color: #555;
-    }
-
-    body.night-mode {
-        background-color: #333;
-        
-    }
-
-
-    #footer.night-mode {
-        background-color: #444;
-        border-top: 1px solid #666;
-    }
-
-    #sendButton.night-mode {
-        background-color: #007ACC;;
-    }
-    #clearContextButton.night-mode {
-        background-color: #007ACC;
-        color: #fff;
-    }
-    #chat-container.night-mode {
-        background-image: url('/static/bgd.png'); /* Ruta a tu nueva imagen de fondo nocturno */
-        background-size: cover;
-    }
-
-    </style>
 </head>
 <body>
     <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
-    <button id="nightModeButton" onclick="toggleNightMode()">Modo Nocturno</button>
+    <button id="nightModeButton" onclick="toggleNightMode()">Lunita</button>
        <div id="chat-container">
         <div id="chat-messages-container">
             <div id="chat-messages"></div>
@@ -74,7 +33,6 @@
             if (userInput.trim() === "") {
                 return; // No enviar si el input está vacío
             }
-
             // Añadir mensaje del usuario al contenedor de mensajes
             var chatMessages = document.getElementById("chat-messages");
             chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'><strong>Yo</strong><br> ${userInput}</div></div>`;
@@ -93,35 +51,35 @@
             });
         }
 
-    socket.on('response', function (data) {
-        var chatMessages = document.getElementById("chat-messages");
-        content = data.content;
-        formattedResponse = content.replace("/", "").replace(">", "");
+        socket.on('response', function (data) {
+            var chatMessages = document.getElementById("chat-messages");
+            content = data.content;
+            formattedResponse = content.replace("/", "").replace(">", "");
 
-        // Buscar y reemplazar solo en el primer y segundo conjunto de comillas triples
-        var firstTripleIndex = formattedResponse.indexOf("```");
-        var secondTripleIndex = formattedResponse.indexOf("```", firstTripleIndex + 3);
-        
-        if (firstTripleIndex !== -1 && secondTripleIndex !== -1) {
-            // Reemplazar solo en el primer y segundo conjunto de comillas triples
-            formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<pre><code>" + 
-                                formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
-                                "</code></pre>" + formattedResponse.substring(secondTripleIndex + 3);
-                                hljs.highlightAll();
-        }
+            // Buscar y reemplazar solo en el primer y segundo conjunto de comillas triples
+            var firstTripleIndex = formattedResponse.indexOf("```");
+            var secondTripleIndex = formattedResponse.indexOf("```", firstTripleIndex + 3);
+            
+            if (firstTripleIndex !== -1 && secondTripleIndex !== -1) {
+                // Reemplazar solo en el primer y segundo conjunto de comillas triples
+                formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<pre><code>" + 
+                                    formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
+                                    "</code></pre>" + formattedResponse.substring(secondTripleIndex + 3);
+                                    hljs.highlightAll();
+            }
 
-        if (data.is_code) {
-            chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
-             // Resaltar el código
-        } else {
-        if (data.user_input !== undefined) {
-            chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
-        } else {
-            // Reemplazar saltos de línea por <br> en partes fuera de <textarea>
-            formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
-            chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
+            if (data.is_code) {
+                chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
+                // Resaltar el código
+            } else {
+            if (data.user_input !== undefined) {
+                chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
+            } else {
+                // Reemplazar saltos de línea por <br> en partes fuera de <textarea>
+                formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
+                chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
+            }
         }
-    }
 
         // Hacer scroll hacia abajo
         var chatMessagesContainer = document.getElementById("chat-messages-container");
@@ -131,27 +89,26 @@
         newMessage.scrollIntoView();
     });
 
-function clear_context() {
-    // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
-    fetch("/clear_context", {
-        method: "POST",  // Puedes ajustar el método según lo que necesites en tu backend
-    })
-    .then(response => {
-        if (response.ok) {
-            var chatMessages = document.getElementById("chat-messages");
-            chatMessages.innerHTML = "";
-            console.log("Contexto limpiado correctamente");
-        }
-        else{
-            throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
+    function clear_context() {
+        // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
+        fetch("/clear_context", {
+            method: "POST",  // Puedes ajustar el método según lo que necesites en tu backend
+        })
+        .then(response => {
+            if (response.ok) {
+                var chatMessages = document.getElementById("chat-messages");
+                chatMessages.innerHTML = "";
+                console.log("Contexto limpiado correctamente");
+            }
+            else{
+                throw new Error(`Error en la solicitud: ${response.statusText}`);
+            }
 
-    })
-    .catch(error => {
-        console.error("Error al limpiar el contexto:", error);
-    });
-}
-
+        })
+        .catch(error => {
+            console.error("Error al limpiar el contexto:", error);
+        });
+    }
     function handleKeyPress(event) {
          if (event.key === "Enter") {
             event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
@@ -180,8 +137,6 @@ function clear_context() {
                 container.classList.toggle("night-mode");
             });
         }
-
     </script>
 </body>
-
 </html>

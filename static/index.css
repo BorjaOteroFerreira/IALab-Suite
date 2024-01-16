@@ -133,3 +133,41 @@ textarea{
     width:100%;
     min-height:50px;
 }
+
+#nightModeButton {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1001; /* Asegura que el botón esté por encima del chat-header */
+}
+
+#nightModeButton:hover {
+    background-color: #555;
+}
+
+body.night-mode {
+    background-color: #333;
+    
+}
+
+
+#footer.night-mode {
+    background-color: #444;
+    border-top: 1px solid #666;
+}
+
+#sendButton.night-mode {
+    background-color: #007ACC;;
+}
+#clearContextButton.night-mode {
+    background-color: #007ACC;
+    color: #fff;
+}
+#chat-container.night-mode {
+    background-image: url('/static/bgd.png'); /* Ruta a tu nueva imagen de fondo nocturno */
+    background-size: cover;
+}

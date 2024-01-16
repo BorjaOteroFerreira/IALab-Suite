@@ -40,7 +40,7 @@ class LlamaAssistant:
 
         # Historial de conversación
         self.conversation_history = []
-        self.mensaje_sistema = '''
+        '''self.mensaje_sistema = 
         Eres un asistente conversacional de habla española, solo puedes hablar español , te van a hacer preguntas sobre Borja, tu creador,
         asique te voy a dar un perfil completo de el, para que puedas responder preguntas sobre Borja:
         Nombre completo: Borja Otero Ferreira;
@@ -74,11 +74,14 @@ class LlamaAssistant:
         Telefono: 698166558 📞;
         Email : borjaoteroferreira@gmail.com .
         '''
-        #self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
+        self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
 
         self.conversation_history.append({"role": "system", "content": self.mensaje_sistema})
+ 
+        
+
 
     def add_user_input(self, user_input):
         # Añadir input del usuario al historial de la conversación
