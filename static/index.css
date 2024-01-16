@@ -39,7 +39,6 @@ pre code {
     max-width: 100%; /* Ancho máximo igual al contenedor padre */
 }
 
-
 .message-container {
     margin: 10px;
     display: flex;
@@ -63,8 +62,6 @@ pre code {
     top: 0;
     z-index: 1000; /* Ajusta el valor según sea necesario para evitar que se solape con otros elementos fijos */
 }
-
-
 
 .user-message .message-content {
     background-color: #e6e6e6;
@@ -121,8 +118,6 @@ pre code {
 
 }
 
-
-
 /* Estilo para el botón deshabilitado */
 #sendButton:disabled {
     background-color: #ddd;
@@ -154,7 +149,6 @@ body.night-mode {
     
 }
 
-
 #footer.night-mode {
     background-color: #444;
     border-top: 1px solid #666;
@@ -163,9 +157,17 @@ body.night-mode {
 #sendButton.night-mode {
     background-color: #007ACC;;
 }
+#sendButton.night-mode:hover {
+    background-color: #fff;
+    color: #007ACC;
+}
 #clearContextButton.night-mode {
     background-color: #007ACC;
     color: #fff;
+}
+#clearContextButton.night-mode:hover {
+    background-color: #fff;
+    color: #007ACC;
 }
 #chat-container.night-mode {
     background-image: url('/static/bgd.png'); /* Ruta a tu nueva imagen de fondo nocturno */

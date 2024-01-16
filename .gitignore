@@ -13,3 +13,4 @@ __pycache__/llama2.cpython-311.pyc
 *.gguf
 pruebas/p.py
 *.pyc
+*.pyc
