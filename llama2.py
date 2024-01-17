@@ -35,7 +35,7 @@ class LlamaAssistant:
             n_gpu_layers=14,
             n_ctx=4096,
             **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
-            chat_format=""
+            chat_format="llama-2"
         )
 
         # Historial de conversación
