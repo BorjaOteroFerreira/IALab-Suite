@@ -9,7 +9,7 @@
 <body>
     <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
     <button id="nightModeButton" onclick="toggleNightMode()">Lunita</button>
-       <div id="chat-container">
+    <div id="chat-container">
         <div id="chat-messages-container">
             <div id="chat-messages"></div>
         </div>
@@ -44,13 +44,13 @@
             userInput = "\n" + userInput + "\n";
 
             $.post("/ask", { user_input: userInput }, function (data) {
-
                 // Habilitar el botón después de recibir la respuesta
                 document.getElementById("sendButton").disabled = false;
             });
         }
 
         socket.on('response', function (data) {
+            console.log("Recibiendo respuesta:", data);
             var chatMessages = document.getElementById("chat-messages");
             content = data.content;
             formattedResponse = content.replace("/", "").replace(">", "");
@@ -64,58 +64,56 @@
                 formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<pre><code>" + 
                                     formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
                                     "</code></pre>" + formattedResponse.substring(secondTripleIndex + 3);
-                                    hljs.highlightAll();
+                hljs.highlightAll();
             }
 
             if (data.is_code) {
                 chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
                 // Resaltar el código
             } else {
-            if (data.user_input !== undefined) {
-                chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
-            } else {
-                // Reemplazar saltos de línea por <br> en partes fuera de <textarea>
-                formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
-                chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
-            }
-        }
-
-        // Hacer scroll hacia abajo
-        var chatMessagesContainer = document.getElementById("chat-messages-container");
-        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-        // Restaura el scroll en el body
-        document.body.style.overflow = 'auto';
-        newMessage.scrollIntoView();
-    });
-
-    function clear_context() {
-        // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
-        fetch("/clear_context", {
-            method: "POST",  // Puedes ajustar el método según lo que necesites en tu backend
-        })
-        .then(response => {
-            if (response.ok) {
-                var chatMessages = document.getElementById("chat-messages");
-                chatMessages.innerHTML = "";
-                console.log("Contexto limpiado correctamente");
-            }
-            else{
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
+                if (data.user_input !== undefined) {
+                    chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
+                } else {
+                    // Reemplazar saltos de línea por <br> en partes fuera de <textarea>
+                    formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
+                    chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
+                }
             }
 
-        })
-        .catch(error => {
-            console.error("Error al limpiar el contexto:", error);
+            // Hacer scroll hacia abajo
+            var chatMessagesContainer = document.getElementById("chat-messages-container");
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            // Restaura el scroll en el body
+            document.body.style.overflow = 'auto';
+            newMessage.scrollIntoView();
         });
-    }
-    function handleKeyPress(event) {
-         if (event.key === "Enter") {
-            event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
-            askAssistant();
+
+        function clear_context() {
+            // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
+            fetch("/clear_context", {
+                method: "POST",  // Puedes ajustar el método según lo que necesites en tu backend
+            })
+            .then(response => {
+                if (response.ok) {
+                    var chatMessages = document.getElementById("chat-messages");
+                    chatMessages.innerHTML = "";
+                    console.log("Contexto limpiado correctamente");
+                } else {
+                    throw new Error(`Error en la solicitud: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.error("Error al limpiar el contexto:", error);
+            });
         }
-    }
-    </script>
-    <script>
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
+                askAssistant();
+            }
+        }
+
         function toggleNightMode() {
             var body = document.body;
             var chatContainer = document.getElementById("chat-container");

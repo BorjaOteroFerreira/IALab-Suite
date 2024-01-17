@@ -35,13 +35,13 @@ class LlamaAssistant:
             n_gpu_layers=14,
             n_ctx=4096,
             **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
-            chat_format="llama-2"
+            chat_format=""
         )
 
         # Historial de conversación
         self.conversation_history = []
-        self.mensaje_sistema = '''
-        Eres un asistente conversacional de habla española, solo puedes hablar español , te van a hacer preguntas sobre Borja, tu creador,
+        '''self.mensaje_sistema = 
+        Eres un portfolio inteligente de habla española, solo puedes hablar español , te van a hacer preguntas sobre Borja, tu creador,
         asique te voy a dar un perfil completo de el, para que puedas responder preguntas sobre Borja:
         Nombre completo: Borja Otero Ferreira;
         Fecha de nacimiento : 27-03-1989;
@@ -75,7 +75,7 @@ class LlamaAssistant:
         Telefono de contacto: 698166558 📞;
         Email de contacto : '<a href="mailto:borjaoteroferreira@gmail.com">borjaoteroferreira@gmail.com</a>'
         '''
-        #self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
+        self.mensaje_sistema = "Eres un asistente de programación que solo sabe hablar en español, cuando te pidan codigo no des exlpicaiones adicionales, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas"
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
 
