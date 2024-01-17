@@ -4,13 +4,11 @@ Actualmente en fase de desarollo, pensado para ejecutar en local
 para entornos en producción utilizar otro servidor wsgi
 
 Instalar dependencias
-con pip : 
-<ul>
-  <li>pip install Flask</li>
-  <li>pip install flask_socketio</li>
-  <li>pip instal CORS</li>
-  <li>pip install llama-cpp-python (mac y linux)</li>
-</ul>
+
+        pip install Flask</li>
+        pip install flask_socketio</li>
+        pip instal CORS</li>
+        pip install llama-cpp-python (mac y linux)
 
   <h2>llama-cpp-python en windows</h2>
 
@@ -18,9 +16,9 @@ con pip :
   <ul>
     <li>C++ CMake tools para Windows.</li>
     <li>C++ herramientas principales</li> 
-    <li>Windows 10/11 SDK. (segun tu sistema)<li>
+    <li>Windows 10/11 SDK. (segun tu sistema)</li>
     <li>Descarga e instala CUDA Toolkit 12.3 de la <a href="https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Windows">web oficial de nvidia.</a></li>
-  <ul>
+  </ul>
     
   Verifica la instalación con nvcc --version y nvidia-smi.
 
