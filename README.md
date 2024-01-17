@@ -24,10 +24,12 @@ Instalar dependencias
 
   Añade CUDA_PATH ( C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3) a tus variables de entorno.
 
-  <p>copia los ficheros de from: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions
-  a la carpeta (Para version enterprise) C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
-  ó
-  (para la version Comunity)C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations</p>
+  <p>copia los ficheros de: 
+          C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions
+  a la carpeta 
+          (Para version enterprise) C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
+          ó
+          (para la version Comunity)C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations</p>
 
 
     set CMAKE_ARGS=-DLLAMA_CUBLAS=on
