@@ -5,9 +5,9 @@ para entornos en producción utilizar otro servidor wsgi
 
 Instalar dependencias
 
-        pip install Flask</li>
-        pip install flask_socketio</li>
-        pip instal CORS</li>
+        pip install Flask
+        pip install flask_socketio
+        pip instal CORS
         pip install llama-cpp-python (mac y linux)
 
   <h2>llama-cpp-python en windows</h2>
