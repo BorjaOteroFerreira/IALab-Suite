@@ -19,10 +19,8 @@ con pip :
     <li>C++ CMake tools para Windows.</li>
     <li>C++ herramientas principales</li> 
     <li>Windows 10/11 SDK. (segun tu sistema)<li>
+    <li>Descarga e instala CUDA Toolkit 12.3 de la <a href="https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Windows">web oficial de nvidia.</a></li>
   <ul>
-
-
-  <p>Descarga e instala CUDA Toolkit 12.3 de la <a href="https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Windows>web oficial de nvidia.</a>
     
   Verifica la instalación con nvcc --version y nvidia-smi.
 
