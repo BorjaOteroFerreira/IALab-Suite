@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
     <title>Portfolio Inteligente</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
 </head>
+
 <body>
     <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
     <button id="nightModeButton" onclick="toggleNightMode()">Lunita</button>
@@ -18,25 +23,23 @@
         <input type="text" id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)">
         <button id="sendButton" onclick="askAssistant()">Enviar</button>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+
     <script>
-        hljs.highlightAll();
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         var content;
 
         function askAssistant() {
             var userInput = document.getElementById("userInput").value;
-
             if (userInput.trim() === "") {
                 return; // No enviar si el input está vacío
             }
+
             // Añadir mensaje del usuario al contenedor de mensajes
             var chatMessages = document.getElementById("chat-messages");
             chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'><strong>Yo</strong><br> ${userInput}</div></div>`;
             var newMessage = chatMessages.lastElementChild;
             newMessage.scrollIntoView();
+
             // Deshabilitar el botón y vaciar el input
             document.getElementById("sendButton").disabled = true;
             document.getElementById("userInput").value = "";
@@ -46,7 +49,43 @@
             $.post("/ask", { user_input: userInput }, function (data) {
                 // Habilitar el botón después de recibir la respuesta
                 document.getElementById("sendButton").disabled = false;
+
+                // Resaltar el código en toda la respuesta
+                var formattedResponse = highlightCodeInResponse(data.content);
+
+                // Mostrar la respuesta en el chat
+                displayAssistantResponse(formattedResponse, data.is_code);
             });
+        }
+
+        function highlightCodeInResponse(response) {
+            // Buscar y reemplazar todas las instancias de comillas triples con <pre><code>
+            var formattedResponse = response.replace(/```([\s\S]*?)```/g, function(match, codeContentWithLanguage) {
+            var codeContentLines = codeContentWithLanguage.split('\n');
+            var language = codeContentLines[0].trim();
+            var codeContent = codeContentLines.slice(1).join('\n').trim();
+
+            return `<pre><code class="${language}">${codeContent}</code></pre>`;
+        });
+
+            // Resaltar el código utilizando Highlight.js
+            var codeContainer = document.createElement("div");
+            codeContainer.innerHTML = formattedResponse;
+
+            var codeBlocks = codeContainer.querySelectorAll("pre code");
+            codeBlocks.forEach(function (codeBlock) {
+                hljs.highlightBlock(codeBlock);
+            });
+
+            return codeContainer.innerHTML;
+        }
+
+        function displayAssistantResponse(formattedResponse, isCode) {
+            var chatMessages = document.getElementById("chat-messages");
+            var chatMessagesContainer = document.getElementById("chat-messages-container");
+            chatMessages.innerHTML += `<div class="${messageContainerClass}">Asistente<br>${formattedResponse}</div>`;
+            // Hacer scroll hacia abajo
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
         }
 
         socket.on('response', function (data) {
@@ -55,31 +94,26 @@
             content = data.content;
             formattedResponse = content.replace("/", "").replace(">", "");
 
-            // Buscar y reemplazar solo en el primer y segundo conjunto de comillas triples
-            var firstTripleIndex = formattedResponse.indexOf("```");
-            var secondTripleIndex = formattedResponse.indexOf("```", firstTripleIndex + 3);
-            
-            if (firstTripleIndex !== -1 && secondTripleIndex !== -1) {
-                // Reemplazar solo en el primer y segundo conjunto de comillas triples
-                formattedResponse = formattedResponse.substring(0, firstTripleIndex) + "<pre><code>" + 
-                                    formattedResponse.substring(firstTripleIndex + 3, secondTripleIndex) + 
-                                    "</code></pre>" + formattedResponse.substring(secondTripleIndex + 3);
-                hljs.highlightAll();
-            }
+          // Buscar y reemplazar en pares de comillas triples
+            var regex = /```([\s\S]*?)```/g;
+            var matches = formattedResponse.match(regex);
 
-            if (data.is_code) {
-                chatMessages.innerHTML += `<div class="message code-window"><pre><code class="python">${content}</code></pre></div>`;
-                // Resaltar el código
-            } else {
-                if (data.user_input !== undefined) {
-                    chatMessages.innerHTML += `<div class="message">Asistente<br> ${formattedResponse}</div>`;
-                } else {
-                    // Reemplazar saltos de línea por <br> en partes fuera de <textarea>
-                    formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
-                    chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
+            if (matches) {
+                for (var i = 0; i < matches.length; i++) {
+                    var tripleBackticks = matches[i];
+                    var codeContent = tripleBackticks.replace(/```/g, '');
+                    var replacement = '<pre><code class="python">' + codeContent + '</code></pre>';
+                    formattedResponse = formattedResponse.replace(tripleBackticks, replacement);
                 }
             }
+                
+            //remplazar saltos de línea por <br> en partes fuera de <textarea>
+            formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
+            chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="profile-image">
+                                     <img src="{{ url_for('static', filename='profile.gif') }}" alt="Profile Image">
+                                     </div><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
 
+            
             // Hacer scroll hacia abajo
             var chatMessagesContainer = document.getElementById("chat-messages-container");
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
