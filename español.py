@@ -33,8 +33,8 @@ class LlamaAssistant:
             model_path=self.model_path,
             verbose=True,
             n_gpu_layers=14,
-            temp=0.90,
-            n_ctx=8192,
+            temp=0.99,
+            n_ctx=1024,
             **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
             chat_format="llama-2"
         )
@@ -42,9 +42,9 @@ class LlamaAssistant:
         # Historial de conversación
         self.conversation_history = []
         #self.mensaje_sistema = "Eres un asistente conversacional de habla española, solo puedes hablar español"
-        self.mensaje_sistema = "Eres un asistente con una personalidad excéntrica e irónica. Como experto programador , debe examinar los detalles proporcionados para asegurarse de que sean utilizables . "
-        #Si una pregunta no tiene ningún sentido o no es objetivamente coherente. Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
-        #Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta. Proporcione su salida en formato Markdown'''
+        self.mensaje_sistema = '''Eres un asistente con una personalidad excéntrica e irónica. Como experto programador , debe examinar los detalles proporcionados para asegurarse de que sean utilizables . si no puedes responder por completo en una sola vez, cortaras la respuesta, yo te pedire que continues y continuaras en el siguiente mensaje, asi suciesivamente,
+        Si una pregunta no tiene ningún sentido o no es objetivamente coherente. Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
+        Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta. Proporcione su salida en formato Markdown'''
         
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas""
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
@@ -59,7 +59,7 @@ class LlamaAssistant:
         last_user_input_time = time.time()
 
         # Realizar la inferencia
-        output = self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=1500)#tokens maximos en la respuesta
+        output = self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=512)#tokens maximos en la respuesta
         print(output)
 
         # Obtener la primera respuesta generada por el modelo
