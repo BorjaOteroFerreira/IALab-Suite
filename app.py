@@ -40,6 +40,10 @@ def ask():
     user_input = request.form["user_input"]
     room_id = request.form.get("room_id")  # Obtener el ID de la sala desde el formulario
     
+    # Limpiar contexto si es necesario
+    if llama_assistant.should_clear_context():
+        llama_assistant.clear_context_if_needed()
+
     # Añadir input del usuario al asistente
     llama_assistant.add_user_input(user_input)
     print(user_input)
@@ -51,6 +55,8 @@ def ask():
     socketio.emit("response", {"role": "assistant", "content": response}, room=room_id)
 
     return jsonify({"status": "success"})
+
+
 
 @socketio.on('join')
 def handle_join(data):

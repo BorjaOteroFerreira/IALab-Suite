@@ -6,6 +6,7 @@ body {
     height: 100vh;
 }
 
+
 #chat-container {
     max-width: 800px;
     margin:  auto;
@@ -91,6 +92,7 @@ pre code {
     border-radius: 4px;
     margin-top: 10px;
     box-sizing: border-box;
+   
 }
 
 
@@ -182,10 +184,16 @@ body.night-mode {
     
 }
 
+#userImput.night-mode{
+    background-color:#444;
+   
+}
+
 #footer.night-mode {
-    background-color: #444;
+    background-color: #2C2C2C;
     border-top: 1px solid #666;
 }
+
 
 #sendButton.night-mode {
     background-color: #007ACC;;
