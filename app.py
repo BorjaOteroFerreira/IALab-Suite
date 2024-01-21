@@ -4,9 +4,10 @@ from español import LlamaAssistant
 from flask_cors import CORS
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'WindowsApesta'
 socketio = SocketIO(app, ping_timeout=600, ping_interval=60, cors_allowed_origins="*")
 
-model_path = "./models/garrulus.Q8_0.gguf"
+model_path = "models/llama2_7b_chat_uncensored.Q8_0.gguf"
 llama_assistant = None
 
 @app.before_request
@@ -68,4 +69,4 @@ def handle_leave(data):
     print(f"Cliente {request.sid} salió de la sala {room_id}")
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=8080, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=False)

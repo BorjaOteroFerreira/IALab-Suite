@@ -46,7 +46,15 @@
 
             userInput = "\n" + userInput + "\n";
 
-            $.post("/ask", { user_input: userInput }, function (data) {
+            fetch("/ask", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `user_input=${encodeURIComponent(userInput)}`,
+            })
+            .then(response => response.json())
+            .then(data => {
                 // Habilitar el botón después de recibir la respuesta
                 document.getElementById("sendButton").disabled = false;
 
@@ -55,8 +63,12 @@
 
                 // Mostrar la respuesta en el chat
                 displayAssistantResponse(formattedResponse, data.is_code);
+            })
+            .catch(error => {
+                console.error("Error en la solicitud POST /ask:", error);
             });
         }
+
 
         function highlightCodeInResponse(response) {
             // Buscar y reemplazar todas las instancias de comillas triples con <pre><code>

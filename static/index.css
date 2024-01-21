@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f9f9f9;
-    height: 100vh;
+    height: 100%;
 }
 
 
@@ -15,7 +15,7 @@ body {
     background-size: cover;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
 }
 
 #chat-messages-container {
