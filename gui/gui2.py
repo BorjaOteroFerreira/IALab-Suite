@@ -24,13 +24,13 @@ class LlamaGUI:
         style.theme_use("clam")
 
         style.configure("TButton", padding=(10, 5, 10, 5), font=('Helvetica', 12), background=vscode_button_color, foreground=vscode_fg_color, borderwidth=0)
-        style.configure("TEntry", padding=(5, 5, 5, 5), font=('Helvetica', 12), background="#1E1E1E", foreground=vscode_fg_color)
+        style.configure("TEntry", padding=(5, 5, 5, 5), font=('Helvetica', 12), bg="1E1E1E", foreground="1E1E1E")
         style.configure("TProgressbar", thickness=20,  troughrelief="flat", background="#1E1E1E", borderwidth=0)
 
         self.progress_bar = ttk.Progressbar(master, orient="vertical", length=200, mode="determinate", style="TProgressbar")
         self.progress_bar.pack(side="left", padx=5, pady=75)
 
-        self.chat_display = scrolledtext.ScrolledText(master, wrap=tk.WORD, width=100, height=40, bg=vscode_bg_color, fg=vscode_fg_color)
+        self.chat_display = scrolledtext.ScrolledText(master, wrap=tk.WORD, width=100, height=70, bg=vscode_bg_color, fg=vscode_fg_color)
         self.chat_display.pack(padx=10, pady=10)
 
         self.user_input_entry = ttk.Entry(master, width=75)
@@ -53,7 +53,7 @@ class LlamaGUI:
         else:
             self.llama_assistant.add_user_input(user_input)
             self.is_processing = True
-            self.add_message_to_display(f"\n\nUsuario:\n\n{user_input}\n\nAsistente:\n\n")
+            self.add_message_to_display(f"\n\nUsuario:\n\n {user_input}\n\nAsistente:\n\n ")
             self.stop_button["state"] = "normal"
             Thread(target=self.infer_thread, daemon=True).start()
 
@@ -120,11 +120,11 @@ class LlamaGUI:
 
 # Bloque principal
 if __name__ == "__main__":
-    model_path = "./models/llama2_7b_chat_uncensored.Q8_0.gguf"
+    model_path = "models/llama2_7b_chat_uncensored.Q8_0.gguf"
     llama_assistant = LlamaAssistant(model_path=model_path)
 
     root = tk.Tk()
-    root.geometry("700x680")  # Ajusta el tamaño de la ventana según tus necesidades
+    root.geometry("700x1050")  # Ajusta el tamaño de la ventana según tus necesidades
     llama_gui = LlamaGUI(root, llama_assistant)
 
     root.mainloop()

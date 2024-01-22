@@ -2,13 +2,13 @@ import tkinter as tk
 from tkinter import scrolledtext
 from threading import Thread
 import queue
-from llama2 import LlamaAssistant
+from gui.llama2 import LlamaAssistant
 
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from threading import Thread
 import queue
-from llama2 import LlamaAssistant
+from gui.llama2 import LlamaAssistant
 
 class LlamaGUI:
     def __init__(self, master, llama_assistant):
@@ -103,7 +103,7 @@ class LlamaGUI:
 
 # Bloque principal
 if __name__ == "__main__":
-    model_path = "./models/llama2_7b_chat_uncensored.Q8_0.gguf"
+    model_path = "../models/llama2_7b_chat_uncensored.Q8_0.gguf"
     llama_assistant = LlamaAssistant(model_path=model_path)
 
     root = tk.Tk()

@@ -1,0 +1,44 @@
+import discord
+from discord.ext import commands
+from llama2 import LlamaAssistant
+
+# Carga las variables de entorno desde el archivo .env
+DISCORD_TOKEN = "MTE5ODgyNTM3NTQ4MDkzODQ5Ng.Go62Dy.gcwLSvZYajH3BO3DFtehX4fNe348zN1a5TRZJs"
+GUILD = "tu_id_de_guild_aqui"  # Puedes omitir esto si solo estás en un servidor
+
+# Inicializa el cliente de Discord con comandos
+intents = discord.Intents.default()
+intents.messages = True
+intents.guilds = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+# Inicializa el asistente LlamaAssistant
+llama_assistant = LlamaAssistant("models/llama2_7b_chat_uncensored.Q8_0.gguf")
+
+# Define el evento cuando el bot está listo
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} has connected to Discord!')
+
+# Define el evento cuando el bot recibe un mensaje
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    # Procesa el mensaje con LlamaAssistant si no es un comando
+    if message.content.startswith('!'):
+        await bot.process_commands(message)
+    else:
+        llama_assistant.add_user_input(message.content)
+        llama_assistant.get_assistant_response(message.channel.send)
+
+# Define un comando para terminar la conversación con el asistente
+@bot.command(name='terminar')
+async def terminar(ctx):
+    llama_assistant.clear_context()
+    await ctx.send('¡Hasta otra!')
+
+# Inicia la conexión al servidor de Discord
+bot.run(DISCORD_TOKEN)
