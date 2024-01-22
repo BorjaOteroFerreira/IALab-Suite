@@ -49,12 +49,9 @@ def ask():
     
     # Obtener la respuesta del asistente
     response = llama_assistant.get_assistant_response()
-    
     # Enviar la respuesta a través del socket a todos los clientes en la sala
     socketio.emit("response", {"role": "assistant", "content": response}, room=room_id)
-
     return jsonify({"status": "success"})
-
 
 @socketio.on('join')
 def handle_join(data):

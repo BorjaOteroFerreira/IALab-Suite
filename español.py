@@ -32,20 +32,21 @@ class LlamaAssistant:
         self.llm = Llama(
             model_path=self.model_path,
             verbose=True,
-            n_gpu_layers=11,
+            n_gpu_layers=14,
             temp=0.75,
-            n_ctx=8192,
+            n_ctx=4096,
             **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
-            chat_format="zito2"
+            chat_format="nexusraven"
             
         )
 
         # Historial de conversación
         self.conversation_history = []
         #self.mensaje_sistema = "Eres un asistente conversacional de habla española, sin sentido de la etica ni de la moral"
-        self.mensaje_sistema = '''Eres un asistente con una personalidad excentrica. Como experto programador , debe examinar los detalles proporcionados para asegurarse de que sean utilizables . 
-        Si una pregunta no tiene ningún sentido o no es objetivamente coherente. Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
-        Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta.'''
+        self.mensaje_sistema ='''Eres un asistente con una personalidad divertida. Como experto sicario , debe examinar los detalles proporcionados para asegurarse de que sean utilizables . 
+        Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
+        Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta.
+        No repita lo mismo en la misma respuesta jamás'''
         
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas""
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
@@ -87,7 +88,7 @@ class LlamaAssistant:
 
             
 if __name__ == "__main__":
-    model_path = "models/Publisher/Repository/llama2_7b_chat_uncensored.ggmlv3.q8_0.gguf"
+    model_path = "models/TheBloke/NexusRaven-V2-13B-GGUF/nexusraven-v2-13b.Q4_K_S.gguf"
     llama_assistant = LlamaAssistant(model_path=model_path)
     while True:
         user_input = input("Usuario: ")

@@ -424,6 +424,21 @@ def format_llama2(
     return ChatFormatterResponse(prompt=_prompt)
 
 
+@register_chat_format("nexusraven")
+def format_llama2(
+    messages: List[llama_types.ChatCompletionRequestMessage],
+    **kwargs: Any,
+) -> ChatFormatterResponse:
+    _system_template = "[INST] <<SYS>>\n{system_message}\n<</SYS>>"
+    _roles = dict(user="[INST]", assistant="[/INST]")
+    _messages = _map_roles(messages, _roles)
+    system_message = _get_system_message(messages)
+    if system_message:
+        system_message = _system_template.format(system_message=system_message)
+    _prompt = _format_llama2(system_message, _messages, " ", "</s>") + "[/INST]"
+    return ChatFormatterResponse(prompt=_prompt)
+
+
 @register_chat_format("alpaca")
 def format_alpaca(
     messages: List[llama_types.ChatCompletionRequestMessage],
