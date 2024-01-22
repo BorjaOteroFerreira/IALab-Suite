@@ -1,12 +1,20 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from llama2 import LlamaAssistant
+from español import LlamaAssistant
 from flask_cors import CORS
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'WindowsApesta'
 socketio = SocketIO(app, ping_timeout=600, ping_interval=60, cors_allowed_origins="*")
-model_path = "./models/llama-2-7b-chat.Q8_0.gguf"
-llama_assistant = LlamaAssistant(model_path=model_path)
+
+model_path = "models/llama2_7b_chat_uncensored.Q8_0.gguf"
+llama_assistant = None
+
+@app.before_request
+def before_first_request():
+    global llama_assistant
+    if llama_assistant is None:
+        llama_assistant = LlamaAssistant(model_path=model_path)
 
 @app.after_request
 def add_header(response):
@@ -30,6 +38,8 @@ def clear_context():
 
 @app.route("/ask", methods=["POST"])
 def ask():
+
+    # Obtener la entrada del usuario desde la solicitud
     user_input = request.form["user_input"]
     room_id = request.form.get("room_id")  # Obtener el ID de la sala desde el formulario
     
@@ -39,10 +49,8 @@ def ask():
     
     # Obtener la respuesta del asistente
     response = llama_assistant.get_assistant_response()
-    
     # Enviar la respuesta a través del socket a todos los clientes en la sala
     socketio.emit("response", {"role": "assistant", "content": response}, room=room_id)
-
     return jsonify({"status": "success"})
 
 @socketio.on('join')
@@ -58,4 +66,4 @@ def handle_leave(data):
     print(f"Cliente {request.sid} salió de la sala {room_id}")
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=8080, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=False)

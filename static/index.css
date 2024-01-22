@@ -3,8 +3,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f9f9f9;
-    height: 100vh;
+    height: 100%;
 }
+
 
 #chat-container {
     max-width: 800px;
@@ -14,7 +15,7 @@ body {
     background-size: cover;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
 }
 
 #chat-messages-container {
@@ -42,11 +43,12 @@ pre code {
 .message-container {
     margin: 10px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     margin-bottom: 15px;
     clear: both;
     height: 65%;
+
 }
 
 #chat-header {
@@ -78,7 +80,7 @@ pre code {
     background-color: #b9f6ca;
     border-radius: 8px;
     padding: 10px;
-    max-width: 80%;
+    max-width: 70%;
     word-wrap: break-word;
 }
 
@@ -90,6 +92,39 @@ pre code {
     border-radius: 4px;
     margin-top: 10px;
     box-sizing: border-box;
+   
+}
+
+
+/* Estilos para la imagen circular del asistente */
+/* Estilos para el contenedor del mensaje del asistente */
+.assistant-message {
+    display: flex;
+    align-items: flex-start; /* Alinear elementos al principio */
+    margin-bottom: 15px;
+    clear: both;
+    height: auto; /* Ajusta la altura automáticamente */
+}
+
+.profile-image {
+    width: 40px; /* Ajusta según tus necesidades */
+    height: 40px; /* Ajusta según tus necesidades */
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 10px; /* Espaciado entre la imagen y el bocadillo */
+}
+
+.profile-image img {
+    width: 100%;
+    height: auto;
+}
+
+.message-content {
+    background-color: #b9f6ca;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
 }
 
 #sendButton {
@@ -149,10 +184,16 @@ body.night-mode {
     
 }
 
+#userImput.night-mode{
+    background-color:#444;
+   
+}
+
 #footer.night-mode {
-    background-color: #444;
+    background-color: #2C2C2C;
     border-top: 1px solid #666;
 }
+
 
 #sendButton.night-mode {
     background-color: #007ACC;;

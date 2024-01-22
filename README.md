@@ -8,7 +8,7 @@ Instalar dependencias
         pip install Flask
         pip install flask_socketio
         pip instal CORS
-        pip install llama-cpp-python (mac y linux)
+        pip install llama-cpp-python (mac)
 
   <h2>llama-cpp-python en windows</h2>
 
