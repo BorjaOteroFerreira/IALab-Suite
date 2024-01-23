@@ -30,7 +30,7 @@ class LlamaAssistant:
             model_path=self.model_path,
             verbose=True,
             n_gpu_layers=14,
-            temp=0.81,
+            temp=0.95,
             n_ctx=4096,
             **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
             chat_format="tb-uncensored"

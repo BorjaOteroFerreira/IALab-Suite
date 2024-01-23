@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 from threading import Thread
 import queue
-from llama2 import LlamaAssistant
+from stream.llama2 import LlamaAssistant
 
 class LlamaGUI:
     def __init__(self, master, llama_assistant):

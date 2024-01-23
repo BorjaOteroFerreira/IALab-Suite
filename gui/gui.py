@@ -1,4 +1,4 @@
-from llama2 import LlamaAssistant
+from stream.llama2 import LlamaAssistant
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from threading import Thread
