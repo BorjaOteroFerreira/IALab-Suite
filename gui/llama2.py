@@ -5,9 +5,9 @@ from llama_cpp import Llama
 class LlamaAssistant:
 
     MAX_CONTEXT_TOKENS = 2048
-    MAX_ASSISTANT_TOKENS = 2000
+    MAX_ASSISTANT_TOKENS = 1024
 
-    def __init__(self, model_path):
+    def __init__(self, model_path,chat_format):
         """
         Inicializa el asistente Llama.
 
@@ -15,11 +15,11 @@ class LlamaAssistant:
         - model_path (str): Ruta al modelo Llama.
         """
         self.is_processing = False
-        self.mensaje_sistema = '''Eres un asistente con una personalidad divertida. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
-        Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
+        self.mensaje_sistema = '''Eres un asistente con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+        Si no sabe la respuesta a una pregunta, no compartas información falsa. Manten tus respuestas en español y no te desvíes de la pregunta.
         Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta.
-        No repita lo mismo en la misma respuesta jamás'''
-
+        '''
+        self.chat_format=chat_format
         self.model_path = model_path
         self.cuda_options = {
             "device": "cuda",
@@ -29,6 +29,7 @@ class LlamaAssistant:
             "device": "metal",
             "metal_device_id": 0,
         }
+
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':
@@ -39,10 +40,10 @@ class LlamaAssistant:
         self.llm = Llama(
             model_path=self.model_path,
             verbose=True,
-            n_gpu_layers=11,
-            n_ctx=2048,
+            n_gpu_layers=1,
+            n_ctx=4096,
             **self.device_options,
-            chat_format="zito2",
+            chat_format=self.chat_format,
             temp=0.81,
         )
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
@@ -55,8 +56,10 @@ class LlamaAssistant:
         Parámetros:
         - user_input (str): Entrada del usuario.
         """
-        self.conversation_history.append({"role": "user", "content": user_input})
+        
         self.update_context_tokens()
+        self.conversation_history.append({"role": "user", "content": user_input})
+        
 
     def get_context_fraction(self):
         """
@@ -66,7 +69,7 @@ class LlamaAssistant:
         float: Fracción de tokens de contexto utilizados.
         """
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
-        return min(1.0, total_tokens / self.MAX_CONTEXT_TOKENS)
+        return min(1.0, total_tokens / self.MAX_CONTEXT_TOKENS * 7.5)
 
     def update_context_tokens(self):
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
@@ -74,6 +77,7 @@ class LlamaAssistant:
             removed_message = self.conversation_history.pop(0)
             total_tokens -= len(removed_message["content"].split())
             self.context_window_start += 1
+    
 
     def get_assistant_response(self, message_queue):
         """
@@ -81,13 +85,11 @@ class LlamaAssistant:
 
         Parámetros:
         - message_queue: Cola de mensajes para comunicarse con otros componentes.
-
-        Nota: Se han eliminado las sentencias de impresión innecesarias para la versión final.
         """
         if not self.is_processing:
             last_user_input_time = time.time()
             response = ""
-
+            message_queue.put({"role": "assistant", "content": "\n\n Asistente: \b"})
             for chunk in self.llm.create_chat_completion(messages=self.conversation_history[self.context_window_start:], max_tokens=self.MAX_ASSISTANT_TOKENS, stream=True):
                 if 'content' in chunk['choices'][0]['delta']:
                     response_chunk = chunk['choices'][0]['delta']['content']
@@ -97,6 +99,7 @@ class LlamaAssistant:
             self.is_processing = False
             elapsed_time = round(time.time() - last_user_input_time, 2)
             print(f" | {elapsed_time}s")
+            print(response)
 
     def clear_context(self):
         """
@@ -109,7 +112,7 @@ class LlamaAssistant:
             print(mensaje)
 
 # Ejemplo de uso:
-# llama_assistant = LlamaAssistant("ruta/al/modelo")
+# llama_assistant = LlamaAssistant("ruta/al/modelo","chat_format="formato_chat")
 # llama_assistant.add_user_input("Hola, ¿cómo estás?")
 # llama_assistant.get_assistant_response(message_queue)
 # llama_assistant.clear_context()

@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'WindowsApesta'
 socketio = SocketIO(app, ping_timeout=600, ping_interval=60, cors_allowed_origins="*")
 
-model_path = "models/llama2_7b_chat_uncensored.Q8_0.gguf"
+model_path = "models/TheBloke/llama2_7b_chat_uncensored-GGUF/llama2_7b_chat_uncensored.Q8_0.gguf"
 llama_assistant = None
 
 @app.before_request
@@ -38,15 +38,12 @@ def clear_context():
 
 @app.route("/ask", methods=["POST"])
 def ask():
-
     # Obtener la entrada del usuario desde la solicitud
     user_input = request.form["user_input"]
     room_id = request.form.get("room_id")  # Obtener el ID de la sala desde el formulario
-    
     # Añadir input del usuario al asistente
     llama_assistant.add_user_input(user_input)
     print(user_input)
-    
     # Obtener la respuesta del asistente
     response = llama_assistant.get_assistant_response()
     # Enviar la respuesta a través del socket a todos los clientes en la sala

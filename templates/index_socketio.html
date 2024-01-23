@@ -10,7 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
 </head>
-
 <body>
     <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
     <button id="nightModeButton" onclick="toggleNightMode()">Lunita</button>
@@ -23,27 +22,22 @@
         <textarea  id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)" ></textarea>
         <button id="sendButton" onclick="askAssistant()">Enviar</button>
     </div>
-
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         var content;
-
         function askAssistant() {
             var userInput = document.getElementById("userInput").value;
             if (userInput.trim() === "") {
                 return; // No enviar si el input está vacío
             }
-
             // Añadir mensaje del usuario al contenedor de mensajes
             var chatMessages = document.getElementById("chat-messages");
             chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'><strong>Yo</strong><br> ${userInput}</div></div>`;
             var newMessage = chatMessages.lastElementChild;
             newMessage.scrollIntoView();
-
             // Deshabilitar el botón y vaciar el input
             document.getElementById("sendButton").disabled = true;
             document.getElementById("userInput").value = "";
-
             userInput = "\n" + userInput + "\n";
 
             fetch("/ask", {
@@ -57,10 +51,8 @@
             .then(data => {
                 // Habilitar el botón después de recibir la respuesta
                 document.getElementById("sendButton").disabled = false;
-
                 // Resaltar el código en toda la respuesta
                 var formattedResponse = highlightCodeInResponse(data.content);
-
                 // Mostrar la respuesta en el chat
                 displayAssistantResponse(formattedResponse, data.is_code);
             })
@@ -68,30 +60,23 @@
                 console.error("Error en la solicitud POST /ask:", error);
             });
         }
-
-
         function highlightCodeInResponse(response) {
             // Buscar y reemplazar todas las instancias de comillas triples con <pre><code>
-            var formattedResponse = response.replace(/```([\s\S]*?)```/g, function(match, codeContentWithLanguage) {
-            var codeContentLines = codeContentWithLanguage.split('\n');
-            var language = codeContentLines[0].trim();
-            var codeContent = codeContentLines.slice(1).join('\n').trim();
-
-            return `<pre><code class="${language}">${codeContent}</code></pre>`;
-        });
-
+            var formattedResponse = response.replace(/```([\s\S]*?)```/g, function(match, codeContentWithLanguage){
+                var codeContentLines = codeContentWithLanguage.split('\n');
+                var language = codeContentLines[0].trim();
+                var codeContent = codeContentLines.slice(1).join('\n').trim();
+                return `<pre><code class="${language}">${codeContent}</code></pre>`;
+            });
             // Resaltar el código utilizando Highlight.js
             var codeContainer = document.createElement("div");
             codeContainer.innerHTML = formattedResponse;
-
             var codeBlocks = codeContainer.querySelectorAll("pre code");
             codeBlocks.forEach(function (codeBlock) {
                 hljs.highlightBlock(codeBlock);
             });
-
             return codeContainer.innerHTML;
         }
-
         function displayAssistantResponse(formattedResponse, isCode) {
             var chatMessages = document.getElementById("chat-messages");
             var chatMessagesContainer = document.getElementById("chat-messages-container");
@@ -99,14 +84,12 @@
             // Hacer scroll hacia abajo
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
         }
-
         socket.on('response', function (data) {
             console.log("Recibiendo respuesta:", data);
             var chatMessages = document.getElementById("chat-messages");
             content = data.content;
             formattedResponse = content.replace("/", "").replace(">", "");
-
-          // Buscar y reemplazar en pares de comillas triples
+            //Buscar y reemplazar en pares de comillas triples
             var regex = /```([\s\S]*?)```/g;
             var matches = formattedResponse.match(regex);
 
@@ -118,14 +101,11 @@
                     formattedResponse = formattedResponse.replace(tripleBackticks, replacement);
                 }
             }
-                
             //remplazar saltos de línea por <br> en partes fuera de <textarea>
             formattedResponse = formattedResponse.replace(/(?!<textarea>)(\n)(?![^<]*<\/textarea>)/g, '<br>');
             chatMessages.innerHTML += `<div class="message-container assistant-message"><div class="profile-image">
                                      <img src="{{ url_for('static', filename='profile.gif') }}" alt="Profile Image">
                                      </div><div class="message-content"><strong>Asistente</strong><br> ${formattedResponse}</div></div>`;
-
-            
             // Hacer scroll hacia abajo
             var chatMessagesContainer = document.getElementById("chat-messages-container");
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
@@ -133,7 +113,6 @@
             document.body.style.overflow = 'auto';
             newMessage.scrollIntoView();
         });
-
         function clear_context() {
             // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
             fetch("/clear_context", {
@@ -152,14 +131,12 @@
                 console.error("Error al limpiar el contexto:", error);
             });
         }
-
         function handleKeyPress(event) {
             if (event.key === "Enter") {
                 event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
                 askAssistant();
             }
         }
-
         function toggleNightMode() {
             var body = document.body;
             var chatContainer = document.getElementById("chat-container");
@@ -170,7 +147,6 @@
             var sendButton = document.getElementById("sendButton");
             var inputMessage = document.getElementById("userInput");
 
-            
             body.classList.toggle("night-mode");
             chatContainer.classList.toggle("night-mode");
             clearContextButton.classList.toggle("night-mode");
@@ -179,7 +155,6 @@
             sendButton.classList.toggle("night-mode");
             inputMessage.style.backgroundColor = (body.classList.contains("night-mode")) ? "#444" : "#FFFFFF";
             inputMessage.style.color = (body.classList.contains("night-mode")) ? "#FFFFFF" : "#444";
-
 
             Array.from(messageContainers).forEach(function(container) {
                 container.classList.toggle("night-mode");
