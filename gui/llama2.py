@@ -15,9 +15,8 @@ class LlamaAssistant:
         - model_path (str): Ruta al modelo Llama.
         """
         self.is_processing = False
-        self.mensaje_sistema = '''Eres un asistente con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+        self.mensaje_sistema = '''Eres un asistente con una personalidad amable y honesta. Como experto programador, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
         Si no sabe la respuesta a una pregunta, no compartas información falsa. Manten tus respuestas en español y no te desvíes de la pregunta.
-        Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta.
         '''
         self.chat_format=chat_format
         self.model_path = model_path
@@ -49,6 +48,14 @@ class LlamaAssistant:
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
         self.context_window_start = 0  # Iniciamos desde el mensaje del sistema en la ventana de contexto móvil
 
+    def count_tokens(self, text):
+        """
+        Cuenta los tokens en el texto dado utilizando la lógica interna de Llama.
+        """
+        tokens = self.llm.tokenize(self,text)
+        print(tokens)
+        return len(tokens)
+
     def add_user_input(self, user_input):
         """
         Agrega la entrada del usuario al historial de conversación.
@@ -78,8 +85,7 @@ class LlamaAssistant:
             total_tokens -= len(removed_message["content"].split())
             self.context_window_start += 1
     
-
-    def get_assistant_response(self, message_queue):
+    def get_assistant_response_stream(self, message_queue):
         """
         Obtiene la respuesta del asistente.
 
@@ -100,6 +106,22 @@ class LlamaAssistant:
             elapsed_time = round(time.time() - last_user_input_time, 2)
             print(f" | {elapsed_time}s")
             print(response)
+
+    def get_assistant_response(self):
+        last_user_input_time = time.time()
+
+        # Realizar la inferencia
+        output = self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=4096)
+        print(output)
+        # Obtener la primera respuesta generada por el modelo
+        response = output['choices'][0]['message']['content']
+        # Eliminar "### RESPONSE:" de la respuesta
+        #response = response.replace("### RESPONSE:", "")
+        # Añadir la respuesta al historial de la conversación
+        self.conversation_history.append({"role": "assistant", "content": response})
+        elapsed_time = round(time.time() - last_user_input_time, 2)
+        response += " | " + str(elapsed_time) + "s"
+        return response
 
     def clear_context(self):
         """

@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+#chat-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#chat-messages {
+    height: 300px;
+    overflow-y: scroll;
+    border-bottom: 1px solid #ccc;
+}
+
+#user-input-container {
+    display: flex;
+    margin-top: 10px;
+}
+
+#user-input {
+    flex: 1;
+    padding: 5px;
+}
+
+button {
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.chat-bubble {
+    background-color: #DCF8C6; /* Color de fondo del bocadillo del asistente */
+    color: #000; /* Color del texto del bocadillo del asistente */
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+}
