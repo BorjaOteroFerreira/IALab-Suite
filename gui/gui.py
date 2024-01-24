@@ -1,14 +1,8 @@
-import tkinter as tk
-from tkinter import scrolledtext
-from threading import Thread
-import queue
-from gui.llama2 import LlamaAssistant
-
+from stream.llama2 import LlamaAssistant
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 from threading import Thread
 import queue
-from gui.llama2 import LlamaAssistant
 
 class LlamaGUI:
     def __init__(self, master, llama_assistant):
@@ -103,8 +97,9 @@ class LlamaGUI:
 
 # Bloque principal
 if __name__ == "__main__":
-    model_path = "../models/llama2_7b_chat_uncensored.Q8_0.gguf"
-    llama_assistant = LlamaAssistant(model_path=model_path)
+    model_path = "models/TheBloke/NexusRaven-V2-13B-GGUF/nexusraven-v2-13b.Q4_K_S.gguf"
+    chat_format="llama-2"
+    llama_assistant = LlamaAssistant(model_path=model_path,chat_format=chat_format)
 
     root = tk.Tk()
     llama_gui = LlamaGUI(root, llama_assistant)

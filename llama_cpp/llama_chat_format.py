@@ -424,21 +424,6 @@ def format_llama2(
     return ChatFormatterResponse(prompt=_prompt)
 
 
-@register_chat_format("nexusraven")
-def format_llama2(
-    messages: List[llama_types.ChatCompletionRequestMessage],
-    **kwargs: Any,
-) -> ChatFormatterResponse:
-    _system_template = "[INST] <<SYS>>\n{system_message}\n<</SYS>>"
-    _roles = dict(user="[INST]", assistant="[/INST]")
-    _messages = _map_roles(messages, _roles)
-    system_message = _get_system_message(messages)
-    if system_message:
-        system_message = _system_template.format(system_message=system_message)
-    _prompt = _format_llama2(system_message, _messages, " ", "</s>") + "[/INST]"
-    return ChatFormatterResponse(prompt=_prompt)
-
-
 @register_chat_format("alpaca")
 def format_alpaca(
     messages: List[llama_types.ChatCompletionRequestMessage],
@@ -452,18 +437,47 @@ def format_alpaca(
     _prompt = _format_add_colon_two(system_message, _messages, _sep, _sep2)
     return ChatFormatterResponse(prompt=_prompt)
 
-@register_chat_format("zito")
-def format_alpaca(
+@register_chat_format("guanaco")
+def format_guanaco(
     messages: List[llama_types.ChatCompletionRequestMessage],
     **kwargs: Any,
 ) -> ChatFormatterResponse:
+    system_template = "### Instruction:\n{system_message}"
+    default_system_message = "The prompt below is a question to answer, a task to complete, or a conversation to respond to; decide which and write an appropriate response."
+    _system_message = _get_system_message(messages)
+    _system_message = (
+        _system_message if _system_message != "" else default_system_message
+    )
+    system_message = system_template.format(system_message=_system_message)
+    _roles = dict(user="### HUMAN:", assistant="### ASSISTANT:")
+    _sep = "\n\n"
+    _stop = "###"
+    system_message = _system_message
+    _messages = _map_roles(messages, _roles)
+    _messages.append((_roles["assistant"], None))
+    _prompt = _format_add_colon_single(system_message, _messages, _sep)
+    return ChatFormatterResponse(prompt=_prompt, stop=_stop)
+
+@register_chat_format("tb-uncensored")
+def format_uncensored(
+    messages: List[llama_types.ChatCompletionRequestMessage],
+    **kwargs: Any,
+) -> ChatFormatterResponse:
+    system_template = "### Instruction:\n{system_message}"
+    default_system_message = "The prompt below is a question to answer, a task to complete, or a conversation to respond to; decide which and write an appropriate response."
+    _system_message = _get_system_message(messages)
+    _system_message = (
+        _system_message if _system_message != "" else default_system_message
+    )
+    system_message = system_template.format(system_message=_system_message)
     _roles = dict(user="### HUMAN:", assistant="### RESPONSE:")
     _sep = "\n\n"
-    _sep2 = " "
-    system_message = _get_system_message(messages)
+    _stop = "###"
+    system_message = _system_message
     _messages = _map_roles(messages, _roles)
-    _prompt = _format_add_colon_two(system_message, _messages, _sep, _sep2)
-    return ChatFormatterResponse(prompt=_prompt)
+    _messages.append((_roles["assistant"], None))
+    _prompt = _format_add_colon_single(system_message, _messages, _sep)
+    return ChatFormatterResponse(prompt=_prompt, stop=_stop)
 
 @register_chat_format("qwen")
 def format_qwen(
@@ -607,26 +621,7 @@ def format_snoozy(
     _prompt = _format_add_colon_single(system_message, _messages, _sep)
     return ChatFormatterResponse(prompt=_prompt, stop=_stop)
 
-@register_chat_format("zito2")
-def format_snoozy(
-    messages: List[llama_types.ChatCompletionRequestMessage],
-    **kwargs: Any,
-) -> ChatFormatterResponse:
-    system_template = "### Instruction:\n{system_message}"
-    default_system_message = "The prompt below is a question to answer, a task to complete, or a conversation to respond to; decide which and write an appropriate response."
-    _system_message = _get_system_message(messages)
-    _system_message = (
-        _system_message if _system_message != "" else default_system_message
-    )
-    system_message = system_template.format(system_message=_system_message)
-    _roles = dict(user="### HUMAN:", assistant="### RESPONSE:")
-    _sep = "\n\n"
-    _stop = "###"
-    system_message = _system_message
-    _messages = _map_roles(messages, _roles)
-    _messages.append((_roles["assistant"], None))
-    _prompt = _format_add_colon_single(system_message, _messages, _sep)
-    return ChatFormatterResponse(prompt=_prompt, stop=_stop)
+
 
 
 @register_chat_format("phind")

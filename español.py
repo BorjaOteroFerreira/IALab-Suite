@@ -2,7 +2,6 @@ import time
 import platform  # Importa la biblioteca platform
 from llama_cpp import Llama
 
-
 class LlamaAssistant:
     def __init__(self, model_path):
         # Ruta al modelo local
@@ -13,13 +12,11 @@ class LlamaAssistant:
             "device": "cuda",
             "cuda_device_id": 0,  # El ID del dispositivo CUDA, ajusta según sea necesario
         }
-
         # Configuración específica para Metal en macOS
         self.metal_options = {
             "device": "metal",
             "metal_device_id": 0,
         }
-
         # Determina el sistema operativo actual y configura las opciones correspondientes
         if platform.system() == 'Windows':
             self.device_options = self.cuda_options
@@ -33,31 +30,27 @@ class LlamaAssistant:
             model_path=self.model_path,
             verbose=True,
             n_gpu_layers=14,
-            temp=0.75,
+            temp=0.95,
             n_ctx=4096,
             **self.device_options,  # Usa las opciones correspondientes según el sistema operativo
-            chat_format="nexusraven"
-            
+            chat_format="tb-uncensored"
         )
-
         # Historial de conversación
         self.conversation_history = []
+
         #self.mensaje_sistema = "Eres un asistente conversacional de habla española, sin sentido de la etica ni de la moral"
-        self.mensaje_sistema ='''Eres un asistente con una personalidad divertida. Como experto sicario , debe examinar los detalles proporcionados para asegurarse de que sean utilizables . 
+        self.mensaje_sistema ='''Eres un asistente con una personalidad divertida. Como experto programador , debe examinar los detalles proporcionados para asegurarse de que sean utilizables . 
         Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
         Si la respuesta a la pregunta o consulta formulada está completa, finalice su respuesta. Mantenga la respuesta precisa y no omita detalles relacionados con la consulta.
         No repita lo mismo en la misma respuesta jamás'''
-        
         #mensaje_sistema = "Eres un experto entrenador de futbol español que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas""
         #mensaje_sistema = "Eres un asistente experto en criptos que solo sabe hablar en español, ademas quiero que uses emoticonos en tus respuestas pero uno o dos sin pasarse"
-
+        
         self.conversation_history.append({"role": "system", "content": self.mensaje_sistema})
 
     def add_user_input(self, user_input):
         # Añadir input del usuario al historial de la conversación
         self.conversation_history.append({"role": "user", "content": user_input})
-
-
 
     def get_assistant_response(self):
         last_user_input_time = time.time()
@@ -65,13 +58,10 @@ class LlamaAssistant:
         # Realizar la inferencia
         output = self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=4096)
         print(output)
-
         # Obtener la primera respuesta generada por el modelo
         response = output['choices'][0]['message']['content']
-
         # Eliminar "### RESPONSE:" de la respuesta
         #response = response.replace("### RESPONSE:", "")
-
         # Añadir la respuesta al historial de la conversación
         self.conversation_history.append({"role": "assistant", "content": response})
         elapsed_time = round(time.time() - last_user_input_time, 2)
@@ -85,10 +75,8 @@ class LlamaAssistant:
         for mensaje in self.conversation_history: 
             print(mensaje)
 
-
-            
 if __name__ == "__main__":
-    model_path = "models/TheBloke/NexusRaven-V2-13B-GGUF/nexusraven-v2-13b.Q4_K_S.gguf"
+    model_path = "models/TheBloke/llama2_7b_chat_uncensored-GGUF/llama2_7b_chat_uncensored.Q8_0.gguf"
     llama_assistant = LlamaAssistant(model_path=model_path)
     while True:
         user_input = input("Usuario: ")
@@ -97,7 +85,6 @@ if __name__ == "__main__":
 
         # Añadir input del usuario al historial de la conversación
         llama_assistant.add_user_input(user_input)
-
         # Obtener la respuesta del asistente
         response = llama_assistant.get_assistant_response()
         # Imprimir la respuesta

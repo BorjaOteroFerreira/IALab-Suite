@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+    <title>Portfolio Inteligente</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+</head>
+<body>
+    <button id="clearContextButton" onclick="clear_context()">Limpiar Contexto</button>
+    <button id="nightModeButton" onclick="toggleNightMode()">Lunita</button>
+    <div id="chat-container">
+        <div id="chat-messages-container">
+            <div id="chat-messages"></div>
+        </div>
+    </div>
+    <div id="footer">
+        <textarea  id="userInput" placeholder="Ingresa tu mensaje" onkeydown="handleKeyPress(event)" ></textarea>
+        <button id="sendButton" onclick="askAssistant()">Enviar</button>
+    </div>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var content;
+        function askAssistant() {
+            var userInput = document.getElementById("userInput").value;
+            if (userInput.trim() === "") {
+                return; // No enviar si el input está vacío
+            }
+
+            // Añadir mensaje del usuario al contenedor de mensajes
+            var chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += `<div class="message user-message"><div class='message-content'><strong>Yo</strong><br>${userInput}</div></div>`;
+            var newMessage = chatMessages.lastElementChild;
+            newMessage.scrollIntoView();
+
+            // Deshabilitar el botón y vaciar el input
+            document.getElementById("sendButton").disabled = true;
+            document.getElementById("userInput").value = "";
+            userInput = "\n" + userInput + "\n";
+
+            fetch("/ask", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `user_input=${encodeURIComponent(userInput)}`,
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Habilitar el botón después de recibir la respuesta
+                document.getElementById("sendButton").disabled = false;
+
+                // Actualizar el área de mensajes con la respuesta del asistente
+                var chatMessages = document.getElementById("chat-messages");
+                chatMessages.innerHTML += `<div class="assistant-message">${data}</div>`;
+                var newMessage = chatMessages.lastElementChild;
+                newMessage.scrollIntoView();
+            })
+            .catch(error => {
+                console.error("Error en la solicitud POST /ask:", error);
+            });
+        }
+
+        function highlightCodeInResponse(response) {
+            // Buscar y reemplazar todas las instancias de comillas triples con <pre><code>
+            var formattedResponse = response.replace(/```([\s\S]*?)```/g, function(match, codeContentWithLanguage){
+                var codeContentLines = codeContentWithLanguage.split('\n');
+                var language = codeContentLines[0].trim();
+                var codeContent = codeContentLines.slice(1).join('\n').trim();
+                return `<pre><code class="${language}">${codeContent}</code></pre>`;
+            });
+            // Resaltar el código utilizando Highlight.js
+            var codeContainer = document.createElement("div");
+            codeContainer.innerHTML = formattedResponse;
+            var codeBlocks = codeContainer.querySelectorAll("pre code");
+            codeBlocks.forEach(function (codeBlock) {
+                hljs.highlightBlock(codeBlock);
+            });
+            return codeContainer.innerHTML;
+        }
+        function displayAssistantResponse(formattedResponse, isCode) {
+            var chatMessages = document.getElementById("chat-messages");
+            var chatMessagesContainer = document.getElementById("chat-messages-container");
+            chatMessages.innerHTML += `<div class="${messageContainerClass}">Asistente<br>${formattedResponse}</div>`;
+            // Hacer scroll hacia abajo
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('response', function (data) {
+            console.log("Recibiendo respuesta:", data);
+            
+            // Actualizar el área de mensajes con la respuesta del asistente
+            var chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += `<div class="assistant-message">${data.content}</div>`;
+            var newMessage = chatMessages.lastElementChild;
+            newMessage.scrollIntoView();
+        });
+        function clear_context() {
+            // Realizar la solicitud fetch al endpoint clear_context en el backend Flask
+            fetch("/clear_context", {
+                method: "POST",  // Puedes ajustar el método según lo que necesites en tu backend
+            })
+            .then(response => {
+                if (response.ok) {
+                    var chatMessages = document.getElementById("chat-messages");
+                    chatMessages.innerHTML = "";
+                    console.log("Contexto limpiado correctamente");
+                } else {
+                    throw new Error(`Error en la solicitud: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.error("Error al limpiar el contexto:", error);
+            });
+        }
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Evitar que se inserte una nueva línea en el campo de entrada
+                askAssistant();
+            }
+        }
+        function toggleNightMode() {
+            var body = document.body;
+            var chatContainer = document.getElementById("chat-container");
+            var clearContextButton = document.getElementById("clearContextButton");
+            var chatMessagesContainer = document.getElementById("chat-messages-container");
+            var messageContainers = document.getElementsByClassName("message-container");
+            var footer = document.getElementById("footer");
+            var sendButton = document.getElementById("sendButton");
+            var inputMessage = document.getElementById("userInput");
+
+            body.classList.toggle("night-mode");
+            chatContainer.classList.toggle("night-mode");
+            clearContextButton.classList.toggle("night-mode");
+            chatMessagesContainer.classList.toggle("night-mode");
+            footer.classList.toggle("night-mode");
+            sendButton.classList.toggle("night-mode");
+            inputMessage.style.backgroundColor = (body.classList.contains("night-mode")) ? "#444" : "#FFFFFF";
+            inputMessage.style.color = (body.classList.contains("night-mode")) ? "#FFFFFF" : "#444";
+
+            Array.from(messageContainers).forEach(function(container) {
+                container.classList.toggle("night-mode");
+            });
+        }
+    </script>
+</body>
+</html>

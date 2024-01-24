@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 from threading import Thread
 import queue
-from llama2 import LlamaAssistant
+from stream.llama2 import LlamaAssistant
 
 class LlamaGUI:
     def __init__(self, master, llama_assistant):
@@ -10,6 +10,7 @@ class LlamaGUI:
         self.llama_assistant = llama_assistant
         self.message_queue = queue.Queue()
         self.is_processing = False
+        self.stream_thread = None  # Variable para almacenar la referencia al hilo del stream
 
         master.title("Llama Assistant Chat")
 
@@ -25,24 +26,27 @@ class LlamaGUI:
 
         style.configure("TButton", padding=(10, 5, 10, 5), font=('Helvetica', 12), background=vscode_button_color, foreground=vscode_fg_color, borderwidth=0)
         style.configure("TEntry", padding=(5, 5, 5, 5), font=('Helvetica', 12), bg="1E1E1E", foreground="1E1E1E")
-        style.configure("TProgressbar", thickness=20,  troughrelief="flat", background="#1E1E1E", borderwidth=0)
+        style.configure("TProgressbar", thickness=20, troughrelief="flat", background="#1E1E1E", borderwidth=0, fg="#007ACC")
+
+        self.master.columnconfigure(1, weight=1)  # Columna del chat expandible
+        self.master.rowconfigure(1, weight=1)  # Fila del chat expandible
 
         self.progress_bar = ttk.Progressbar(master, orient="vertical", length=200, mode="determinate", style="TProgressbar")
-        self.progress_bar.pack(side="left", padx=5, pady=75)
+        self.progress_bar.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
 
-        self.chat_display = scrolledtext.ScrolledText(master, wrap=tk.WORD, width=100, height=70, bg=vscode_bg_color, fg=vscode_fg_color)
-        self.chat_display.pack(padx=10, pady=10)
+        self.chat_display = scrolledtext.ScrolledText(master, font=('Helvetica', 16,), wrap=tk.WORD, width=100, height=70, bg=vscode_bg_color, fg="#007ACC")
+        self.chat_display.grid(row=1, column=1, sticky="ew", padx=20, pady=10)
 
         self.user_input_entry = ttk.Entry(master, width=75)
-        self.user_input_entry.pack(padx=10, pady=5)
+        self.user_input_entry.grid(row=2, column=1, sticky="ew", padx=10, pady=5)
         self.user_input_entry.bind("<Return>", self.send_user_input)
 
         self.stop_button = ttk.Button(master, text="Detener Stream", command=self.stop_stream)
-        self.stop_button.pack(pady=5)
+        self.stop_button.grid(row=3, column=1, sticky="nsew", padx=10, pady=5)
         self.stop_button["state"] = "disabled"
 
         self.clear_button = ttk.Button(master, text="Limpiar Contexto", command=self.clear_context)
-        self.clear_button.pack(pady=5)
+        self.clear_button.grid(row=4, column=1, sticky="nsew", padx=10, pady=5)
 
         self.update_chat_display()
 
@@ -53,13 +57,14 @@ class LlamaGUI:
         else:
             self.llama_assistant.add_user_input(user_input)
             self.is_processing = True
-            self.add_message_to_display(f"\n\nUsuario:\n\n {user_input}\n\nAsistente:\n\n ")
+            self.add_message_to_display(f"\n\n Usuario:\b  {user_input}")
             self.stop_button["state"] = "normal"
-            Thread(target=self.infer_thread, daemon=True).start()
+            self.stream_thread = Thread(target=self.infer_thread, daemon=False)
+            self.stream_thread.start()
+           
 
     def stop_stream(self):
         self.is_processing = False
-        self.stop_button["state"] = "disabled"
         self.master.after(100, self.update_chat_display)
 
     def clear_context(self):
@@ -74,8 +79,9 @@ class LlamaGUI:
         self.progress_bar["value"] = 0
 
     def infer_thread(self):
-        self.llama_assistant.get_assistant_response(self.message_queue)
-        self.master.after(0, self.update_chat_display)
+        if self.is_processing == True:
+            self.llama_assistant.get_assistant_response(self.message_queue)
+            self.master.after(0, self.update_chat_display)
 
     def update_chat_display(self):
         while not self.message_queue.empty():
@@ -100,12 +106,10 @@ class LlamaGUI:
         self.master.after(100, self.update_chat_display)
 
     def get_context_color(self, fraction):
-        # Calcular el color de contexto basado en la fracción
-        # Puedes personalizar esta lógica según tus preferencias
-        red = int(255 * fraction)
-        green = int(255 * (1 - fraction))
-        blue = 0
-        return f"#{red:02X}{green:02X}{blue:02X}"
+   
+        return "#007ACC"
+    
+        
 
     def add_message_to_display(self, message):
         self.chat_display.config(state=tk.NORMAL)
@@ -114,14 +118,11 @@ class LlamaGUI:
         self.chat_display.config(state=tk.DISABLED)
         self.user_input_entry.delete(0, tk.END)
 
-    def infer_thread(self):
-        self.llama_assistant.get_assistant_response(self.message_queue)
-        self.master.after(0, self.update_chat_display)
-
 # Bloque principal
 if __name__ == "__main__":
-    model_path = "models/llama2_7b_chat_uncensored.Q8_0.gguf"
-    llama_assistant = LlamaAssistant(model_path=model_path)
+    model_path = "models/TheBloke/Guanaco-13B-Uncensored-GGUF/guanaco-13b-uncensored.Q5_K_M.gguf"
+    chat_format="guanaco"
+    llama_assistant = LlamaAssistant(model_path=model_path, chat_format=chat_format)
 
     root = tk.Tk()
     root.geometry("700x1050")  # Ajusta el tamaño de la ventana según tus necesidades
