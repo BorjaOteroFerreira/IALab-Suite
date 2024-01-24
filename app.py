@@ -14,7 +14,7 @@ class LlamaAssistant:
 
     def __init__(self, model_path, chat_format):
         self.is_processing = False
-        self.mensaje_sistema = '''Eres un asistente con una personalidad amable y honesta. Como experto en análisis de sentimientos, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+        self.mensaje_sistema = '''Eres un asistente en español con una personalidad amable y honesta. Como experto en programación y pentesting, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
         Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
         '''
         self.chat_format = chat_format
@@ -85,7 +85,27 @@ class LlamaAssistant:
         self.update_context_tokens()
         self.conversation_history.append({"role": "user", "content": user_input})
 
-    
+    def get_assistant_response_stream(self, message_queue):
+        """
+        Obtiene la respuesta del asistente.
+
+        Parámetros:
+        - message_queue: Cola de mensajes para comunicarse con otros componentes.
+        """
+        if not self.is_processing:
+            last_user_input_time = time.time()
+            response = ""
+            message_queue.put({"role": "assistant", "content": "\n\n Asistente: \b"})
+            for chunk in self.llm.create_chat_completion(messages=self.conversation_history[self.context_window_start:], max_tokens=self.MAX_ASSISTANT_TOKENS, stream=True):
+                if 'content' in chunk['choices'][0]['delta']:
+                    response_chunk = chunk['choices'][0]['delta']['content']
+                    response += response_chunk
+                    message_queue.put({"role": "assistant", "content": response_chunk})
+                    
+            self.is_processing = False
+            elapsed_time = round(time.time() - last_user_input_time, 2)
+            print(f" | {elapsed_time}s")
+            print(response)    
 
     def emit_assistant_response_stream(self, socketio):
         if not self.is_processing:
@@ -112,7 +132,18 @@ class LlamaAssistant:
     def clear_chat_history(self):
         socketio.emit('clear_chat', namespace='/test')
 
-llama_assistant = LlamaAssistant("models/llama-2-7b-chat.Q8_0.gguf", "llama-2")
+
+model_path="models/llama-2-7b-chat.Q8_0.gguf"
+chat_format="tb-uncensored" 
+llama_assistant = None       
+@app.before_request
+def before_first_request():
+    global llama_assistant
+    if llama_assistant is None:
+        llama_assistant = LlamaAssistant(model_path=model_path,chat_format=chat_format)
+
+
+
 
 @app.route('/')
 def index():
@@ -139,6 +170,7 @@ def unload_model():
     llama_assistant.unload_model()
     llama_assistant.clear_context()
     return 'Modelo desinstalado'
+
 
 def get_models_list(folder_path):
     models_list = []
