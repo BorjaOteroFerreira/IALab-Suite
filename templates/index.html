@@ -35,7 +35,8 @@
             border-radius: 5px;
             overflow-y: auto;
             max-height: calc(100vh - 120px);
-            margin-left:20%;
+            margin-left:10%;
+            margin-right:25%;
             position: relative;
         }
         #footer {
@@ -114,12 +115,40 @@
             color: #fff;
             white-space: nowrap; /* Evitar que el texto se desborde en varias líneas */
         }
+
+
+        @media (max-width: 767px) {
+            /* Estilos específicos para pantallas pequeñas (móviles) */
+
+            #sidebar {
+                display: none; /* Oculta la barra lateral en pantallas pequeñas */
+            }
+
+            #chat-container {
+                margin-left: 0; /* Ajusta el margen izquierdo para ocupar toda la pantalla */
+                margin-right: 0; /* Ajusta el margen derecho para ocupar toda la pantalla */
+                max-width: 100%; /* Ajusta el ancho máximo para ocupar toda la pantalla */
+            }
+
+            /* Estilos para reducir el tamaño de los botones */
+            #model-form button {
+                font-size: 12px; /* Ajusta el tamaño de la fuente */
+                padding: 5px 10px; /* Ajusta el relleno */
+            }
+
+            /* Estilos para reducir el tamaño del select */
+            #model-select {
+                font-size: 12px; /* Ajusta el tamaño de la fuente */
+                padding: 5px; /* Ajusta el relleno */
+                width:80%;
+            }
+        }
     </style>
 </head>
 <body>
 <div id="header">
     <form id="model-form">
-        <label for="model-select">Selecciona un modelo:</label>
+        <!--<label for="model-select">Selecciona un modelo:</label>-->
         <select id="model-select" name="models">
             {% for model_path in models_list %}
                 <option value="{{ model_path }}">{{ model_path }}</option>
@@ -209,6 +238,7 @@ function handleAssistantResponse(response) {
         keysContainer.prepend(key);
     }
 
+    // Hacer scroll hacia abajo después de agregar un nuevo mensaje
     scrollToBottom();
 }
 
@@ -247,14 +277,8 @@ function unloadModel() {
 }
 
 function scrollToBottom() {
-    var chatList = $('#chat-list');
-    var scrollHeight = chatList[0].scrollHeight;
-    var visibleHeight = chatList.innerHeight();
-    var userBarHeight = $('#footer').outerHeight();
-
-    if (scrollHeight > visibleHeight) {
-        chatList.scrollTop(scrollHeight - visibleHeight + userBarHeight);
-    }
+    var chatContainer = $('#chat-container')[0];
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 $('#model-form button:nth-child(2)').on('click', function() {

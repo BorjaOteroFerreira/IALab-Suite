@@ -9,8 +9,8 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 class LlamaAssistant:
-    MAX_CONTEXT_TOKENS = 3000
-    MAX_ASSISTANT_TOKENS = 2048
+    MAX_CONTEXT_TOKENS = 4096
+    MAX_ASSISTANT_TOKENS = 1024
 
     def __init__(self, model_path, chat_format):
         self.is_processing = False
