@@ -9,8 +9,8 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 class LlamaAssistant:
-    MAX_CONTEXT_TOKENS = 2048
-    MAX_ASSISTANT_TOKENS = 1024
+    MAX_CONTEXT_TOKENS = 3000
+    MAX_ASSISTANT_TOKENS = 2048
 
     def __init__(self, model_path, chat_format):
         self.is_processing = False
@@ -133,7 +133,7 @@ class LlamaAssistant:
         socketio.emit('clear_chat', namespace='/test')
 
 
-model_path="models/llama-2-7b-chat.Q8_0.gguf"
+model_path="models/TheBloke/Guanaco-13B-Uncensored-GGUF/guanaco-13b-uncensored.Q5_K_M.gguf"
 chat_format="tb-uncensored" 
 llama_assistant = None       
 @app.before_request
