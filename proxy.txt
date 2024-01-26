@@ -1,0 +1,17 @@
+Asistente:  Si deseas saltarte una red proxy utilizando Docker, puedes utilizar un contenedor de Polipo, 
+que es un servidor proxy caché. Sin embargo, debes tener en cuenta que esto puede ser contraído por la política de seguridad de tu organización.  
+Para saltarte el proxy con Docker y Polipo, puedes seguir los siguientes pasos: 
+1. Instala Docker en tu sistema. 
+2. Crea un archivo llamado `Dockerfile` con el siguiente contenido: 
+ ```dockerfile FROM polipo/polipo EXPOSE 8118 CMD ["-u", "0"] ```  
+ 3. Construye y ejecuta el contenedor de Polipo: 
+  ```bash docker build -t my-polipo . docker run --name polipo -p 8118:8118 -d my-polipo ```  
+ 4. Abre un archivo llamado `/etc/environment` dentro del contenedor de Polipo y agrega la siguiente línea para configurar el proxy de salida: 
+  ```bash export NO_LISTEN_LOCALHOST=1 export POLIPO_CLIENTS="127.0.0.1" export POLIPO_OUTPROXY="192.168.0.11:3128" ```  
+ 5. Para asegurarte de que Polipo se ejecute al iniciar el sistema, agrega la siguiente línea al archivo `/etc/rc.local` dentro del contenedor: 
+  ```bash /usr/local/bin/polipo -d -u 0 ``` 
+ 6. Actualiza los cambios en el contenedor y reinicia Polipo:  
+ ```bash docker exec polipo sh -c "source /etc/environment && /etc/init.d/polipo restart" ```  
+ 7. Configura tu sistema local para utilizar el proxy de Docker como pasarela de salida. Para esto, agrega una entrada en `/etc/resolv.conf` con la siguiente línea: 
+ ```bash nameserver 127.0.0.1 ``` 
+8. Configura el proxy de salida en tu navegador web o aplicación específica utilizando `localhost` como dirección y `8118` como puerto.  Recuerda que estos pasos pueden variar dependiendo del entorno en el que estés trabajando, así que puedes necesitar adaptarlos a tus necesidades específicas.

@@ -6,7 +6,6 @@ body {
     height: 100%;
 }
 
-
 #chat-container {
     max-width: 800px;
     margin:  auto;
@@ -48,7 +47,6 @@ pre code {
     margin-bottom: 15px;
     clear: both;
     height: 65%;
-
 }
 
 #chat-header {
@@ -92,9 +90,7 @@ pre code {
     border-radius: 4px;
     margin-top: 10px;
     box-sizing: border-box;
-   
 }
-
 
 /* Estilos para la imagen circular del asistente */
 /* Estilos para el contenedor del mensaje del asistente */

@@ -10,8 +10,8 @@ socketio = SocketIO(app)
 MAX_CONTEXT_TOKENS = 4096
 MAX_ASSISTANT_TOKENS = 1024
 
-
 class LlamaAssistant:
+
     def __init__(self, model_path, chat_format):
 
         self.is_processing = False
@@ -82,7 +82,7 @@ class LlamaAssistant:
             self.context_window_start += 1
 
     def add_user_input(self, user_input):
-        socketio.emit('assistant_response', {'role': 'assistant', 'content': f"<label id='assistant'><strong>Yo:</strong></label> {user_input}"}, namespace='/test')
+        socketio.emit('assistant_response', {'role': 'assistant', 'content': f"<div class='user-bubble'><label id='assistant'><strong>Yo:</strong></label> {user_input}</div>"}, namespace='/test')
         self.update_context_tokens()
         self.conversation_history.append({"role": "user", "content": user_input})
 
@@ -111,13 +111,14 @@ class LlamaAssistant:
     def emit_assistant_response_stream(self, socketio):
         if not self.is_processing:
             last_user_input_time = time.time()
-            socketio.emit('assistant_response', {'role': 'assistant', 'content': "<br><br><div class='chat-bubble'><label id='assistant'><strong>Asistente: </strong></label>"}, namespace='/test')
+            socketio.emit('assistant_response', {'role': 'assistant', 'content': "<div class='assistant-bubble'><label id='assistant'><strong>Asistente: </strong></label>"}, namespace='/test')
             for chunk in self.llm.create_chat_completion(messages=self.conversation_history[self.context_window_start:], max_tokens=MAX_ASSISTANT_TOKENS, stream=True):
                 if 'content' in chunk['choices'][0]['delta']:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     socketio.emit('assistant_response', {'role': 'assistant', 'content': response_chunk}, namespace='/test')
                     time.sleep(0.01)
             socketio.emit('assistant_response', {'role': 'assistant', 'content': "</div><hr>"}, namespace='/test')
+
         self.is_processing = False
         elapsed_time = round(time.time() - last_user_input_time, 2)
         print(f" | {elapsed_time}s")
@@ -128,16 +129,13 @@ class LlamaAssistant:
         print("Se ha limpiado el historial de conversación ")
         for mensaje in self.conversation_history:
             print(mensaje)
-   
     
     def clear_chat_history(self):
         socketio.emit('clear_chat', namespace='/test')
-        
 
-model_path="models/TheBloke/Mixtral_7Bx2_MoE-GGUF/mixtral_7bx2_moe.Q6_K.gguf"
+model_path="models/TheBloke/Guanaco-13B-Uncensored-GGUF/guanaco-13b-uncensored.Q5_K_M.gguf"
 chat_format="tb-uncensored" 
 llama_assistant = None       
-
 @app.before_request
 def before_first_request():
     global llama_assistant
@@ -174,7 +172,6 @@ def unload_model():
 @app.route('/clear_context', methods=['POST'])
 def clear_context():
     llama_assistant.clear_context()
-    return "Historial limpiado"
 
 
 def get_models_list(folder_path):
