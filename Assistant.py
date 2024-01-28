@@ -47,7 +47,7 @@ class LlamaAssistant:
             chat_format=format,
             temp=0.81,
         )
-        
+
     def unload_model(self):
         self.llm = None
 
@@ -91,7 +91,6 @@ class LlamaAssistant:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     response += response_chunk
                     message_queue.put({"role": "assistant", "content": response_chunk})
-                    
             self.is_processing = False
             elapsed_time = round(time.time() - last_user_input_time, 2)
             print(f" | {elapsed_time}s")
