@@ -458,6 +458,29 @@ def format_guanaco(
     _prompt = _format_add_colon_single(system_message, _messages, _sep)
     return ChatFormatterResponse(prompt=_prompt, stop=_stop)
 
+@register_chat_format("airoboros")
+def format_guanaco(
+    messages: List[llama_types.ChatCompletionRequestMessage],
+    **kwargs: Any,
+) -> ChatFormatterResponse:
+    system_template = "### Instruction:\n{system_message}"
+    default_system_message = "The prompt below is a question to answer, a task to complete, or a conversation to respond to; decide which and write an appropriate response."
+    _system_message = _get_system_message(messages)
+    _system_message = (
+        _system_message if _system_message != "" else default_system_message
+    )
+    system_message = system_template.format(system_message=_system_message)
+    _roles = dict(user="### USER:", assistant="### ASSISTANT:")
+    _sep = ""
+    _stop = "###"
+    system_message = _system_message
+    _messages = _map_roles(messages, _roles)
+    _messages.append((_roles["assistant"], None))
+    _prompt = _format_add_colon_single(system_message, _messages, _sep)
+    return ChatFormatterResponse(prompt=_prompt, stop=_stop)
+
+
+
 @register_chat_format("tb-uncensored")
 def format_uncensored(
     messages: List[llama_types.ChatCompletionRequestMessage],

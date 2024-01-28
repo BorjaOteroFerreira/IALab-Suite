@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 from threading import Thread
 import queue
-from app import LlamaAssistant
+from Assistant import LlamaAssistant
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import get_formatter_by_name
@@ -122,8 +122,8 @@ class LlamaGUI:
         self.user_input_entry.delete(0, tk.END)
 
 if __name__ == "__main__":
-    model_path = "models/TheBloke/llama2_7b_chat_uncensored-GGUF/llama2_7b_chat_uncensored.Q8_0.gguf"
-    chat_format = "tb-uncensored"
+    model_path = "models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
+    chat_format = "airoboros"
     llama_assistant = LlamaAssistant(model_path=model_path, chat_format=chat_format)
 
     root = tk.Tk()
