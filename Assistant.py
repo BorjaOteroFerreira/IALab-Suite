@@ -9,14 +9,14 @@ class LlamaAssistant:
         self.max_context_tokens = 5000
         self.max_assistant_tokens = 2048
         self.is_processing = False
-        self.mensaje_sistema = '''Eres un asistente en español con una personalidad amable y honesta. Como experto en programación y pentesting, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
-        Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
-        '''
         self.chat_format = chat_format
         self.model_path = model_path
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal","metal_device_id": 0}
-
+        self.mensaje_sistema = '''Eres un asistente en español con una personalidad amable y honesta. Como experto en programación y pentesting, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+        Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
+        '''
+        
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':
@@ -61,7 +61,6 @@ class LlamaAssistant:
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
         return min(1.0, total_tokens / self.max_context_tokens * 7.5)
 
-
     def update_context_tokens(self):
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
         while total_tokens > self.max_context_tokens:
@@ -100,14 +99,23 @@ class LlamaAssistant:
         if not self.is_processing:
             full_response = ""
             last_user_input_time = time.time()
-            socketio.emit('assistant_response', {'role': 'assistant', 'content': "<br><br><div class='chat-bubble'><label id='assistant'><strong>Asistente: </strong></label>"}, namespace='/test')
-            for chunk in self.llm.create_chat_completion(messages=self.conversation_history, max_tokens=self.max_assistant_tokens, stream=True):
+            socketio.emit('assistant_response', 
+                          {'role': 'assistant', 'content': "<br><br><div class='chat-bubble'><label id='assistant'><strong>Asistente: </strong></label>"},
+                            namespace='/test')
+            for chunk in self.llm.create_chat_completion(messages=self.conversation_history,
+                                                        max_tokens=self.max_assistant_tokens, 
+                                                        stream=True):
                 if 'content' in chunk['choices'][0]['delta']:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     full_response += response_chunk  # Acumular la respuesta
-                    socketio.emit('assistant_response', {'role': 'assistant', 'content': response_chunk}, namespace='/test')
+                    socketio.emit('assistant_response',
+                                  {'role': 'assistant', 'content': response_chunk},
+                                    namespace='/test')
                     time.sleep(0.01)
-            socketio.emit('assistant_response', {'role': 'assistant', 'content': "</div><hr>"}, namespace='/test')
+            socketio.emit(
+                'assistant_response',
+                {'role': 'assistant','content': "</div><hr>"},
+                namespace='/test')
             self.conversation_history.append({"role": "assistant", "content": full_response})
         self.is_processing = False
         elapsed_time = round(time.time() - last_user_input_time, 2)

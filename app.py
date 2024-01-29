@@ -5,8 +5,8 @@ from Assistant import LlamaAssistant
 
 app = Flask(__name__)
 socketio = SocketIO(app)
-model_path="models/TheBloke/Mixtral_7Bx2_MoE-GGUF/mixtral_7bx2_moe.Q6_K.gguf"
-chat_format="airobos" 
+model_path="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
+chat_format="airoboros" 
 llm = None       
 
 @app.before_request

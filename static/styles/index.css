@@ -160,14 +160,14 @@ body {
     /* Estilos para reducir el tamaño del select */
     #model-select {
         font-size: 12px; /* Ajusta el tamaño de la fuente */
-        height:20px;
+        height:25px;
         width: 65%;
        
        
     }
     #format-select {
         font-size: 12px; /* Ajusta el tamaño de la fuente */
-        height:20px;
+        height:25px;
         width:20%
     }
     .chat-bubble {

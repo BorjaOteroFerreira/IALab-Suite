@@ -17,6 +17,7 @@ function handleAssistantResponse(response) {
         currentAssistantResponse += response;
     }
     chatList.html('<li class="assistant-message">' + currentAssistantResponse + '</li>');
+    scrollToBottom();
     /** Agregar teclas que caen
     var keysContainer = $('#key-container');
     var responseArray = response.split('');
@@ -27,7 +28,6 @@ function handleAssistantResponse(response) {
         keysContainer.prepend(key);
     }**/
     // Hacer scroll hacia abajo después de agregar un nuevo mensaje
-    scrollToBottom();
 }
 
 socket.on('clear_chat', function () {
@@ -65,8 +65,8 @@ function startModel() {
         },
         error: function (error) {
             console.error('Error:', error);
-        }
-    });
+     }
+});
 }
 
 function unloadModel() {
