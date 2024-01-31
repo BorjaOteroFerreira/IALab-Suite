@@ -61,7 +61,7 @@ class LlamaGUI:
         if user_input.lower() == 'exit':
             self.master.destroy()
         else:
-            self.llama_assistant.add_user_input(user_input)
+            self.llama_assistant.add_user_input(user_input,None)
             self.is_processing = True
             self.add_message_to_display(f"\n\n Usuario:\b  {user_input}")
             self.stop_button["state"] = "normal"

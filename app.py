@@ -8,7 +8,6 @@ socketio = SocketIO(app)
 model_path="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
 chat_format="airoboros" 
 llm = None       
-
 @app.before_request
 def before_first_request():
     global llm
@@ -26,12 +25,9 @@ def index():
 @app.route('/user_input', methods=['POST'])
 def handle_user_input():
     user_input = request.form.get('content')
-    # Procesar la entrada del usuario según sea necesario
     print("Usuario dijo:", user_input)
-    # Realizar operaciones adicionales aquí
-    llm.add_user_input(user_input,socketio)
+    llm.add_user_input(user_input)
     llm.emit_assistant_response_stream(socketio)
-    # Devolver una respuesta si es necesario
     return 'Respuesta del servidor'
 
 @app.route('/start_model', methods=['POST'])

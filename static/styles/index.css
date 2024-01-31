@@ -13,23 +13,33 @@ body {
     color: #ffffff;
     padding: 10px;
     text-align: center;
-    position: fixed;
+    position: relative;
     width: 100%;
     top: 0;
     z-index: 1000;
+    clear:both;
 }
 #chat-container {
-    max-width: 50%;
-    margin: 80px auto 0; 
-    padding: 20px;
-    padding-top: 80px;
+    max-width: 68%;
+    padding-bottom: 10px;
     border: 0px solid #ccc;
     border-radius: 5px;
-    overflow-y: auto;
-    max-height: calc(100vh - 120px);
-    margin-left:20%;
+    height: calc(100vh - 200px);
+    margin-left:10%;
+    margin-top:0px !important;
     margin-right:25%;
     position: relative;
+    overflow-y: scroll; /* Agrega la barra de desplazamiento solo cuando sea necesario */
+    scrollbar-width: thin; /* Establece el grosor de la barra de desplazamiento en navegadores que lo soportan */
+    scrollbar-color: transparent transparent;
+}
+
+#chat-container::-webkit-scrollbar {
+    width: 6px; /* Establece el ancho de la barra de desplazamiento en navegadores WebKit (Chrome, Safari) */
+}
+
+#chat-container::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Establece el color del pulgar de la barra de desplazamiento en navegadores WebKit */
 }
 #footer {
     background-color: #2C2C2C;
@@ -42,44 +52,53 @@ body {
     display: flex;
     flex-direction: column; /* Cambiado para poner el botón debajo del input */
 }
-.user-message {
-    background-color: #DCF8C6;
-    padding: 10px;
-    margin-bottom: 10px;
+.user-message-container {
+    border: 1px solid #f7e3c1;
+    color: #f7e3c1;
+    width:100%;
+    padding: 20px;
+    margin: 10px;
     border-radius: 10px;
+    clear:both;
 }
-.assistant-message {
-    background-color: #F3F3F3;
-    padding: 10px;
-    margin-bottom: 10px;
+.user-message{
+    margin-left:10px;
+    margin-top:10px;
+
+}
+.assistant-message-container {
+    clear:both;
+    width:100%;
+    border:1px solid #DCF8C6;
+    color: #DCF8C6;
+    padding: 20px;
+    margin: 10px;
     border-radius: 10px;
     white-space: pre-line;
-}
-.assistant-message li{
-    list-style: none;
-    margin:0;
-}
-#send-button{
-    width:100%;
-    margin-top: 5px; /* Añadido margen superior para separar el botón del input */
-}
-#chat-list li {
-    list-style: none;
-    margin: 0;
-}
-.form-group{
-    width:100%;
-    background-color:#2C2C2C;
-}
-#chat-list ul {
-    padding: 0;
-    margin: 0;
-    margin-top: 80px;
-}
-.form-control{
-    background-color: #999;
-}
 
+}
+.assistant-message{
+    margin-left:10px;
+    clear:both;
+    margin-top:10px;
+}
+.user-message-container label {
+    border:1px solid #f7e3c1;
+    border-start-start-radius: 5px;
+    color: #f7e3c1;
+    padding-left:7px;
+    padding-right:20px;
+    font-weight: bold;
+    font-size:14;
+}
+.assistant-message-container label {
+    border:1px solid #DCF8C6;
+    border-start-start-radius: 5px;
+    color: #DCF8C6;
+    padding-left:7px;
+    padding-right:20px;
+    font-weight: bold;
+}
 #sidebar {
     background-color: #f5f5f5;
     position: fixed;
@@ -90,7 +109,6 @@ body {
     padding: 20px;
     overflow-y: auto;
 }
-
 .key-container {
     position: absolute;
     bottom: 0; /* Cambiado a bottom: 0 */
@@ -100,27 +118,17 @@ body {
     gap: 5px;
     z-index: 2;
 }
-
 .key {
     font-size: 24px;
     font-weight: bold;
     color: #fff;
     white-space: nowrap; /* Evitar que el texto se desborde en varias líneas */
 }
-.chat-bubble {
-    background-color: #DCF8C6;; /* Color de fondo del bocadillo del asistente */
-    color: #000; /* Color del texto del bocadillo del asistente */
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 10px;
-    z-index:3;
-}
-
 #model-form button {
     padding: 5px 10px;
     margin-top:5px;
+    font-size: 12px; /* Ajusta el tamaño de la fuente */   
 }
-
 #model-form button {
     margin-top:5px;
 }
@@ -135,28 +143,77 @@ body {
     margin-right:10px;
     margin-left:10%;
 }
+#model-form button {
+    font-size: 12px; /* Ajusta el tamaño de la fuente */
+    padding: 5px 10px; /* Ajusta el relleno */
+    margin-top:5px;
+    background-color:#33333300;
+    border:1px solid #f7e3c1;
+    border-radius: 2px 2px 2px 2px;   
+}
+#send-button{
+    width:100%;
+    margin-top: 5px; /* Añadido margen superior para separar el botón del input */
+    background-color:#00000000;
+    border:1px solid #f7e3c1;
+}
+.form-group{
+    width:100%;
+    background-color:#2C2C2C;
+}
+.form-control{
+    background-color: #999;
+}
+.copy-button {
+    position: relative;
+    float:right;
+    top: 5px;
+    right: 5px;
+    padding: 3px;
+    cursor: pointer;
+    background-color: #2C2C2C;
+    border-color:#DCF8C6;
+    border-radius:2px 2px 2px 2px;
+    color:#DCF8C6;
+    font-family: Arial, sans-serif;
+}
 
+.copy-button:hover{
+    color: #2C2C2C;
+    background-color:#DCF8C6;
+}
 @media (max-width: 767px) {
     /* Estilos específicos para pantallas pequeñas (móviles) */
 
     #sidebar {
         display: none; /* Oculta la barra lateral en pantallas pequeñas */
     }
-
     #chat-container {
-        margin-left: 0; /* Ajusta el margen izquierdo para ocupar toda la pantalla */
-        margin-right: 0; /* Ajusta el margen derecho para ocupar toda la pantalla */
-        max-width: 100%; /* Ajusta el ancho máximo para ocupar toda la pantalla */
-    }
+        margin-left: 0px; /* Ajusta el margen izquierdo para ocupar toda la pantalla */
+        margin-right: 0px; /* Ajusta el margen derecho para ocupar toda la pantalla */
+        max-width: 98%; /* Ajusta el ancho máximo para ocupar toda la pantalla */
+        height: calc(100vh - 200px);
 
+    }
     /* Estilos para reducir el tamaño de los botones */
     #model-form button {
         font-size: 12px; /* Ajusta el tamaño de la fuente */
         padding: 5px 10px; /* Ajusta el relleno */
         margin-top:5px;
-    
+        background-color:#33333300;
+        border:1px solid #f7e3c1;
+        border-radius: 2px 2px 2px 2px;   
     }
-
+    #footer{
+        background-color:#333333;
+    }
+    #send-button{
+        background-color:#00000000;
+        border:1px solid #f7e3c1;
+    }
+    #user-input{
+        border-color:#f7e3c1;
+    }
     /* Estilos para reducir el tamaño del select */
     #model-select {
         font-size: 12px; /* Ajusta el tamaño de la fuente */
@@ -170,11 +227,19 @@ body {
         height:25px;
         width:20%
     }
-    .chat-bubble {
-        color: #000; /* Color del texto del bocadillo del asistente */
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 10px;
-        z-index:3;
+    .user-message-container {
+        margin-top:20px;
+        min-width:80%;
+        max-width:100%;
     }
+    .assistant-message-container {
+      
+       min-width:80%;
+       max-width:100%;
+    }
+
+   
+
+ 
+    
 }

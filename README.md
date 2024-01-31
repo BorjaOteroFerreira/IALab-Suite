@@ -50,7 +50,3 @@ Se inicia el servidor en el localhost 127.0.0.1:5000
 Probar sin servdor en local:
 
         python3 ./llama2.py
-
-
-
-

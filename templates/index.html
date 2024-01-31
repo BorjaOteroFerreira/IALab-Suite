@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Llama Assistant</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/prism.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script> 
+    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>   
 </head>
 <body>
@@ -60,5 +62,10 @@
     });
     $('#send-button').on('click', function() {
         sendMessage();
+        
+    });
+    // Inicializar Prism.js después de que la página se haya cargado
+    document.addEventListener('DOMContentLoaded', function () {
+        Prism.highlightAll();
     });
 </script>
