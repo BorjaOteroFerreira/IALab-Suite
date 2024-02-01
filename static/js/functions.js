@@ -1,13 +1,15 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 var currentAssistantResponse;
-n_responses = 0;
+var n_responses = 0;
+var response
 socket.on('connect', function() {
-    console.log('Connected!');
+    console.log('Conectado!');
 });
 
 socket.on('assistant_response', function(response) {
     handleAssistantResponse(response.content);
     scrollToBottom();
+    console.log('Tokens recibidos')
   
 });
 
@@ -28,23 +30,14 @@ function handleAssistantResponse(response) {
     div.html(currentAssistantResponse);
     Prism.highlightAll();
     scrollToBottom();
-    /** Agregar teclas que caen
-    var keysContainer = $('#key-container');
-    var responseArray = response.split('');
-
-    // Agregar cada tecla individualmente en orden inverso
-    for (var i = 0; i < responseArray.length; i++) {
-        var key = $('<div class="key">' + responseArray[i] + '</div>');
-        keysContainer.prepend(key);
-    }**/
-    // Hacer scroll hacia abajo después de agregar un nuevo mensaje
 }
 
-socket.on('clear_chat', function () {
+function clear_chat() {
     $('#chat-list').html('');
     currentAssistantResponse = '';
     $('#key-container').empty();
-});
+    console.log('Se ha vaciado el chat!')
+}
 
 function sendMessage() {
     currentAssistantResponse=" "
@@ -61,13 +54,17 @@ function sendMessage() {
             console.error('Error:', error);
         }
     });
+    console.log('Prompt enviado!')
     $('#user-input').val('');
     $('#user-input').focus();
-    var message = $('<div class="user-message-container"><label>Yo</label><div class="user-message">' + userMessage + '</div></div>');
+    var message = $('<div class="user-message-container-'+n_responses+' user-message-container"><label>Yo</label><div class="user-message user-message-' + n_responses + '">' + userMessage + '</div></div>');
     var chatList = $('#chat-list');
     chatList.append(message);
-    var divAssistant = $('<div class="assistant-message-container"><label>Asistente<br></label><div id="chat-assistant-'+n_responses+'" class="assistant-message"></div></div>')
-    chatList.append(divAssistant)
+    var divAssistant = $('<div class="assistant-message-container-'+n_responses+' assistant-message-container"><label>Asistente<br></label><div id="chat-assistant-'+n_responses+'" class="assistant-message"></div></div>');
+    chatList.append(divAssistant);
+    var botonCompartir = $('<button id="share" onclick="compartirChat(' + n_responses + ')">Compartir</button>');
+    userMessageCointainer = $('.assistant-message-container-' + n_responses);
+    userMessageCointainer.append(botonCompartir);
     scrollToBottom();
     
 }
@@ -84,9 +81,11 @@ function startModel() {
         },
         error: function (error) {
             console.error('Error:', error);
-     }
-});
+        }
+    });
+    clear_chat()
 }
+
 
 function unloadModel() {
     $.ajax({
@@ -112,6 +111,7 @@ function clearContext() {
             console.error('Error:', error);
         }
     });
+    clear_chat();
 }
 
 function scrollToBottom() {
@@ -139,4 +139,28 @@ function copyToClipboard(button) {
     document.body.removeChild(textarea);
 
     alert('Copiado al portapapeles');
+    console.log('Copiado al portapapeles!')
+}
+function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
+}
+
+
+function compartirChat(numeroRespuesta) {
+    if (navigator.share) {
+        var pregunta = $('.user-message-' + numeroRespuesta).text();
+        var respuesta =  $('#chat-assistant-' + numeroRespuesta).html();
+        var respuestaCompleta = "Yo: \n"+pregunta+"\n\nAsistente:\n"+respuesta
+        respuestaCompleta = respuestaCompleta.replace(/<br>/g, '\n');
+        navigator.share({
+            title: pregunta,
+            text: respuestaCompleta,
+            url: 'VidriosDeLaTorre/VidrioAhumado' 
+        })
+        .then(() => console.log('Chat compartido con éxito'))
+        .catch((error) => console.error('Error al compartir el chat:', error));
+    } else {
+        alert('La función de compartir no está soportada en este navegador.');
+    }
 }

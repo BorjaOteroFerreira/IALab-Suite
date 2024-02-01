@@ -19,15 +19,17 @@ body {
     z-index: 1000;
     clear:both;
 }
+
 #chat-container {
-    max-width: 68%;
+    max-width: 60%;
     padding-bottom: 10px;
     border: 0px solid #ccc;
     border-radius: 5px;
     height: calc(100vh - 200px);
     margin-left:10%;
     margin-top:0px !important;
-    margin-right:25%;
+    margin-left:20%;
+    padding:50px;
     position: relative;
     overflow-y: scroll; /* Agrega la barra de desplazamiento solo cuando sea necesario */
     scrollbar-width: thin; /* Establece el grosor de la barra de desplazamiento en navegadores que lo soportan */
@@ -51,6 +53,17 @@ body {
     margin-top:5px;
     display: flex;
     flex-direction: column; /* Cambiado para poner el botón debajo del input */
+
+}
+#footer input:active,
+#footer input:focus {
+    outline: none !important;
+    border: 1px solid #f7e3c1 !important; /* Ajusta el color del borde después de hacer clic */
+}
+
+#footer input {
+    background-color:#2C2C2C;
+    color: #f7e3c1;
 }
 .user-message-container {
     border: 1px solid #f7e3c1;
@@ -100,14 +113,79 @@ body {
     font-weight: bold;
 }
 #sidebar {
-    background-color: #f5f5f5;
+    height: calc(100vh - 200px);
+    display: none;
     position: fixed;
-    top: 80px;
+    top: 0;
+    color: #DCF8C6;
+    margin-top: 125px;
     right: 0;
     width: 200px;
-    height: calc(100% - 80px);
-    padding: 20px;
-    overflow-y: auto;
+    background-color: #2C2C2C;
+    padding: 10px;
+    box-shadow: -5px 0 5px -5px #333;
+    z-index: 2;
+}
+
+#sidebar h5 {
+    color: #DCF8C6;
+    margin-bottom: 10px;
+}
+
+#sidebar .form-group {
+    margin-bottom: 15px;
+}
+
+#sidebar label {
+    display: block;
+    margin-bottom: 5px;
+    color: #DCF8C6;
+}
+
+#sidebar input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #DCF8C6;
+    background-color: #2C2C2C;
+    color: #DCF8C6;
+}
+/* Estilo para quitar el resaltado del botón al hacer clic */
+button:active,
+button:focus {
+    outline: none;
+    border: 1px solid #f7e3c1; /* Ajusta el color del borde después de hacer clic */
+}
+
+/* Estilo para quitar el resaltado de los input al hacer clic */
+input:active,
+input:focus {
+    outline: none;
+    border: 1px solid #DCF8C6; /* Ajusta el color del borde después de hacer clic */
+}
+#sidebar button {
+    width: 100%;
+    padding: 8px;
+    background-color: #2C2C2C;
+    border: 1px solid #f7e3c1;
+    border-radius: 2px;
+    color: #f7e3c1;
+}
+#sidebar button:hover {
+    width: 100%;
+    padding: 8px;
+    background-color: #f7e3c1;
+    border: 1px solid #f7e3c1;
+    border-radius: 2px;
+    color: #2C2C2C
+}
+#sidebar select {
+    width: 100%;
+    padding: 8px;
+    height:35px;
+    background-color: #33333300;
+    border: 1px solid #DCF8C6;
+    border-radius: 2px;
+    color: #DCF8C6;
 }
 .key-container {
     position: absolute;
@@ -124,14 +202,7 @@ body {
     color: #fff;
     white-space: nowrap; /* Evitar que el texto se desborde en varias líneas */
 }
-#model-form button {
-    padding: 5px 10px;
-    margin-top:5px;
-    font-size: 12px; /* Ajusta el tamaño de la fuente */   
-}
-#model-form button {
-    margin-top:5px;
-}
+
 #format-select {
     padding: 5px; 
     width:10%;
@@ -144,18 +215,31 @@ body {
     margin-left:10%;
 }
 #model-form button {
-    font-size: 12px; /* Ajusta el tamaño de la fuente */
-    padding: 5px 10px; /* Ajusta el relleno */
+    padding: 5px 10px;
     margin-top:5px;
+    font-size: 12px; /* Ajusta el tamaño de la fuente */  
     background-color:#33333300;
     border:1px solid #f7e3c1;
     border-radius: 2px 2px 2px 2px;   
+}
+#model-form button:hover {
+    background-color:#f7e3c1;
+    border:1px solid #33333300;
+    color:#2C2C2C;
+
 }
 #send-button{
     width:100%;
     margin-top: 5px; /* Añadido margen superior para separar el botón del input */
     background-color:#00000000;
     border:1px solid #f7e3c1;
+    color:#f7e3c1;
+}
+#send-button:hover{
+
+    background-color:#f7e3c1;;
+    border:1px solid #2C2C2C;
+    color:#2C2C2C;;
 }
 .form-group{
     width:100%;
@@ -178,9 +262,36 @@ body {
     font-family: Arial, sans-serif;
 }
 
+#toggle-sidebar-button{
+    background-color: #2C2C2C; 
+    color: #DCF8C6; 
+    border : 1px solid #DCF8C6; 
+}
+#toggle-sidebar-button:hover{
+    background-color:  #DCF8C6; 
+    color: #2C2C2C;
+    border : 1px solid #DCF8C6; 
+}
+
+
 .copy-button:hover{
     color: #2C2C2C;
     background-color:#DCF8C6;
+}
+
+#share {
+    position: relative;
+    float:right;
+    font-size: 12px; /* Ajusta el tamaño de la fuente */
+    background-color: #00000000;
+    border: none;
+    color: #fbfbfb;
+    cursor: pointer;
+    clear:both;
+}
+
+#share:hover {
+    color: #DCF8C6;
 }
 @media (max-width: 767px) {
     /* Estilos específicos para pantallas pequeñas (móviles) */
@@ -237,6 +348,11 @@ body {
        min-width:80%;
        max-width:100%;
     }
+    #sidebar{
+        margin-top:110px;
+        width:100%;
+    }
+
 
    
 

@@ -28,7 +28,7 @@ def handle_user_input():
     print("Usuario dijo:", user_input)
     llm.add_user_input(user_input)
     llm.emit_assistant_response_stream(socketio)
-    return 'Respuesta del servidor'
+    return 'Respuesta finalizada!'
 
 @app.route('/start_model', methods=['POST'])
 def start_model():
@@ -37,19 +37,18 @@ def start_model():
     llm.unload_model()
     llm.clear_context()
     llm.start_model(selected_model, selected_format)
-    socketio.emit('clear_chat', namespace='/test')  # Agrega este evento para limpiar el historial en el cliente
-    return 'Modelo iniciado: ' + selected_model
+    return 'Modelo iniciado:\n ' + selected_model
 
 @app.route('/unload_model', methods=['POST'])
 def unload_model():
     llm.unload_model()
     llm.clear_context()
-    return 'Modelo desinstalado'
+    return 'Modelo desinstalado!'
 
 @app.route('/clear_context', methods=['POST'])
 def clear_context():
     llm.clear_context()
-    return "Historial limpiado"
+    return "Historial limpiado!"
 
 def get_models_list(folder_path):
     models_list = []

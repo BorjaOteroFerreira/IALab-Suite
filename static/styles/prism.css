@@ -21,7 +21,7 @@ code,pre{
 }
     @media print{
         code,pre{
-            text-shadow:non
+            text-shadow:none
         }
     }
     :not(pre)>code,pre{

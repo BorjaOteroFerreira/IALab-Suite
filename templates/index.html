@@ -27,22 +27,34 @@
         </select>
         <button type="button" class="btn btn-primary" onclick="startModel()">Montar</button>
         <button type="button" class="btn btn-secondary" onclick="unloadModel()">Desmontar</button>
-        <button class="btn btn-secondary" id="clear-context-button" onclick="clearContext()">Limpiar Historial</button>
+        <button class="btn btn-secondary" id="clear-context-button" onclick="clearContext()">Reiniciar chat</button>
     </form>
 </div>
 <div class="key-container" id="key-container"></div>
+<button id="toggle-sidebar-button" onclick="toggleSidebar()">Menu</button>
+
 <div id="chat-container" class="container mt-4">
     <div id="chat-list"></div>
 </div>
 <div id="sidebar">
     <h5>Configuración del Modelo</h5>
-    <label for="chat-format">Formato del Chat:</label>
-    <input type="text" id="chat-format" placeholder="Ejemplo: my-custom-format">
-    <label for="temperature">Temperatura:</label>
-    <input type="number" id="temperature" step="0.01" placeholder="Ejemplo: 0.8">
-    <label for="context">Contexto Máximo:</label>
-    <input type="number" id="context" placeholder="Ejemplo: 2048">
-    <button type="button" onclick="applyModelConfig()">Aplicar Configuración</button>
+    <div class="form-group">
+        <label for="format-select">Formato del Chat:</label>
+        <select class="form-control" id="format-select" name="formats">
+            {% for format in format_list %}
+                <option value="{{ format }}">{{ format }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="temperature">Temperatura:</label>
+        <input type="number" id="temperature" class="form-control" step="0.01" placeholder="Ejemplo: 0.8">
+    </div>
+    <div class="form-group">
+        <label for="context">Contexto Máximo:</label>
+        <input type="number" id="context" class="form-control" placeholder="Ejemplo: 2048">
+    </div>
+    <button type="button" class="btn btn-primary" onclick="applyModelConfig()">Aplicar Configuración</button>
 </div>
 <div id="footer" >
     <div class="form-group">
@@ -51,6 +63,8 @@
     <button class="btn btn-primary" id="send-button">Enviar</button>
 </div>
 </body>
+<audio id="audioPlayer" controls style="display: none;"></audio>
+
 </html>
 <script>
     var conversationStarted = false;
