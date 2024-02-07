@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 import os
-from Assistant import LlamaAssistant
+from Assistant import Assistant
 import logging
 
 app = Flask(__name__, static_url_path='/static')
@@ -15,7 +15,7 @@ llm = None
 def before_first_request():
     global llm
     if llm is None:
-        llm = LlamaAssistant(model_path=selected_model,chat_format=selected_format)
+        llm = Assistant(model_path=selected_model,chat_format=selected_format)
 
 @app.route('/')
 def index():
@@ -66,7 +66,7 @@ def get_models_list(folder_path):
     return models_list
 
 def get_format_list():
-    format_list = ["llama-2","tb-uncensored", "airoboros", "guanaco","mistral-24","qwen","vicuna"]
+    format_list = ["llama-2","tb-uncensored", "airoboros", "guanaco", "mistral-24", "qwen", "vicuna"]
     return format_list
 
 if __name__ == '__main__':

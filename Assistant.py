@@ -5,7 +5,7 @@ import platform
 import time
 import cv2
 
-class LlamaAssistant:
+class Assistant:
 
     def __init__(self, model_path, chat_format):
         self.max_context_tokens = 2048
