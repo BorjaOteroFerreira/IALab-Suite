@@ -8,7 +8,7 @@ Instalar dependencias
         pip install Flask
         pip install flask_socketio
         pip instal CORS
-        pip install llama-cpp-python (mac)
+        pip install llama-cpp-python 
 
 # llama-cpp-python
 
@@ -101,7 +101,7 @@ python -m pip install -e .
 !python -m pip install -e . --force-reinstall --no-cache-dir
 ```
 
-## Uso
+# Uso
 
 Descargar <a href="https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true">modelo</a> y meterlo en la carpeta models.
 
@@ -113,7 +113,7 @@ Modo de empleo:
 Se inicia el servidor en el localhost 127.0.0.1:5000
 
 
-## Contribución
+# Contribución
 
 Las contribuciones son bienvenidas. 
 btc: bc1qs52ppg3c8qpmskchhxvrrxc2wragh2qy3rl65d
