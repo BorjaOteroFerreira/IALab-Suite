@@ -117,7 +117,7 @@ Se inicia el servidor en el localhost 127.0.0.1:5000
 
 Las contribuciones (BTC) son bienvenidas:
         
-        bc1qs52ppg3c8qpmskchhxvrrxc2wragh2qy3rl65d
+bc1qs52ppg3c8qpmskchhxvrrxc2wragh2qy3rl65d
 
 
 
