@@ -10,6 +10,8 @@ body {
 }
 #header {
     background-color: #343a40;
+    max-width:60%;
+    margin-left: 20%;
     color: #ffffff;
     padding: 10px;
     text-align: center;
@@ -21,18 +23,17 @@ body {
 }
 
 #chat-container {
+    border-right:1px solid #f7e3c1;
+    border-left:1px solid #f7e3c1 ;
     max-width: 60%;
-    padding-bottom: 10px;
-    border: 0px solid #ccc;
-    border-radius: 5px;
-    height: calc(100vh - 200px);
+    height: calc(100vh - 238px);
     margin-left:10%;
     margin-top:0px !important;
     margin-left:20%;
     padding:50px;
     position: relative;
-    overflow-y: scroll; /* Agrega la barra de desplazamiento solo cuando sea necesario */
-    scrollbar-width: thin; /* Establece el grosor de la barra de desplazamiento en navegadores que lo soportan */
+    overflow-y: scroll; 
+    scrollbar-width: thin; 
     scrollbar-color: transparent transparent;
 }
 
@@ -49,16 +50,18 @@ body {
     position: fixed;
     bottom: 0;
     z-index: 2;
-    width: 100%;
+    width: 60%;
+    margin-left:20%;
     margin-top:5px;
     display: flex;
-    flex-direction: column; /* Cambiado para poner el botón debajo del input */
+    flex-direction: column;
+
 
 }
 #footer input:active,
 #footer input:focus {
     outline: none !important;
-    border: 1px solid #f7e3c1 !important; /* Ajusta el color del borde después de hacer clic */
+    border: 1px solid #f7e3c1 !important; 
 }
 
 #footer input {
@@ -78,6 +81,10 @@ body {
     margin-left:10px;
     margin-top:10px;
 
+}
+
+#clear-context-button{
+    float:right;
 }
 .assistant-message-container {
     clear:both;
@@ -113,14 +120,13 @@ body {
     font-weight: bold;
 }
 #sidebar {
-    height: calc(100vh - 200px);
+    height: 100vh;
+    width:20%;
     display: none;
     position: fixed;
     top: 0;
     color: #DCF8C6;
-    margin-top: 125px;
     right: 0;
-    width: 200px;
     background-color: #2C2C2C;
     padding: 10px;
     box-shadow: -5px 0 5px -5px #333;
@@ -153,14 +159,12 @@ body {
 button:active,
 button:focus {
     outline: none;
-    border: 1px solid #f7e3c1; /* Ajusta el color del borde después de hacer clic */
+    border: 1px solid #f7e3c1; 
 }
-
-/* Estilo para quitar el resaltado de los input al hacer clic */
 input:active,
 input:focus {
     outline: none;
-    border: 1px solid #DCF8C6; /* Ajusta el color del borde después de hacer clic */
+    border: 1px solid #DCF8C6;
 }
 #sidebar button {
     width: 100%;
@@ -169,6 +173,7 @@ input:focus {
     border: 1px solid #f7e3c1;
     border-radius: 2px;
     color: #f7e3c1;
+    margin-bottom:10px;
 }
 #sidebar button:hover {
     width: 100%;
@@ -189,7 +194,7 @@ input:focus {
 }
 .key-container {
     position: absolute;
-    bottom: 0; /* Cambiado a bottom: 0 */
+    bottom: 0; 
     left: 10px;
     display: flex;
     flex-direction: column-reverse;
@@ -200,7 +205,7 @@ input:focus {
     font-size: 24px;
     font-weight: bold;
     color: #fff;
-    white-space: nowrap; /* Evitar que el texto se desborde en varias líneas */
+    white-space: nowrap; 
 }
 
 #format-select {
@@ -208,16 +213,12 @@ input:focus {
     width:10%;
 }
 #model-select {
-    padding: 5px; 
-    width:75%;
-    float:left;
-    margin-right:10px;
-    margin-left:10%;
+    margin-bottom:10px
 }
 #model-form button {
     padding: 5px 10px;
     margin-top:5px;
-    font-size: 12px; /* Ajusta el tamaño de la fuente */  
+    font-size: 12px; 
     background-color:#33333300;
     border:1px solid #f7e3c1;
     border-radius: 2px 2px 2px 2px;   
@@ -230,7 +231,7 @@ input:focus {
 }
 #send-button{
     width:100%;
-    margin-top: 5px; /* Añadido margen superior para separar el botón del input */
+    margin-top: 5px;
     background-color:#00000000;
     border:1px solid #f7e3c1;
     color:#f7e3c1;
@@ -261,11 +262,18 @@ input:focus {
     color:#DCF8C6;
     font-family: Arial, sans-serif;
 }
+#start-tour-button{
+
+    float:left;
+    clear:both;
+}
 
 #toggle-sidebar-button{
     background-color: #2C2C2C; 
     color: #DCF8C6; 
     border : 1px solid #DCF8C6; 
+    max-width:60%;
+    margin-left:20%;
 }
 #toggle-sidebar-button:hover{
     background-color:  #DCF8C6; 
@@ -282,7 +290,7 @@ input:focus {
 #share {
     position: relative;
     float:right;
-    font-size: 12px; /* Ajusta el tamaño de la fuente */
+    font-size: 12px; 
     background-color: #00000000;
     border: none;
     color: #fbfbfb;
@@ -293,23 +301,29 @@ input:focus {
 #share:hover {
     color: #DCF8C6;
 }
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
     /* Estilos específicos para pantallas pequeñas (móviles) */
 
-    #sidebar {
-        display: none; /* Oculta la barra lateral en pantallas pequeñas */
-    }
-    #chat-container {
-        margin-left: 0px; /* Ajusta el margen izquierdo para ocupar toda la pantalla */
-        margin-right: 0px; /* Ajusta el margen derecho para ocupar toda la pantalla */
-        max-width: 98%; /* Ajusta el ancho máximo para ocupar toda la pantalla */
-        height: calc(100vh - 200px);
+    #header{
+        max-width:100%;
+        margin-left:0%;
 
     }
-    /* Estilos para reducir el tamaño de los botones */
+
+
+
+    #chat-container {
+        margin-left: 0px; 
+        margin-right: 0px; 
+        max-width: 100%;
+        height: calc(100vh - 200px);
+        padding:10px;
+
+    }
+  
     #model-form button {
-        font-size: 12px; /* Ajusta el tamaño de la fuente */
-        padding: 5px 10px; /* Ajusta el relleno */
+        font-size: 12px; 
+        padding: 5px 10px; 
         margin-top:5px;
         background-color:#33333300;
         border:1px solid #f7e3c1;
@@ -317,6 +331,8 @@ input:focus {
     }
     #footer{
         background-color:#333333;
+        width:100%;
+        margin-left:0;
     }
     #send-button{
         background-color:#00000000;
@@ -325,37 +341,63 @@ input:focus {
     #user-input{
         border-color:#f7e3c1;
     }
-    /* Estilos para reducir el tamaño del select */
+
     #model-select {
-        font-size: 12px; /* Ajusta el tamaño de la fuente */
+        font-size: 12px; 
         height:25px;
         width: 65%;
-       
-       
     }
     #format-select {
-        font-size: 12px; /* Ajusta el tamaño de la fuente */
+        font-size: 12px; 
         height:25px;
         width:20%
     }
     .user-message-container {
         margin-top:20px;
-        min-width:80%;
-        max-width:100%;
+        max-width:95%;
     }
     .assistant-message-container {
-      
-       min-width:80%;
-       max-width:100%;
+       width:95%;
     }
     #sidebar{
-        margin-top:110px;
+        margin-top:80px;
         width:100%;
+        display: none; 
+     
+    }
+    #toggle-sidebar-button{
+        max-width:100%;
+        margin-left:0%;
     }
 
+}
 
-   
+@media (max-height: 740px) {
 
- 
+    #sidebar{
+        margin-top:80px;
+        font-size: 10px;
+    }
+    #sidebar h5{
+        font-size:12px
+    }
+
+    #sidebar select,textarea{
+        max-height:30px;
+
+    }
+
+    #sidebar input{
+        max-height:20px;
+
+    }
+    #sidebar button{
+      
+        margin-bottom:5px;
+        font-size:12px;
+    }
+
     
+
+
 }

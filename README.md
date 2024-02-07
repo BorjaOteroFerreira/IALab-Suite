@@ -10,30 +10,109 @@ Instalar dependencias
         pip instal CORS
         pip install llama-cpp-python (mac)
 
-  <h2>llama-cpp-python en windows</h2>
+# llama-cpp-python
 
-  <h3>Instalar Visual Studio con:</h3>
-  <ul>
-    <li>C++ CMake tools para Windows.</li>
-    <li>C++ herramientas principales</li> 
-    <li>Windows 10/11 SDK. (segun tu sistema)</li>
-    <li>Descarga e instala CUDA Toolkit 12.3 de la <a href="https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Windows">web oficial de nvidia.</a></li>
-  </ul>
-    
-  Verifica la instalación con nvcc --version y nvidia-smi.
+## Instalación
 
-  Añade CUDA_PATH ( C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3) a tus variables de entorno.
+Hay diferentes opciones para instalar el paquete llama-cpp:
 
-  <p>copia los ficheros de: <br>
-          C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions<br>
-  a la carpeta <br>
-          (Para version enterprise) C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations<br>
-          (para la version Comunity)C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations</p>
+- Uso de CPU
+- CPU + GPU (utilizando uno de los muchos backends de BLAS)
+- GPU Metal (MacOS con chip Apple Silicon)
 
+## Instalación solo CPU
 
-    set CMAKE_ARGS=-DLLAMA_CUBLAS=on
-    set FORCE_CMAKE=1
-    pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir --verbose
+\`\`\`
+%pip install --upgrade --quiet llama-cpp-python
+\`\`\`
+
+## Instalación con OpenBLAS / cuBLAS / CLBlast
+
+llama.cpp admite múltiples backends de BLAS para un procesamiento más rápido. Use la variable de entorno FORCE_CMAKE=1 para forzar el uso de cmake e instalar el paquete pip para el backend BLAS deseado.
+
+Ejemplo de instalación con backend cuBLAS:
+
+\`\`\`
+!CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
+\`\`\`
+
+**IMPORTANTE:** Si ya ha instalado la versión solo CPU del paquete, debe reinstalarlo desde cero. Considere el siguiente comando:
+
+\`\`\`
+!CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+\`\`\`
+
+## Instalación con Metal
+
+llama.cpp admite Apple Silicon como ciudadano de primera clase, optimizado a través de ARM NEON, Accelerate y Metal frameworks. Use la variable de entorno FORCE_CMAKE=1 para forzar el uso de cmake e instalar el paquete pip para el soporte de Metal.
+
+Ejemplo de instalación con soporte de Metal:
+
+\`\`\`
+!CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
+\`\`\`
+
+**IMPORTANTE:** Si ya ha instalado una versión solo CPU del paquete, debe reinstalarlo desde cero: considere el siguiente comando:
+
+\`\`\`
+!CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+\`\`\`
+
+## Instalación con Windows
+
+Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. Puede seguir la mayoría de las instrucciones en el repositorio mismo, pero hay algunas instrucciones específicas de Windows que podrían ser útiles.
+
+### Requisitos para instalar llama-cpp-python
+
+- git
+- python
+- cmake
+- Visual Studio Community (asegúrese de instalar esto con la configuración siguiente)
+  - Desarrollo de escritorio con C++
+  - Desarrollo de Python
+  - Desarrollo de Linux embebido con C++
+
+Clona el repositorio de git recursivamente para obtener también el submódulo llama.cpp.
+
+```
+git clone --recursive -j8 https://github.com/abetlen/llama-cpp-python.git
+```
+
+Abre un símbolo del sistema y establece las siguientes variables de entorno.
+
+```
+set FORCE_CMAKE=1
+set CMAKE_ARGS=-DLLAMA_CUBLAS=OFF
+```
+
+Si tienes una GPU NVIDIA, asegúrate de que DLLAMA_CUBLAS esté configurado como ON.
+
+### Compilación e instalación
+
+Ahora puedes navegar al directorio llama-cpp-python e instalar el paquete.
+
+```
+python -m pip install -e .
+```
+
+**IMPORTANTE:** Si ya has instalado una versión solo CPU del paquete, debes reinstalarlo desde cero: considera el siguiente comando:
+
+```
+!python -m pip install -e . --force-reinstall --no-cache-dir
+```
+
+## Uso
+
+```python
+import llama_cpp
+# Utiliza las funciones y clases proporcionadas por llama_cpp
+```
+
+## Contribución
+
+Las contribuciones son bienvenidas. Para cambios importantes, primero abre un problema para discutir lo que te gustaría cambiar.
+
+Asegúrate de actualizar las pruebas según corresponda.
 
 
 Descargar <a href="https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true">modelo</a> y meterlo en la carpeta models.

@@ -423,6 +423,21 @@ def format_llama2(
     _prompt = _format_llama2(system_message, _messages, " ", "</s>") + "[/INST]"
     return ChatFormatterResponse(prompt=_prompt)
 
+@register_chat_format("mistral-24")
+def format_mistral(
+    messages: List[llama_types.ChatCompletionRequestMessage],
+    **kwargs: Any,
+) -> ChatFormatterResponse:
+    _roles = dict(System="system", User="user", Assistant="assistant")
+    system_message = "Eres un asistente útil."
+    system_template = "{System}\n[INST]\n{system_message}\n[/INST]"
+    system_message = system_template.format(System=_roles["System"], system_message=system_message)
+    _messages = _map_roles(messages, _roles)
+    _messages.append((_roles["Assistant"], None))
+    _sep = ""
+    _prompt = _format_chatml(system_message, _messages, _sep)
+    _sep2 = ""
+    return ChatFormatterResponse(prompt=_prompt, stop=_sep2)
 
 @register_chat_format("alpaca")
 def format_alpaca(

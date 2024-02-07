@@ -1,7 +1,9 @@
 
 from llama_cpp import Llama 
+import llama_cpp
 import platform
 import time
+import cv2
 
 class LlamaAssistant:
 
@@ -13,10 +15,10 @@ class LlamaAssistant:
         self.model_path = model_path
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal","metal_device_id": 0}
-        self.mensaje_sistema = '''Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+        '''self.mensaje_sistema = Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
         Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
         '''
-        
+        self.mensaje_sistema = "Eres un asistente en español con una personalidad amable y honesta."
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':
@@ -32,23 +34,39 @@ class LlamaAssistant:
             **self.device_options,
             chat_format=self.chat_format,
             temp=0.81,
-            use_mmap=True
+            use_mmap=True,
+            n_threads=11,
+            
         )
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
         self.context_window_start = 0
 
-    def start_model(self, model_path, format):
+    def start_model(self, model_path, format, n_gpu_layer, system_message, context):
+        
+        message =  system_message if system_message is not None else self.mensaje_sistema
+        gpu_layers = n_gpu_layer if n_gpu_layer is not None else 14
+
+        self.mensaje_sistema = message
         self.model_path = model_path
+        self.max_context_tokens = context
+        self.max_assistant_tokens = context 
+       
         self.llm = Llama(
-            model_path=self.model_path,
-            verbose=True,
-            n_gpu_layers=14,
-            n_ctx=self.max_context_tokens,
+            model_path = self.model_path,
+            n_gpu_layers = gpu_layers,
+            verbose = True,
+            n_ctx = self.max_context_tokens,
             **self.device_options,
-            chat_format=format,
-            temp=0.81,
-            use_mmap=True,
+            chat_format = format,
+            temp = 0.81,
+            use_mmap = True,
+            n_threads = 11
+
         )
+
+        self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
+        self.context_window_start = 0
+
 
     def unload_model(self):
         self.llm = None
@@ -72,8 +90,10 @@ class LlamaAssistant:
         print("TOKENS: "+str(total_tokens))
 
     def add_user_input(self, user_input):
-        self.conversation_history.append({"role": "user", "content": user_input})
+        embeddings = llama_cpp.llama_get_embeddings(user_input)
+        self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings})
         self.update_context_tokens()
+
       
     def get_assistant_response_stream(self, message_queue):
         """

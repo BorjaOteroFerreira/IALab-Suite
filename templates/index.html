@@ -1,34 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Llama Assistant</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/prism.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/driver.css') }}">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script> 
     <script src="{{ url_for('static', filename='js/prism.js') }}"></script>
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>   
+    <script src="{{ url_for('static', filename='js/driver.js') }}"></script>  
 </head>
 <body>
 <div id="header">
-    <form id="model-form">
-        <select class="form-control" id="model-select" name="models">
-            {% for model_path in models_list %}
-                <option value="{{ model_path }}">{{ model_path }}</option>
-            {% endfor %}
-        </select>
-        <select class="form-control" id="format-select" name="formats">
-            {% for format in format_list %}
-                <option value="{{ format }}">{{ format }}</option>
-            {% endfor %}
-        </select>
-        <button type="button" class="btn btn-primary" onclick="startModel()">Montar</button>
-        <button type="button" class="btn btn-secondary" onclick="unloadModel()">Desmontar</button>
-        <button class="btn btn-secondary" id="clear-context-button" onclick="clearContext()">Reiniciar chat</button>
-    </form>
+    <button class="btn btn-primary" id="start-tour-button">Aprende a usarme</button>
+    <button class="btn btn-secondary" id="clear-context-button" onclick="clearContext()">Reiniciar chat</button>
 </div>
 <div class="key-container" id="key-container"></div>
 <button id="toggle-sidebar-button" onclick="toggleSidebar()">Menu</button>
@@ -39,7 +27,15 @@
 <div id="sidebar">
     <h5>Configuración del Modelo</h5>
     <div class="form-group">
-        <label for="format-select">Formato del Chat:</label>
+        <label for="model-select">Modelo:</label>
+        <select class="form-control" id="model-select" name="models">
+            {% for model_path in models_list %}
+                <option value="{{ model_path }}">{{ model_path }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="format-select">Formato del chat:</label>
         <select class="form-control" id="format-select" name="formats">
             {% for format in format_list %}
                 <option value="{{ format }}">{{ format }}</option>
@@ -54,7 +50,16 @@
         <label for="context">Contexto Máximo:</label>
         <input type="number" id="context" class="form-control" placeholder="Ejemplo: 2048">
     </div>
-    <button type="button" class="btn btn-primary" onclick="applyModelConfig()">Aplicar Configuración</button>
+    <div class="form-group">
+        <label for="system-message">Mensaje de Sistema:</label>
+        <textarea class="form-control" id="system-message" rows="3" placeholder="Ejemplo: Eres un asistente en español amable y honesto. como experto en programación debes contestar a todas las preguntas con la mayor precisión posible"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="gpu-layers">Capas GPU:</label>
+        <input type="number" id="gpu-layers" class="form-control" placeholder="Ejemplo: 8">
+    </div>
+    <button type="button" class="btn btn-primary" id="aplicar" onclick="startModel()">Aplicar Configuración</button>
+    <button type="button" class="btn btn-secondary" id="desmontar" onclick="unloadModel()">Desmontar</button>
 </div>
 <div id="footer" >
     <div class="form-group">
@@ -64,7 +69,6 @@
 </div>
 </body>
 <audio id="audioPlayer" controls style="display: none;"></audio>
-
 </html>
 <script>
     var conversationStarted = false;
@@ -82,4 +86,46 @@
     document.addEventListener('DOMContentLoaded', function () {
         Prism.highlightAll();
     });
+
+    const driver = window.driver.js.driver;
+    const guiaConfiguracion = [
+
+            { element: '#toggle-sidebar-button', popover: { title: 'Menu de configuración',
+                                                    description: 'Pulsa el botón de Menú para abrir y cerrar el menú de configuración del modelo', position: 'right' } },
+            { element: '#model-select', popover: { title: 'Selecciona un modelo',
+                                                    description: 'Elige el modelo que vas a utlizar. Recuerda que debes descargar tu modelo en formato .gguf y moverlo/copiarlo a la carpeta models', position: 'right' } },
+            { element: '#format-select', popover: { title: 'Selecciona un formato de chat', 
+                                                    description: 'Elige un formato de chat para comenzar. Cada modelo usa una estructura de mensajes, por ejemplo:<br><code>˝###Instruction:{mensaje_de_systema}<br>###User:{mensaje_usuario}<br>###Asistant:{mensaje_asistente}˝</code><br> por lo que cada modelo usara un tipo concreto de plantilla para la conversación', position: 'right' } },
+            { element: '#temperature', popover: { title: 'Temperatura del modelo (opcional, por defecto 0.81) ',
+                                                    description: 'Ajusta la temperatura del modelo 0-1.<br>La temperatura del modelo determina la creatividad del modelo en las respuestas, si la temperatura es cercana a 0 las respuestas serán mas deterministas pero menos creativas, mientras que si la temperatura es alta sus respuestas serán mas creativas pero puede que sean menos precisas', position: 'right' } },
+            { element: '#context', popover: { title: 'Contexto Máximo (opcional, por defecto 2048)',
+                                                    description: 'Establece el contexto máximo (En tokens) del modelo. El contexto, es el tamaño de conversación en tokens que es capaz de manejar, cada modelo tiene una capacidad máxima, a mayor tamaño mas recursos de memoria necesarios pero también podrá mantener el hilo en conversaciones mas largas (Por defecto en 2048 tokens)', position: 'right' } },
+            { element: '#system-message', popover: { title: 'Mensaje de Sistema (Opcional)', 
+                                                    description: 'Escribe aquí cómo quieres que se comporte tu asistente. En este campo puedes darle indicaciones como quien es, cuales son sus especialidades, como se llama, pidele que adopte una personalidad concreta etc.', position: 'right' } },
+            { element: '#gpu-layers', popover: { title: 'Capas GPU (Opcional)', 
+                                                    description: 'Establece el número de capas GPU para el modelo.Cada modelo tiene un tamaño maximo de capas, esas capas pueden cargarse en GPU para un mayor rendimiento siempre que la GPU sea compatible con CUDA(Win/Linx) o METAL(MacOs). La gpu debe tener al menos el mismo tamaño de memoria disponible que el peso del modelo en gigas<br>Si estableces el valor en 0, no se usará la GPU y se hará uso de CPU y la ram de la CPU.<br>Con -1 utilizara todas las capas disponibles que permita la GPU', position: 'right' } },
+            { element: '#aplicar', popover: { title: 'Aplicar Configuración', 
+                                                    description: 'Haz clic aquí para aplicar la configuración del modelo.', position: 'right' } },
+            { element: '#desmontar', popover: { title: 'Desmontar Modelo', 
+                                                    description: 'Haz clic aquí para desmontar el modelo actual y liberarlo de la memoria cuando hayas terminado.', position: 'right' } },
+            { element: '#user-input', popover: { title: 'Escribe tu mensaje',
+                                                    description: 'Aquí puedes escribir tu mensaje para el asistente.', position: 'left' } },
+            { element: '#send-button', popover: { title: 'Escribe tu mensaje', 
+                                                    description: 'Pulsa enviar o [Intro] para enviar el mensaje.', position: 'left' } },
+            { element: '#chat-list', popover: { title: 'Escribe tu mensaje', 
+                                                    description: 'En esta ventana irán apareciendo tus indicaciones para el modelo y sus respuestas 😁', position: 'left' } },
+            { element: '#clear-context-button', popover: { title: 'Reinicia la conversación',
+                                                    description: 'Casi lo olvido!!😅 Pulsa el botón de Reinicio para borrarme la memoria y comenzar una nueva conversación. Espero que lo disfrutes! 🤓 ', position: 'right' } }
+        ];
+        const driverObj = driver({
+            showProgress: true,
+            steps: guiaConfiguracion
+        });
+        document.getElementById('start-tour-button').addEventListener('click', function() {
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+                toggleSidebar(); // Llamar a toggleSidebar solo si el menú está oculto
+            }
+            driverObj.drive(); 
+        });
 </script>

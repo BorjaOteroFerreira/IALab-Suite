@@ -20,7 +20,7 @@ class LlamaGUI:
         vscode_bg_color = "#1E1E1E"
         vscode_fg_color = "#D4D4D4"
         vscode_button_color = "#007ACC"
-
+        
         master.config(bg=vscode_bg_color)
         style = ttk.Style()
         style.theme_use("clam")

@@ -2,17 +2,20 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 import os
 from Assistant import LlamaAssistant
+import logging
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app)
-model_path="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
-chat_format="airoboros" 
+
+logging.basicConfig(filename='registro_peticiones.log', level=logging.INFO)
+selected_model="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
+selected_format="airoboros" 
 llm = None       
 @app.before_request
 def before_first_request():
     global llm
     if llm is None:
-        llm = LlamaAssistant(model_path=model_path,chat_format=chat_format)
+        llm = LlamaAssistant(model_path=selected_model,chat_format=selected_format)
 
 @app.route('/')
 def index():
@@ -28,15 +31,18 @@ def handle_user_input():
     print("Usuario dijo:", user_input)
     llm.add_user_input(user_input)
     llm.emit_assistant_response_stream(socketio)
-    return 'Respuesta finalizada!'
+    return 'Respuesta finalizada! 📩'
 
 @app.route('/start_model', methods=['POST'])
 def start_model():
     selected_model = request.form.get('model_path')
     selected_format = request.form.get('format')
+    n_gpu_layers = request.form.get('n_gpu_layers')
+    system_message = request.form.get('system_message')
+    n_ctx = int(request.form.get('context')) if request.form.get('context') is not '' else 2048
     llm.unload_model()
     llm.clear_context()
-    llm.start_model(selected_model, selected_format)
+    llm.start_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
     return 'Modelo iniciado:\n ' + selected_model
 
 @app.route('/unload_model', methods=['POST'])
@@ -60,7 +66,7 @@ def get_models_list(folder_path):
     return models_list
 
 def get_format_list():
-    format_list = ["llama-2","tb-uncensored", "airoboros", "guanaco"]
+    format_list = ["llama-2","tb-uncensored", "airoboros", "guanaco","mistral-24","qwen","vicuna"]
     return format_list
 
 if __name__ == '__main__':
