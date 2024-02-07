@@ -8,8 +8,8 @@ app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app)
 
 logging.basicConfig(filename='flask_log.log', level=logging.INFO)
-selected_model="models/TheBloke/Guanaco-13B-Uncensored-GGUF/guanaco-13b-uncensored.Q5_K_M.gguf"
-selected_format="guanaco" 
+selected_model="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
+selected_format="airoboros" 
 llm = None       
 @app.before_request
 def before_first_request():
@@ -66,7 +66,7 @@ def get_models_list(folder_path):
     return models_list
 
 def get_format_list():
-    format_list = ["llama-2","tb-uncensored", "airoboros", "guanaco", "mistral-24", "qwen", "vicuna"]
+    format_list = [ "guanaco", "llama-2","tb-uncensored", "airoboros", "mistral-24", "qwen", "vicuna"]
     return format_list
 
 if __name__ == '__main__':

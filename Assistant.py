@@ -87,7 +87,7 @@ class Assistant:
             removed_message = self.conversation_history.pop(0)
             total_tokens -= len(removed_message["content"].split())
             self.context_window_start += 1
-        print("TOKENS: "+str(total_tokens))
+        print("TOKENS: "+ str(total_tokens))
 
     def add_user_input(self, user_input):
         embeddings = llama_cpp.llama_get_embeddings(user_input)

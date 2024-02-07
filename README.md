@@ -110,7 +110,7 @@ Modo de empleo:
     cd ruta/a/carpeta/del/proyecto
     python3 ./app.py
 
-Se inicia el servidor en el localhost 127.0.0.1:5000
+Se inicia el servidor en el localhost 127.0.0.1:8080
 
 
 # Contribución
