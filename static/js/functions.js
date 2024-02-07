@@ -41,7 +41,6 @@ function sendMessage() {
     currentAssistantResponse = " ";
     n_responses += 1;
     var userMessage = $('#user-input').val();
-    // Sanitiza la entrada del usuario
     var sanitizedUserMessage = escapeHtml(userMessage);
     $.ajax({
         type: 'POST',
