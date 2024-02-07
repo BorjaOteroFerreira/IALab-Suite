@@ -3,9 +3,8 @@ pruebas/*.*
 models/*.*
 *gguf
 *pyc
-models/Publisher/.DS_Store
-Bypass etico.txt
-configuraciones.txt
+*.txt
 *.bin
-models/Publisher/Repository/.DS_Store
 *.log
+models/Publisher/.DS_Store
+models/Publisher/Repository/.DS_Store
