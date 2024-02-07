@@ -68,7 +68,6 @@ function sendMessage() {
     scrollToBottom();
     
 }
-
 //escapar caracteres especiales HTML
 function escapeHtml(text) {
     var map = {
@@ -160,7 +159,6 @@ function toggleSidebar() {
     sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
 }
 
-
 function compartirChat(numeroRespuesta) {
     if (navigator.share) {
         var pregunta = $('.user-message-' + numeroRespuesta).text();
@@ -181,8 +179,7 @@ function compartirChat(numeroRespuesta) {
 
 function applyConfig() {
     var systemMessage = $('#system-message').val();
-    var gpuLayers = $('#gpu-layers').val();
-    
+    var gpuLayers = $('#gpu-layers').val();    
     $.ajax({
         type: "POST",
         url: "/unload_model",
@@ -194,8 +191,6 @@ function applyConfig() {
             console.error('Error:', error);
         }
     });
-
-    
 }
 
 function applyModelConfig(){

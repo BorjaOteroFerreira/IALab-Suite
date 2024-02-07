@@ -81,7 +81,6 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
     });
     $('#send-button').on('click', function() {
         sendMessage();
-        
     });
     // Inicializar Prism.js después de que la página se haya cargado
     document.addEventListener('DOMContentLoaded', function () {
@@ -90,7 +89,6 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
 
     const driver = window.driver.js.driver;
     const guiaConfiguracion = [
-
             { element: '#toggle-sidebar-button', popover: { title: 'Menu de configuración',
                                                     description: 'Pulsa el botón de Menú para abrir y cerrar el menú de configuración del modelo', position: 'right' } },
             { element: '#model-select', popover: { title: 'Selecciona un modelo',
@@ -98,7 +96,7 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
             { element: '#format-select', popover: { title: 'Selecciona un formato de chat', 
                                                     description: 'Elige un formato de chat para comenzar. Cada modelo usa una estructura de mensajes, por ejemplo:<br><code>˝###Instruction:{mensaje_de_systema}<br>###User:{mensaje_usuario}<br>###Asistant:{mensaje_asistente}˝</code><br> por lo que cada modelo usara un tipo concreto de plantilla para la conversación', position: 'right' } },
             { element: '#temperature', popover: { title: 'Temperatura del modelo (opcional, por defecto 0.81) ',
-                                                    description: 'Ajusta la temperatura del modelo 0-1.<br>La temperatura del modelo determina la creatividad del modelo en las respuestas, si la temperatura es cercana a 0 las respuestas serán mas deterministas pero menos creativas, mientras que si la temperatura es alta sus respuestas serán mas creativas pero puede que sean menos precisas', position: 'right' } },
+                                                    description: 'Ajusta la temperatura del modelo 0-1.<br>La temperatura determina la creatividad del modelo en las respuestas, si la temperatura es cercana a 0 las respuestas serán mas deterministas pero menos creativas, mientras que si la temperatura es alta sus respuestas serán mas creativas pero puede que sean menos precisas', position: 'right' } },
             { element: '#context', popover: { title: 'Contexto Máximo (opcional, por defecto 2048)',
                                                     description: 'Establece el contexto máximo (En tokens) del modelo. El contexto, es el tamaño de conversación en tokens que es capaz de manejar, cada modelo tiene una capacidad máxima, a mayor tamaño mas recursos de memoria necesarios pero también podrá mantener el hilo en conversaciones mas largas (Por defecto en 2048 tokens)', position: 'right' } },
             { element: '#system-message', popover: { title: 'Mensaje de Sistema (Opcional)', 
@@ -111,12 +109,12 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
                                                     description: 'Haz clic aquí para desmontar el modelo actual y liberarlo de la memoria cuando hayas terminado.', position: 'right' } },
             { element: '#user-input', popover: { title: 'Escribe tu mensaje',
                                                     description: 'Aquí puedes escribir tu mensaje para el asistente.', position: 'left' } },
-            { element: '#send-button', popover: { title: 'Escribe tu mensaje', 
+            { element: '#send-button', popover: { title: 'Envía tu mensaje', 
                                                     description: 'Pulsa enviar o [Intro] para enviar el mensaje.', position: 'left' } },
-            { element: '#chat-list', popover: { title: 'Escribe tu mensaje', 
+            { element: '#chat-list', popover: { title: 'Lista de mensajes', 
                                                     description: 'En esta ventana irán apareciendo tus indicaciones para el modelo y sus respuestas 😁', position: 'left' } },
             { element: '#clear-context-button', popover: { title: 'Reinicia la conversación',
-                                                    description: 'Casi lo olvido!!😅 Pulsa el botón de Reinicio para borrarme la memoria y comenzar una nueva conversación. Espero que lo disfrutes! 🤓 ', position: 'right' } }
+                                                  description: 'Casi lo olvido!!😅 Pulsa el botón de Reinicio para borrarme la memoria y comenzar una nueva conversación. Espero que lo disfrutes! 🤓 ', position: 'right' } }
         ];
         const driverObj = driver({
             showProgress: true,

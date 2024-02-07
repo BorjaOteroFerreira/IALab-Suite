@@ -42,8 +42,8 @@ class LlamaAssistant:
         self.context_window_start = 0
 
     def start_model(self, model_path, format, n_gpu_layer, system_message, context):
-        
-        message =  system_message if system_message is not None else self.mensaje_sistema
+
+        message =  system_message if system_message is not None and system_message != '' else self.mensaje_sistema
         gpu_layers = n_gpu_layer if n_gpu_layer is not None else 14
 
         self.mensaje_sistema = message
