@@ -22,9 +22,9 @@ Hay diferentes opciones para instalar el paquete llama-cpp:
 
 ## Instalación solo CPU
 
-\`\`\`
+```
 %pip install --upgrade --quiet llama-cpp-python
-\`\`\`
+```
 
 ## Instalación con OpenBLAS / cuBLAS / CLBlast
 
@@ -32,15 +32,15 @@ llama.cpp admite múltiples backends de BLAS para un procesamiento más rápido.
 
 Ejemplo de instalación con backend cuBLAS:
 
-\`\`\`
+```
 !CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
-\`\`\`
+```
 
 **IMPORTANTE:** Si ya ha instalado la versión solo CPU del paquete, debe reinstalarlo desde cero. Considere el siguiente comando:
 
-\`\`\`
+```
 !CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
-\`\`\`
+```
 
 ## Instalación con Metal
 
@@ -48,15 +48,15 @@ llama.cpp admite Apple Silicon como ciudadano de primera clase, optimizado a tra
 
 Ejemplo de instalación con soporte de Metal:
 
-\`\`\`
+```
 !CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
-\`\`\`
+```
 
 **IMPORTANTE:** Si ya ha instalado una versión solo CPU del paquete, debe reinstalarlo desde cero: considere el siguiente comando:
 
-\`\`\`
+```
 !CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
-\`\`\`
+```
 
 ## Instalación con Windows
 
@@ -118,7 +118,6 @@ Asegúrate de actualizar las pruebas según corresponda.
 Descargar <a href="https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true">modelo</a> y meterlo en la carpeta models.
 
 Modo de empleo: 
-
 
     cd ruta/a/carpeta/del/proyecto
     python3 ./app.py
