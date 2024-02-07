@@ -7,9 +7,9 @@ import logging
 app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app)
 
-logging.basicConfig(filename='registro_peticiones.log', level=logging.INFO)
-selected_model="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
-selected_format="airoboros" 
+logging.basicConfig(filename='flask_log.log', level=logging.INFO)
+selected_model="models/TheBloke/Guanaco-13B-Uncensored-GGUF/guanaco-13b-uncensored.Q5_K_M.gguf"
+selected_format="guanaco" 
 llm = None       
 @app.before_request
 def before_first_request():
@@ -39,7 +39,7 @@ def start_model():
     selected_format = request.form.get('format')
     n_gpu_layers = request.form.get('n_gpu_layers')
     system_message = request.form.get('system_message')
-    n_ctx = int(request.form.get('context')) if request.form.get('context') is not '' else 2048
+    n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
     llm.unload_model()
     llm.clear_context()
     llm.start_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
