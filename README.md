@@ -103,18 +103,6 @@ python -m pip install -e .
 
 ## Uso
 
-```python
-import llama_cpp
-# Utiliza las funciones y clases proporcionadas por llama_cpp
-```
-
-## Contribución
-
-Las contribuciones son bienvenidas. Para cambios importantes, primero abre un problema para discutir lo que te gustaría cambiar.
-
-Asegúrate de actualizar las pruebas según corresponda.
-
-
 Descargar <a href="https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true">modelo</a> y meterlo en la carpeta models.
 
 Modo de empleo: 
@@ -122,9 +110,20 @@ Modo de empleo:
     cd ruta/a/carpeta/del/proyecto
     python3 ./app.py
 
-
 Se inicia el servidor en el localhost 127.0.0.1:5000
 
 Probar sin servdor en local:
 
         python3 ./llama2.py
+
+## Contribución
+
+Las contribuciones son bienvenidas. 
+btc: bc1qs52ppg3c8qpmskchhxvrrxc2wragh2qy3rl65d
+
+
+
+
+
+
+
