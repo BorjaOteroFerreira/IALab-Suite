@@ -86,15 +86,15 @@ Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. P
   a la carpeta 
   
           Para version Enterprise
-          ''' 
+      
           C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
-          '''
-          Para la version Comunity
-          '''
-          C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
-          '''
-
           
+          Para la version Comunity
+         
+          C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
+        
+
+
 Clona el repositorio de git recursivamente para obtener también el submódulo llama.cpp.
 
 ```
