@@ -141,4 +141,4 @@ python3 ./app.py
 The server starts on localhost 127.0.0.1:8080.
 
 
-#### Tested in Mackbook Pro M3 Pro 11 cpu cores , 14 gpu cores, 18 unify memory with models max 12GB & AMD Ryzen 5600x , Nvidia RTX 3060 gaming OC 12GB, 32GB cpu Memory. | Python version 3.11.7 | 
+#### __Tested in Mackbook Pro M3 Pro 11 cpu cores , 14 gpu cores, 18 unify memory with models max 12GB & AMD Ryzen 5600x , Nvidia RTX 3060 gaming OC 12GB, 32GB cpu Memory.__ | __Python version 3.11.7__ | 
