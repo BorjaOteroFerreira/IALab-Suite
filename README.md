@@ -67,10 +67,23 @@ Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. P
 - git
 - python
 - cmake
-- Visual Studio Community (asegúrese de instalar esto con la configuración siguiente)
+- Visual Studio Community / Enterprise (asegúrese de instalar esto con la configuración siguiente)
   - Desarrollo de escritorio con C++
   - Desarrollo de Python
   - Desarrollo de Linux embebido con C++
+
+- Descarga e instala CUDA Toolkit 12.3 de la <a href="https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Windows">web oficial de nvidia.</a></li>
+  
+    
+  Verifica la instalación con nvcc --version y nvidia-smi.
+
+  Añade CUDA_PATH ( C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3) a tus variables de entorno.
+
+  <p>copia los ficheros de: <br>
+          C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions<br>
+  a la carpeta <br>
+          (Para version Enterprise) C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations<br>
+          (para la version Comunity)C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations</p>
 
 Clona el repositorio de git recursivamente para obtener también el submódulo llama.cpp.
 
