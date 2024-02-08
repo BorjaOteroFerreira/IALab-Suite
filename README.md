@@ -82,7 +82,7 @@ It is stable to install the llama-cpp-python library by compiling from source. Y
 
   Copy the files from: 
   ```
-  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\extras\visual_studio_integration\MSBuildExtensions
   ```
   To the folder:
   For Enterprise version:
