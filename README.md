@@ -81,7 +81,7 @@ Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. P
 
   Copia los ficheros de: 
     
-    C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions.
+          C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions.
    
   A la carpeta: 
   
