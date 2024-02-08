@@ -39,13 +39,13 @@ llama.cpp supports multiple BLAS backends for faster processing. Use the FORCE_C
 Example installation with cuBLAS backend:
 
 ```bash
-!CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
 ```
 
 **IMPORTANT:** If you have already installed the CPU-only version of the package, you must reinstall it from scratch. Consider the following command:
 
 ```bash
-!CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
 
 ### Installation with Metal
@@ -55,13 +55,13 @@ llama.cpp supports Apple Silicon as a first-class citizen, optimized through ARM
 Example installation with Metal support:
 
 ```bash
-!CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
+CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
 ```
 
 **IMPORTANT:** If you have already installed a CPU-only version of the package, you must reinstall it from scratch: consider the following command:
 
 ```bash
-!CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
 
 ### Installation on Windows
@@ -124,7 +124,7 @@ python -m pip install -e .
 **IMPORTANT:** If you have already installed a CPU-only version of the package, you must reinstall it from scratch: consider the following command:
 
 ```bash
-!python -m pip install -e . --force-reinstall --no-cache-dir
+python -m pip install -e . --force-reinstall --no-cache-dir
 ```
 
 ## Usage
