@@ -1,6 +1,12 @@
 # IA SUITE
 
-Currently in development phase, designed to run locally, for production environments use another wsgi server.
+### Flask App for Testing LLM Models with Llama.pp Library
+
+This Flask application serves as a platform for testing Language Model (LLM) models using the Llama.pp library. Users can mount and evaluate LLM models in the GGUF format conveniently through the provided template. As an ongoing project, it is continuously being developed with enhancements and code refactoring. 
+Stay tuned for updates and additional functionalities!
+
+
+For production environments use another wsgi server.
 
 ## Installation
 
