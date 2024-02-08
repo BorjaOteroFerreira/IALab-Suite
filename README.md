@@ -89,7 +89,7 @@ Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. P
       ```
   C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
       ``` 
-  Para la version Comunity
+  <br>Para la version Comunity
       ```   
   C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
       ```  
