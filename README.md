@@ -80,11 +80,21 @@ Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. P
   Añade CUDA_PATH ( C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3) a tus variables de entorno.
 
   Copia los ficheros de: 
-          C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions<br>
-  a la carpeta <br>
-          (Para version Enterprise) C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations<br>
-          (para la version Comunity)C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations</p>
+      '''
+          C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions
+      '''
+  a la carpeta 
+  
+          Para version Enterprise
+          ''' 
+          C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
+          '''
+          Para la version Comunity
+          '''
+          C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
+          '''
 
+          
 Clona el repositorio de git recursivamente para obtener también el submódulo llama.cpp.
 
 ```
