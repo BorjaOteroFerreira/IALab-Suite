@@ -1,6 +1,6 @@
-<h1> Proyecto de IA basado en LLama-2</h1>
+<h1>IA SUITE</h1>
 
-Actualmente en fase de desarollo, pensado para ejecutar en local
+Actualmente en fase de desarollo, pensado para ejecutar en local,
 para entornos en producción utilizar otro servidor wsgi
 
 Instalar dependencias
