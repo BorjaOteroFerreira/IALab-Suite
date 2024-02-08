@@ -83,15 +83,15 @@ Es estable instalar la biblioteca llama-cpp-python compilando desde la fuente. P
     
       C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\extras\visual_studio_integration\MSBuildExtensions.
    
-  A la carpeta: 
+   A la carpeta: 
   
-      Para version Enterprise
+  Para version Enterprise
       ```
-      C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
+  C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
       ``` 
-      Para la version Comunity
+  Para la version Comunity
       ```   
-      C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
+  C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
       ```  
 
 
