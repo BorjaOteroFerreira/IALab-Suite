@@ -4,7 +4,6 @@ import llama_cpp
 import platform
 import time
 
-
 class Assistant:
     '''
         Instancia un asistente conversacional. 
@@ -58,12 +57,13 @@ class Assistant:
         - (int) context: tamaño en tokens del contexto máximo. 
         '''
         message =  system_message if system_message is not None and system_message != '' else self.mensaje_sistema
-        gpu_layers = n_gpu_layer if n_gpu_layer is not None else 14
+        gpu_layers = n_gpu_layer if n_gpu_layer is not None else -1
+        ctx = context if context  is not None and context != '' else self.max_context_tokens
 
         self.mensaje_sistema = message
         self.model_path = model_path
-        self.max_context_tokens = context
-        self.max_assistant_tokens = context 
+        self.max_context_tokens = ctx
+        self.max_assistant_tokens = ctx 
        
         self.llm = Llama(
             model_path = self.model_path,
@@ -114,9 +114,9 @@ class Assistant:
         '''
         embeddings = llama_cpp.llama_get_embeddings(user_input)
         self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings})
+        print(embeddings)
         self.update_context_tokens()
 
-      
     def get_assistant_response_stream(self, message_queue):
         """
         Obtiene la respuesta del asistente.
@@ -146,6 +146,7 @@ class Assistant:
         - (obj) socketio: Conexion para comunicarse con la plantilla y enviar el stream.
         """
         if not self.is_processing:
+            self.is_processing = True
             full_response = ""
             last_user_input_time = time.time()
             for chunk in self.llm.create_chat_completion(messages=self.conversation_history,
