@@ -3,10 +3,16 @@ from llama_cpp import Llama
 import llama_cpp
 import platform
 import time
-import cv2
+
 
 class Assistant:
+    '''
+        Instancia un asistente conversacional. 
 
+        Parámetros:
+        - (str) model_path: ruta al archivo .gguf del modelo.
+        - (str) chat_format: formato de la plantilla del modelo.
+    '''
     def __init__(self, model_path, chat_format):
         self.max_context_tokens = 2048
         self.max_assistant_tokens = 2048
@@ -15,10 +21,10 @@ class Assistant:
         self.model_path = model_path
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal","metal_device_id": 0}
-        '''self.mensaje_sistema = Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+
+        self.mensaje_sistema = '''Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
         Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
         '''
-        self.mensaje_sistema = "Eres un asistente en español con una personalidad amable y honesta."
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':
@@ -36,12 +42,21 @@ class Assistant:
             temp=0.81,
             use_mmap=True,
             n_threads=11,
-            
         )
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
         self.context_window_start = 0
 
     def start_model(self, model_path, format, n_gpu_layer, system_message, context):
+        '''
+        Créa una instancia del modelo.
+
+        Parámetros: 
+        - (str) model_path: ruta al archivo gguf del modelo. 
+        - (str) format: formato de la plantilla del chat. 
+        - (int) n_gpu_layer: numero de capas enviadas a la GPU.
+        - (str) system_message: mensaje de sistema inicial. 
+        - (int) context: tamaño en tokens del contexto máximo. 
+        '''
         message =  system_message if system_message is not None and system_message != '' else self.mensaje_sistema
         gpu_layers = n_gpu_layer if n_gpu_layer is not None else 14
 
@@ -65,6 +80,9 @@ class Assistant:
         self.context_window_start = 0
 
     def unload_model(self):
+        '''
+        Elimina la referencia al modelo vaciando el atributo llm del asistente, liberándolo de memoria
+        '''
         self.llm = None
 
     def get_context_fraction(self):
@@ -79,7 +97,7 @@ class Assistant:
 
     def update_context_tokens(self):
         '''
-        Actualiza la ventana de contexto con un numero de mensajes inferior al contexto total
+        Actualiza la ventana de contexto con un numero de mensajes inferior al contexto total.
         '''
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
         while total_tokens > self.max_context_tokens:
@@ -89,6 +107,11 @@ class Assistant:
         print("TOKENS: "+ str(total_tokens))
 
     def add_user_input(self, user_input):
+        '''
+        Añade el input del usuario al historial de conversación. 
+        Parámetros: 
+        - (str) user_input: input del usuario.
+        '''
         embeddings = llama_cpp.llama_get_embeddings(user_input)
         self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings})
         self.update_context_tokens()
@@ -99,7 +122,7 @@ class Assistant:
         Obtiene la respuesta del asistente.
 
         Parámetros:
-        - message_queue: Cola de mensajes para comunicarse con otros componentes.
+        - (str[]) message_queue: Cola de mensajes para comunicarse con otros componentes.
         """
         if not self.is_processing:
             last_user_input_time = time.time()
@@ -120,7 +143,7 @@ class Assistant:
         Obtiene la respuesta del asistente.
 
         Parámetros:
-        - socketio: Socket para comunicarse con la plantilla y enviar el stream.
+        - (obj) socketio: Conexion para comunicarse con la plantilla y enviar el stream.
         """
         if not self.is_processing:
             full_response = ""
@@ -142,7 +165,7 @@ class Assistant:
 
     def clear_context(self):
         '''
-        Limpia el historial de conversación.
+            Limpia el historial de conversación.
         '''
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
         self.context_window_start = 0
