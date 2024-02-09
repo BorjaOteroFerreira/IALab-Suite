@@ -42,7 +42,6 @@ class Assistant:
         self.context_window_start = 0
 
     def start_model(self, model_path, format, n_gpu_layer, system_message, context):
-
         message =  system_message if system_message is not None and system_message != '' else self.mensaje_sistema
         gpu_layers = n_gpu_layer if n_gpu_layer is not None else 14
 
@@ -61,12 +60,9 @@ class Assistant:
             temp = 0.81,
             use_mmap = True,
             n_threads = 11
-
         )
-
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
         self.context_window_start = 0
-
 
     def unload_model(self):
         self.llm = None
@@ -82,6 +78,9 @@ class Assistant:
         return min(1.0, total_tokens / self.max_context_tokens * 7.5)
 
     def update_context_tokens(self):
+        '''
+        Actualiza la ventana de contexto con un numero de mensajes inferior al contexto total
+        '''
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
         while total_tokens > self.max_context_tokens:
             removed_message = self.conversation_history.pop(0)
@@ -117,6 +116,12 @@ class Assistant:
             print(response)    
 
     def emit_assistant_response_stream(self, socketio):
+        """
+        Obtiene la respuesta del asistente.
+
+        Parámetros:
+        - socketio: Socket para comunicarse con la plantilla y enviar el stream.
+        """
         if not self.is_processing:
             full_response = ""
             last_user_input_time = time.time()
@@ -136,6 +141,9 @@ class Assistant:
         print(f" | {elapsed_time}s")
 
     def clear_context(self):
+        '''
+        Limpia el historial de conversación.
+        '''
         self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
         self.context_window_start = 0
         print("Se ha limpiado el historial de conversación ")

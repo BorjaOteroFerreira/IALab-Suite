@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
 import os
 from Assistant import Assistant
@@ -68,6 +68,8 @@ def get_models_list(folder_path):
 def get_format_list():
     format_list = [ "guanaco", "llama-2","tb-uncensored", "airoboros", "mistral-24", "qwen", "vicuna"]
     return format_list
+
+
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8080, debug=True)
