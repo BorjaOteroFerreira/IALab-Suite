@@ -7,6 +7,9 @@ The app is under active development, with a focus on enhancing features and main
 
 For production environments use another wsgi server.
 
+
+<img src=media/pic.png value="chat-pic" width=200px height=200px />
+
 ## Installation
 
 Install dependencies:

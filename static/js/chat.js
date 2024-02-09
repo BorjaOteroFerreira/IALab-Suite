@@ -7,12 +7,6 @@ class ChatApp {
         this.currentAssistantResponse = '';
         this.n_responses = 0;
         this.conversationStarted = false;
-
-        $('#clear-context-button').on('click', () => this.clearContext);
-        $('#start-tour-button').on('click', () => this.startTour);
-        $('#toggle-sidebar-button').on('click', () => this.toggleSidebar);
-        $('#aplicar').on('click', () => this.applyConfig);
-        $('#desmontar').on('click', () => this.unloadModel);
     }
     onConnect() {
         console.log('Conectado! ✅');
@@ -25,21 +19,17 @@ class ChatApp {
         console.log('Tokens received 🔤');
     }
     
-
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '<br>');
         var chatList = $('#chat-list');
-
         if (!this.conversationStarted) {
             this.currentAssistantResponse = response;
             this.conversationStarted = true;
         } else {
             this.currentAssistantResponse += response;
         }
-
         // Reemplaza triple comilla con <pre><code>
-        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick=copyToClipboard(this)>Copiar</button><code>$1</code></pre>');
-
+        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chatApp.copyToClipboard(this)">Copiar</button><code>$1</code></pre>');
         var div = $('#chat-assistant-' + this.n_responses);
         div.html(this.currentAssistantResponse);
         Prism.highlightAll();
@@ -70,22 +60,20 @@ class ChatApp {
                 console.error('Error:', error);
             }
         });
-
         console.log('Prompt enviado! 🧠');
         $('#user-input').val('');
         $('#user-input').focus();
-
+       
         var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label>Yo</label><div class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
         var chatList = $('#chat-list');
         chatList.append(message);
-
+        
         var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label>Asistente<br></label><div id="chat-assistant-'+this.n_responses+'" class="assistant-message"></div></div>');
         chatList.append(divAssistant);
 
-        var botonCompartir = $('<button id="share" onclick="compartirChat(' + this.n_responses + ')">Compartir</button>');
+        var botonCompartir = $('<button id="share" onclick="chatApp.shareChat(' + this.n_responses + ')">Compartir</button>');
         var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
         userMessageCointainer.append(botonCompartir);
-
         this.scrollToBottom();
     }
 
@@ -126,7 +114,6 @@ class ChatApp {
                 console.error('Error:', error);
             }
         });
-
     }
 
     unloadModel() {
@@ -142,7 +129,6 @@ class ChatApp {
         });
     }
 
-    // Utility methods 
     scrollToBottom() {
         var chatContainer = $('#chat-container')[0];
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -162,13 +148,11 @@ class ChatApp {
         alert('Copiado al portapapeles');
         console.log('Copiado al portapapeles! 📋');
     }
-
     toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
         sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
     }
     
-
     escapeHtml(text) {
         var map = {
             '&': '&amp;',
@@ -180,6 +164,24 @@ class ChatApp {
         return text.replace(/[&<>"']/g, function (m) {
             return map[m];
         });
+    }
+
+    shareChat(numeroRespuesta) {
+        if (navigator.share) {
+            var pregunta = $('.user-message-' + numeroRespuesta).text();
+            var respuesta =  $('#chat-assistant-' + numeroRespuesta).html();
+            var respuestaCompleta = "Yo: \n"+pregunta+"\n\nAsistente:\n"+respuesta
+            respuestaCompleta = respuestaCompleta.replace(/<br>/g, '\n');
+            navigator.share({
+                title: pregunta,
+                text: respuestaCompleta,
+                url: 'VidriosDeLaTorre/VidrioAhumado' 
+            })
+            .then(() => console.log('Chat compartido con éxito'))
+            .catch((error) => console.error('Error al compartir el chat:', error));
+        } else {
+            alert('La función de compartir no está soportada en este navegador. 😤');
+        }
     }
 }
 
