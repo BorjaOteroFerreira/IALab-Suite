@@ -1,4 +1,7 @@
-  <img src="static/favicon.ico" alt="Chat code prompt"># IA SUITE
+
+
+# IA SUITE <img src="static/favicon.ico" alt="Chat code prompt">
+
 
 ### Flask App for Testing LLM Models with Llama.cpp Library
 
