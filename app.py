@@ -73,3 +73,15 @@ def get_format_list():
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8080, debug=True)
+
+'''
+TODO:
+    - Stop stream response
+    - Best control of context
+    - FormatChat editor 
+    - Conversations List 
+    - Save conversation in json
+    - Advanced parameters to menu configuration
+    - Capture exceptions.
+    - Refactor the code. 
+'''
