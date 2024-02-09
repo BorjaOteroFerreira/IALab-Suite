@@ -39,7 +39,7 @@ def start_model():
     selected_format = request.form.get('format')
     n_gpu_layers = request.form.get('n_gpu_layers')
     system_message = request.form.get('system_message')
-    n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
+    n_ctx = int(request.form.get('context')) if request.form.get('context') != ''  else 2048
     llm.unload_model()
     llm.clear_context()
     llm.start_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
