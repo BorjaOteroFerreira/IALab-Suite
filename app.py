@@ -49,7 +49,7 @@ def start_model():
 def unload_model():
     llm.unload_model()
     llm.clear_context()
-    return 'Modelo desinstalado!'
+    return 'Modelo desinstalado! '
 
 @app.route('/clear_context', methods=['POST'])
 def clear_context():
@@ -84,4 +84,5 @@ TODO:
     - Advanced parameters to menu configuration
     - Capture exceptions.
     - Refactor the code. 
+    - Implement LangChains.
 '''
