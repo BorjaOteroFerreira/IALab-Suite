@@ -73,21 +73,14 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
 </body>
 </html>
 <script>
-    var chatApp = NaN
-    var conversationStarted = false;
-    var currentAssistantResponse = '';
+    const chatApp = new ChatApp();
     $('#user-input').on('keypress', function (e) {
         if (e.which === 13) {
             chatApp.sendMessage();
         }
     });
-    $('#send-button').on('click', function() {
-        sendMessage();
-    });
-
     // Inicializar Prism.js después de que la página se haya cargado
     document.addEventListener('DOMContentLoaded', function () {
-        chatApp = new ChatApp();
         Prism.highlightAll();
     });
 

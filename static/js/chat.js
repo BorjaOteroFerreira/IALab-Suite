@@ -3,7 +3,7 @@ class ChatApp {
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
         this.socket.on('assistant_response', (response) => this.onAssistantResponse(response));
-   
+
         this.currentAssistantResponse = '';
         this.n_responses = 0;
         this.conversationStarted = false;
@@ -13,10 +13,9 @@ class ChatApp {
     }
 
     onAssistantResponse(response) {
-        console.log('Received response:', response);
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
-        console.log('Tokens received 🔤');
+        console.log('Tokens recividos 🔤');
     }
     
     handleAssistantResponse(response) {
@@ -114,6 +113,7 @@ class ChatApp {
                 console.error('Error:', error);
             }
         });
+        this.clearContext();
     }
 
     unloadModel() {
@@ -166,16 +166,16 @@ class ChatApp {
         });
     }
 
-    shareChat(numeroRespuesta) {
+    shareChat(responseNumber) {
         if (navigator.share) {
-            var pregunta = $('.user-message-' + numeroRespuesta).text();
-            var respuesta =  $('#chat-assistant-' + numeroRespuesta).html();
-            var respuestaCompleta = "Yo: \n"+pregunta+"\n\nAsistente:\n"+respuesta
-            respuestaCompleta = respuestaCompleta.replace(/<br>/g, '\n');
+            var ask = $('.user-message-' + responseNumber).text();
+            var response =  $('#chat-assistant-' + responseNumber).html();
+            var fullResponse = "Yo: \n"+ask+"\n\nAsistente:\n"+response
+            fullResponse = fullResponse.replace(/<br>/g, '\n');
             navigator.share({
-                title: pregunta,
-                text: respuestaCompleta,
-                url: 'VidriosDeLaTorre/VidrioAhumado' 
+                title: ask,
+                text: fullResponse,
+                url: '/' 
             })
             .then(() => console.log('Chat compartido con éxito'))
             .catch((error) => console.error('Error al compartir el chat:', error));
