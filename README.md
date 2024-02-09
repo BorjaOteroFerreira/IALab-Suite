@@ -9,7 +9,7 @@ For production environments use another wsgi server.
 
 
 <p align="center">
-  <img src="media/pic.png" alt="Chat code prompt" width=400px height=500px>
+  <img src="media/pic.png" alt="Chat code prompt" width=600px height=800px>
 </p>
 
 ## Installation
