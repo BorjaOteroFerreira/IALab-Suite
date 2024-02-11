@@ -1,14 +1,12 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 import os
-from Assistant import Assistant  # Importa tu clase Assistant desde el módulo Assistant
+from Assistant import Assistant 
 import logging
-
 
 class IASuiteApi:
     def __init__(self):
         self.app = Flask(__name__, static_url_path='/static')
-        # Configuración de parámetros
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
         self.default_model_path = "models/llama/llama-2-7b-chat.Q8_0.gguf"
