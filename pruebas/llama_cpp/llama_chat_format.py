@@ -507,6 +507,7 @@ def format_uncensored(
     _system_message = (
         _system_message if _system_message != "" else default_system_message
     )
+    
     system_message = system_template.format(system_message=_system_message)
     _roles = dict(user="### HUMAN:", assistant="### RESPONSE:")
     _sep = "\n\n"
