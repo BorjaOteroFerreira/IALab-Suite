@@ -9,3 +9,4 @@ models/*.*
 models/Publisher/.DS_Store
 models/Publisher/Repository/.DS_Store
 locales
+pruebas/llama_cpp/*.*
