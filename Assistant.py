@@ -21,9 +21,14 @@ class Assistant:
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal", "metal_device_id": 0}
         self.gpu_layers = 14
-        self.system_message = '''Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
-        Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
-        '''
+        self.system_message = '''
+You are an assistant with a kind and honest personality. 
+As an expert programmer and pentester, 
+you should examine the details provided to ensure that they are usable.
+If you don't know the answer to a question, don't share false information and don't stray from the question.
+ '''
+ 
+
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':

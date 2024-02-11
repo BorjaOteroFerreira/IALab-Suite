@@ -8,8 +8,8 @@ app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app)
 
 logging.basicConfig(filename='flask_log.log', level=logging.INFO)
-default_model_path="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
-default_chat_format="airoboros" 
+default_model_path="models/llama/llama-2-7b-chat.Q8_0.gguf"
+default_chat_format="llama-2" 
 assistant = None  
 
 @app.before_request
