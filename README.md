@@ -145,7 +145,7 @@ python3 -m pip install -e . --force-reinstall --no-cache-dir
 ## Usage
 
 Download the [model](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true) and place it in the models/llama folder.
-The path seems like: 
+The path looks like this:
 
 ```bash
 models/llama/llama-2-7b-chat.Q8_0.gguf
