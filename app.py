@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 import os
 from Assistant import Assistant
@@ -8,14 +8,15 @@ app = Flask(__name__, static_url_path='/static')
 socketio = SocketIO(app)
 
 logging.basicConfig(filename='flask_log.log', level=logging.INFO)
-selected_model="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
-selected_format="airoboros" 
-llm = None       
+default_model_path="models/TheBloke/airoboros-l2-7B-gpt4-2.0-GGUF/airoboros-l2-7B-gpt4-2.0.Q8_0.gguf"
+default_chat_format="airoboros" 
+assistant = None  
+
 @app.before_request
 def before_first_request():
-    global llm
-    if llm is None:
-        llm = Assistant(model_path=selected_model,chat_format=selected_format)
+    global assistant
+    if assistant is None:
+        assistant = Assistant(default_model_path=default_model_path,default_chat_format=default_chat_format)
 
 @app.route('/')
 def index():
@@ -29,8 +30,8 @@ def index():
 def handle_user_input():
     user_input = request.form.get('content')
     print("Usuario dijo:", user_input)
-    llm.add_user_input(user_input)
-    llm.emit_assistant_response_stream(socketio)
+    assistant.add_user_input(user_input)
+    assistant.emit_assistant_response_stream(socketio)
     return 'Respuesta finalizada! 📩'
 
 @app.route('/start_model', methods=['POST'])
@@ -40,21 +41,26 @@ def start_model():
     n_gpu_layers = request.form.get('n_gpu_layers')
     system_message = request.form.get('system_message')
     n_ctx = int(request.form.get('context')) if request.form.get('context') != ''  else 2048
-    llm.unload_model()
-    llm.clear_context()
-    llm.start_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
+    assistant.unload_model()
+    assistant.clear_context()
+    assistant.start_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
     return 'Modelo iniciado:\n ' + selected_model
 
 @app.route('/unload_model', methods=['POST'])
 def unload_model():
-    llm.unload_model()
-    llm.clear_context()
+    assistant.unload_model()
+    assistant.clear_context()
     return 'Modelo desinstalado! '
 
 @app.route('/clear_context', methods=['POST'])
 def clear_context():
-    llm.clear_context()
+    assistant.clear_context()
     return "Historial limpiado!"
+
+@app.route('/stop_response', methods=['POST'])
+def stop_response():
+    assistant.stop_response()
+    return "Respuesta cancelada!"
 
 def get_models_list(folder_path):
     models_list = []
@@ -74,12 +80,11 @@ if __name__ == '__main__':
 
 '''
 TODO:
-    - Stop stream response
-    - Best control of context
-    - FormatChat editor 
-    - Conversations List 
-    - Save conversation in json
-    - Advanced parameters to menu configuration
+    - Best control of context.
+    - FormatChat editor. 
+    - Conversations List. 
+    - Save conversation.
+    - Advanced parameters to menu configuration.
     - Capture exceptions.
     - Refactor the code. 
     - Implement LangChains.
