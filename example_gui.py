@@ -20,37 +20,37 @@ class ExampleGui:
 
     def create_widgets(self):
         # Header
-        header_frame = tk.Frame(self.master, bg="#343a40", padx=10, pady=10)
-        header_frame.pack(side=tk.TOP, fill=tk.X)
+        self.header_frame = tk.Frame(self.master, bg="#343a40", padx=10, pady=10)
+        self.header_frame.pack(side=tk.TOP, fill=tk.X)
 
-        clear_context_button = tk.Button(header_frame, text="Reset chat", bg="#555555", fg="black", command=self.clear_context)
-        clear_context_button.pack(side=tk.RIGHT)
+        self.clear_context_button = tk.Button(self.header_frame, text="Reset chat", bg="#555555", fg="black", command=self.clear_context)
+        self.clear_context_button.pack(side=tk.RIGHT)
 
         # Main Container
-        main_container = tk.Frame(self.master)
-        main_container.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.main_container = tk.Frame(self.master)
+        self.main_container.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
         # Chat Container
-        chat_container = tk.Frame(main_container, bg="#333333")
-        chat_container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.chat_container = tk.Frame(self.main_container, bg="#333333")
+        self.chat_container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        self.chat_display = scrolledtext.ScrolledText(chat_container, wrap=tk.WORD, width=100, height=25, bg="#333333", fg="white")
+        self.chat_display = scrolledtext.ScrolledText(self.chat_container, wrap=tk.WORD, width=100, height=25, bg="#333333", fg="white")
         self.chat_display.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         # Footer
-        footer_frame = tk.Frame(main_container, bg="#333333", padx=10, pady=10)
-        footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        self.footer_frame = tk.Frame(self.main_container, bg="#333333", padx=10, pady=10)
+        self.footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.stop_button = tk.Button(footer_frame, text="Stop", fg="black", command=self.stop_stream)
+        self.stop_button = tk.Button(self.footer_frame, text="Stop", fg="black", command=self.stop_stream)
         self.stop_button.pack(side=tk.LEFT)
 
-        self.user_input_entry = tk.Entry(footer_frame, bg="#2C2C2C", fg="white", bd=1, insertbackground="white")
+        self.user_input_entry = tk.Entry(self.footer_frame, bg="#2C2C2C", fg="white", bd=1, insertbackground="white")
         self.user_input_entry.pack(side=tk.LEFT, expand=True, fill=tk.X)
         self.user_input_entry.bind("<Return>", self.send_user_input)
 
-        send_button = tk.Button(footer_frame, text="Send", fg="black", command=self.send_user_input)
+        self.send_button = tk.Button(self.footer_frame, text="Send", fg="black", command=self.send_user_input)
     
-        send_button.pack(side=tk.RIGHT)
+        self.send_button.pack(side=tk.RIGHT)
 
     def send_user_input(self, event=None):
         user_input = self.user_input_entry.get()  

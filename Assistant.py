@@ -129,18 +129,20 @@ your responses allways in markdown.
         '''
         if not self.is_processing:
             self.stop_emit = False
-            last_user_input_time = time.time()
             response = ""
             for chunk in self.model.create_chat_completion(messages=self.conversation_history[self.context_window_start:], 
                                                            max_tokens=self.max_assistant_tokens, 
                                                            stream=True):
                           
-                if 'content' in chunk['choices'][0]['delta'] and self.stop_emit is False:
+                if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     response += response_chunk
                     message_queue.put({"role": "assistant", "content": response_chunk})
+
+            if not self.stop_emit:
+                self.conversation_history.append({"role": "assistant", "content": response})
+                print(response)
             self.is_processing = False
-            print(response)
  
 
     def emit_assistant_response_stream(self, socket):
@@ -158,15 +160,16 @@ your responses allways in markdown.
                                                         max_tokens=self.max_assistant_tokens, 
                                                         stream=True):
                 
-                if 'content' in chunk['choices'][0]['delta'] and self.stop_emit is False:
+                if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
                     response_chunk = chunk['choices'][0]['delta']['content']
-                    full_response += response_chunk  
+                    response += response_chunk  
                     socket.emit('assistant_response',
-                                  {'role': 'assistant', 'content': response_chunk}, namespace='/test')
+                                {'role': 'assistant', 'content': response_chunk}, namespace='/test')
                     time.sleep(0.01)
-            if self.stop_emit is False:
+
+            if not self.stop_emit:
                 self.conversation_history.append({"role": "assistant", "content": response})
-            print(response)
+                print(response)
         self.is_processing = False
 
     def clear_context(self):
