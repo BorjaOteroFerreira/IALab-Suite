@@ -9,5 +9,3 @@ models/*.*
 models/Publisher/.DS_Store
 models/Publisher/Repository/.DS_Store
 locales
-llama_cpp
-llama_cpp/*
