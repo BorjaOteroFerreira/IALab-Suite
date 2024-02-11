@@ -5,7 +5,7 @@ import queue
 from Assistant import Assistant 
 
 
-class LlamaGUI:
+class ExampleGui:
     def __init__(self, master, assistant):
         self.master = master
         self.assistant = assistant
@@ -49,8 +49,6 @@ class LlamaGUI:
         send_button = tk.Button(footer_frame, text="Send", bg="#007ACC", fg="black", command=self.send_user_input)
         send_button.pack(side=tk.RIGHT)
 
-
-
     def send_user_input(self, event=None):
         user_input = self.user_input_entry.get()  
         if user_input.lower() == 'exit':
@@ -75,7 +73,6 @@ class LlamaGUI:
         self.chat_display.delete(1.0, tk.END)
         self.chat_display.config(state=tk.DISABLED)
         self.user_input_entry.delete(0, tk.END)
-
 
     def infer_thread(self):
         if self.is_processing:
@@ -107,6 +104,6 @@ if __name__ == "__main__":
 
     root = tk.Tk()
     root.geometry("700x600") 
-    llama_gui = LlamaGUI(root, assistant)
+    llama_gui = ExampleGui(root, assistant)
 
     root.mainloop()
