@@ -1,23 +1,37 @@
-class ChatApp {
+class Chat {
     constructor() {
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
-        this.socket.on('assistant_response', (response) => this.onAssistantResponse(response));
-
+        this.socket.on('assistant_response', (response) => this.assistantResponse(response));
+        
         this.currentAssistantResponse = '';
         this.n_responses = 0;
         this.conversationStarted = false;
+        
+      
+
     }
     onConnect() {
         console.log('Conectado! ✅');
+        $('#stop-button').hide();
+       
+    }
+
+    assistantResponse(response){
+        this.onAssistantResponse(response);
+   
+
     }
 
     onAssistantResponse(response) {
+        $('#stop-button').show();
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens recividos 🔤');
     }
-    
+
+  
+
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '<br>');
         var chatList = $('#chat-list');
@@ -53,6 +67,7 @@ class ChatApp {
             url: '/user_input',
             data: { content: sanitizedUserMessage },
             success: function (data) {
+                $('#stop-button').hide();
                 console.log(data);
             },
             error: function (error) {
@@ -98,7 +113,7 @@ class ChatApp {
         var n_ctx  = $('#context').val();   
         $.ajax({
             type: "POST",
-            url: "/start_model",
+            url: "/load_model",
             data: { 
                 model_path: selectedModel, 
                 format: selectedFormat,
@@ -127,6 +142,21 @@ class ChatApp {
                 console.error('Error:', error);
             }
         });
+    }
+
+    stopResponse() {
+        $.ajax({
+            type: "POST",
+            url: "/stop_response",
+            success: (data) => {
+                console.log(data);
+                $('#stop-button').hide();
+            },
+            error: (error) => {
+                console.error('Error:', error);
+            }
+        });
+      
     }
 
     scrollToBottom() {

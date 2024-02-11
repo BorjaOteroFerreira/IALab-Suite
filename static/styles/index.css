@@ -45,7 +45,7 @@ body {
     background-color: transparent; /* Establece el color del pulgar de la barra de desplazamiento en navegadores WebKit */
 }
 #footer {
-    background-color: #2C2C2C;
+    background-color: #2c2c2c00;
     padding: 10px;
     position: fixed;
     bottom: 0;
@@ -55,6 +55,8 @@ body {
     margin-top:5px;
     display: flex;
     flex-direction: column;
+    border: 1px solid #f7e3c1;
+    border-top: 0;
 
 
 }
@@ -286,6 +288,20 @@ input:focus {
 .copy-button:hover{
     color: #2C2C2C;
     background-color:#DCF8C6;
+}
+
+#stop-button {
+    width: 8%;
+    position: absolute;
+    bottom: 100%;
+    right: 46%;
+    background-color: #fe7361;
+    color: white;
+
+
+}
+.stop-button{
+    display: none 
 }
 
 #share {

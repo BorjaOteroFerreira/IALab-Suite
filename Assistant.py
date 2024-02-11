@@ -50,7 +50,7 @@ class Assistant:
         self.context_window_start = 0
         self.stop_emit = False
 
-    def start_model(self, model_path, format, n_gpu_layer, new_system_message, context):
+    def load_model(self, model_path, format, n_gpu_layer, new_system_message, context):
         '''
         Créa una instancia del modelo.
 

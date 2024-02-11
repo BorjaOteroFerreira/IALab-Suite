@@ -34,7 +34,7 @@ def handle_user_input():
     assistant.emit_assistant_response_stream(socketio)
     return 'Respuesta finalizada! 📩'
 
-@app.route('/start_model', methods=['POST'])
+@app.route('/load_model', methods=['POST'])
 def start_model():
     selected_model = request.form.get('model_path')
     selected_format = request.form.get('format')
@@ -43,7 +43,7 @@ def start_model():
     n_ctx = int(request.form.get('context')) if request.form.get('context') != ''  else 2048
     assistant.unload_model()
     assistant.clear_context()
-    assistant.start_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
+    assistant.load_model(selected_model, selected_format, n_gpu_layers, system_message, n_ctx)
     return 'Modelo iniciado:\n ' + selected_model
 
 @app.route('/unload_model', methods=['POST'])

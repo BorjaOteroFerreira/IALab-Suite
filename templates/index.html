@@ -11,17 +11,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/prism.css') }}">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script> 
-    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>   
-    <script src="{{ url_for('static', filename='js/driver.js') }}"></script>  
+    <script src="{{ url_for('static', filename='js/Prism.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/Chat.js') }}"></script>   
+    <script src="{{ url_for('static', filename='js/Driver.js') }}"></script>  
 </head>
 <body>
 <div id="header">
     <button class="btn btn-primary" id="start-tour-button">Aprende a usarme</button>
-    <button class="btn btn-secondary" id="clear-context-button" onclick="chatApp.clearContext()">Reiniciar chat</button>
+    <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reiniciar chat</button>
 </div>
 <div class="key-container" id="key-container"></div>
-<button id="toggle-sidebar-button" onclick="chatApp.toggleSidebar()">Menu</button>
+<button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
 
 <div id="chat-container" class="container mt-4">
     <div id="chat-list"></div>
@@ -61,29 +61,25 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
         <label for="gpu-layers">Capas GPU:</label>
         <input type="number" id="gpu-layers" class="form-control" placeholder="Ejemplo: 8">
     </div>
-    <button type="button" class="btn btn-primary" id="aplicar" onclick="chatApp.applyConfig()">Aplicar Configuración</button>
-    <button type="button" class="btn btn-secondary" id="desmontar" onclick="chatApp.unloadModel()">Desmontar</button>
+    <button type="button" class="btn btn-primary" id="aplicar" onclick="chat.applyConfig()">Aplicar Configuración</button>
+    <button type="button" class="btn btn-secondary" id="desmontar" onclick="chat.unloadModel()">Desmontar</button>
 </div>
 <div id="footer" >
+    <button  id="stop-button" onclick="chat.stopResponse()" height="20px">Stop</button>
     <div class="form-group">
         <input type="text" class="form-control" id="user-input" placeholder="Escribe tu mensaje">
     </div>
-    <button class="btn btn-primary" id="send-button" onclick="chatApp.sendMessage()">Enviar</button>
+    <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Enviar</button>
 </div>
 </body>
 </html>
 <script>
-    const chatApp = new ChatApp();
+    const chat = new Chat();
     $('#user-input').on('keypress', function (e) {
         if (e.which === 13) {
-            chatApp.sendMessage();
+            chat.sendMessage();
         }
     });
-    // Inicializar Prism.js después de que la página se haya cargado
-    document.addEventListener('DOMContentLoaded', function () {
-        Prism.highlightAll();
-    });
-
     const driver = window.driver.js.driver;
     const guiaConfiguracion = [
             { element: '#toggle-sidebar-button', popover: { title: 'Menu de configuración',
@@ -120,7 +116,7 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
         document.getElementById('start-tour-button').addEventListener('click', function() {
             var sidebar = document.getElementById('sidebar');
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                chatApp.toggleSidebar(); // Llamar a toggleSidebar solo si el menú está oculto
+                chat.toggleSidebar(); // Llamar a toggleSidebar solo si el menú está oculto
             }
             driverObj.drive(); 
         });
