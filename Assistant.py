@@ -12,16 +12,17 @@ class Assistant:
         - (str) model_path: ruta al archivo .gguf del modelo.
         - (str) chat_format: formato de la plantilla del modelo.
     '''
-    def __init__(self, model_path, chat_format):
+    def __init__(self, default_model_path, default_chat_format):
         self.max_context_tokens = 2048
         self.max_assistant_tokens = 2048
         self.is_processing = False
-        self.chat_format = chat_format
-        self.model_path = model_path
+        self.chat_format = default_chat_format
+        self.model_path = default_model_path
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
-        self.metal_options = {"device": "metal","metal_device_id": 0}
+        self.metal_options = {"device": "metal", "metal_device_id": 0}
+        self.gpu_layers = 14
 
-        self.mensaje_sistema = '''Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
+        self.system_message = '''Eres un asistente en español con una personalidad amable y honesta. Como experto programador y pentester, debe examinar los detalles proporcionados para asegurarse de que sean utilizables. 
         Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga sus respuestas en español y no se desvíe de la pregunta.
         '''
         if platform.system() == 'Windows' or platform.system() == 'Linux':
@@ -31,10 +32,13 @@ class Assistant:
         else:
             raise RuntimeError("Sistema operativo no compatible")
 
+        self.load_default_model()
+
+    def load_default_model(self):
         self.llm = Llama(
             model_path=self.model_path,
             verbose=True,
-            n_gpu_layers=14,
+            n_gpu_layers=self.gpu_layers,
             n_ctx=self.max_context_tokens,
             **self.device_options,
             chat_format=self.chat_format,
@@ -42,10 +46,11 @@ class Assistant:
             use_mmap=True,
             n_threads=11,
         )
-        self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
+        self.conversation_history = [{"role": "system", "content": self.system_message}]
         self.context_window_start = 0
+        self.stop_emit = False
 
-    def start_model(self, model_path, format, n_gpu_layer, system_message, context):
+    def start_model(self, model_path, format, n_gpu_layer, new_system_message, context):
         '''
         Créa una instancia del modelo.
 
@@ -53,37 +58,34 @@ class Assistant:
         - (str) model_path: ruta al archivo gguf del modelo. 
         - (str) format: formato de la plantilla del chat. 
         - (int) n_gpu_layer: numero de capas enviadas a la GPU.
-        - (str) system_message: mensaje de sistema inicial. 
+        - (str) new_system_message: mensaje de sistema inicial. 
         - (int) context: tamaño en tokens del contexto máximo. 
         '''
-        message =  system_message if system_message is not None and system_message != '' else self.mensaje_sistema
+        message = new_system_message if new_system_message is not None and new_system_message != '' else self.system_message
         gpu_layers = n_gpu_layer if n_gpu_layer is not None else -1
-        ctx = context if context  is not None and context != '' else self.max_context_tokens
+        ctx = context if context is not None and context != '' else self.max_context_tokens
 
-        self.mensaje_sistema = message
+        self.system_message = message
         self.model_path = model_path
         self.max_context_tokens = ctx
-        self.max_assistant_tokens = ctx 
-       
-        self.llm = Llama(
-            model_path = self.model_path,
-            n_gpu_layers = gpu_layers,
-            verbose = True,
-            n_ctx = self.max_context_tokens,
-            **self.device_options,
-            chat_format = format,
-            temp = 0.81,
-            use_mmap = True,
-            n_threads = 11
-        )
-        self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
+        self.max_assistant_tokens = ctx
+        self.chat_format = format
+        self.gpu_layers = gpu_layers
+        self.conversation_history = [{"role": "system", "content": self.system_message}]
         self.context_window_start = 0
+        self.stop_emit = False
+   
+        if hasattr(self, 'llm'):
+            # Si ya hay un modelo cargado, elimina la referencia
+            del self.llm
+
+        self.load_default_model()
 
     def unload_model(self):
         '''
         Elimina la referencia al modelo vaciando el atributo llm del asistente, liberándolo de memoria
         '''
-        self.llm = None
+        del self.llm
 
     def get_context_fraction(self):
         """
@@ -93,7 +95,7 @@ class Assistant:
         float: Fracción de tokens de contexto utilizados.
         """
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
-        return min(1.0, total_tokens / self.max_context_tokens * 7.5)
+        return min(1.0, total_tokens / self.max_context_tokens * 10)
 
     def update_context_tokens(self):
         '''
@@ -114,7 +116,6 @@ class Assistant:
         '''
         embeddings = llama_cpp.llama_get_embeddings(user_input)
         self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings})
-        print(embeddings)
         self.update_context_tokens()
 
     def get_assistant_response_stream(self, message_queue):
@@ -146,33 +147,41 @@ class Assistant:
         - (obj) socketio: Conexion para comunicarse con la plantilla y enviar el stream.
         """
         if not self.is_processing:
+            self.stop_emit = False
             self.is_processing = True
             full_response = ""
-            last_user_input_time = time.time()
             for chunk in self.llm.create_chat_completion(messages=self.conversation_history,
                                                         max_tokens=self.max_assistant_tokens, 
                                                         stream=True):
-                if 'content' in chunk['choices'][0]['delta']:
+                
+                if 'content' in chunk['choices'][0]['delta'] and self.stop_emit is False:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     full_response += response_chunk  # Acumular la respuesta
                     socketio.emit('assistant_response',
                                   {'role': 'assistant', 'content': response_chunk}, namespace='/test')
                     time.sleep(0.01)
-            self.conversation_history.append({"role": "assistant", "content": full_response})
+            if self.stop_emit is False:
+                self.conversation_history.append({"role": "assistant", "content": full_response})
             print(full_response)
         self.is_processing = False
-        elapsed_time = round(time.time() - last_user_input_time, 2)
-        print(f" | {elapsed_time}s")
+
+
 
     def clear_context(self):
         '''
             Limpia el historial de conversación.
         '''
-        self.conversation_history = [{"role": "system", "content": self.mensaje_sistema}]
+        self.conversation_history = [{"role": "system", "content": self.system_message}]
         self.context_window_start = 0
         print("Se ha limpiado el historial de conversación ")
         for mensaje in self.conversation_history:
             print(mensaje)
-   
+
+    def stop_response(self):
+        '''
+            Stop response stream
+        '''
+        self.stop_emit = True
+    
 
 
