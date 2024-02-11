@@ -6,7 +6,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
     background-color:#333333;
-    /*background: linear-gradient(to right, #333333, #00e5ff, #333333);*/
 }
 #header {
     background-color: #343a40;
@@ -21,7 +20,6 @@ body {
     z-index: 1000;
     clear:both;
 }
-
 #chat-container {
     border-right:1px solid #f7e3c1;
     border-left:1px solid #f7e3c1 ;
@@ -36,11 +34,9 @@ body {
     scrollbar-width: thin; 
     scrollbar-color: transparent transparent;
 }
-
 #chat-container::-webkit-scrollbar {
     width: 6px; /* Establece el ancho de la barra de desplazamiento en navegadores WebKit (Chrome, Safari) */
 }
-
 #chat-container::-webkit-scrollbar-thumb {
     background-color: transparent; /* Establece el color del pulgar de la barra de desplazamiento en navegadores WebKit */
 }
@@ -57,15 +53,13 @@ body {
     flex-direction: column;
     border: 1px solid #f7e3c1;
     border-top: 0;
-
-
+    border-radius:0 0 5px 5px;
 }
 #footer input:active,
 #footer input:focus {
     outline: none !important;
     border: 1px solid #f7e3c1 !important; 
 }
-
 #footer input {
     background-color:#2C2C2C;
     color: #f7e3c1;
@@ -82,9 +76,7 @@ body {
 .user-message{
     margin-left:10px;
     margin-top:10px;
-
 }
-
 #clear-context-button{
     float:right;
 }
@@ -97,7 +89,6 @@ body {
     margin: 10px;
     border-radius: 10px;
     white-space: pre-line;
-
 }
 
 .assistant-message{
@@ -135,22 +126,18 @@ body {
     box-shadow: -5px 0 5px -5px #333;
     z-index: 2;
 }
-
 #sidebar h5 {
     color: #DCF8C6;
     margin-bottom: 10px;
 }
-
 #sidebar .form-group {
     margin-bottom: 15px;
 }
-
 #sidebar label {
     display: block;
     margin-bottom: 5px;
     color: #DCF8C6;
 }
-
 #sidebar input {
     width: 100%;
     padding: 8px;
@@ -158,7 +145,6 @@ body {
     background-color: #2C2C2C;
     color: #DCF8C6;
 }
-/* Estilo para quitar el resaltado del botón al hacer clic */
 button:active,
 button:focus {
     outline: none;
@@ -210,7 +196,6 @@ input:focus {
     color: #fff;
     white-space: nowrap; 
 }
-
 #format-select {
     padding: 5px; 
     width:10%;
@@ -230,7 +215,6 @@ input:focus {
     background-color:#f7e3c1;
     border:1px solid #33333300;
     color:#2C2C2C;
-
 }
 #send-button{
     width:100%;
@@ -266,11 +250,9 @@ input:focus {
     font-family: Arial, sans-serif;
 }
 #start-tour-button{
-
     float:left;
     clear:both;
 }
-
 #toggle-sidebar-button{
     background-color: #2C2C2C; 
     color: #DCF8C6; 
@@ -283,27 +265,23 @@ input:focus {
     color: #2C2C2C;
     border : 1px solid #DCF8C6; 
 }
-
-
 .copy-button:hover{
     color: #2C2C2C;
     background-color:#DCF8C6;
 }
-
 #stop-button {
     width: 8%;
     position: absolute;
     bottom: 100%;
     right: 46%;
-    background-color: #fe7361;
-    color: white;
-
-
+    border:1px solid #fe978a;
+    background-color:#2C2C2C;
+    border-radius: 5px;
+    color: #fe978a
 }
 .stop-button{
     display: none 
 }
-
 #share {
     position: relative;
     float:right;
@@ -314,30 +292,23 @@ input:focus {
     cursor: pointer;
     clear:both;
 }
-
 #share:hover {
     color: #DCF8C6;
 }
 @media (max-width: 1023px) {
-    /* Estilos específicos para pantallas pequeñas (móviles) */
 
     #header{
         max-width:100%;
         margin-left:0%;
 
     }
-
-
-
     #chat-container {
         margin-left: 0px; 
         margin-right: 0px; 
         max-width: 100%;
         height: calc(100vh - 200px);
         padding:10px;
-
     }
-  
     #model-form button {
         font-size: 12px; 
         padding: 5px 10px; 
@@ -358,7 +329,6 @@ input:focus {
     #user-input{
         border-color:#f7e3c1;
     }
-
     #model-select {
         font-size: 12px; 
         height:25px;
@@ -380,15 +350,12 @@ input:focus {
         margin-top:80px;
         width:100%;
         display: none; 
-     
     }
     #toggle-sidebar-button{
         max-width:100%;
         margin-left:0%;
     }
-
 }
-
 @media (max-height: 740px) {
 
     #sidebar{
@@ -401,20 +368,12 @@ input:focus {
 
     #sidebar select,textarea{
         max-height:30px;
-
     }
-
     #sidebar input{
         max-height:20px;
-
     }
-    #sidebar button{
-      
+    #sidebar button{ 
         margin-bottom:5px;
         font-size:12px;
     }
-
-    
-
-
 }

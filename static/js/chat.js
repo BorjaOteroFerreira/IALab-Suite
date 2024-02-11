@@ -7,20 +7,15 @@ class Chat {
         this.currentAssistantResponse = '';
         this.n_responses = 0;
         this.conversationStarted = false;
-        
-      
-
     }
+
     onConnect() {
         console.log('Conectado! ✅');
         $('#stop-button').hide();
-       
     }
 
     assistantResponse(response){
         this.onAssistantResponse(response);
-   
-
     }
 
     onAssistantResponse(response) {
@@ -29,8 +24,6 @@ class Chat {
         this.scrollToBottom();
         console.log('Tokens recividos 🔤');
     }
-
-  
 
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '<br>');
@@ -42,7 +35,7 @@ class Chat {
             this.currentAssistantResponse += response;
         }
         // Reemplaza triple comilla con <pre><code>
-        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chatApp.copyToClipboard(this)">Copiar</button><code>$1</code></pre>');
+        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chatApp.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
         var div = $('#chat-assistant-' + this.n_responses);
         div.html(this.currentAssistantResponse);
         Prism.highlightAll();
@@ -78,11 +71,11 @@ class Chat {
         $('#user-input').val('');
         $('#user-input').focus();
        
-        var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label>Yo</label><div class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
+        var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label>User</label><div class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
         var chatList = $('#chat-list');
         chatList.append(message);
         
-        var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label>Asistente<br></label><div id="chat-assistant-'+this.n_responses+'" class="assistant-message"></div></div>');
+        var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label>Asistant<br></label><div id="chat-assistant-'+this.n_responses+'" class="assistant-message"></div></div>');
         chatList.append(divAssistant);
 
         var botonCompartir = $('<button id="share" onclick="chatApp.shareChat(' + this.n_responses + ')">Compartir</button>');

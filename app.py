@@ -87,5 +87,5 @@ TODO:
     - Advanced parameters to menu configuration.
     - Capture exceptions.
     - Refactor the code. 
-    - Implement LangChains.
+    - Implement LangChain.
 '''

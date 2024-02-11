@@ -22,7 +22,6 @@
 </div>
 <div class="key-container" id="key-container"></div>
 <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
-
 <div id="chat-container" class="container mt-4">
     <div id="chat-list"></div>
 </div>
@@ -95,7 +94,7 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
             { element: '#system-message', popover: { title: 'Mensaje de Sistema (Opcional)', 
                                                     description: 'Escribe aquí cómo quieres que se comporte tu asistente. En este campo puedes darle indicaciones como quien es, cuales son sus especialidades, como se llama, pidele que adopte una personalidad concreta etc.', position: 'right' } },
             { element: '#gpu-layers', popover: { title: 'Capas GPU (Opcional)', 
-                                                    description: 'Establece el número de capas GPU para el modelo.Cada modelo tiene un tamaño maximo de capas, esas capas pueden cargarse en GPU para un mayor rendimiento siempre que la GPU sea compatible con CUDA(Win/Linx) o METAL(MacOs). La gpu debe tener al menos el mismo tamaño de memoria disponible que el peso del modelo en gigas<br>Si estableces el valor en 0, no se usará la GPU y se hará uso de CPU y la ram de la CPU.<br>Con -1 utilizara todas las capas disponibles que permita la GPU', position: 'right' } },
+                                                    description: 'Establece el número de capas GPU para el modelo. Cada modelo tiene un tamaño maximo de capas, esas capas pueden cargarse en GPU para un mayor rendimiento siempre que la GPU sea compatible con CUDA(Win/Linx) o METAL(MacOs). La gpu debe tener al menos el mismo tamaño de memoria disponible que el peso del modelo en gigas<br>Si estableces el valor en 0, no se usará la GPU y se hará uso de CPU y la ram de la CPU.<br>Con -1 utilizara todas las capas disponibles que permita la GPU', position: 'right' } },
             { element: '#aplicar', popover: { title: 'Aplicar Configuración', 
                                                     description: 'Haz clic aquí para aplicar la configuración del modelo.', position: 'right' } },
             { element: '#desmontar', popover: { title: 'Desmontar Modelo', 
