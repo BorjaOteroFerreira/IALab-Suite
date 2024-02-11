@@ -148,8 +148,7 @@ models/llama/llama-2-7b-chat.Q8_0.gguf
 ```
 
 This model is used as the default model,
-you can add more models in .gguf format on[models](https://huggingface.co/models?search=gguf)
-and they will be added directly to the list in the interface
+you can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
 **IMPORTANT:** Remember to use models of size according to the available RAM of your graphics card.
 In the case of MacOs with Metal, the maximum memory that can be used for inference is limited, around 65-75% of the total memory.
 For use with CPU the limit is the total memory of the CPU on both Windows and Mac.
