@@ -18,6 +18,7 @@ class Assistant:
         self.is_processing = False
         self.chat_format = default_chat_format
         self.model_path = default_model_path
+        self.temperature = 0.81
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal", "metal_device_id": 0}
         self.gpu_layers = 14
@@ -45,7 +46,7 @@ your responses allways in markdown.
             n_ctx=self.max_context_tokens,
             **self.device_options,
             chat_format=self.chat_format,
-            temp=0.81,
+            temp=self.temperature,
             use_mmap=True,
             n_threads=11,
         )
@@ -53,7 +54,7 @@ your responses allways in markdown.
         self.context_window_start = 0
         self.stop_emit = False
 
-    def load_model(self, model_path, format, n_gpu_layer, new_system_message, context):
+    def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context):
         '''
         Créa una instancia del modelo.
 
@@ -67,8 +68,10 @@ your responses allways in markdown.
         message = new_system_message if new_system_message is not None and new_system_message != '' else self.system_message
         gpu_layers = n_gpu_layer if n_gpu_layer is not None else -1
         ctx = context if context is not None and context != '' else self.max_context_tokens
+        temperature = new_temperature if new_temperature is not None else 0.81
         self.system_message = message
         self.model_path = model_path
+        self.temperature = temperature
         self.max_context_tokens = ctx
         self.max_assistant_tokens = ctx
         self.chat_format = format

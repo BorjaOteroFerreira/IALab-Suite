@@ -103,6 +103,7 @@ class Chat {
         var selectedFormat = $('#format-select').val();
         var systemMessage = $('#system-message').val();
         var gpuLayers = $('#gpu-layers').val();
+        var temperature = $('#temperature').val();
         var n_ctx  = $('#context').val();   
         $.ajax({
             type: "POST",
@@ -110,6 +111,7 @@ class Chat {
             data: { 
                 model_path: selectedModel, 
                 format: selectedFormat,
+                temperature: temperature,
                 system_message: systemMessage, 
                 gpu_layers: gpuLayers,
                 context: n_ctx
@@ -187,7 +189,7 @@ class Chat {
             return map[m];
         });
     }
-    
+
     shareChat(responseNumber) {
         if (navigator.share) {
             var ask = $('.user-message-' + responseNumber).text();
