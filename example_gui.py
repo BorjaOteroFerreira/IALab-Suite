@@ -1,10 +1,7 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import scrolledtext
 from threading import Thread
 import queue
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters import get_formatter_by_name
 from Assistant import Assistant 
 
 
@@ -28,9 +25,16 @@ class LlamaGUI:
         clear_context_button = tk.Button(header_frame, text="Reset chat", bg="#555555", fg="black", command=self.clear_context)
         clear_context_button.pack(side=tk.RIGHT)
 
-        # Container principal
+        # Main Container
         main_container = tk.Frame(self.master)
         main_container.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        # Chat Container
+        chat_container = tk.Frame(main_container, bg="#333333")
+        chat_container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        self.chat_display = scrolledtext.ScrolledText(chat_container, wrap=tk.WORD, width=100, height=25, bg="#333333", fg="white")
+        self.chat_display.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         # Footer
         footer_frame = tk.Frame(main_container, bg="#333333", padx=10, pady=10)
@@ -46,12 +50,7 @@ class LlamaGUI:
         send_button = tk.Button(footer_frame, text="Send", bg="#007ACC", fg="black", command=self.send_user_input)
         send_button.pack(side=tk.RIGHT)
 
-        # Chat Container
-        chat_container = tk.Frame(main_container, bg="#333333")
-        chat_container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        self.chat_display = scrolledtext.ScrolledText(chat_container, wrap=tk.WORD, width=100, height=25, bg="#333333", fg="white")
-        self.chat_display.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
     def send_user_input(self, event=None):
         user_input = self.user_input_entry.get()  
@@ -93,11 +92,8 @@ class LlamaGUI:
             self.chat_display.see(tk.END)
             self.chat_display.config(state=tk.DISABLED)
             self.user_input_entry.delete(0, tk.END)
-
         self.master.after(100, self.update_chat_display)
 
-    def get_context_color(self, fraction):
-        return "#007ACC"
 
     def add_message_to_display(self, message):
         self.chat_display.config(state=tk.NORMAL)
