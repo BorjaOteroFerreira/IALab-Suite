@@ -2,14 +2,12 @@
 
 # IA SUITE 
 
-
 ### Flask App for Testing LLM Models with Llama.cpp Library
 
 This Flask application offers a unique local chat experience for testing Language Model (LLM) using the Llama.cpp library. Unlike many online platforms, this chat operates entirely offline, ensuring user privacy by eliminating the need for internet access and avoiding data sharing with third-party companies. Users can confidently mount and evaluate LLM models in the GGUF format without compromising their data security. 
 The app is under active development, with a focus on enhancing features and maintaining robust privacy measures.
 
 For production environments use another wsgi server.
-
 
 <p align="center">
   <img src="media/chat_pic.png" alt="Chat code prompt">
@@ -28,8 +26,6 @@ pip install flask_socketio
 ```bash
 pip install CORS
 ```
-
-
 
 # llama-cpp-python
 
@@ -152,8 +148,11 @@ models/llama/llama-2-7b-chat.Q8_0.gguf
 ```
 
 This model is used as the default model,
-you can add more models in .gguf format
+you can add more models in .gguf format on[models](https://huggingface.co/models?search=gguf)
 and they will be added directly to the list in the interface
+**IMPORTANT:** Remember to use models of size according to the available RAM of your graphics card.
+In the case of MacOs with Metal, the maximum memory that can be used for inference is limited, around 65-75% of the total memory.
+For use with CPU the limit is the total memory of the CPU on both Windows and Mac.
 
 Usage:
 
@@ -164,10 +163,7 @@ python3 ./app.py
 
 The server starts on localhost 127.0.0.1:8080.
 
-
 #### __Tested in MacBook-Pro M3-Pro 11 cpu cores , 14 gpu cores, 18 unify memory with models max 12GB & AMD Ryzen 5600x , Nvidia RTX 3060 gaming OC 12GB, 32GB cpu Memory.__ | __Python version 3.11.7__ | 
-
-
 
 #### TODO:
   - Best control of context
