@@ -21,7 +21,7 @@ class Assistant:
         self.temperature = 0.81
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal", "metal_device_id": 0}
-        self.gpu_layers = 14
+        self.gpu_layers = -1
         self.system_message = '''
 You are an assistant with a kind and honest personality. 
 As an expert programmer and pentester, 
@@ -66,7 +66,7 @@ your responses allways in markdown.
         - (int) context: tamaño en tokens del contexto máximo. 
         '''
         message = new_system_message if new_system_message is not None and new_system_message != '' else self.system_message
-        gpu_layers = n_gpu_layer if n_gpu_layer is not None else -1
+        gpu_layers = int(n_gpu_layer) if n_gpu_layer is not None else -1
         ctx = context if context is not None and context != '' else self.max_context_tokens
         temperature = new_temperature if new_temperature is not None else 0.81
         self.system_message = message

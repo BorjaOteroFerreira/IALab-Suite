@@ -4,9 +4,12 @@ import os
 from Assistant import Assistant  # Importa tu clase Assistant desde el módulo Assistant
 import logging
 
+
 class IASuiteApi:
     def __init__(self):
         self.app = Flask(__name__, static_url_path='/static')
+        # Configuración de parámetros
+        self.app.config['PING_TIMEOUT'] = 100  # Tiempo de espera máximo (en segundos) para recibir un ping desde el cliente
         self.socketio = SocketIO(self.app)
         self.logging_setup()
         self.default_model_path = "models/llama/llama-2-7b-chat.Q8_0.gguf"
@@ -49,7 +52,7 @@ class IASuiteApi:
     def load_model(self):
         selected_model = request.form.get('model_path')
         selected_format = request.form.get('format')
-        n_gpu_layers = request.form.get('n_gpu_layers')
+        n_gpu_layers = request.form.get('gpu_layers')
         system_message = request.form.get('system_message')
         temperature = request.form.get('temperature')
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
@@ -81,5 +84,5 @@ class IASuiteApi:
         return models_list
 
     def get_format_list(self):
-        format_list = ["guanaco", "llama-2", "tb-uncensored", "airoboros", "mistral-24", "qwen", "vicuna"]
+        format_list = ["llama-2", "qwen", "vicuna","guanaco","tb-uncensored","airoboros" , "mistral-24"]
         return format_list
