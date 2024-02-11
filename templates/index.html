@@ -17,8 +17,8 @@
 </head>
 <body>
 <div id="header">
-    <button class="btn btn-primary" id="start-tour-button">Aprende a usarme</button>
-    <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reiniciar chat</button>
+    <button class="btn btn-primary" id="start-tour-button">How To</button>
+    <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reset chat</button>
 </div>
 <div class="key-container" id="key-container"></div>
 <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
@@ -81,33 +81,33 @@ Si no sabe la respuesta a una pregunta, no comparta información falsa. Mantenga
     });
     const driver = window.driver.js.driver;
     const guiaConfiguracion = [
-            { element: '#toggle-sidebar-button', popover: { title: 'Menu de configuración',
-                                                    description: 'Pulsa el botón de Menú para abrir y cerrar el menú de configuración del modelo', position: 'right' } },
-            { element: '#model-select', popover: { title: 'Selecciona un modelo',
-                                                    description: 'Elige el modelo que vas a utlizar. Recuerda que debes descargar tu modelo en formato .gguf y moverlo/copiarlo a la carpeta models', position: 'right' } },
-            { element: '#format-select', popover: { title: 'Selecciona un formato de chat', 
-                                                    description: 'Elige un formato de chat para comenzar. Cada modelo usa una estructura de mensajes, por ejemplo:<br><code>˝###Instruction:{mensaje_de_systema}<br>###User:{mensaje_usuario}<br>###Asistant:{mensaje_asistente}˝</code><br> por lo que cada modelo usara un tipo concreto de plantilla para la conversación', position: 'right' } },
-            { element: '#temperature', popover: { title: 'Temperatura del modelo (opcional, por defecto 0.81) ',
-                                                    description: 'Ajusta la temperatura del modelo 0-1.<br>La temperatura determina la creatividad del modelo en las respuestas, si la temperatura es cercana a 0 las respuestas serán mas deterministas pero menos creativas, mientras que si la temperatura es alta sus respuestas serán mas creativas pero puede que sean menos precisas', position: 'right' } },
-            { element: '#context', popover: { title: 'Contexto Máximo (opcional, por defecto 2048)',
-                                                    description: 'Establece el contexto máximo (En tokens) del modelo. El contexto, es el tamaño de conversación en tokens que es capaz de manejar, cada modelo tiene una capacidad máxima, a mayor tamaño mas recursos de memoria necesarios pero también podrá mantener el hilo en conversaciones mas largas (Por defecto en 2048 tokens)', position: 'right' } },
-            { element: '#system-message', popover: { title: 'Mensaje de Sistema (Opcional)', 
-                                                    description: 'Escribe aquí cómo quieres que se comporte tu asistente. En este campo puedes darle indicaciones como quien es, cuales son sus especialidades, como se llama, pidele que adopte una personalidad concreta etc.', position: 'right' } },
-            { element: '#gpu-layers', popover: { title: 'Capas GPU (Opcional)', 
-                                                    description: 'Establece el número de capas GPU para el modelo. Cada modelo tiene un tamaño maximo de capas, esas capas pueden cargarse en GPU para un mayor rendimiento siempre que la GPU sea compatible con CUDA(Win/Linx) o METAL(MacOs). La gpu debe tener al menos el mismo tamaño de memoria disponible que el peso del modelo en gigas<br>Si estableces el valor en 0, no se usará la GPU y se hará uso de CPU y la ram de la CPU.<br>Con -1 utilizara todas las capas disponibles que permita la GPU', position: 'right' } },
-            { element: '#aplicar', popover: { title: 'Aplicar Configuración', 
-                                                    description: 'Haz clic aquí para aplicar la configuración del modelo.', position: 'right' } },
-            { element: '#desmontar', popover: { title: 'Desmontar Modelo', 
-                                                    description: 'Haz clic aquí para desmontar el modelo actual y liberarlo de la memoria cuando hayas terminado.', position: 'right' } },
-            { element: '#user-input', popover: { title: 'Escribe tu mensaje',
-                                                    description: 'Aquí puedes escribir tu mensaje para el asistente.', position: 'left' } },
-            { element: '#send-button', popover: { title: 'Envía tu mensaje', 
-                                                    description: 'Pulsa enviar o [Intro] para enviar el mensaje.', position: 'left' } },
-            { element: '#chat-list', popover: { title: 'Lista de mensajes', 
-                                                    description: 'En esta ventana irán apareciendo tus indicaciones para el modelo y sus respuestas 😁', position: 'left' } },
-            { element: '#clear-context-button', popover: { title: 'Reinicia la conversación',
-                                                  description: 'Casi lo olvido!!😅 Pulsa el botón de Reinicio para borrarme la memoria y comenzar una nueva conversación. Espero que lo disfrutes! 🤓 ', position: 'right' } }
-        ];
+    { element: '#toggle-sidebar-button', popover: { title: 'Settings menu',
+                                                     description: 'Press the Menu button to open and close the model settings menu', position: 'right' } },
+             { element: '#model-select', popover: { title: 'Select a model',
+                                                     description: 'Choose the model you are going to use. Remember that you must download your model in .gguf format and move/copy it to the model\'s folder', position: 'right' } },
+             { element: '#format-select', popover: { title: 'Select a chat format',
+                                                     description: 'Choose a chat format to start. Each model uses a message structure, for example:<br><code>˝###Instruction:{system_message}<br>###User:{user_message}<br>###Assistant:{assistant_message}˝< /code><br> so each model will use a specific type of template for the conversation', position: 'right' } },
+             { element: '#temperature', popover: { title: 'Model temperature (optional, default 0.81) ',
+                                                     description: 'Adjust the temperature of the model from 0-1.<br>The temperature determines the creativity of the model in the responses, if the temperature is close to 0 the responses will be more deterministic but less creative, while if the temperature is high its Answers will be more creative but may be less precise', position: 'right' } },
+             { element: '#context', popover: { title: 'Maximum Context (optional, default 2048)',
+                                                     description: 'Sets the maximum context (In tokens) of the model. The context is the size of the conversation in tokens that it is capable of handling, each model has a maximum capacity, the larger the size the more memory resources required but it will also be able to maintain the thread in longer conversations (by default in 2048 tokens)', position: 'right' } },
+             { element: '#system-message', popover: { title: 'System Message (Optional)',
+                                                     description: 'Write here how you want your assistant to behave. In this field you can give him instructions such as who he is, what his specialties are, what his name is, ask him to adopt a specific personality, etc.', position: 'right' } },
+             { element: '#gpu-layers', popover: { title: 'GPU Layers (Optional)',
+                                                     description: 'Sets the number of GPU layers for the model. Each model has a maximum layer size, those layers can be loaded on the GPU for greater performance as long as the GPU supports CUDA (Win/Linx) or METAL (MacOs). The gpu must have at least the same size of available memory as the model weight in gigabytes<br>If you set the value to 0, the GPU will not be used and the CPU and CPU ram will be used.<br> With -1 it will use all the available layers that the GPU allows', position: 'right' } },
+             { element: '#apply', popover: { title: 'Apply Settings',
+                                                     description: 'Click here to apply model settings.', position: 'right' } },
+             { element: '#dismount', popover: { title: 'Dismount Model',
+                                                     description: 'Click here to unmount the current model and free it from memory when you\'re done.', position: 'right' } },
+             { element: '#user-input', popover: { title: 'Enter your message',
+                                                     description: 'Here you can write your message to the assistant.', position: 'left' } },
+             { element: '#send-button', popover: { title: 'Send your message',
+                                                     description: 'Press send or [Enter] to send the message.', position: 'left' } },
+             { element: '#chat-list', popover: { title: 'Message List',
+                                                     description: 'In this window your instructions for the model and its answers will appear 😁', position: 'left' } },
+             { element: '#clear-context-button', popover: { title: 'Restart the conversation',
+                                                   description: 'I almost forgot!!😅 Press the Reset button to erase my memory and start a new conversation. I hope you enjoy it! 🤓 ', position: 'right' } }
+         ];
         const driverObj = driver({
             showProgress: true,
             steps: guiaConfiguracion
