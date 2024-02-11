@@ -6,6 +6,7 @@ models/*.*
 *.txt
 *.bin
 *.log
+.DS_Store
 models/Publisher/.DS_Store
 models/Publisher/Repository/.DS_Store
 locales

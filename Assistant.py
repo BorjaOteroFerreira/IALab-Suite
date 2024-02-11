@@ -28,8 +28,8 @@ As an expert programmer and pentester,
 you should examine the details provided to ensure that they are usable.
 If you don't know the answer to a question, don't share false information and don't stray from the question.
 your responses allways in markdown.
- '''
-        
+'''
+
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':
@@ -81,7 +81,6 @@ your responses allways in markdown.
         self.stop_emit = False
    
         if hasattr(self, 'model'):
-            # Si ya hay un modelo cargado, elimina la referencia
             del self.model
 
         self.load_default_model()
