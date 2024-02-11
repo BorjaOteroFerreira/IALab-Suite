@@ -60,8 +60,8 @@
         <label for="gpu-layers">GPU layers:</label>
         <input type="number" id="gpu-layers" class="form-control" placeholder="Example: 8">
     </div>
-    <button type="button" class="btn btn-primary" id="aplicar" onclick="chat.applyConfig()">Apply configuration</button>
-    <button type="button" class="btn btn-secondary" id="desmontar" onclick="chat.unloadModel()">Unmount</button>
+    <button type="button" class="btn btn-primary" id="apply" onclick="chat.applyConfig()">Apply configuration</button>
+    <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
 </div>
 <div id="footer" >
     <button  id="stop-button" onclick="chat.stopResponse()" height="20px">Stop</button>
@@ -97,7 +97,7 @@
                                                      description: 'Sets the number of GPU layers for the model. Each model has a maximum layer size, those layers can be loaded on the GPU for greater performance as long as the GPU supports CUDA (Win/Linx) or METAL (MacOs). The gpu must have at least the same size of available memory as the model weight in gigabytes<br>If you set the value to 0, the GPU will not be used and the CPU and CPU ram will be used.<br> With -1 it will use all the available layers that the GPU allows', position: 'right' } },
              { element: '#apply', popover: { title: 'Apply Settings',
                                                      description: 'Click here to apply model settings.', position: 'right' } },
-             { element: '#dismount', popover: { title: 'Dismount Model',
+             { element: '#unmount', popover: { title: 'Dismount Model',
                                                      description: 'Click here to unmount the current model and free it from memory when you\'re done.', position: 'right' } },
              { element: '#user-input', popover: { title: 'Enter your message',
                                                      description: 'Here you can write your message to the assistant.', position: 'left' } },

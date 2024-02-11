@@ -35,7 +35,7 @@ class Chat {
             this.currentAssistantResponse += response;
         }
         // Reemplaza triple comilla con <pre><code>
-        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chatApp.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
+        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
         var div = $('#chat-assistant-' + this.n_responses);
         div.html(this.currentAssistantResponse);
         Prism.highlightAll();
@@ -78,7 +78,7 @@ class Chat {
         var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label>Asistant<br></label><div id="chat-assistant-'+this.n_responses+'" class="assistant-message"></div></div>');
         chatList.append(divAssistant);
 
-        var botonCompartir = $('<button id="share" onclick="chatApp.shareChat(' + this.n_responses + ')">Share</button>');
+        var botonCompartir = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
         var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
         userMessageCointainer.append(botonCompartir);
         this.scrollToBottom();
@@ -149,7 +149,6 @@ class Chat {
                 console.error('Error:', error);
             }
         });
-      
     }
 
     scrollToBottom() {
@@ -171,11 +170,11 @@ class Chat {
         alert('Copiado al portapapeles');
         console.log('Copiado al portapapeles! 📋');
     }
+
     toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
         sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
     }
-    
     escapeHtml(text) {
         var map = {
             '&': '&amp;',
@@ -188,7 +187,7 @@ class Chat {
             return map[m];
         });
     }
-
+    
     shareChat(responseNumber) {
         if (navigator.share) {
             var ask = $('.user-message-' + responseNumber).text();

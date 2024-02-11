@@ -98,19 +98,19 @@ body {
 }
 .user-message-container label {
     border:1px solid #f7e3c1;
-    border-start-start-radius: 5px;
+    border-radius: 5px;
     color: #f7e3c1;
+    padding-right:7px;
     padding-left:7px;
-    padding-right:20px;
     font-weight: bold;
     font-size:14;
 }
 .assistant-message-container label {
     border:1px solid #DCF8C6;
-    border-start-start-radius: 5px;
+    border-radius: 5px;
     color: #DCF8C6;
+    padding-right:7px;
     padding-left:7px;
-    padding-right:20px;
     font-weight: bold;
 }
 #sidebar {
