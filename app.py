@@ -35,7 +35,7 @@ def handle_user_input():
     return 'Respuesta finalizada! 📩'
 
 @app.route('/load_model', methods=['POST'])
-def start_model():
+def load_model():
     selected_model = request.form.get('model_path')
     selected_format = request.form.get('format')
     n_gpu_layers = request.form.get('n_gpu_layers')
