@@ -78,7 +78,7 @@ class Chat {
         var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label>Asistant<br></label><div id="chat-assistant-'+this.n_responses+'" class="assistant-message"></div></div>');
         chatList.append(divAssistant);
 
-        var botonCompartir = $('<button id="share" onclick="chatApp.shareChat(' + this.n_responses + ')">Compartir</button>');
+        var botonCompartir = $('<button id="share" onclick="chatApp.shareChat(' + this.n_responses + ')">Share</button>');
         var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
         userMessageCointainer.append(botonCompartir);
         this.scrollToBottom();
