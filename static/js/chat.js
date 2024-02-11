@@ -194,7 +194,7 @@ class Chat {
         if (navigator.share) {
             var ask = $('.user-message-' + responseNumber).text();
             var response =  $('#chat-assistant-' + responseNumber).html();
-            var fullResponse = "Yo: \n"+ask+"\n\nAsistente:\n"+response
+            var fullResponse = "User: \n"+ask+"\n\nAsistente:\n"+response
             fullResponse = fullResponse.replace(/<br>/g, '\n');
             navigator.share({
                 title: ask,
