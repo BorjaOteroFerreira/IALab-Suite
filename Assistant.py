@@ -129,11 +129,14 @@ your responses allways in markdown.
         - (str[]) message_queue: Cola de mensajes para comunicarse con otros componentes.
         """
         if not self.is_processing:
+            self.stop_emit = False
             last_user_input_time = time.time()
             response = ""
-            message_queue.put({"role": "assistant", "content": "\n\n Asistente: \b"})
-            for chunk in self.model.create_chat_completion(messages=self.conversation_history[self.context_window_start:], max_tokens=self.max_assistant_tokens, stream=True):
-                if 'content' in chunk['choices'][0]['delta']:
+            for chunk in self.model.create_chat_completion(messages=self.conversation_history[self.context_window_start:], 
+                                                           max_tokens=self.max_assistant_tokens, 
+                                                           stream=True):
+                
+                if 'content' in chunk['choices'][0]['delta'] and self.stop_emit is False:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     response += response_chunk
                     message_queue.put({"role": "assistant", "content": response_chunk})
