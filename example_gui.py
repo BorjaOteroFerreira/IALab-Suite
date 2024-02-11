@@ -13,7 +13,6 @@ class LlamaGUI:
         self.is_processing = False
         self.stream_thread = None
         master.title("Assistant Chat")
-
         self.create_widgets()
         self.update_chat_display()
 
@@ -94,7 +93,6 @@ class LlamaGUI:
             self.user_input_entry.delete(0, tk.END)
         self.master.after(100, self.update_chat_display)
 
-
     def add_message_to_display(self, message):
         self.chat_display.config(state=tk.NORMAL)
         self.chat_display.insert(tk.END, message)
@@ -108,7 +106,7 @@ if __name__ == "__main__":
     assistant = Assistant(default_model_path=model_path, default_chat_format=chat_format)
 
     root = tk.Tk()
-    root.geometry("700x600")  # Ajusta el tamaño según tus necesidades
+    root.geometry("700x600") 
     llama_gui = LlamaGUI(root, assistant)
 
     root.mainloop()
