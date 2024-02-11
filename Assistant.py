@@ -128,7 +128,7 @@ your responses allways in markdown.
         Obtiene la respuesta del asistente.
 
         Parámetros:
-        - (map[]) message_queue: Cola de mensajes para comunicarse con otros componentes.
+        - (map[]) message_queue: Cola de mensajes para comunicarse con otros componentes como example_gui.py.
         '''
         if not self.is_processing:
             self.stop_emit = False
@@ -147,7 +147,7 @@ your responses allways in markdown.
                 print(response)
             self.is_processing = False
  
-
+    #TODO: stop token generation thread
     def emit_assistant_response_stream(self, socket):
         '''
         Obtiene la respuesta del asistente.
@@ -169,7 +169,6 @@ your responses allways in markdown.
                     socket.emit('assistant_response',
                                 {'role': 'assistant', 'content': response_chunk}, namespace='/test')
                     time.sleep(0.01)
-
             if not self.stop_emit:
                 self.conversation_history.append({"role": "assistant", "content": response})
                 print(response)

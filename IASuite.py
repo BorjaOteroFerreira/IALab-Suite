@@ -9,7 +9,7 @@ class IASuiteApi:
     def __init__(self):
         self.app = Flask(__name__, static_url_path='/static')
         # Configuración de parámetros
-        self.socketio = SocketIO(self.app, async_mode='threading', ping_timeout=600, ping_interval=60)
+        self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
         self.default_model_path = "models/llama/llama-2-7b-chat.Q8_0.gguf"
         self.default_chat_format = "llama-2"
