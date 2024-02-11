@@ -170,13 +170,13 @@ The server starts on localhost 127.0.0.1:8080.
 
 
 #### TODO:
-  - Stop stream response
   - Best control of context
   - FormatChat editor 
   - Conversations List 
   - Save conversation in json
   - Advanced parameters to menu configuration
   - multimodal form input
-  - Capture exceptions.
-  - Refactor the code. 
+  - Implement LangChain.
+
+
  
