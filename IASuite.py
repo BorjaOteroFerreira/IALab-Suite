@@ -9,8 +9,7 @@ class IASuiteApi:
     def __init__(self):
         self.app = Flask(__name__, static_url_path='/static')
         # Configuración de parámetros
-        self.app.config['PING_TIMEOUT'] = 100  # Tiempo de espera máximo (en segundos) para recibir un ping desde el cliente
-        self.socketio = SocketIO(self.app)
+        self.socketio = SocketIO(self.app, async_mode='threading', ping_timeout=600, ping_interval=60)
         self.logging_setup()
         self.default_model_path = "models/llama/llama-2-7b-chat.Q8_0.gguf"
         self.default_chat_format = "llama-2"
