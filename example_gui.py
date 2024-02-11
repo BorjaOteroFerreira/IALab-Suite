@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 from tkinter import scrolledtext
 from threading import Thread
 import queue
@@ -12,9 +13,10 @@ class ExampleGui:
         self.message_queue = queue.Queue()
         self.is_processing = False
         self.stream_thread = None
-        master.title("Assistant Chat")
+        master.title("IA Suite - Example Gui")
         self.create_widgets()
         self.update_chat_display()
+        ttk.Style().theme_use('clam')
 
     def create_widgets(self):
         # Header
@@ -39,14 +41,15 @@ class ExampleGui:
         footer_frame = tk.Frame(main_container, bg="#333333", padx=10, pady=10)
         footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.stop_button = tk.Button(footer_frame, text="Stop", bg="#FF5555", fg="black", command=self.stop_stream)
+        self.stop_button = tk.Button(footer_frame, text="Stop", fg="black", command=self.stop_stream)
         self.stop_button.pack(side=tk.LEFT)
 
         self.user_input_entry = tk.Entry(footer_frame, bg="#2C2C2C", fg="white", bd=1, insertbackground="white")
         self.user_input_entry.pack(side=tk.LEFT, expand=True, fill=tk.X)
         self.user_input_entry.bind("<Return>", self.send_user_input)
 
-        send_button = tk.Button(footer_frame, text="Send", bg="#007ACC", fg="black", command=self.send_user_input)
+        send_button = tk.Button(footer_frame, text="Send", fg="black", command=self.send_user_input)
+    
         send_button.pack(side=tk.RIGHT)
 
     def send_user_input(self, event=None):
@@ -103,7 +106,7 @@ if __name__ == "__main__":
     assistant = Assistant(default_model_path=model_path, default_chat_format=chat_format)
 
     root = tk.Tk()
-    root.geometry("700x600") 
+    root.geometry("600x800") 
     llama_gui = ExampleGui(root, assistant)
 
     root.mainloop()

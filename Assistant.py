@@ -28,8 +28,7 @@ you should examine the details provided to ensure that they are usable.
 If you don't know the answer to a question, don't share false information and don't stray from the question.
 your responses allways in markdown.
  '''
- 
-
+        
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
         elif platform.system() == 'Darwin':
@@ -91,12 +90,12 @@ your responses allways in markdown.
         del self.model
 
     def get_context_fraction(self):
-        """
+        '''
         Calcula la fracción de tokens de contexto utilizados.
 
         Retorna:
         float: Fracción de tokens de contexto utilizados.
-        """
+        '''
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
         return min(1.0, total_tokens / self.max_context_tokens * 10)
 
@@ -122,12 +121,12 @@ your responses allways in markdown.
         self.update_context_tokens()
 
     def get_assistant_response_stream(self, message_queue):
-        """
+        '''
         Obtiene la respuesta del asistente.
 
         Parámetros:
-        - (str[]) message_queue: Cola de mensajes para comunicarse con otros componentes.
-        """
+        - (map[]) message_queue: Cola de mensajes para comunicarse con otros componentes.
+        '''
         if not self.is_processing:
             self.stop_emit = False
             last_user_input_time = time.time()
@@ -135,40 +134,39 @@ your responses allways in markdown.
             for chunk in self.model.create_chat_completion(messages=self.conversation_history[self.context_window_start:], 
                                                            max_tokens=self.max_assistant_tokens, 
                                                            stream=True):
-                
+                          
                 if 'content' in chunk['choices'][0]['delta'] and self.stop_emit is False:
                     response_chunk = chunk['choices'][0]['delta']['content']
                     response += response_chunk
                     message_queue.put({"role": "assistant", "content": response_chunk})
             self.is_processing = False
-            elapsed_time = round(time.time() - last_user_input_time, 2)
-            print(f" | {elapsed_time}s")
-            print(response)    
+            print(response)
+ 
 
     def emit_assistant_response_stream(self, socket):
-        """
+        '''
         Obtiene la respuesta del asistente.
 
         Parámetros:
         - (obj) socket: Conexion para enviar el stream.
-        """
+        '''
         if not self.is_processing:
             self.stop_emit = False
             self.is_processing = True
-            full_response = ""
+            response = ""
             for chunk in self.model.create_chat_completion(messages=self.conversation_history,
                                                         max_tokens=self.max_assistant_tokens, 
                                                         stream=True):
                 
                 if 'content' in chunk['choices'][0]['delta'] and self.stop_emit is False:
                     response_chunk = chunk['choices'][0]['delta']['content']
-                    full_response += response_chunk  # Acumular la respuesta
+                    full_response += response_chunk  
                     socket.emit('assistant_response',
                                   {'role': 'assistant', 'content': response_chunk}, namespace='/test')
                     time.sleep(0.01)
             if self.stop_emit is False:
-                self.conversation_history.append({"role": "assistant", "content": full_response})
-            print(full_response)
+                self.conversation_history.append({"role": "assistant", "content": response})
+            print(response)
         self.is_processing = False
 
     def clear_context(self):
@@ -183,7 +181,7 @@ your responses allways in markdown.
 
     def stop_response(self):
         '''
-            Stop response stream
+            Detiene la generación de repspuesta en curso
         '''
         self.stop_emit = True
     
