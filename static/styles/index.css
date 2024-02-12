@@ -8,7 +8,8 @@ body {
     background-color:#333333;
 }
 #header {
-    background-color: #343a40;
+    margin-top:2px;
+    background-color: #272727;
     max-width:60%;
     margin-left: 20%;
     color: #ffffff;
@@ -19,6 +20,9 @@ body {
     top: 0;
     z-index: 1000;
     clear:both;
+    border:1px  solid #DCF8C6;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 #chat-container {
     border-right:1px solid #f7e3c1;
@@ -79,6 +83,15 @@ body {
 }
 #clear-context-button{
     float:right;
+    color:#272727;
+    background-color: #DCF8C6;
+    font-weight: bold;
+
+}
+#clear-context-button:hover{
+    color:#DCF8C6;
+    background-color:#272727;
+    border-color:#DCF8C6
 }
 .assistant-message-container {
     clear:both;
@@ -252,7 +265,20 @@ input:focus {
 #start-tour-button{
     float:left;
     clear:both;
+    background-color:#f7e3c1;
+    color:#2C2C2C;
+    border-color:#f7e3c1;
+    font-weight:bold;
 }
+#start-tour-button:hover{
+    float:left;
+    clear:both;
+    background-color:#00000000;
+    color:#f7e3c1;
+    border-color:#f7e3c1;
+
+}
+
 #toggle-sidebar-button{
     background-color: #2C2C2C; 
     color: #DCF8C6; 
@@ -347,9 +373,10 @@ input:focus {
        width:95%;
     }
     #sidebar{
-        margin-top:80px;
+        margin-top:90px;
         width:100%;
         display: none; 
+        z-index:0;
     }
     #toggle-sidebar-button{
         max-width:100%;
@@ -359,8 +386,9 @@ input:focus {
 @media (max-height: 740px) {
 
     #sidebar{
-        margin-top:80px;
+        margin-top:90px;
         font-size: 10px;
+        z-index:0;
     }
     #sidebar h5{
         font-size:12px

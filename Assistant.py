@@ -25,7 +25,7 @@ your responses allways in markdown.
 '''
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
-            self.use_nmap = False
+            self.use_nmap = True
         elif platform.system() == 'Darwin':
             self.device_options = self.metal_options
             self.use_nmap = True
