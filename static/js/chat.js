@@ -71,11 +71,11 @@ class Chat {
         $('#user-input').val('');
         $('#user-input').focus();
        
-        var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label>User</label><div class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
+        var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label for="cha-user-' + this.n_responses + '">User</label><div id="chat-user-' + this.n_responses + '" class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
         var chatList = $('#chat-list');
         chatList.append(message);
         
-        var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label>Asistant<br></label><div id="chat-assistant-'+this.n_responses+'" class="assistant-message"></div></div>');
+        var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label for="chat-assistant-' +this.n_responses + '">Asistant<br></label><div id="chat-assistant-' + this.n_responses +'" class="assistant-message"></div></div>');
         chatList.append(divAssistant);
 
         var botonCompartir = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
