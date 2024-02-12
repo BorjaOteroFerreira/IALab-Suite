@@ -165,3 +165,6 @@ The server starts on localhost 127.0.0.1:8080.
 
 #### __Tested in MacBook-Pro M3-Pro 11 cpu cores , 14 gpu cores, 18 unify memory, tested with 12gb max size models & AMD Ryzen 5600x , Nvidia RTX 3060 gaming OC 12GB, 32GB cpu Memory.__ | __Python version 3.11.7__ | 
 
+## Code & license 
+This code released under the [MIT License](https://github.com/BorjaOteroFerreira/IA-Suite/blob/main/LICENSE)
+
