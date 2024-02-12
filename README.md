@@ -144,7 +144,7 @@ python3 -m pip install -e .
 python3 -m pip install -e . --force-reinstall --no-cache-dir
 ```
 
-## **IMPORTANT (WINDOWS AND MAC):**
+## **IMPORTANT (MAC & WINDOWS):**
 After installation:
 Go to the llama-cpp installation folder
 If you have installed it with pip on MacOs you will find it in the python site-packages directory
