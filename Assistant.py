@@ -82,7 +82,7 @@ your responses allways in markdown.
         self.stop_emit = False
    
         if hasattr(self, 'model'):
-            del self.model
+             self.model = None
 
         self.load_default_model()
 
@@ -90,7 +90,7 @@ your responses allways in markdown.
         '''
         Elimina la referencia al modelo vaciando el atributo model del asistente, liberándolo de memoria
         '''
-        del self.model
+        self.model = None
 
     def get_context_fraction(self):
         '''
