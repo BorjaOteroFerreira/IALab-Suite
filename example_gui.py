@@ -13,7 +13,7 @@ class ExampleGui:
         self.message_queue = queue.Queue()
         self.is_processing = False
         self.stream_thread = None
-        master.title("IA Suite - Example Gui")
+        master.title("IALab Suite - Example Gui")
         self.create_widgets()
         self.update_chat_display()
         ttk.Style().theme_use('clam')
