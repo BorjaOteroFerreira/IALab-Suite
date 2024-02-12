@@ -144,6 +144,19 @@ python3 -m pip install -e .
 python3 -m pip install -e . --force-reinstall --no-cache-dir
 ```
 
+**IMPORTANT:**
+After installation:
+Go to the llama-cpp installation folder
+If you have installed it with pip on MacOs you will find it in the python site-packages directory
+
+If you have installed it on Windows with cmake, it is most likely located in C:\Users\your_user\llama-cpp-python\llama_cpp
+
+You can always do a quick search for the file llama_chat_format.py
+
+Make a copy of the file llama_chat_format.py renaming it to llama_chat_format.bk and paste the attached file into this repository.
+
+This solution is provisional but necessary to use models like Mixtral and others that need templates that are not included by default in the llama-cpp library until you implement a template editor to create, load and save templates without having to replace library files. library
+
 ## Usage
 
 Download the [model](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true) and place it in the models/llama folder.
@@ -153,11 +166,11 @@ The path looks like this:
 models/llama/llama-2-7b-chat.Q8_0.gguf
 ```
 
-This model is used as the default model,
+This model is used as the default model, (dont need llama_chat_format.py file sustitution)
 you can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
 
 
-[TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)  (size - 8.87 GB | Max ram required - 	11.37 GB)
+[TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)  (size - 8.87 GB | Max ram required - 	11.37 GB) (need llama_chat_format.py sustitution and use Custom-IALab chat format")
 
 
 The path looks like this:
