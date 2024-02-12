@@ -58,7 +58,7 @@ class IASuiteApi:
         self.assistant.clear_context()
         self.assistant.load_model(selected_model, selected_format, temperature, n_gpu_layers, system_message, n_ctx)
         return f'''
-                \nModelo:{selected_model}
+                \nModel:{selected_model}
                 \nformat: {selected_format}
                 \ntemp: {temperature}
                 \nlayers: {n_gpu_layers}
