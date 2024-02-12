@@ -49,7 +49,7 @@ your responses allways in markdown.
             chat_format=self.chat_format,
             temp=self.temperature,
             use_mmap=False,
-            n_threads=11,
+
         )
         self.conversation_history = [{"role": "system", "content": self.system_message}]
         self.context_window_start = 0
