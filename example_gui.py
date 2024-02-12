@@ -107,6 +107,6 @@ if __name__ == "__main__":
 
     root = tk.Tk()
     root.geometry("600x800") 
-    llama_gui = ExampleGui(root, assistant)
+    asistant_gui = ExampleGui(root, assistant)
 
     root.mainloop()
