@@ -15,7 +15,8 @@ class IASuiteApi:
         self.setup_routes()
 
     def logging_setup(self):
-        logging.basicConfig(filename='flask_log.log', level=logging.INFO)
+        logging.basicConfig(filename='flask_log.log', level=logging.ERROR)
+
 
     def setup_routes(self):
         self.app.before_request(self.before_first_request)
@@ -51,7 +52,7 @@ class IASuiteApi:
         selected_format = request.form.get('format')
         n_gpu_layers = int(request.form.get('gpu_layers')) if request.form.get('gpu_layers') != '' else -1
         system_message = request.form.get('system_message')
-        temperature = int(request.form.get('temperature')) if request.form.get('temperature') != '' else 0.81
+        temperature = float(request.form.get('temperature')) if request.form.get('temperature') != '' else 0.81
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
         self.assistant.unload_model()
         self.assistant.clear_context()
