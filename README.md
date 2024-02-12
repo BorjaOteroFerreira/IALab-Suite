@@ -146,7 +146,7 @@ python3 -m pip install -e . --force-reinstall --no-cache-dir
 
 ## **IMPORTANT (MAC & WINDOWS):**
 After installation:
-Go to the llama-cpp installation folder
+Go to the llama_cpp installation folder
 If you have installed it with pip on MacOs you will find it in the python site-packages directory
 
 If you have installed it on Windows with cmake, it is most likely located in C:\Users\your_user\llama-cpp-python\llama_cpp
@@ -155,8 +155,7 @@ You can always do a quick search for the file llama_chat_format.py
 
 Make a copy of the file llama_chat_format.py renaming it to llama_chat_format.bk and paste the attached file into this repository.
 
-This solution is provisional but necessary to use models like Mixtral and others that need templates that are not included by default in the llama-cpp library until you implement a template editor to create, load and save templates without having to replace library files. library
-
+This solution is provisional but necessary to use models such as Mixtral and others that need templates that are not included by default in the library llama-cpp the implementation of a template editor to create, load and save templates without having to replace library files
 ## Usage
 
 Download the [model](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true) and place it in the models/llama folder.
