@@ -22,7 +22,7 @@ class Chat {
         $('#stop-button').show();
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
-        console.log('Tokens recividos 🔤');
+        console.log('Tokens recibidos 🧠');
     }
 
     handleAssistantResponse(response) {
@@ -67,7 +67,7 @@ class Chat {
                 console.error('Error:', error);
             }
         });
-        console.log('Prompt enviado! 🧠');
+        console.log('Prompt enviado! 🔤');
         $('#user-input').val('');
         $('#user-input').focus();
        
