@@ -1,6 +1,6 @@
 
 
-# IALab-Suite
+# IA SUITE 
 
 ### Flask App for Testing LLM Models with Llama.cpp Library
 
@@ -155,6 +155,15 @@ models/llama/llama-2-7b-chat.Q8_0.gguf
 
 This model is used as the default model,
 you can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
+
+
+[TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)  (size - 8.87 GB | Max ram required - 	11.37 GB)
+
+
+The path looks like this:
+```bash
+models/TheBloke/mixtral_7bx2_moe/mixtral_7bx2_moe.Q5_0.gguf
+```
 
 **IMPORTANT:** Remember to use models of size according to the available RAM of your graphics card.
 In the case of MacOs with Metal, the maximum memory that can be used for inference is limited, around 65-75% of the total memory.
