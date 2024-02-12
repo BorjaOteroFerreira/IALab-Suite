@@ -146,12 +146,10 @@ python3 -m pip install -e . --force-reinstall --no-cache-dir
 
 ## **IMPORTANT (MAC & WINDOWS):**
 After installation:
-Go to the llama_cpp installation folder
-If you have installed it with pip on MacOs you will find it in the python site-packages directory
 
-If you have installed it on Windows with cmake, it is most likely located in C:\Users\your_user\llama-cpp-python\llama_cpp
+Go to the llama-cpp installation folder
 
-You can always do a quick search for the file llama_chat_format.py
+If you don't know where the directory is located, you can always do a quick search for the file llama_chat_format.py
 
 Make a copy of the file llama_chat_format.py renaming it to llama_chat_format.bk and paste the attached file into this repository.
 
@@ -165,8 +163,11 @@ The path looks like this:
 models/llama/llama-2-7b-chat.Q8_0.gguf
 ```
 
-This model is used as the default model, (dont need llama_chat_format.py file sustitution)
-you can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
+This model is used as the default model, (dont need llama_chat_format.py file sustitution).
+
+
+
+You can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
 
 
 [TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)[ Size - 8.87 GB | Max ram required - 	11.37 GB ] (need llama_chat_format.py sustitution and use Custom-IALab chat format)
