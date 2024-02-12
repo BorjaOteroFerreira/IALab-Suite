@@ -128,7 +128,7 @@ body {
 }
 #sidebar {
     height: 100vh;
-    width:20%;
+    width:19.8%;
     display: none;
     position: fixed;
     top: 0;
@@ -176,6 +176,7 @@ input:focus {
     border-radius: 2px;
     color: #f7e3c1;
     margin-bottom:10px;
+    border-radius:5px;
 }
 #sidebar button:hover {
     width: 100%;
