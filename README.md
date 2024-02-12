@@ -4,7 +4,7 @@
 
 ### Flask App for Testing LLM Models with Llama.cpp Library
 
-This Flask application offers a unique local chat experience for testing Language Model (LLM) using the Llama.cpp library. Unlike many online platforms, this chat operates entirely offline, ensuring user privacy by eliminating the need for internet access and avoiding data sharing with third-party companies. Users can confidently mount and evaluate LLM models in the GGUF format without compromising their data security. 
+This Flask application offers a unique local chat experience for testing Large Language Model (LLM) using the Llama.cpp library. Unlike many online platforms, this chat operates entirely offline, ensuring user privacy by eliminating the need for internet access and avoiding data sharing with third-party companies. Users can confidently mount and evaluate LLM models in the GGUF format without compromising their data security. 
 The app is under active development, with a focus on enhancing features and maintaining robust privacy measures.
 
 For production environments use another wsgi server.
