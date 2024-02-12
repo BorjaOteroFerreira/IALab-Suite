@@ -33,8 +33,10 @@ your responses allways in markdown.
 
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
+            self.use_nmap = False
         elif platform.system() == 'Darwin':
             self.device_options = self.metal_options
+            self.use_nmap = True
         else:
             raise RuntimeError("Sistema operativo no compatible")
         self.load_default_model()
@@ -48,7 +50,7 @@ your responses allways in markdown.
             **self.device_options,
             chat_format=self.chat_format,
             temp=self.temperature,
-            use_mmap=False,
+           
 
         )
         self.conversation_history = [{"role": "system", "content": self.system_message}]
