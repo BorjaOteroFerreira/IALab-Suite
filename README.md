@@ -1,6 +1,6 @@
 
 
-# IALab Suite
+# IALab-Suite
 
 ### Flask App for Testing LLM Models with Llama.cpp Library
 
