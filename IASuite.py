@@ -88,5 +88,5 @@ class IASuiteApi:
         return models_list
 
     def get_format_list(self):
-        format_list = ["llama-2", "qwen", "vicuna","guanaco","tb-uncensored","airoboros" , "mistral-24"]
+        format_list = ["llama-2", "qwen", "vicuna","guanaco","Custom-IALab","airoboros" , "mistral-24"]
         return format_list

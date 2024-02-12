@@ -496,7 +496,7 @@ def format_guanaco(
 
 
 
-@register_chat_format("tb-uncensored")
+@register_chat_format("Custom-IALab")
 def format_uncensored(
     messages: List[llama_types.ChatCompletionRequestMessage],
     **kwargs: Any,
