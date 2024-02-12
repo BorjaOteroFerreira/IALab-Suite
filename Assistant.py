@@ -69,10 +69,6 @@ your responses allways in markdown.
     def unload_model(self):
         self.model = None
 
-    def get_context_fraction(self):
-        total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
-        return min(1.0, total_tokens / self.max_context_tokens * 10)
-
     def update_context_tokens(self):
         total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
         while total_tokens > self.max_context_tokens:
