@@ -13,6 +13,7 @@ class Assistant:
         - (str) default_chat_format: formato de la plantilla del modelo.
     '''
     def __init__(self, default_model_path, default_chat_format):
+        self.model = None
         self.max_context_tokens = 2048
         self.max_assistant_tokens = 2048
         self.is_processing = False
@@ -66,7 +67,7 @@ your responses allways in markdown.
         - (int) context: tamaño en tokens del contexto máximo. 
         '''
         message = new_system_message if new_system_message is not None and new_system_message != '' else self.system_message
-        gpu_layers = int(n_gpu_layer) if n_gpu_layer is not None else -1
+        gpu_layers = n_gpu_layer if n_gpu_layer is not None else -1
         ctx = context if context is not None and context != '' else self.max_context_tokens
         temperature = new_temperature if new_temperature is not None else 0.81
         self.system_message = message
