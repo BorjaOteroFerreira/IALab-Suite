@@ -154,6 +154,7 @@ If you don't know where the directory is located, you can always do a quick sear
 Rename the file llama_chat_format.py to llama_chat_format.bk and paste the attached file into this repository.
 
 This solution is provisional but necessary to use models such as Mixtral and others that need templates that are not included by default in the library llama-cpp the implementation of a template editor to create, load and save templates without having to replace library files
+
 ## Usage
 
 Download the [model](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true) and place it in the models/llama folder.
