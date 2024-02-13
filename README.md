@@ -205,11 +205,16 @@ models/TheBloke/mixtral_7bx2_moe/mixtral_7bx2_moe.Q5_0.gguf
 In the case of MacOs with Metal, the maximum memory that can be used for inference is limited, around 65-75% of the total memory.
 For use with CPU the limit is the total memory of the CPU on both Windows and Mac.
 
-Usage:
+Run the App:
 
 ```bash
-cd path/to/project/folder
-python3 ./app.py
+git clone https://github.com/BorjaOteroFerreira/IALab-Suite.git
+```
+```bash
+cd IALab-Suite
+```
+```bash
+python app.py
 ```
 
 The server starts on localhost 127.0.0.1:8080.
