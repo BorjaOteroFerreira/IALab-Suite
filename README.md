@@ -10,8 +10,11 @@ The app is under active development, with a focus on enhancing features and main
 For production environments use another wsgi server.
 
 <p align="center">
-  <img src="media/chat_pic.png" />
+Responsive:
+  <img src="media/chat_pic.png" height="600"/>
+Desktop:
   <img src ="media/chat_pic_pan.png" />
+
 </p>
 
 ## Installation
