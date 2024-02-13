@@ -39,7 +39,7 @@ There are different options for installing the llama-cpp package:
 - CPU + GPU (using one of the many BLAS backends)
 - Metal GPU (MacOS with Apple Silicon chip)
 
-### Installation CPU Only
+### Installation CPU Only (Any processor compatible with AVX2)
 
 ```bash
 pip install --upgrade --quiet llama-cpp-python
