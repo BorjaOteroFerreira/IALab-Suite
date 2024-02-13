@@ -100,8 +100,6 @@ It is stable to install the llama-cpp-python library by compiling from source. Y
 
   Verify the installation with `nvcc --version` and `nvidia-smi`.
 
-  Add CUDA_PATH (C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3) to your environment variables.
-
   Copy the files from: 
   ```
   C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.\extras\visual_studio_integration\MSBuildExtensions
