@@ -7,15 +7,16 @@
 This Flask application offers a unique local chat experience for testing Large Language Model (LLM) using the Llama.cpp library. Unlike many online platforms, this chat operates entirely offline, ensuring user privacy by eliminating the need for internet access and avoiding data sharing with third-party companies. Users can confidently mount and evaluate LLM models in the GGUF format without compromising their data security. 
 The app is under active development, with a focus on enhancing features and maintaining robust privacy measures.
 
-For production environments use another wsgi server.
-<label>Responsive:</label>
+For production environments use another wsgi server.<br>
+
+
 <p align="center">
+  <label>Responsive:</label>
   <img src="media/chat_pic.png" height="600"/>
 </p>
-<lael>Desktop:</label>
 <p align="center">
+  <lael>Desktop:</label>
   <img src ="media/chat_pic_pan.png" width="600" />
-
 </p>
 
 ## Installation
