@@ -56,13 +56,14 @@ class IASuiteApi:
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
         self.assistant.unload_model()
         self.assistant.clear_context()
-        self.assistant.load_model(selected_model, selected_format, temperature, n_gpu_layers, system_message, n_ctx)
+        self.assistant.load_model(selected_model,selected_format,temperature,n_gpu_layers,system_message,n_ctx)
         return f'''
                 \nModel:{selected_model}
                 \nformat: {selected_format}
                 \ntemp: {temperature}
                 \nlayers: {n_gpu_layers}
-                \nSM: {system_message}\nctx: {n_ctx}
+                \nSM: {system_message}
+                \nctx: {n_ctx}
                 '''
 
     def unload_model(self):
@@ -88,5 +89,11 @@ class IASuiteApi:
         return models_list
 
     def get_format_list(self):
-        format_list = ["llama-2", "qwen", "vicuna","guanaco","Custom-IALab","airoboros" , "mistral-24"]
+        format_list = ["llama-2", 
+                       "qwen",
+                       "vicuna",
+                       "guanaco",
+                       "Custom-IALab",
+                       "airoboros" ,
+                       "mistral-24"]
         return format_list
