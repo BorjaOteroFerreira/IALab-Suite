@@ -34,7 +34,7 @@ pip install flask_socketio
 pip install CORS
 ```
 
-# llama-cpp-python
+## llama-cpp-python
 
 ## Installation
 
@@ -81,6 +81,29 @@ CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
 ```bash
 CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
+
+### Installation with CUDA on Linux 
+
+```bash
+export CXX=$(which g++) 
+```
+
+```bash
+export CUDA_PATH=/usr/local/cuda 
+```
+
+```bash
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+If you get an error for not finding the cuda architecture, you can try this command:
+
+```bash
+CUDA_ARCH=sm_86 CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+In my case the architecture of the card is ampere so it corresponds to sm_86, change it to the one that corresponds to your graphics card
+
 
 ### Installation on Windows
 

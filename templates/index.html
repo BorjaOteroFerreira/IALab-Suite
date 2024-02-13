@@ -11,9 +11,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/prism.css') }}">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script> 
-    <script src="{{ url_for('static', filename='js/Prism.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/Chat.js') }}"></script>   
-    <script src="{{ url_for('static', filename='js/Driver.js') }}"></script>  
+    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>   
+    <script src="{{ url_for('static', filename='js/driver.js') }}"></script>  
 </head>
 <body>
 <div id="header">
@@ -71,6 +71,8 @@
     <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
 </div>
 </body>
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python  --upgrade --force-reinstall --no-cache-dir
+
 </html>
 <script>
     const chat = new Chat();
