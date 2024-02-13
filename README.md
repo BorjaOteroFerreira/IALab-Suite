@@ -20,23 +20,20 @@ For production environments use another wsgi server.<br>
   <img src ="media/chat_pic_pan.png" width="600" />
 </p>
 
-## Installation
+## Dependencies
 
-Install dependencies:
+- Flask
+- flask_socketio
+- CORS
+- platform
+- llama-cpp-python
 
 ```bash
-pip install Flask
-```
-```bash
-pip install flask_socketio
-```
-```bash
-pip install CORS
+pip install Flask flask-socketio flask-cors platform
+
 ```
 
-## llama-cpp-python
-
-## Installation
+## llama-cpp-python installation
 
 There are different options for installing the llama-cpp package:
 
