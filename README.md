@@ -10,8 +10,8 @@ The app is under active development, with a focus on enhancing features and main
 For production environments use another wsgi server.
 
 <p align="center">
-  [![mobile](media/chat_pic.png)](media/chat_pic.png)
-  [![panoramic](media/chat_pic_pan.png)](media/chat_pic_pan.png)
+  <img src="media/chat_pic.png" />
+  <img src ="media/chat_pic_pan.png" />
 </p>
 
 ## Installation
