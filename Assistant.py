@@ -49,10 +49,10 @@ your responses allways in markdown.
         self.stop_emit = False
 
     def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context):
-        message = new_system_message if new_system_message is not None and new_system_message != '' else self.system_message
-        gpu_layers = int(n_gpu_layer) if n_gpu_layer is not None and n_gpu_layer != '' else -1
-        ctx = context if context is not None and context != '' else self.max_context_tokens
-        temperature = new_temperature if new_temperature is not None else 0.81
+        message = new_system_message if isinstance(new_system_message, str) and new_system_message != '' else self.system_message
+        gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else -1
+        ctx = context if isinstance(context, int)  else self.max_context_tokens
+        temperature = new_temperature if isinstance(new_temperature, float) else 0.81
         self.system_message = message
         self.model_path = model_path
         self.temperature = temperature
