@@ -25,11 +25,10 @@ For production environments use another wsgi server.<br>
 - Flask
 - flask_socketio
 - CORS
-- platform
 - llama-cpp-python
 
 ```bash
-pip install Flask flask-socketio flask-cors platform
+pip install Flask flask-socketio flask-cors 
 
 ```
 
