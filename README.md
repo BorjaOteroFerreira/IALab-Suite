@@ -96,7 +96,7 @@ It is stable to install the llama-cpp-python library by compiling from source. Y
   - Python development
   - Embedded Linux development with C++
 
-- Download and install CUDA Toolkit 12.3 from the [official Nvidia website](https://developer.nvidia.com/cuda-12-2-0-download-archive?target_os=Windows).
+- Download and install CUDA Toolkit 12.3 from the [official Nvidia website](https://developer.nvidia.com/cuda-12-3-0-download-archive?target_os=Windows).
 
   Verify the installation with `nvcc --version` and `nvidia-smi`.
 
