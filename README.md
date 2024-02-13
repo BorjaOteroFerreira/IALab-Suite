@@ -102,7 +102,7 @@ In my case the architecture of the card is ampere so it corresponds to sm_86, ch
 
 ### Installation on Windows
 
-It is stable to install the llama-cpp-python library by compiling from source. You can follow most of the instructions in the repository itself, but there are some Windows-specific instructions that might be helpful.
+If you are unable to install the llama-cpp-python library by compiling from source, you can follow most of the instructions in the repository itself. However, there are some Windows-specific instructions that might be helpful.
 
 #### Requirements to install llama-cpp-python
 
