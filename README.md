@@ -9,13 +9,14 @@ The app is under active development, with a focus on enhancing features and main
 
 For production environments use another wsgi server.<br>
 
-
+### Responsive Inteface
 <p align="center">
-  <label>Responsive:</label>
+
   <img src="media/chat_pic.png" height="600"/>
 </p>
+
+### Desktop Interface
 <p align="center">
-  <lael>Desktop:</label>
   <img src ="media/chat_pic_pan.png" width="600" />
 </p>
 
