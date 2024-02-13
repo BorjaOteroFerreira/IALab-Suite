@@ -204,12 +204,6 @@ For use with CPU the limit is the total memory of the CPU on both Windows and Ma
 Run the App:
 
 ```bash
-git clone https://github.com/BorjaOteroFerreira/IALab-Suite.git
-```
-```bash
-cd IALab-Suite
-```
-```bash
 python app.py
 ```
 
