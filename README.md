@@ -8,12 +8,13 @@ This Flask application offers a unique local chat experience for testing Large L
 The app is under active development, with a focus on enhancing features and maintaining robust privacy measures.
 
 For production environments use another wsgi server.
-
+<label>Responsive:</label>
 <p align="center">
-Responsive:
   <img src="media/chat_pic.png" height="600"/>
-Desktop:
-  <img src ="media/chat_pic_pan.png" />
+</p>
+<lael>Desktop:</label>
+<p align="center">
+  <img src ="media/chat_pic_pan.png" width="600" />
 
 </p>
 
