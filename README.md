@@ -11,7 +11,6 @@ For production environments use another wsgi server.<br>
 
 ### Responsive Inteface
 <p align="center">
-
   <img src="media/chat_pic.png" height="600"/>
 </p>
 
@@ -152,8 +151,6 @@ If you have an NVIDIA GPU, make sure DLLAMA_CUBLAS is set to ON.
 #### Compilation and Installation
 
 Now you can navigate to the llama-cpp-python directory and install the package.
-
-Now you must install de package with this command: 
 
 ```bash
 python3 -m pip install -e .
