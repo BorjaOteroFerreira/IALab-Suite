@@ -105,6 +105,7 @@ It is stable to install the llama-cpp-python library by compiling from source. Y
   C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.\extras\visual_studio_integration\MSBuildExtensions
   ```
   To the folder:
+  
   For Enterprise version:
   ```
   C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
