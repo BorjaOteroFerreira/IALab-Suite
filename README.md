@@ -134,10 +134,6 @@ If you have an NVIDIA GPU, make sure DLLAMA_CUBLAS is set to ON.
 
 Now you can navigate to the llama-cpp-python directory and install the package.
 
-```bash
-cmake -DLLAMA_CUBLAS=ON
-```
-
 Now you must install de package with this command: 
 
 ```bash
