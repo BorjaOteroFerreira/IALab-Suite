@@ -3,7 +3,7 @@ pruebas/
 models/*.*
 *gguf
 *pyc
-*.txt
+
 *.bin
 *.log
 .DS_Store
