@@ -10,10 +10,9 @@ class Chat {
         this.conversationStarted = false;
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
-        // Agregar el evento keydown al elemento #user-input
         textarea.addEventListener('keydown', (e) => {
             if (e.which === 13 && !e.shiftKey) {
-                e.preventDefault(); // Evita que se añada una nueva línea al presionar "Enter"
+                e.preventDefault();
                 this.sendMessage();
                 }
         });
@@ -45,7 +44,6 @@ class Chat {
         } else {
             this.currentAssistantResponse += response;
         }
-        // Replace triple backticks with <pre><code>
         this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
         var div = $('#chat-assistant-' + this.n_responses);
         div.html(this.currentAssistantResponse);
@@ -283,13 +281,10 @@ class Chat {
     adjustTextareaHeight() {
         const textarea = document.getElementById('user-input');
         const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight); // Altura de una línea en píxeles
-        const maxLines = 20; // Número máximo de líneas permitidas
-        const maxHeight = maxLines * lineHeight; // Altura máxima en píxeles
+        const maxLines = 20; 
+        const maxHeight = maxLines * lineHeight; 
         
-        // Restablecer la altura a 0 para que el scrollHeight se ajuste correctamente
         textarea.style.height = '0';
-        
-        // Establecer la altura del textarea según su scrollHeight, pero limitándola a la altura máxima
         textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     }
 }
