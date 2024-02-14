@@ -17,7 +17,7 @@
 </head>
 <body>
 <div id="header">
-    <button class="btn btn-primary" id="start-tour-button">How to use</button>
+    <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">How to use</button>
     <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reset chat</button>
 </div>
 <div class="key-container" id="key-container"></div>
@@ -64,22 +64,18 @@
     <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
 </div>
 <div id="footer" >
-    <button  id="stop-button" onclick="chat.stopResponse()" height="20px">Stop</button>
-    <div class="form-group">
-        <input type="text" class="form-control" id="user-input" placeholder="Write your message">
+  
+    <div class="form-group" style="position: relative;">
+        <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
+        <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
+        <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
     </div>
-    <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
 </div>
 </body>
 
 </html>
 <script>
     const chat = new Chat();
-    $('#user-input').on('keypress', function (e) {
-        if (e.which === 13) {
-            chat.sendMessage();
-        }
-    });
     const driver = window.driver.js.driver;
     const guiaConfiguracion = [
     { element: '#toggle-sidebar-button', popover: { title: 'Settings menu',
@@ -113,11 +109,11 @@
             showProgress: true,
             steps: guiaConfiguracion
         });
-        document.getElementById('start-tour-button').addEventListener('click', function() {
+        function toggleSidebar(){
             var sidebar = document.getElementById('sidebar');
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
                 chat.toggleSidebar(); // Llamar a toggleSidebar solo si el menú está oculto
             }
             driverObj.drive(); 
-        });
+        };
 </script>

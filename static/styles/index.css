@@ -4,7 +4,7 @@
     --primary-bg-color: #272727;
     --secondary-bg-color: #2C2C2C;
     }
-    
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -36,7 +36,7 @@ body {
     border-right:1px solid var(--secondary-color);
     border-left:1px solid var(--secondary-color) ;
     max-width: 60%;
-    height: calc(100vh - 208px);
+    height: calc(100vh - 108px);
     margin-left:10%;
     margin-top:0px !important;
     margin-left:20%;
@@ -266,23 +266,68 @@ input:focus {
     color:    var(--secondary-bg-color);
 }
 
+#user-input{
+    resize: none !important;
+    scrollbar-width: none; 
+    scrollbar-color: transparent transparent;
+    width: calc(100% - 95px); /* Resta el ancho del botón de enviar */
+    border-radius: 5px 0 0 5px; /* Bordes redondeados en la esquina superior izquierda */
+    border-right: none; /* Elimina el borde derecho para evitar la superposición con el botón */
+    padding:10px;
+    outline: none !important;
+    border:1px solid var(--secondary-color);
+    border-right-width: 0;
+   
+}
+#user-input:focus {
+    box-shadow: none;
+}
+#stop-button {
+    border:1px solid #fe978a;
+    background-color: var(--secondary-bg-color);
+    color: #fe978a;
+    margin-top:15px;
+    position: absolute;
+    bottom: 0px;
+    width:94px;
+    right: 2px;
+    height:100%; /* Ajusta la altura del botón para que sea igual a la del textarea */
+    border-radius: 0 5px 5px 0;
+}
+.stop-button{
+    display: none 
+}
+
 #send-button{
-    width:100%;
-    margin-top: 5px;
+    margin-top: 15px;
     background-color:#00000000;
     border:1px solid var(--secondary-color);
     color:var(--secondary-color);
+    position: absolute;
+    bottom: 0px;
+    width:94px;
+    right: 2px;
+    height:100%; /* Ajusta la altura del botón para que sea igual a la del textarea */
+    border-radius: 0 5px 5px 0;
 }
 
 #send-button:hover{
     background-color:var(--secondary-color);
-    border:1px solid var(--secondary-bg-color);
-    color:    var(--secondary-bg-color);
+    color: var(--secondary-bg-color);
 }
 
-.form-group{
+.form-control:focus {
+    background-color: var(--secondary-bg-color);
+    border:var(--secondary-bg-color);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem  var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+#footer .form-group{
     width:100%;
-    background-color:    var(--secondary-bg-color);
+    background-color:var(--secondary-bg-color);
+    margin-top:20px;
 }
 
 .form-control{
@@ -336,19 +381,7 @@ input:focus {
     color: var(--secondary-bg-color);
     background-color: var(--primary-color);
 }
-#stop-button {
-    width: 8%;
-    position: absolute;
-    bottom: 100%;
-    right: 46%;
-    border:1px solid #fe978a;
-    background-color: var(--secondary-bg-color);
-    border-radius: 5px;
-    color: #fe978a
-}
-.stop-button{
-    display: none 
-}
+
 #share {
     position: relative;
     float:right;
@@ -389,6 +422,10 @@ input:focus {
     border: 5px solid var(--primary-color);
 }
 
+
+
+
+
 .popup-error {
     border: 5px solid #fe978a !important;
 }
@@ -403,7 +440,7 @@ input:focus {
         margin-left: 0px; 
         margin-right: 0px; 
         max-width: 100%;
-        height: calc(100vh - 200px);
+        height: calc(100vh - 100px);
         padding:10px;
     }
     #model-form button {
@@ -415,16 +452,26 @@ input:focus {
         border-radius: 2px 2px 2px 2px;   
     }
     #footer{
-        background-color:#333333;
+        background-color:var(--secondary-bg-color);
         width:100%;
         margin-left:0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Centra verticalmente el contenido */
+        align-items: center; 
+        
     }
-    #send-button{
-        background-color:#00000000;
+    #send-button{   
+        padding:1px;
+    
         border:1px solid var(--secondary-color);
     }
     #user-input{
         border-color:var(--secondary-color);
+        resize: none !important;
+        scrollbar-width: thin; 
+        scrollbar-color: transparent transparent;
+        scrollbar-width: none; 
     }
     #model-select {
         font-size: 12px; 

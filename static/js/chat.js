@@ -1,5 +1,6 @@
 class Chat {
     constructor() {
+        const textarea = document.getElementById('user-input');
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
@@ -7,6 +8,15 @@ class Chat {
         this.n_responses = 0;
         this.popupCount = 0;
         this.conversationStarted = false;
+        this.adjustTextareaHeight();
+        textarea.addEventListener('input', () => this.adjustTextareaHeight());  
+        // Agregar el evento keydown al elemento #user-input
+        textarea.addEventListener('keydown', (e) => {
+            if (e.which === 13 && !e.shiftKey) {
+                e.preventDefault(); // Evita que se añada una nueva línea al presionar "Enter"
+                this.sendMessage();
+                }
+        });
     }
 
     onConnect() {
@@ -20,6 +30,7 @@ class Chat {
 
     onAssistantResponse(response) {
         $('#stop-button').show();
+        $('#send-button').hide();
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens received 🧠');
@@ -65,6 +76,7 @@ class Chat {
                 data: { content: sanitizedUserMessage },
                 success: function (data) {
                     $('#stop-button').hide();
+                    $('#send-button').show();
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -266,5 +278,18 @@ class Chat {
                 }, 500); //seconds to complete disappearance animation
             }, 9500); //seconds before disappearing
         }, 100); // 0.1 seconds before displaying
+    }
+
+    adjustTextareaHeight() {
+        const textarea = document.getElementById('user-input');
+        const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight); // Altura de una línea en píxeles
+        const maxLines = 20; // Número máximo de líneas permitidas
+        const maxHeight = maxLines * lineHeight; // Altura máxima en píxeles
+        
+        // Restablecer la altura a 0 para que el scrollHeight se ajuste correctamente
+        textarea.style.height = '0';
+        
+        // Establecer la altura del textarea según su scrollHeight, pero limitándola a la altura máxima
+        textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     }
 }
