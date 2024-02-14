@@ -45,7 +45,7 @@ class IASuiteApi:
         print("Usuario dijo:", user_input)
         self.assistant.add_user_input(user_input)
         self.assistant.emit_assistant_response_stream(self.socketio)
-        return 'Respuesta finalizada! 📩'
+        return 'Response finished! 📩'
 
     def load_model(self):
         selected_model = request.form.get('model_path')
@@ -69,15 +69,15 @@ class IASuiteApi:
     def unload_model(self):
         self.assistant.unload_model()
         self.assistant.clear_context()
-        return 'Modelo desinstalado! '
+        return 'Model uninstalled!'
 
     def clear_context(self):
         self.assistant.clear_context()
-        return "Contexto Reiniciado!"
+        return "Context Reset!"
 
     def stop_response(self):
         self.assistant.stop_response()
-        return "Respuesta cancelada!"
+        return "Finishing response...\nPlease wait"
 
     def get_models_list(self, folder_path):
         models_list = []
