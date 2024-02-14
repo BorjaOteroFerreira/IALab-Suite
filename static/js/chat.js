@@ -1,23 +1,24 @@
+//@author: Borja Otero Ferreira
 class Chat {
     constructor() {
         const textarea = document.getElementById('user-input');
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
-        this.currentAssistantResponse = '';
+        this.currentResponse = '';
         this.n_responses = 0;
         this.popupCount = 0;
         this.conversationStarted = false;
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
-            if (e.which === 13 && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-                }
-        });
+                                                        if (e.which === 13 && !e.shiftKey) {
+                                                            e.preventDefault();
+                                                            this.sendMessage();
+                                                            }
+                                                    });
     }
-
+/** METHODS */
     onConnect() {
         console.log('Connected! ✅');
         $('#stop-button').hide();
@@ -39,22 +40,22 @@ class Chat {
         response = response.replace(/<0x0A>/g, '<br>');
         var chatList = $('#chat-list');
         if (!this.conversationStarted) {
-            this.currentAssistantResponse = response;
+            this.currentResponse = response;
             this.conversationStarted = true;
         } else {
-            this.currentAssistantResponse += response;
+            this.currentResponse += response;
         }
-        this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
+        this.currentResponse = this.currentResponse.replace(/```([\s\S]*?)```/g,
+                            '<pre><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
         var div = $('#chat-assistant-' + this.n_responses);
-        div.html(this.currentAssistantResponse);
+        div.html(this.currentResponse);
         Prism.highlightAll();
-        this.scrollToBottom();
-       
+        this.scrollToBottom();       
     }
 
     clearChat() {
         $('#chat-list').html('');
-        this.currentAssistantResponse = '';
+        this.currentResponse = '';
         $('#key-container').empty();
         let str = 'Chat emptied! 🗑️';
         this.showPopup(str);
@@ -63,7 +64,7 @@ class Chat {
 
     sendMessage() {
         if (!this.conversationStarted){
-            this.currentAssistantResponse = ' ';
+            this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val();
             var sanitizedUserMessage = this.escapeHtml(userMessage);
@@ -90,11 +91,19 @@ class Chat {
             $('#user-input').val('');
             $('#user-input').focus();
 
-            var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label for="chat-user-' + this.n_responses + '">User</label><div id="chat-user-' + this.n_responses + '" class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
+            var message = $('<div class="user-message-container-' + this.n_responses + 
+                            ' user-message-container"><label for="chat-user-' + this.n_responses + 
+                            '">User</label><div id="chat-user-' + this.n_responses + 
+                            '" class="user-message user-message-' + this.n_responses + '">' + 
+                            sanitizedUserMessage + '</div></div>');
+
             var chatList = $('#chat-list');
             chatList.append(message);
 
-            var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + ' assistant-message-container"><label for="chat-assistant-' + this.n_responses + '">Assistant<br></label><div id="chat-assistant-' + this.n_responses + '" class="assistant-message"></div></div>');
+            var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + 
+                                ' assistant-message-container"><label for="chat-assistant-' + this.n_responses + 
+                                '">Assistant<br></label><div id="chat-assistant-' + this.n_responses + 
+                                '" class="assistant-message"></div></div>');
             chatList.append(divAssistant);
 
             var shareButton = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
@@ -185,7 +194,7 @@ class Chat {
             }
         });
     }
-
+//** UTILS */
     scrollToBottom() {
         var chatContainer = $('#chat-container')[0];
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -280,10 +289,9 @@ class Chat {
 
     adjustTextareaHeight() {
         const textarea = document.getElementById('user-input');
-        const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight); // Altura de una línea en píxeles
+        const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight);
         const maxLines = 20; 
         const maxHeight = maxLines * lineHeight; 
-        
         textarea.style.height = '0';
         textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     }

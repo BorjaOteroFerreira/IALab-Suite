@@ -1,3 +1,6 @@
+'''
+@Author: Borja Otero Ferreira
+'''
 from IASuite import IASuiteApi
 
 

@@ -1,3 +1,6 @@
+'''
+@author: Borja Otero Ferreira
+'''
 from llama_cpp import Llama as Model
 import llama_cpp
 import platform
