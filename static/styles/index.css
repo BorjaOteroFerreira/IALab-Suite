@@ -36,7 +36,7 @@ body {
     border-right:1px solid var(--secondary-color);
     border-left:1px solid var(--secondary-color) ;
     max-width: 60%;
-    height: calc(100vh - 108px);
+    height: calc(100vh - 193px);
     margin-left:10%;
     margin-top:0px !important;
     margin-left:20%;
@@ -284,8 +284,8 @@ input:focus {
 }
 #stop-button {
     border:1px solid #fe978a;
-    background-color: var(--secondary-bg-color);
-    color: #fe978a;
+    background-color: #fe978a;
+    color: var(--secondary-bg-color);
     margin-top:15px;
     position: absolute;
     bottom: 0px;
@@ -440,7 +440,7 @@ input:focus {
         margin-left: 0px; 
         margin-right: 0px; 
         max-width: 100%;
-        height: calc(100vh - 100px);
+        height: calc(100vh - 175px);
         padding:10px;
     }
     #model-form button {
