@@ -38,7 +38,7 @@ class Chat {
     }
 
     handleAssistantResponse(response) {
-        response = response.replace(/<0x0A>/g, '<br>');
+        //response = response.replace(/<0x0A>/g, '<br>');
         var chatList = $('#chat-list');
         if (!this.conversationStarted) {
             this.currentResponse = response;
