@@ -3,18 +3,18 @@ class Chat {
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
-        
         this.currentAssistantResponse = '';
         this.n_responses = 0;
+        this.popupCount = 0;
         this.conversationStarted = false;
     }
 
     onConnect() {
-        console.log('Conectado! ✅');
+        console.log('Connected! ✅');
         $('#stop-button').hide();
     }
 
-    assistantResponse(response){
+    assistantResponse(response) {
         this.onAssistantResponse(response);
     }
 
@@ -22,7 +22,7 @@ class Chat {
         $('#stop-button').show();
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
-        console.log('Tokens recibidos 🧠');
+        console.log('Tokens received 🧠');
     }
 
     handleAssistantResponse(response) {
@@ -34,64 +34,77 @@ class Chat {
         } else {
             this.currentAssistantResponse += response;
         }
-        // Reemplaza triple comilla con <pre><code>
+        // Replace triple backticks with <pre><code>
         this.currentAssistantResponse = this.currentAssistantResponse.replace(/```([\s\S]*?)```/g, '<pre><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
         var div = $('#chat-assistant-' + this.n_responses);
         div.html(this.currentAssistantResponse);
         Prism.highlightAll();
         this.scrollToBottom();
+       
     }
 
     clearChat() {
         $('#chat-list').html('');
         this.currentAssistantResponse = '';
         $('#key-container').empty();
-        console.log('Se ha vaciado el chat! 🗑️');
+        let str = 'Chat emptied! 🗑️';
+        this.showPopup(str);
+        console.log(str);
     }
 
     sendMessage() {
-        this.currentAssistantResponse = ' ';
-        this.n_responses += 1;
-        var userMessage = $('#user-input').val();
-        var sanitizedUserMessage = this.escapeHtml(userMessage);
+        if (!this.conversationStarted){
+            this.currentAssistantResponse = ' ';
+            this.n_responses += 1;
+            var userMessage = $('#user-input').val();
+            var sanitizedUserMessage = this.escapeHtml(userMessage);
+            const self = this;
+            $.ajax({
+                type: 'POST',
+                url: '/user_input',
+                data: { content: sanitizedUserMessage },
+                success: function (data) {
+                    $('#stop-button').hide();
+                    self.showPopup(data);
+                    console.log(data);
+                    self.conversationStarted = false;
+                },
+                error: function (error) {
+                    self.showPopup(error, 'error');
+                    console.error('Error:', error);
+                    self.conversationStarted = false;
+                }
+            });
+            
+            console.log('Prompt sent! 🔤');
+            $('#user-input').val('');
+            $('#user-input').focus();
 
-        $.ajax({
-            type: 'POST',
-            url: '/user_input',
-            data: { content: sanitizedUserMessage },
-            success: function (data) {
-                $('#stop-button').hide();
-                console.log(data);
-            },
-            error: function (error) {
-                console.error('Error:', error);
-            }
-        });
-        console.log('Prompt enviado! 🔤');
-        $('#user-input').val('');
-        $('#user-input').focus();
-       
-        var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label for="chat-user-' + this.n_responses + '">User</label><div id="chat-user-' + this.n_responses + '" class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
-        var chatList = $('#chat-list');
-        chatList.append(message);
-        
-        var divAssistant = $('<div class="assistant-message-container-'+this.n_responses+' assistant-message-container"><label for="chat-assistant-' +this.n_responses + '">Asistant<br></label><div id="chat-assistant-' + this.n_responses +'" class="assistant-message"></div></div>');
-        chatList.append(divAssistant);
+            var message = $('<div class="user-message-container-' + this.n_responses + ' user-message-container"><label for="chat-user-' + this.n_responses + '">User</label><div id="chat-user-' + this.n_responses + '" class="user-message user-message-' + this.n_responses + '">' + sanitizedUserMessage + '</div></div>');
+            var chatList = $('#chat-list');
+            chatList.append(message);
 
-        var botonCompartir = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
-        var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
-        userMessageCointainer.append(botonCompartir);
-        this.scrollToBottom();
+            var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + ' assistant-message-container"><label for="chat-assistant-' + this.n_responses + '">Assistant<br></label><div id="chat-assistant-' + this.n_responses + '" class="assistant-message"></div></div>');
+            chatList.append(divAssistant);
+
+            var botonCompartir = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
+            var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
+            userMessageCointainer.append(botonCompartir);
+            this.scrollToBottom();
+        }
     }
 
     clearContext() {
+        const self = this;
         $.ajax({
             type: "POST",
-            url: "/clear_context", 
+            url: "/clear_context",
             success: function (data) {
+                self.showPopup(data);
                 console.log(data);
             },
             error: function (error) {
+                self.showPopup(error, 'error');
                 console.error('Error:', error);
             }
         });
@@ -104,22 +117,26 @@ class Chat {
         var systemMessage = $('#system-message').val();
         var gpuLayers = $('#gpu-layers').val();
         var temperature = $('#temperature').val();
-        var n_ctx  = $('#context').val();   
+        var n_ctx = $('#context').val();
+        const self = this;
         $.ajax({
+
             type: "POST",
             url: "/load_model",
-            data: { 
-                model_path: selectedModel, 
+            data: {
+                model_path: selectedModel,
                 format: selectedFormat,
                 temperature: temperature,
-                system_message: systemMessage, 
+                system_message: systemMessage,
                 gpu_layers: gpuLayers,
                 context: n_ctx
             },
             success: function (data) {
+                self.showPopup('Model loaded successfully');
                 console.log(data);
             },
             error: function (error) {
+                self.showPopup(error, 'error');
                 console.error('Error:', error);
             }
         });
@@ -127,27 +144,33 @@ class Chat {
     }
 
     unloadModel() {
+        const self = this;
         $.ajax({
             type: "POST",
             url: "/unload_model",
             success: function (data) {
+                self.showPopup(data);
                 console.log(data);
             },
             error: function (error) {
+                self.showPopup(error, 'error');
                 console.error('Error:', error);
             }
         });
     }
 
     stopResponse() {
+        const self = this;
         $.ajax({
             type: "POST",
             url: "/stop_response",
             success: (data) => {
                 console.log(data);
+                self.showPopup(data);
                 $('#stop-button').hide();
             },
             error: (error) => {
+                self.showPopup(error, 'error');
                 console.error('Error:', error);
             }
         });
@@ -169,14 +192,16 @@ class Chat {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        alert('Copiado al portapapeles');
-        console.log('Copiado al portapapeles! 📋');
+        let str = 'Copied to clipboard! 📋';
+        this.showPopup(str);
+        console.log(str);
     }
 
     toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
         sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
     }
+
     escapeHtml(text) {
         var map = {
             '&': '&amp;',
@@ -191,21 +216,55 @@ class Chat {
     }
 
     shareChat(responseNumber) {
+        const self = this;
+        let str_success = 'Chat shared successfully';
         if (navigator.share) {
             var ask = $('.user-message-' + responseNumber).text();
-            var response =  $('#chat-assistant-' + responseNumber).html();
-            var fullResponse = "User: \n"+ask+"\n\nAsistente:\n"+response
+            var response = $('#chat-assistant-' + responseNumber).html();
+            var fullResponse = "User: \n" + ask + "\n\nAssistant:\n" + response;
             fullResponse = fullResponse.replace(/<br>/g, '\n');
             navigator.share({
                 title: ask,
                 text: fullResponse,
-                url: '/' 
+                url: '/'
             })
-            .then(() => console.log('Chat compartido con éxito'))
-            .catch((error) => console.error('Error al compartir el chat:', error));
+                .then(() => { console.log(str_success); self.showPopup(str_success); })
+                .catch((error) => console.error('Error sharing chat:', error));
         } else {
-            alert('La función de compartir no está soportada en este navegador. 😤');
+            self.showPopup('Sharing function not supported in this browser. 😤', 'error');
         }
     }
-}
 
+    showPopup(message, type) {
+        let container = document.getElementById('notification-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'notification-container';
+            container.className = 'popup-container';
+            container.style.left = '20px'; 
+            container.style.bottom = '20px'; 
+            document.body.appendChild(container);
+        }
+
+        const popup = document.createElement('div');
+        popup.className = 'popup-notification';
+        if (type === 'error') {
+            popup.classList.add('popup-error');
+        }
+        popup.textContent = message;
+        container.appendChild(popup);
+
+        setTimeout(() => {
+            popup.style.opacity = 1;
+            setTimeout(() => {
+                popup.style.opacity = 0;
+                setTimeout(() => {
+                    container.removeChild(popup);
+                    if (container.childNodes.length === 0) {
+                        document.body.removeChild(container);
+                    }
+                }, 500); //seconds to complete disappearance animation
+            }, 9500); //seconds before disappearing
+        }, 100); // 0.1 seconds before displaying
+    }
+}

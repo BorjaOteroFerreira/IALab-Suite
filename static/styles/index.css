@@ -4,6 +4,7 @@
     --primary-bg-color: #272727;
     --secondary-bg-color: #2C2C2C;
     }
+    
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -45,12 +46,15 @@ body {
     scrollbar-width: thin; 
     scrollbar-color: transparent transparent;
 }
+
 #chat-container::-webkit-scrollbar {
     width: 6px; /* Establece el ancho de la barra de desplazamiento en navegadores WebKit (Chrome, Safari) */
 }
+
 #chat-container::-webkit-scrollbar-thumb {
     background-color: transparent; /* Establece el color del pulgar de la barra de desplazamiento en navegadores WebKit */
 }
+
 #footer {
     background-color: #2c2c2c;
     padding: 10px;
@@ -66,15 +70,18 @@ body {
     border-top: 0;
     border-radius:0 0 5px 5px;
 }
+
 #footer input:active,
 #footer input:focus {
     outline: none !important;
     border: 1px solid var(--secondary-color) !important; 
 }
+
 #footer input {
     background-color:    var(--secondary-bg-color);
     color: var(--secondary-color);
 }
+
 .user-message-container {
     border: 1px solid var(--secondary-color);
     color: var(--secondary-color);
@@ -84,10 +91,12 @@ body {
     border-radius: 10px;
     clear:both;
 }
+
 .user-message{
     margin-left:10px;
     margin-top:10px;
 }
+
 #clear-context-button{
     float:right;
     color:#272727;
@@ -95,11 +104,13 @@ body {
     font-weight: bold;
 
 }
+
 #clear-context-button:hover{
     color:var(--primary-color);
     background-color:#272727;
     border-color:var(--primary-color)
 }
+
 .assistant-message-container {
     clear:both;
     width:100%;
@@ -116,6 +127,7 @@ body {
     clear:both;
     margin-top:10px;
 }
+
 .user-message-container label {
     border:1px solid var(--secondary-color);
     border-radius: 5px;
@@ -125,6 +137,7 @@ body {
     font-weight: bold;
     font-size:14;
 }
+
 .assistant-message-container label {
     border:1px solid var(--primary-color);
     border-radius: 5px;
@@ -133,6 +146,7 @@ body {
     padding-left:7px;
     font-weight: bold;
 }
+
 #sidebar {
     height: 100vh;
     width:19.8%;
@@ -146,18 +160,22 @@ body {
     box-shadow: -5px 0 5px -5px #333;
     z-index: 2;
 }
+
 #sidebar h5 {
     color: var(--primary-color);
     margin-bottom: 10px;
 }
+
 #sidebar .form-group {
     margin-bottom: 15px;
 }
+
 #sidebar label {
     display: block;
     margin-bottom: 5px;
     color: var(--primary-color);
 }
+
 #sidebar input {
     width: 100%;
     padding: 8px;
@@ -175,6 +193,7 @@ input:focus {
     outline: none;
     border: 1px solid var(--primary-color);
 }
+
 #sidebar button {
     width: 100%;
     padding: 8px;
@@ -185,6 +204,7 @@ input:focus {
     margin-bottom:10px;
     border-radius:5px;
 }
+
 #sidebar button:hover {
     width: 100%;
     padding: 8px;
@@ -194,6 +214,7 @@ input:focus {
     color:     var(--secondary-bg-color)
 
 }
+
 #sidebar select {
     width: 100%;
     padding: 8px;
@@ -203,6 +224,7 @@ input:focus {
     border-radius: 2px;
     color: var(--primary-color);
 }
+
 .key-container {
     position: absolute;
     bottom: 0; 
@@ -212,19 +234,23 @@ input:focus {
     gap: 5px;
     z-index: 2;
 }
+
 .key {
     font-size: 24px;
     font-weight: bold;
     color: #fff;
     white-space: nowrap; 
 }
+
 #format-select {
     padding: 5px; 
     width:10%;
 }
+
 #model-select {
     margin-bottom:10px
 }
+
 #model-form button {
     padding: 5px 10px;
     margin-top:5px;
@@ -233,11 +259,13 @@ input:focus {
     border:1px solid var(--secondary-color);
     border-radius: 2px 2px 2px 2px;   
 }
+
 #model-form button:hover {
     background-color:var(--secondary-color);
     border:1px solid #33333300;
     color:    var(--secondary-bg-color);
 }
+
 #send-button{
     width:100%;
     margin-top: 5px;
@@ -245,19 +273,22 @@ input:focus {
     border:1px solid var(--secondary-color);
     color:var(--secondary-color);
 }
-#send-button:hover{
 
+#send-button:hover{
     background-color:var(--secondary-color);
     border:1px solid var(--secondary-bg-color);
     color:    var(--secondary-bg-color);
 }
+
 .form-group{
     width:100%;
     background-color:    var(--secondary-bg-color);
 }
+
 .form-control{
     background-color: #999;
 }
+
 .copy-button {
     position: relative;
     float:right;
@@ -271,6 +302,7 @@ input:focus {
     color:var(--primary-color);
     font-family: Arial, sans-serif;
 }
+
 #start-tour-button{
     float:left;
     clear:both;
@@ -279,13 +311,13 @@ input:focus {
     border-color:var(--secondary-color);
     font-weight:bold;
 }
+
 #start-tour-button:hover{
     float:left;
     clear:both;
     background-color:#00000000;
     color:var(--secondary-color);
     border-color:var(--secondary-color);
-
 }
 
 #toggle-sidebar-button{
@@ -329,6 +361,36 @@ input:focus {
 }
 #share:hover {
     color:  var(--primary-color);
+}
+
+.popup-container {
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    width:300px;
+    align-items:center;
+    margin-left:calc(20% - 330px);
+    margin-bottom:100px;
+    display: flex;
+    flex-direction: column-reverse; 
+    align-items: flex-end; 
+}
+
+.popup-notification {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: opacity 0.5s ease;
+    opacity: 0;
+    max-width:300px;
+    margin-bottom:20px;
+    margin-left:20px;
+    border: 5px solid var(--primary-color);
+}
+
+.popup-error {
+    border: 5px solid #fe978a !important;
 }
 @media (max-width: 1023px) {
 
