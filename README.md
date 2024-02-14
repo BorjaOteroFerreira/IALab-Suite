@@ -31,6 +31,12 @@ pip install Flask flask-socketio flask-cors
 
 ```
 
+Or in the proyect folder 
+
+```bash
+pip install -r requirements.txt
+```
+
 ## llama-cpp-python installation
 
 There are different options for installing the llama-cpp package:
