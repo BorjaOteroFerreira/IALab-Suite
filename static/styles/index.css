@@ -422,14 +422,21 @@ input:focus {
     border: 5px solid var(--primary-color);
 }
 
-
-
-
-
 .popup-error {
     border: 5px solid #fe978a !important;
 }
 @media (max-width: 1023px) {
+    .popup-container {
+        position: absolute;
+        width:300px;
+        align-items:center;
+        margin-left:10px;
+        padding-left:2PX;
+        margin-bottom:50px;
+        display: flex;
+        flex-direction: column-reverse; 
+        z-index :5;
+    }
 
     #header{
         max-width:100%;

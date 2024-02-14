@@ -274,7 +274,7 @@ class Chat {
                         document.body.removeChild(container);
                     }
                 }, 500); //seconds to complete disappearance animation
-            }, 9500); //seconds before disappearing
+            }, 5500); //seconds before disappearing
         }, 100); // 0.1 seconds before displaying
     }
 
