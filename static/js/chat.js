@@ -30,6 +30,7 @@ class Chat {
 
     onAssistantResponse(response) {
         $('#stop-button').show();
+        $('#send-button').prop('disabled', true);
         $('#send-button').hide();
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
@@ -76,6 +77,7 @@ class Chat {
                 success: function (data) {
                     $('#stop-button').hide();
                     $('#send-button').show();
+                    $('#send-button').prop('disabled', false);
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -187,6 +189,7 @@ class Chat {
                 console.log(data);
                 self.showPopup(data);
                 $('#stop-button').hide();
+                $('#send-button').show();
             },
             error: (error) => {
                 self.showPopup(error, 'error');
