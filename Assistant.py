@@ -61,7 +61,7 @@ your responses allways in markdown.
         self.model_path = model_path
         self.temperature = temperature
         self.max_context_tokens = ctx
-        self.max_assistant_tokens = ctx
+        self.max_assistant_tokens = self.max_assistant_tokens #TODO: change in interface
         self.chat_format = format
         self.gpu_layers = gpu_layers
         self.conversation_history = [{"role": "system", "content": self.system_message}]
@@ -83,7 +83,7 @@ your responses allways in markdown.
 
     def add_user_input(self, user_input):
         embeddings = llama_cpp.llama_get_embeddings(user_input)
-        self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings})
+        self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings}) #TODO: use embeddings for recomendations
         self.update_context_tokens()
 
     def get_assistant_response_stream(self, message_queue):
