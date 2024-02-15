@@ -229,7 +229,8 @@ class Chat {
 
     toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
-        sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
+        sidebar.style.display = (sidebar.style.display === 'none' || 
+                                sidebar.style.display === '') ? 'block' : 'none';
     }
 
     escapeHtml(text) {
