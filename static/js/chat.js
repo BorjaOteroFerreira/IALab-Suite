@@ -18,6 +18,7 @@ class Chat {
                                                             }
                                                     });
     }
+    
 /** METHODS */
     onConnect() {
         console.log('Connected! ✅');
@@ -35,8 +36,6 @@ class Chat {
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens received 🧠');
-
-
     }
 
     handleAssistantResponse(response) {
@@ -46,25 +45,21 @@ class Chat {
         } else {
             this.currentResponse += response;
         }
-        
-        // Reemplazar etiquetas <code> dentro de <pre> con Prism.js
         this.currentResponse = this.currentResponse.replace(/<pre><code class="language-(\w+?)">([\s\S]*?)<\/code><\/pre>/g,
                             '<pre class="language-$1"><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code class="language-$1">$2</code></pre>');
         
+        //markdown to html 
         const converter = new showdown.Converter();
         this.response = converter.makeHtml(this.currentResponse);
         
         var divAssistant = $('#chat-assistant-' + this.n_responses);
         divAssistant.html(this.response);
         
-        // Resaltar el código con Prism.js
+        //highlight code blocks
         divAssistant.find('pre code').each(function(i, block) {
             Prism.highlightElement(block);
         });
-        
-        // Agregar el botón de copia solo a los bloques de código
         divAssistant.find('pre code').parent().prepend('<button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button>');
-        
         this.scrollToBottom();
     }
 
@@ -102,11 +97,10 @@ class Chat {
                     self.conversationStarted = false;
                 }
             });
-            
+
             console.log('Prompt sent! 🔤');
             $('#user-input').val('');
             $('#user-input').focus();
-
             var message = $('<div class="user-message-container-' + this.n_responses + 
                             ' user-message-container"><label for="chat-user-' + this.n_responses + 
                             '">User</label><div id="chat-user-' + this.n_responses + 
