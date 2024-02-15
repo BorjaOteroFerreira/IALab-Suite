@@ -35,23 +35,37 @@ class Chat {
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens received 🧠');
+
+
     }
 
     handleAssistantResponse(response) {
-        //response = response.replace(/<0x0A>/g, '<br>');
-        var chatList = $('#chat-list');
         if (!this.conversationStarted) {
             this.currentResponse = response;
             this.conversationStarted = true;
         } else {
             this.currentResponse += response;
         }
-        this.currentResponse = this.currentResponse.replace(/```([\s\S]*?)```/g,
-                            '<pre><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code>$1</code></pre>');
-        var div = $('#chat-assistant-' + this.n_responses);
-        div.html(this.currentResponse);
-        Prism.highlightAll();
-        this.scrollToBottom();       
+        
+        // Reemplazar etiquetas <code> dentro de <pre> con Prism.js
+        this.currentResponse = this.currentResponse.replace(/<pre><code class="language-(\w+?)">([\s\S]*?)<\/code><\/pre>/g,
+                            '<pre class="language-$1"><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code class="language-$1">$2</code></pre>');
+        
+        const converter = new showdown.Converter();
+        this.response = converter.makeHtml(this.currentResponse);
+        
+        var divAssistant = $('#chat-assistant-' + this.n_responses);
+        divAssistant.html(this.response);
+        
+        // Resaltar el código con Prism.js
+        divAssistant.find('pre code').each(function(i, block) {
+            Prism.highlightElement(block);
+        });
+        
+        // Agregar el botón de copia solo a los bloques de código
+        divAssistant.find('pre code').parent().prepend('<button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button>');
+        
+        this.scrollToBottom();
     }
 
     clearChat() {
