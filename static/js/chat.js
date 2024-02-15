@@ -78,6 +78,7 @@ class Chat {
 
     sendMessage() {
         if (!this.conversationStarted){
+            this.conversationStarted= true;
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val();

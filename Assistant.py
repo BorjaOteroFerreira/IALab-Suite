@@ -82,9 +82,10 @@ your responses allways in markdown.
         print("TOKENS: "+ str(total_tokens))
 
     def add_user_input(self, user_input):
-        embeddings = llama_cpp.llama_get_embeddings(user_input)
-        self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings}) #TODO: use embeddings for recomendations
-        self.update_context_tokens()
+        if not self.is_processing:
+            embeddings = llama_cpp.llama_get_embeddings(user_input)
+            self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings}) #TODO: use embeddings for recomendations
+            self.update_context_tokens()
 
     def get_assistant_response_stream(self, message_queue):
         '''
