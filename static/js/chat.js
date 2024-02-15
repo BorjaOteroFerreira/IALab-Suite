@@ -18,7 +18,6 @@ class Chat {
                                                             }
                                                     });
     }
-    
 /** METHODS */
     onConnect() {
         console.log('Connected! ✅');
@@ -36,9 +35,12 @@ class Chat {
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens received 🧠');
+
+
     }
 
     handleAssistantResponse(response) {
+        response = response.replace(/<0x0A>/g, '\n');
         if (!this.conversationStarted) {
             this.currentResponse = response;
             this.conversationStarted = true;
@@ -56,8 +58,10 @@ class Chat {
         divAssistant.html(this.response);
         
         //highlight code blocks
+
         divAssistant.find('pre code').each(function(i, block) {
             Prism.highlightElement(block);
+            
         });
         divAssistant.find('pre code').parent().prepend('<button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button>');
         this.scrollToBottom();
@@ -97,7 +101,6 @@ class Chat {
                     self.conversationStarted = false;
                 }
             });
-
             console.log('Prompt sent! 🔤');
             $('#user-input').val('');
             $('#user-input').focus();
@@ -106,7 +109,6 @@ class Chat {
                             '">User</label><div id="chat-user-' + this.n_responses + 
                             '" class="user-message user-message-' + this.n_responses + '">' + 
                             sanitizedUserMessage + '</div></div>');
-
             var chatList = $('#chat-list');
             chatList.append(message);
 
@@ -229,8 +231,7 @@ class Chat {
 
     toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
-        sidebar.style.display = (sidebar.style.display === 'none' || 
-                                sidebar.style.display === '') ? 'block' : 'none';
+        sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
     }
 
     escapeHtml(text) {
