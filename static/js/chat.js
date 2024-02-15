@@ -38,7 +38,6 @@ class Chat {
 
 
     }
-
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '\n');
         if (!this.conversationStarted) {
@@ -47,26 +46,22 @@ class Chat {
         } else {
             this.currentResponse += response;
         }
-        this.currentResponse = this.currentResponse.replace(/<pre><code class="language-(\w+?)">([\s\S]*?)<\/code><\/pre>/g,
-                            '<pre class="language-$1"><button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button><code class="language-$1">$2</code></pre>');
-        
-        //markdown to html 
+    
+        // Convertir Markdown a HTML
         const converter = new showdown.Converter();
         this.response = converter.makeHtml(this.currentResponse);
-        
+    
         var divAssistant = $('#chat-assistant-' + this.n_responses);
         divAssistant.html(this.response);
-        
-        //highlight code blocks
-
+        document.querySelectorAll('pre').forEach(function(pre) {
+            pre.classList.add('line-numbers');
+        });
+        // Resaltar bloques de código
         divAssistant.find('pre code').each(function(i, block) {
             Prism.highlightElement(block);
-            
         });
-        divAssistant.find('pre code').parent().prepend('<button class="copy-button" onclick="chat.copyToClipboard(this)">Copy</button>');
         this.scrollToBottom();
     }
-
     clearChat() {
         $('#chat-list').html('');
         this.currentResponse = '';

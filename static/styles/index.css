@@ -341,18 +341,8 @@ input:focus {
     
 }
 
-.copy-button {
-    position: relative;
-    float:right;
-    top: 5px;
-    right: 5px;
-    padding: 3px;
-    cursor: pointer;
-    background-color: var(--secondary-bg-color);
-    border-color:var(--primary-color);
-    border-radius:2px 2px 2px 2px;
-    color:var(--primary-color);
-    font-family: Arial, sans-serif;
+.copy-to-clipboard-button{
+    font-size:20px !important;
 }
 
 #start-tour-button{
