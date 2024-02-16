@@ -107,7 +107,7 @@ class Chat {
                             sanitizedUserMessage + '</div></div>');
             var chatList = $('#chat-list');
             chatList.append(message);
-
+          
             var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + 
                                 ' assistant-message-container"><label for="chat-assistant-' + this.n_responses + 
                                 '">Assistant<br></label><div id="chat-assistant-' + this.n_responses + 
@@ -118,6 +118,7 @@ class Chat {
             var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
             userMessageCointainer.append(shareButton);
             this.scrollToBottom();
+            
         }
     }
 

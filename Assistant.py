@@ -121,19 +121,21 @@ your responses allways in markdown.
             self.stop_emit = False
             self.is_processing = True
             response = ""
-            for chunk in self.model.create_chat_completion(messages=self.conversation_history,
-                                                        max_tokens=self.max_assistant_tokens, 
-                                                        stream=True):
-                if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
-                    response_chunk = chunk['choices'][0]['delta']['content']
-                    response += response_chunk  
-                    socket.emit('assistant_response',
-                                {'role': 'assistant', 'content': response_chunk}, namespace='/test')
-                    time.sleep(0.01)
-            if not self.stop_emit:
-                self.conversation_history.append({"role": "assistant", "content": response})
-                print(response)
-        self.is_processing = False
+            try:
+                for chunk in self.model.create_chat_completion(messages=self.conversation_history,
+                                                            max_tokens=self.max_assistant_tokens, 
+                                                            stream=True):
+                    if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
+                        response_chunk = chunk['choices'][0]['delta']['content']
+                        response += response_chunk  
+                        socket.emit('assistant_response',
+                                    {'role': 'assistant', 'content': response_chunk}, namespace='/test')
+                        time.sleep(0.01)
+                if not self.stop_emit:
+                    self.conversation_history.append({"role": "assistant", "content": response})
+                    print(response)
+            finally:
+                self.is_processing = False
 
     def clear_context(self):
         self.conversation_history = [{"role": "system", "content": self.system_message}]
