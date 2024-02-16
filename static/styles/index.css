@@ -411,7 +411,7 @@ pre:not(pre)>code[class*=language-], pre[class*=language-] {
 } 
 code{
     font-weight: bold !important;
-    font-size: 1em !important;
+    font-size: 0.9em !important;
 }
 
 
