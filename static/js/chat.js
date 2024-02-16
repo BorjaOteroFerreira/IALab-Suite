@@ -38,22 +38,13 @@ class Chat {
 
 
     }
-    handleAssistantResponse(response) {
-        response = response.replace(/<0x0A>/g, '\n');
-    
-        if (!this.conversationStarted) {
-            this.currentResponse = response;
-            this.conversationStarted = true;
-        } else {
-            this.currentResponse += response;
-        }
-    
+
+    transformTable(response) {
         const converter = new showdown.Converter();
-        this.response = converter.makeHtml(this.currentResponse);
-    
-        // Procesar las tablas Markdown a HTML
+        const htmlResponse = converter.makeHtml(response);
+
         const tableRegex = /(?:\|.*(?:\|).*)+\|/gs;
-        let htmlResponse = this.response.replace(tableRegex, (table) => {
+        const transformedResponse = htmlResponse.replace(tableRegex, (table) => {
             const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
             let htmlTable = '<table>';
             for (let i = 0; i < rows.length; i++) {
@@ -70,11 +61,27 @@ class Chat {
             htmlTable += '</table>';
             return htmlTable;
         });
+
+        return transformedResponse;
+    }
+
+
+    
+    handleAssistantResponse(response) {
+        response = response.replace(/<0x0A>/g, '\n');
+    
+        if (!this.conversationStarted) {
+            this.currentResponse = response;
+            this.conversationStarted = true;
+        } else {
+            this.currentResponse += response;
+        }
+        
+        let htmlResponse = this.transformTable(this.currentResponse);
     
         var divAssistant = $('#chat-assistant-' + this.n_responses);
         divAssistant.html(htmlResponse);
     
-        // Resaltar el código
         document.querySelectorAll('pre').forEach(function(pre) {
             pre.classList.add('line-numbers');
         });

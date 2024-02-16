@@ -6,6 +6,7 @@
     --secondary-color: #f7e3c1;
     --primary-bg-color: #272727;
     --secondary-bg-color: #2C2C2C;
+    --comment-color: #e83e8c;
     }
 
 body {
@@ -15,7 +16,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #333333;
+    background-color: #333333 !important;
 }
 #header {
     margin-top:2px;
@@ -51,11 +52,11 @@ body {
 }
 
 #chat-container::-webkit-scrollbar {
-    width: 6px; /* Establece el ancho de la barra de desplazamiento en navegadores WebKit (Chrome, Safari) */
+    width: 6px; 
 }
 
 #chat-container::-webkit-scrollbar-thumb {
-    background-color: transparent; /* Establece el color del pulgar de la barra de desplazamiento en navegadores WebKit */
+    background-color: transparent; 
 }
 
 #footer {
