@@ -215,7 +215,7 @@ Run the App:
 python app.py
 ```
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/borjaoteroferreira@gmail.com)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/BorjaOteroFerreira)
 
 
 #### __Tested in MacBook-Pro M3-Pro 11 cpu cores , 14 gpu cores, 18 unify memory (Sonoma 14.1) & AMD Ryzen 5600x, Nvidia RTX 3060 gaming OC 12GB, 32GB cpu Memory (Linux/Windows). Tested with 12gb max size models__ | __Python version 3.11.7__ | 
