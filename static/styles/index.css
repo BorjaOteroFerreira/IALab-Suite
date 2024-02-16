@@ -436,23 +436,36 @@ code{
 table{
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #ccc;
-    border-radius:5px;
+
   
+}
+tbody{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
 }
 table th {
     background-color: var(--secondary-color);
     -webkit-text-fill-color: var(--secondary-bg-color);
-}
-table thead {
+    border-color:var(--primary-color)!important;
     text-align: center;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
 
 
+}
+
+th:first-child {
+    border-top-left-radius: 5px; /* Borde redondeado en la esquina superior izquierda */
+    border-left:3px;
+}
+
+th:last-child {
+    border-right:3px;
+    border-top-right-radius: 5px; /* Borde redondeado en la esquina superior derecha */
 }
 table tr:nth-child(even) {
     background-color: var(--primary-bg-color);
+
+
 }
 
 
