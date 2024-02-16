@@ -47,7 +47,7 @@ class Chat {
             this.currentResponse += response;
         }
     
-        // Convertir Markdown a HTML
+    
         const converter = new showdown.Converter();
         this.response = converter.makeHtml(this.currentResponse);
     
@@ -56,7 +56,7 @@ class Chat {
         document.querySelectorAll('pre').forEach(function(pre) {
             pre.classList.add('line-numbers');
         });
-        // Resaltar bloques de código
+
         divAssistant.find('pre code').each(function(i, block) {
             Prism.highlightElement(block);
         });
