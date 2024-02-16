@@ -39,12 +39,22 @@ class Chat {
 
     }
 
-    transformTable(response) {
+    
+    handleAssistantResponse(response) {
+        response = response.replace(/<0x0A>/g, '\n');
+    
+        if (!this.conversationStarted) {
+            this.currentResponse = response;
+            this.conversationStarted = true;
+        } else {
+            this.currentResponse += response;
+        }
+        
         const converter = new showdown.Converter();
-        const htmlResponse = converter.makeHtml(response);
-
+        this.response = converter.makeHtml(this.currentResponse);
+    
         const tableRegex = /(?:\|.*(?:\|).*)+\|/gs;
-        const transformedResponse = htmlResponse.replace(tableRegex, (table) => {
+        let htmlResponse = this.response.replace(tableRegex, (table) => {
             const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
             let htmlTable = '<table>';
             for (let i = 0; i < rows.length; i++) {
@@ -61,23 +71,6 @@ class Chat {
             htmlTable += '</table>';
             return htmlTable;
         });
-
-        return transformedResponse;
-    }
-
-
-    
-    handleAssistantResponse(response) {
-        response = response.replace(/<0x0A>/g, '\n');
-    
-        if (!this.conversationStarted) {
-            this.currentResponse = response;
-            this.conversationStarted = true;
-        } else {
-            this.currentResponse += response;
-        }
-        
-        let htmlResponse = this.transformTable(this.currentResponse);
     
         var divAssistant = $('#chat-assistant-' + this.n_responses);
         divAssistant.html(htmlResponse);
@@ -92,6 +85,7 @@ class Chat {
     
         this.scrollToBottom();
     }
+
     clearChat() {
         $('#chat-list').html('');
         this.currentResponse = '';
