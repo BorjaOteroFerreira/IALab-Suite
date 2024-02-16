@@ -40,6 +40,7 @@ class Chat {
     }
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '\n');
+    
         if (!this.conversationStarted) {
             this.currentResponse = response;
             this.conversationStarted = true;
@@ -47,19 +48,41 @@ class Chat {
             this.currentResponse += response;
         }
     
-    
         const converter = new showdown.Converter();
         this.response = converter.makeHtml(this.currentResponse);
     
+        // Procesar las tablas Markdown a HTML
+        const tableRegex = /(?:\|.*(?:\|).*)+\|/gs;
+        let htmlResponse = this.response.replace(tableRegex, (table) => {
+            const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
+            let htmlTable = '<table>';
+            for (let i = 0; i < rows.length; i++) {
+                htmlTable += '<tr>';
+                for (let j = 0; j < rows[i].length; j++) {
+                    if (i === 0) {
+                        htmlTable += `<th>${rows[i][j]}</th>`;
+                    } else {
+                        htmlTable += `<td>${rows[i][j]}</td>`;
+                    }
+                }
+                htmlTable += '</tr>';
+            }
+            htmlTable += '</table>';
+            return htmlTable;
+        });
+    
         var divAssistant = $('#chat-assistant-' + this.n_responses);
-        divAssistant.html(this.response);
+        divAssistant.html(htmlResponse);
+    
+        // Resaltar el código
         document.querySelectorAll('pre').forEach(function(pre) {
             pre.classList.add('line-numbers');
         });
-
+    
         divAssistant.find('pre code').each(function(i, block) {
             Prism.highlightElement(block);
         });
+    
         this.scrollToBottom();
     }
     clearChat() {

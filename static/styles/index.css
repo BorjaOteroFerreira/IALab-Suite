@@ -436,19 +436,29 @@ table{
     width: 100%;
     border-collapse: collapse;
     border: 1px solid #ccc;
+    border-radius:5px;
   
+}
+table th {
+    background-color: var(--secondary-color);
+    -webkit-text-fill-color: var(--secondary-bg-color);
 }
 table thead {
     text-align: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
+
 }
 table tr:nth-child(even) {
     background-color: var(--primary-bg-color);
 }
 
+
 /* Estilo para las celdas de la tabla */
 table td {
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--secondary-color);
 }
 @media (max-width: 1023px) {
     .popup-container {
