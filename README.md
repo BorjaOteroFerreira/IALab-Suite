@@ -228,7 +228,10 @@ OR...
 
 ```javascript
 !pullrequest && !putIssue ? user.donate(CoffeWhitPaypal) : null;
+
 ```
+
+console.log( [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/borjaoteroferreira) );
 
 ## Code & license 
 This code released under the [MIT License](https://github.com/BorjaOteroFerreira/IALab-Suite/blob/main/LICENSE)
