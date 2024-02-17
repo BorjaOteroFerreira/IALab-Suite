@@ -216,7 +216,7 @@ python app.py
 ```
 
 ## Contribution
-Contributions are welcome! If you find any bugs or have suggestions to improve this FrameWork, feel free to open an issue or submit a pull request. 
+Contributions are welcome! If you find any bugs or have suggestions to improve this Framework, feel free to open an issue or submit a pull request. 
 
 OR...
 
