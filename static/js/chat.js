@@ -35,11 +35,8 @@ class Chat {
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens received 🧠');
-
-
     }
 
-    
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '\n');
     
