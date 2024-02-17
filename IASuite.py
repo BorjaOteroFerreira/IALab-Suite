@@ -72,15 +72,15 @@ class IASuiteApi:
     def unload_model(self):
         self.assistant.unload_model()
         self.assistant.clear_context()
-        return 'Model uninstalled!'
+        return 'Model uninstalled 🫗!'
 
     def clear_context(self):
         self.assistant.clear_context()
-        return "Context Reset!"
+        return "Context Reset 🔁!"
 
     def stop_response(self):
         self.assistant.stop_response()
-        return "Finishing response...\nPlease wait"
+        return "Finishing response...\nPlease wait ⏳"
 
     def get_models_list(self, folder_path):
         models_list = []
