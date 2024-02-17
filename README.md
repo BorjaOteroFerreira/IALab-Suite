@@ -227,7 +227,7 @@ Contributions are welcome! If you find any bugs or have suggestions to improve t
 OR...
 
 ```javascript
-!pullrequest && !putIssue ? user.donate(CoffeWhitPaypal) : null;
+!pullrequest && !putIssue ? user.donate(CoffeeWhitPaypal) : null;
 
 ```
 
