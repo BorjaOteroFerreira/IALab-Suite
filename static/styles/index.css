@@ -331,19 +331,15 @@ input:focus {
 #footer .form-group{
     width:80%;
     display:flex;
-    
     background-color:var(--secondary-bg-color);
     margin-top:20px;
 }
 
 .form-control{
     background-color: #999;
-    
 }
 
-.copy-to-clipboard-button{
-    font-size:20px !important;
-}
+
 
 #start-tour-button{
     float:left;
@@ -374,10 +370,7 @@ input:focus {
     color: var(--secondary-bg-color);
     border : 1px solid  var(--primary-color); 
 }
-.copy-button:hover{
-    color: var(--secondary-bg-color);
-    background-color: var(--primary-color);
-}
+
 
 #share {
     position: relative;
@@ -414,7 +407,6 @@ code{
     font-size: 0.9em !important;
 }
 
-
 .popup-notification {
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
@@ -435,21 +427,18 @@ code{
 table{
     width: 100%;
     border-collapse: collapse;
-
-  
 }
+
 tbody{
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-
 }
+
 table th {
     background-color: var(--secondary-color);
     -webkit-text-fill-color: var(--secondary-bg-color);
     border-color:var(--primary-color)!important;
     text-align: center;
-
-
 }
 
 th:first-child {
@@ -463,8 +452,6 @@ th:last-child {
 }
 table tr:nth-child(even) {
     background-color: var(--primary-bg-color);
-
-
 }
 
 
