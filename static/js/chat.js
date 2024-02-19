@@ -55,17 +55,13 @@ class Chat {
             const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
         
             // Filtrar las filas que contienen guiones
-            const filteredRows = rows.filter(row => !row.some(cell => cell.includes('----')));
+            const filteredRows = rows.filter(row => !row.some(cell => cell.includes('---')));
         
             let htmlTable = '<table>';
             for (let i = 0; i < filteredRows.length; i++) {
                 htmlTable += '<tr>';
                 for (let j = 0; j < filteredRows[i].length; j++) {
-                    if (i === 0) {
-                        htmlTable += `<th>${filteredRows[i][j]}</th>`;
-                    } else {
-                        htmlTable += `<td>${filteredRows[i][j]}</td>`;
-                    }
+                    htmlTable += (i === 0) ? `<th>${filteredRows[i][j]}</th>` : `<td>${filteredRows[i][j]}</td>`;
                 }
                 htmlTable += '</tr>';
             }
