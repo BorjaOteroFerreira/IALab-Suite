@@ -54,8 +54,7 @@ class Chat {
         let htmlResponse = this.response.replace(tableRegex, (table) => {
             const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
         
-            // Filtrar las filas que contienen guiones
-            const filteredRows = rows.filter(row => !row.some(cell => cell.includes('----')));
+            const filteredRows = rows.filter(row => !row.some(cell => cell.includes('---')));
         
             let htmlTable = '<table>';
             for (let i = 0; i < filteredRows.length; i++) {
