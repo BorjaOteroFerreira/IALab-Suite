@@ -2,11 +2,13 @@
 @Author: Borja Otero Ferreira
 */
 :root {
-    --primary-color: #DCF8C6;
-    --secondary-color: #f7e3c1;
-    --primary-bg-color: #272727;
-    --secondary-bg-color: #2C2C2C;
+    --primary-color: #43D9AD;/**#DCF8C6;*/
+    --secondary-color: #E99287;/**#f7e3c1;*/
+    --primary-bg-color: #010d17;
+    --secondary-bg-color: #011627;
+    --third-bg-color:#5565E8;
     --comment-color: #e83e8c;
+    --footer-bg: #010d17 ;
     }
 
 body {
@@ -16,7 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #333333 !important;
+    background-color: #011627 !important;
 }
 #header {
     margin-top:2px;
@@ -31,9 +33,10 @@ body {
     top: 0;
     z-index: 1000;
     clear:both;
-    border:1px  solid  var(--primary-color);
+    border:1px  solid  var(--secondary-color);
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
+    border-bottom: 0;
 } 
 
 #chat-container {
@@ -59,7 +62,7 @@ body {
 }
 
 #footer {
-    background-color: #2c2c2c;
+    background-color:var(--footer-bg) ;  /** #2c2c2c;*/
     padding: 10px;
     position: fixed;
     bottom: 0;
@@ -103,16 +106,17 @@ body {
 
 #clear-context-button{
     float:right;
-    color:#272727;
-    background-color: var(--primary-color);
+    color:var(--primary-color);
+    background-color:var(--primary-bg-color);
+    border-color:var(--primary-color);
     font-weight: bold;
 
 }
 
 #clear-context-button:hover{
-    color:var(--primary-color);
-    background-color:#272727;
-    border-color:var(--primary-color)
+    color:var(--primary-bg-color);
+    background-color: var(--primary-color);
+
 }
 
 .assistant-message-container {
@@ -344,8 +348,9 @@ input:focus {
 #start-tour-button{
     float:left;
     clear:both;
-    background-color:var(--secondary-color);
-    color: var(--secondary-bg-color);
+    background-color:#00000000;
+    color:var(--secondary-color);
+
     border-color:var(--secondary-color);
     font-weight:bold;
 }
@@ -353,22 +358,25 @@ input:focus {
 #start-tour-button:hover{
     float:left;
     clear:both;
-    background-color:#00000000;
-    color:var(--secondary-color);
+    background-color:var(--secondary-color);
+    color: var(--secondary-bg-color);
     border-color:var(--secondary-color);
 }
 
 #toggle-sidebar-button{
-    background-color: var(--secondary-bg-color); 
-    color: var(--primary-color); 
-    border : 1px solid var(--primary-color); 
+    background-color:var(--third-bg-color); 
+    color: var(--secondary-bg-color);
+    border-top:1px solid var(--third-bg-color);
+    border-bottom: 1px solid var(--third-bg-color); 
+    border-left: 1px solid var(--secondary-color);
+    border-right: 1px solid var(--secondary-color);
     max-width:80%;
+
 
 }
 #toggle-sidebar-button:hover{
-    background-color:var(--primary-color); 
-    color: var(--secondary-bg-color);
-    border : 1px solid  var(--primary-color); 
+    background-color: var(--secondadry-bg-color); 
+    color: var(--third-bg-color); 
 }
 
 
