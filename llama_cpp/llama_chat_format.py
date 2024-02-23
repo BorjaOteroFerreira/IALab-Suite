@@ -534,6 +534,23 @@ def format_qwen(
     _sep2 = "<|endoftext|>"
     return ChatFormatterResponse(prompt=_prompt,stop=_sep2)
 
+@register_chat_format("gemma")
+def format_gemma(
+    messages: List[llama_types.ChatCompletionRequestMessage],
+    **kwargs: Any,
+) -> ChatFormatterResponse:
+    system_message = _get_system_message(messages)
+    if system_message is not None and system_message != "":
+        raise ValueError(
+            "`role='system'` messages are not allowed on Google's Gemma models."
+        )
+    _roles = dict(user="<start_of_turn>user\n", assistant="<start_of_turn>model\n")
+    _sep = "<end_of_turn>\n"
+    _messages = _map_roles(messages, _roles)
+    _messages.append((_roles["assistant"], None))
+    _prompt = _format_no_colon_single(system_message="", messages=_messages, sep=_sep)
+    return ChatFormatterResponse(prompt=_prompt, stop=_sep)
+
 @register_chat_format("vicuna")
 def format(
     messages: List[llama_types.ChatCompletionRequestMessage],

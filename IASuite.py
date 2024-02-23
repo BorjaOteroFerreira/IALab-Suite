@@ -94,6 +94,7 @@ class IASuiteApi:
     def get_format_list(self):
         format_list = ["llama-2", 
                        "qwen",
+                       "gemma",
                        "vicuna",
                        "guanaco",
                        "Custom-IALab",
