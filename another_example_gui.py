@@ -29,7 +29,7 @@ class EmbeddedFlaskApp(QMainWindow):
 
         # Maximizar la ventana para llenar la pantalla
         self.showMaximized()
-        web_view.setZoomFactor(0.75)  # Puedes ajustar el valor según sea necesario
+        web_view.setZoomFactor(0.75)  
      
         style_sheet = """
             QMainWindow {
@@ -50,7 +50,6 @@ class EmbeddedFlaskApp(QMainWindow):
 if __name__ == '__main__':
     app = QApplication([])
 
-    # Cambiar el nombre que se muestra en la barra de tareas de Mac
     app.setApplicationDisplayName("IALab_Suite")
 
     main_window = EmbeddedFlaskApp()
