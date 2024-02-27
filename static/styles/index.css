@@ -20,18 +20,25 @@ body {
     min-height: 100vh;
     background-color: #011627 !important;
 }
+#container {
+    display: flex;
+}
+#main-container{
+    flex: 1;
+    width:100%;
+    
+
+}
 #header {
-    margin-top:2px;
-    background-color: var(--primary-bg-color);
-    max-width:80%;
    
+    background-color: var(--primary-bg-color);
+    height:65px;
     color: #ffffff;
     padding: 10px;
     text-align: center;
     position: relative;
     width: 100%;
     top: 0;
-    z-index: 1000;
     clear:both;
     border:1px  solid  var(--secondary-color);
     border-top-left-radius: 5px;
@@ -42,8 +49,8 @@ body {
 #chat-container {
     border-right:1px solid var(--secondary-color);
     border-left:1px solid var(--secondary-color) ;
-    max-width: 80%;
-    height: calc(100vh - 193px);
+    max-width: 100%;
+    height: calc(100vh - 200px);
     margin-top:0px !important;
     margin-left:0 !important;
     padding:50px;
@@ -64,11 +71,9 @@ body {
 #footer {
     background-color:var(--footer-bg) ;  /** #2c2c2c;*/
     padding: 10px;
-    position: fixed;
     bottom: 0;
-    z-index: 2;
-    width: 80%;
-
+    left:0;
+    width: 100%;
     margin-top:5px;
     display: flex;
     flex-direction: column;
@@ -166,7 +171,7 @@ body {
     background-color: var(--secondary-bg-color);
     padding: 10px;
     box-shadow: -5px 0 5px -5px #333;
-    z-index: 2;
+
 }
 
 #sidebar h5 {
@@ -335,6 +340,7 @@ input:focus {
 #footer .form-group{
     width:80%;
     display:flex;
+    position:relative;
     background-color:var(--secondary-bg-color);
     margin-top:20px;
 }
@@ -370,7 +376,7 @@ input:focus {
     border-bottom: 1px solid var(--third-bg-color); 
     border-left: 1px solid var(--secondary-color);
     border-right: 1px solid var(--secondary-color);
-    max-width:80%;
+    width:100%;
 
 
 }
@@ -468,6 +474,10 @@ table td {
     padding: 8px;
     border: 1px solid var(--secondary-color);
 }
+textarea{
+
+}
+
 @media (max-width: 1023px) {
     .popup-container {
         position: absolute;
@@ -480,17 +490,13 @@ table td {
         flex-direction: column-reverse; 
         z-index :5;
     }
-
-    #header{
-        max-width:100%;
-        margin-left:0%;
-
+    #main-container{
+        width:100%;
+        margin-right:0px !important; 
     }
+
     #chat-container {
         margin-left: 0px; 
-        margin-right: 0px; 
-        max-width: 100%;
-        height: calc(100vh - 175px);
         padding:10px;
     }
     #model-form button {
@@ -513,7 +519,6 @@ table td {
     }
     #send-button{   
         padding:1px;
-    
         border:1px solid var(--secondary-color);
     }
     #user-input{
@@ -544,7 +549,7 @@ table td {
         margin-top:90px;
         width:100%;
         display: none; 
-        z-index:0;
+
     }
     #toggle-sidebar-button{
         max-width:100%;
@@ -556,7 +561,6 @@ table td {
     #sidebar{
         margin-top:90px;
         font-size: 10px;
-        z-index:0;
     }
     #sidebar h5{
         font-size:12px
