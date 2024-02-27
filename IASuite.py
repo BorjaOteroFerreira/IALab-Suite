@@ -25,10 +25,16 @@ class IASuiteApi:
         self.app.before_request(self.before_first_request)
         self.app.route('/')(self.index)
         self.socketio.on_event('user_input', self.handle_user_input_route, namespace='/test')
+        self.app.route('/crear_historial', methods=['POST'])(self.crear_historial)
+        self.app.route('/actualizar_historial', methods=['POST'])(self.actualizar_historial)
+        self.app.route('/eliminar_historial', methods=['DELETE'])(self.eliminar_historial)
+        self.app.route('/recuperar_historial', methods=['GET'])(self.recuperar_historial)
         self.app.route('/user_input', methods=['POST'])(self.handle_user_input_route)
         self.app.route('/load_model', methods=['POST'])(self.load_model)
         self.app.route('/unload_model', methods=['POST'])(self.unload_model)
         self.app.route('/stop_response', methods=['POST'])(self.stop_response)
+
+
 
     def before_first_request(self):
         if self.assistant is None:
@@ -41,6 +47,57 @@ class IASuiteApi:
         models_list = self.get_models_list("models")
         format_list = self.get_format_list()
         return render_template('index.html', models_list=models_list, format_list=format_list)
+    
+
+    def crear_historial(self):
+        nombre_chat = request.form.get('nombre_chat')
+        historial = request.json.get('historial')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
+        with open(ruta_archivo, 'w') as f:
+            json.dump(historial, f, indent=4)
+        return jsonify({'message': f'Historial {nombre_chat} creado exitosamente.'}), 200
+
+    def actualizar_historial(self):
+        nombre_chat = request.json.get('nombre_chat')
+        nombre_chat = nombre_chat.replace('/', '-')
+        nombre_chat = nombre_chat.replace(':', '-')
+        nombre_chat = nombre_chat.replace(' ', '_')
+        print(nombre_chat)
+        historial = request.json.get('historial')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
+
+        # Verificar si el archivo existe
+        if not os.path.exists(ruta_archivo):
+            # Si el archivo no existe, crear uno nuevo con el historial
+            with open(ruta_archivo, 'w') as f:
+                json.dump(historial, f, indent=4)
+            return jsonify({'message': f'Historial {nombre_chat} creado exitosamente.'}), 201
+        else:
+            # Si el archivo ya existe, actualizar el historial
+            with open(ruta_archivo, 'w') as f:
+                json.dump(historial, f, indent=4)
+            return jsonify({'message': f'Historial {nombre_chat} actualizado exitosamente.'}), 200
+
+    def eliminar_historial(self):
+        nombre_chat = request.args.get('nombre_chat')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
+        if os.path.exists(ruta_archivo):
+            os.remove(ruta_archivo)
+            return jsonify({'message': f'Historial {nombre_chat} eliminado exitosamente.'}), 200
+        else:
+            return jsonify({'error': f'No se encontró el historial {nombre_chat}.'}), 404
+
+    def recuperar_historial(self):
+        nombre_chat = request.args.get('nombre_chat')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
+        if os.path.exists(ruta_archivo):
+            with open(ruta_archivo, 'r') as f:
+                historial = json.load(f)
+            return jsonify(historial), 200
+        else:
+            return jsonify({'error': f'No se encontró el historial {nombre_chat}.'}), 404
+
+
 
     def handle_user_input_route(self):
         request_data = request.json  # Obtener los datos JSON del cuerpo de la solicitud
@@ -115,6 +172,8 @@ class IASuiteApi:
                         "rarete"]
         return format_list
     
+
+
     def stop_server(self):
         os.kill(os.getpid(), signal.SIGINT) 
         return 'Server shutting down...'

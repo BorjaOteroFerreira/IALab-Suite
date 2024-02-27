@@ -1,6 +1,8 @@
 '''
 @author: Borja Otero Ferreira
 '''
+import json
+import os
 from llama_cpp import Llama as Model
 import llama_cpp
 import platform
@@ -77,7 +79,7 @@ your responses allways in markdown.
         if not self.is_processing:
             self.emit_assistant_response_stream(user_input,socket)
   
-    
+         
 
     def get_assistant_response_stream(self, message_queue):
         '''
@@ -113,18 +115,28 @@ your responses allways in markdown.
             self.stop_emit = False
             self.is_processing = True
             response = ""
+            tokensInput = str(user_input[-1]["content"]).encode()  # Convertir a bytes
+            print(tokensInput)
+            tokens = self.model.tokenize(tokensInput)  
+
+            total_user_tokens = len(tokens)  # Contar los tokens de la entrada del usuario
+            total_assistant_tokens = 0  # Inicializar el contador de tokens del asistente
             try:
-                for chunk in self.model.create_chat_completion(messages=user_input,
-                                                            max_tokens=self.max_assistant_tokens, 
-                                                            stream=True):
+                for chunk in self.model.create_chat_completion(messages=user_input, max_tokens=self.max_assistant_tokens, stream=True):
                     if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
                         response_chunk = chunk['choices'][0]['delta']['content']
                         response += response_chunk  
-                        socket.emit('assistant_response',
-                                    {'role': 'assistant', 'content': response_chunk}, namespace='/test')
+                        total_assistant_tokens+=1 # Contar los tokens en el chunk actual
+                        socket.emit('assistant_response', {
+                            'content': chunk,
+                            'total_user_tokens': total_user_tokens,
+                            'total_assistant_tokens': total_assistant_tokens
+                        }, namespace='/test')
                         time.sleep(0.01)
             finally:
                 self.is_processing = False
+
+                
 
 
     def stop_response(self):

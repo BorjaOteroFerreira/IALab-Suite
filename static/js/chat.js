@@ -11,7 +11,10 @@ class Chat {
         this.n_responses = 0;
         this.popupCount = 0;
         this.fullResponse = '';
+        this.totalTokens = 0;
+        this.totalTokensResponse =0;
         this.conversationStarted = false;
+        this.chatId = ' ';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
@@ -33,14 +36,76 @@ class Chat {
     }
 
     onAssistantResponse(response) {
-        this.fullResponse += response.content;
+      
+        const responseData = response.content["choices"][0];
+        const { id, model, created, object } = response.content;
+        const { index, delta, finish_reason } = responseData;
+        const responseId = id;
+        const responseModel = model;
+        const responseCreated = created;
+        const responseObject = object;
+        const choiceIndex = index;
+        const choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
+        this.fullResponse += choiceDelta; // Agregar a fullResponse
+        const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
+        const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
+        const totalAssistantTokens = response.total_assistant_tokens; 
+        this.totalTokensResponse = totalUserTokens + totalAssistantTokens
+
+        console.log("ID de la respuesta:", responseId);
+        console.log("Modelo utilizado:", responseModel);
+        console.log("Creación:", responseCreated);
+        console.log("Objeto:", responseObject);
+        console.log("Índice de la elección:", choiceIndex);
+        console.log("Contenido de la elección:", choiceDelta);
+        console.log("Razón de finalización:", choiceFinishReason);
+        console.log("Tokens del usuario : ", totalUserTokens);
+        console.log("Tokens Respuesta: ", totalAssistantTokens);
+
         $('#stop-button').show();
         $('#send-button').prop('disabled', true);
         $('#send-button').hide();
-        this.handleAssistantResponse(response.content);
+        this.handleAssistantResponse(choiceDelta);
         this.scrollToBottom();
-        console.log('Tokens received 🧠');
+        /*console.log('Tokens received 🧠');**/
         
+    }
+    guardarHistorial(chatId, content) {
+        console.log("PRUEBA 2:" + chatId)
+        $.ajax({
+            type: 'POST',
+            url: '/actualizar_historial', // Endpoint para actualizar el historial
+            data: JSON.stringify({ nombre_chat: chatId, historial: content }), // Convertir a JSON
+            contentType: 'application/json', // Asegura que el servidor entienda que es JSON
+            success: function (data) {
+                
+            },
+            error: function (error) {
+                console.error('Error al guardar el historial:', error); // Imprimir el mensaje de error en la consola
+            }
+        });
+    }
+
+    cargarHistorial(nombre_chat) {
+        const self = this;
+        $.ajax({
+            type: 'GET',
+            url: `/recuperar_historial?nombre_chat=${nombre_chat}`,
+            contentType: 'application/json',
+            success: function (data) {
+                // Verifica si se recuperaron datos válidos
+                if (data && Array.isArray(data)) {
+                    self.conversationHistory = data; // Asigna los datos recuperados a conversationHistory
+                    console.log('Historial cargado exitosamente:', self.conversationHistory);
+                } else {
+                    console.error('Error: No se pudieron recuperar datos válidos del historial.');
+                }
+            },
+            error: function (error) {
+                self.showPopup('Error cargando historial','error')
+                console.error('Error al cargar el historial:', error); // Imprime el mensaje de error en la consola
+            }
+        });
     }
 
     handleAssistantResponse(response) {
@@ -90,6 +155,9 @@ class Chat {
     clearChat() {
         $('#chat-list').html('');
         this.currentResponse = '';
+        this.totalTokens = 0;
+        var label = document.getElementById('tokens');
+        label.textContent = ' ' + this.totalTokens + ' Tokens';
         this.conversationHistory = [{'role':'system', 'content' : this.systemMessage}]
         $('#key-container').empty();
         let str = 'Chat emptied! 🗑️';
@@ -97,13 +165,29 @@ class Chat {
         console.log(str);
     }
 
+    actualizarTokens(){
+        this.totalTokens += this.totalTokensResponse
+        this.totalTokensResponse = 0;
+        var label = document.getElementById('tokens');
+        label.textContent = ' ' + this.totalTokens + ' Tokens';
+    }
+
     sendMessage() {
         if (!this.conversationStarted){
-  
+         
             this.conversationStarted= true;
             this.currentResponse = ' ';
             this.n_responses += 1;
-            var userMessage = $('#user-input').val();
+            var userMessage = $('#user-input').val(); // Obtener el valor del input
+            var userMessage = userMessage.substring(0, 15); // Usando substring
+            var currentDate = new Date(); // Obtener la fecha y hora actual
+            var formattedDateTime = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes(); // Formatear la fecha y hora
+            var messageWithDateTime = userMessage + ' - ' + formattedDateTime; // Agregar la fecha y hora al mensaje
+            if (this.chatId ===' '){
+                this.chatId = messageWithDateTime;
+
+            }
+        
             var sanitizedUserMessage = this.escapeHtml(userMessage);
             this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage})
             const self = this;
@@ -117,6 +201,8 @@ class Chat {
                     $('#send-button').show();
                     $('#send-button').prop('disabled', false);
                     self.addToConversationHistory(); // Agregar la respuesta completa al historial
+                    self.actualizarTokens();
+                    self.guardarHistorial(self.chatId , self.conversationHistory);
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
