@@ -4,10 +4,13 @@ class Chat {
         const textarea = document.getElementById('user-input');
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
+        this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
         this.currentResponse = '';
+        this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español'
         this.n_responses = 0;
         this.popupCount = 0;
+        this.fullResponse = '';
         this.conversationStarted = false;
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
@@ -26,15 +29,18 @@ class Chat {
 
     assistantResponse(response) {
         this.onAssistantResponse(response);
+
     }
 
     onAssistantResponse(response) {
+        this.fullResponse += response.content;
         $('#stop-button').show();
         $('#send-button').prop('disabled', true);
         $('#send-button').hide();
         this.handleAssistantResponse(response.content);
         this.scrollToBottom();
         console.log('Tokens received 🧠');
+        
     }
 
     handleAssistantResponse(response) {
@@ -84,6 +90,7 @@ class Chat {
     clearChat() {
         $('#chat-list').html('');
         this.currentResponse = '';
+        this.conversationHistory = [{'role':'system', 'content' : this.systemMessage}]
         $('#key-container').empty();
         let str = 'Chat emptied! 🗑️';
         this.showPopup(str);
@@ -92,20 +99,24 @@ class Chat {
 
     sendMessage() {
         if (!this.conversationStarted){
+  
             this.conversationStarted= true;
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val();
             var sanitizedUserMessage = this.escapeHtml(userMessage);
+            this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage})
             const self = this;
             $.ajax({
                 type: 'POST',
                 url: '/user_input',
-                data: { content: sanitizedUserMessage },
+                data: JSON.stringify({ content: self.conversationHistory }), // Convertir a JSON
+                contentType: 'application/json', // Asegura que el servidor entienda que es JSON
                 success: function (data) {
                     $('#stop-button').hide();
                     $('#send-button').show();
                     $('#send-button').prop('disabled', false);
+                    self.addToConversationHistory(); // Agregar la respuesta completa al historial
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -141,20 +152,16 @@ class Chat {
         }
     }
 
+    // Método para agregar la respuesta completa al historial de conversación
+    addToConversationHistory() {
+        // Agregar la respuesta completa al historial de conversación
+        this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
+        
+        // Reiniciar la respuesta completa para futuras conversaciones
+        this.fullResponse = '';
+    }
+
     clearContext() {
-        const self = this;
-        $.ajax({
-            type: "POST",
-            url: "/clear_context",
-            success: function (data) {
-                self.showPopup(data);
-                console.log(data);
-            },
-            error: function (error) {
-                self.showPopup(error, 'error');
-                console.error('Error:', error);
-            }
-        });
         this.clearChat();
     }
 

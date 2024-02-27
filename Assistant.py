@@ -19,7 +19,7 @@ class Assistant:
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal", "metal_device_id": 0}
         self.gpu_layers = -1
-        self.system_message = '''
+        self.default_system_message = '''
 You are an assistant with a kind and honest personality. 
 As an expert programmer and pentester, 
 you should examine the details provided to ensure that they are usable.
@@ -47,13 +47,13 @@ your responses allways in markdown.
             chat_format=self.chat_format,
             temp=self.temperature,
         )
-        self.conversation_history = [{"role": "system", "content": self.system_message}]
         self.context_window_start = 0
         self.stop_emit = False
 
     def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context):
-        
-        message = new_system_message if isinstance(new_system_message, str) and new_system_message != '' else self.system_message
+
+
+        message = new_system_message if isinstance(new_system_message, str) and new_system_message != '' else self.default_system_message
         gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else self.gpu_layers
         ctx = context if isinstance(context, int)  else self.max_context_tokens
         temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
@@ -64,8 +64,6 @@ your responses allways in markdown.
         self.max_assistant_tokens = self.max_assistant_tokens #TODO: change in interface
         self.chat_format = format
         self.gpu_layers = gpu_layers
-        self.conversation_history = [{"role": "system", "content": self.system_message}]
-        self.context_window_start = 0
         self.stop_emit = False
 
         self.load_default_model()
@@ -73,19 +71,13 @@ your responses allways in markdown.
     def unload_model(self):
         self.model = None
 
-    def update_context_tokens(self):
-        total_tokens = sum(len(message["content"].split()) for message in self.conversation_history)
-        while total_tokens > self.max_context_tokens:
-            removed_message = self.conversation_history.pop(0)
-            total_tokens -= len(removed_message["content"].split())
-            self.context_window_start += 1
-        print("TOKENS: "+ str(total_tokens))
 
-    def add_user_input(self, user_input):
+
+    def add_user_input(self, user_input,socket):
         if not self.is_processing:
-            embeddings = llama_cpp.llama_get_embeddings(user_input)
-            self.conversation_history.append({"role": "user", "content": user_input, "embeddings": embeddings}) #TODO: use embeddings for recomendations
-            self.update_context_tokens()
+            self.emit_assistant_response_stream(user_input,socket)
+  
+    
 
     def get_assistant_response_stream(self, message_queue):
         '''
@@ -110,7 +102,7 @@ your responses allways in markdown.
                 print(response)
             self.is_processing = False
 
-    def emit_assistant_response_stream(self, socket):
+    def emit_assistant_response_stream(self,user_input, socket):
         '''
         Obtiene la respuesta del asistente.
 
@@ -122,7 +114,7 @@ your responses allways in markdown.
             self.is_processing = True
             response = ""
             try:
-                for chunk in self.model.create_chat_completion(messages=self.conversation_history,
+                for chunk in self.model.create_chat_completion(messages=user_input,
                                                             max_tokens=self.max_assistant_tokens, 
                                                             stream=True):
                     if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
@@ -131,18 +123,9 @@ your responses allways in markdown.
                         socket.emit('assistant_response',
                                     {'role': 'assistant', 'content': response_chunk}, namespace='/test')
                         time.sleep(0.01)
-                if not self.stop_emit:
-                    self.conversation_history.append({"role": "assistant", "content": response})
-                    print(response)
             finally:
                 self.is_processing = False
 
-    def clear_context(self):
-        self.conversation_history = [{"role": "system", "content": self.system_message}]
-        self.context_window_start = 0
-        print("Se ha limpiado el historial de conversación ")
-        for mensaje in self.conversation_history:
-            print(mensaje)
 
     def stop_response(self):
         self.stop_emit = True
