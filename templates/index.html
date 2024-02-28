@@ -18,61 +18,75 @@
     <script src="{{ url_for('static', filename='js/showdown.min.js') }}"></script>  
 </head>
 <body>
-<div id="header">
-    <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">How to use</button>
-    <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reset chat</button>
-</div>
-<div class="key-container" id="key-container"></div>
-<button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
-<div id="chat-container" class="container mt-4">
-    <div id="chat-list"></div>
-</div>
-<div id="sidebar">
-    <h5>Model configuration</h5>
-    <div class="form-group">
-        <label for="model-select">Model:</label>
-        <select class="form-control" id="model-select" name="models">
-            {% for model_path in models_list %}
-                <option value="{{ model_path }}">{{ model_path }}</option>
+<div id="container">
+    <div id="history-chats">
+        <h1>History Chats</h1>
+        <div id = conversations-list>
+            {% for chat_name in chat_list %}
+                <button value="{{ chat_name }}" onclick="chat.loadHistory(chat_name)" class="load-history">{{ chat_name }}</button>
             {% endfor %}
-        </select>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="format-select">Chat format:</label>
-        <select class="form-control" id="format-select" name="formats">
-            {% for format in format_list %}
-                <option value="{{ format }}">{{ format }}</option>
-            {% endfor %}
-        </select>
+    <div id="main-container">
+
+        <div id="header">
+            <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">How to use</button>
+            <label >Context used:</label><label id="tokens">0</label>
+            <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reset chat</button>
+        </div>
+        <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
+        <div id="chat-container" class="container mt-4">
+            <div id="chat-list"></div>
+        </div>
+    
+        <div id="footer" >
+            <div class="form-group" style="position: relative;">
+                <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
+                <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
+                <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="temperature">Temperature:</label>
-        <input type="number" id="temperature" class="form-control" step="0.01" placeholder="Example: 0.8">
+    <div id="sidebar">
+        <h5>Model configuration</h5>
+        <div class="form-group">
+            <label for="model-select">Model:</label>
+            <select class="form-control" id="model-select" name="models">
+                {% for model_path in models_list %}
+                    <option value="{{ model_path }}">{{ model_path }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="format-select">Chat format:</label>
+            <select class="form-control" id="format-select" name="formats">
+                {% for format in format_list %}
+                    <option value="{{ format }}">{{ format }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="temperature">Temperature:</label>
+            <input type="number" id="temperature" class="form-control" step="0.01" placeholder="Example: 0.8">
+        </div>
+        <div class="form-group">
+            <label for="context">Max. context:</label>
+            <input type="number" id="context" class="form-control" placeholder="Example: 2048">
+        </div>
+        <div class="form-group">
+            <label for="system-message">System message:</label>
+            <textarea class="form-control" id="system-message" rows="3" placeholder="Example: You are a assistant with a friendly and honest personality. As an expert programmer and pentester, you should examine the details provided to ensure that they are usable.
+            If you don't know the answer to a question, don't share false information.Don't deviate from the question"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="gpu-layers">GPU layers:</label>
+            <input type="number" id="gpu-layers" class="form-control" placeholder="Example: 8">
+        </div>
+        <button type="button" class="btn btn-primary" id="apply" onclick="chat.applyConfig()">Apply configuration</button>
+        <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
     </div>
-    <div class="form-group">
-        <label for="context">Max. context:</label>
-        <input type="number" id="context" class="form-control" placeholder="Example: 2048">
-    </div>
-    <div class="form-group">
-        <label for="system-message">System message:</label>
-        <textarea class="form-control" id="system-message" rows="3" placeholder="Example: You are a assistant with a friendly and honest personality. As an expert programmer and pentester, you should examine the details provided to ensure that they are usable.
-        If you don't know the answer to a question, don't share false information.Don't deviate from the question"></textarea>
-    </div>
-    <div class="form-group">
-        <label for="gpu-layers">GPU layers:</label>
-        <input type="number" id="gpu-layers" class="form-control" placeholder="Example: 8">
-    </div>
-    <button type="button" class="btn btn-primary" id="apply" onclick="chat.applyConfig()">Apply configuration</button>
-    <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
 </div>
-<div id="footer" >
-  
-    <div class="form-group" style="position: relative;">
-        <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
-        <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
-        <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
-    </div>
-</div>
+
 </body>
 
 </html>

@@ -46,7 +46,8 @@ class IASuiteApi:
     def index(self):
         models_list = self.get_models_list("models")
         format_list = self.get_format_list()
-        return render_template('index.html', models_list=models_list, format_list=format_list)
+        chat_list = self.get_chat_list()
+        return render_template('index.html', models_list=models_list, format_list=format_list, chat_list=chat_list)
     
 
     def crear_historial(self):
@@ -172,7 +173,17 @@ class IASuiteApi:
                         "rarete"]
         return format_list
     
-
+    def get_chat_list(self):
+        nombres_archivos_json = []
+        # Obtener la lista de archivos en el directorio
+        archivos = os.listdir('chats')
+        # Filtrar solo los archivos con extensión .json
+        for archivo in archivos:
+            if archivo.endswith('.json'):
+                nombres_archivos_json.append(archivo)
+        # Ordenar la lista en orden inverso
+        nombres_archivos_json.sort(reverse=True)
+        return nombres_archivos_json
 
     def stop_server(self):
         os.kill(os.getpid(), signal.SIGINT) 

@@ -20,17 +20,61 @@ body {
     min-height: 100vh;
     background-color: #011627 !important;
 }
+
+h1{
+    color:var(--third-bg-color);
+ 
+}
 #container {
     display: flex;
+    flex-direction:row;
+    max-height:calc(100vh);
+}
+#history-chats{
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    padding: 2em;
+    width: 10%;
+    max-height: 100%; 
+    height: auto; 
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    text-align: center;
+    overflow-x: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent; 
+
+}
+#conversations-list {
+    position: relative;
+    overflow-y: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent; 
+}
+
+
+.load-history{
+    width:100%;
+    padding:5px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: var(--secondary-color);
+    color: var(--secondary-bg-color);
+    overflow: hidden;
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    text-overflow: ellipsis;
+    margin-top:15px;
 }
 #main-container{
     flex: 1;
-    width:100%;
-    
-
+    width:90%;
+    margin:20px;
 }
+
+
+
 #header {
-   
     background-color: var(--primary-bg-color);
     height:65px;
     color: #ffffff;
@@ -50,7 +94,7 @@ body {
     border-right:1px solid var(--secondary-color);
     border-left:1px solid var(--secondary-color) ;
     max-width: 100%;
-    height: calc(100vh - 200px);
+    height: calc(100vh - 240px);
     margin-top:0px !important;
     margin-left:0 !important;
     padding:50px;
@@ -477,7 +521,9 @@ table td {
 textarea{
 
 }
-
+#tokens {
+margin-left:1em;
+}
 @media (max-width: 1023px) {
     .popup-container {
         position: absolute;

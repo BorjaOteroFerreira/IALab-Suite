@@ -71,7 +71,6 @@ class Chat {
         
     }
     guardarHistorial(chatId, content) {
-        console.log("PRUEBA 2:" + chatId)
         $.ajax({
             type: 'POST',
             url: '/actualizar_historial', // Endpoint para actualizar el historial
@@ -156,6 +155,7 @@ class Chat {
         $('#chat-list').html('');
         this.currentResponse = '';
         this.totalTokens = 0;
+        this.chatId=' ';
         var label = document.getElementById('tokens');
         label.textContent = ' ' + this.totalTokens + ' Tokens';
         this.conversationHistory = [{'role':'system', 'content' : this.systemMessage}]
@@ -179,10 +179,10 @@ class Chat {
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val(); // Obtener el valor del input
-            var userMessage = userMessage.substring(0, 15); // Usando substring
+            var userMessageTrimed = userMessage.substring(0, 15); // Usando substring
             var currentDate = new Date(); // Obtener la fecha y hora actual
-            var formattedDateTime = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes(); // Formatear la fecha y hora
-            var messageWithDateTime = userMessage + ' - ' + formattedDateTime; // Agregar la fecha y hora al mensaje
+            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate() + '-' + currentDate.getHours() + '.' + currentDate.getMinutes() + '.' + currentDate.getSeconds(); 
+            var messageWithDateTime =   formattedDateTime + '-'  + userMessageTrimed; // Agregar la fecha y hora al mensaje
             if (this.chatId ===' '){
                 this.chatId = messageWithDateTime;
 
@@ -203,6 +203,20 @@ class Chat {
                     self.addToConversationHistory(); // Agregar la respuesta completa al historial
                     self.actualizarTokens();
                     self.guardarHistorial(self.chatId , self.conversationHistory);
+                    var conversationListDiv = $('#conversations-list');
+                    var buttonExists = false;
+                    $('.load-history').each(function() {
+                        if ($(this).text() === self.chatId) {
+                            buttonExists = true;
+                            return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
+                        }
+                    });
+
+                    if (!buttonExists) {
+                        var conversationListDiv = $('#conversations-list');
+                        const newChatHistory = $("<button class='load-history' onclick='chat.loadHistory("+self.chatId+")'>"+self.chatId+"</button>");
+                        conversationListDiv.prepend(newChatHistory);
+                    }
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -352,7 +366,7 @@ class Chat {
                 chatContainer.style.marginRight = '20%'; // Ajustar el margen derecho para dejar espacio al sidebar
             } else {
                 sidebar.style.display = 'none';
-                chatContainer.style.marginRight = '0'; // Restaurar el margen derecho a 0
+                chatContainer.style.marginRight = '20px'; // Restaurar el margen derecho a 0
             }
         }
         else{
