@@ -428,35 +428,33 @@ input:focus {
 
 
 #start-tour-button{
-    font-size: 1.2em;
+    font-size: 1.3em;
+    padding:2px;
+    width:30px;
     background-color:#00000000;
-    color:var(--secondary-color);
-    border: 3px solid grey;
-    font-weight:bold;
-    padding:5px;
-    border-radius: 50px;
+    border:none;
  
 }
 
 #start-tour-button:hover{
-    background-color:#E9928721;
+
     color: var(--secondary-bg-color);
-    border-color:#E9928721;
-    ;
+    font-size:1.6em;
+    
+    
 }
 
 #toggle-sidebar-button{
-    font-size: 1.2em;
-    padding:5px;
-    border: 3px solid grey;
-    border-radius: 30px;
-    background-color:#00000000;
-    
+    font-size: 1.3em;
+    padding:2px;
+    width:30px;
+    background-color: #00000000;
+    border:none;
+
 
 }
 #toggle-sidebar-button:hover{
-    background-color:#E9928721;
-    border-color:#E9928721;
+    font-size:1.6em;
 }
 
 
