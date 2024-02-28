@@ -56,7 +56,7 @@ h1{
 
 .load-history{
     width:100%;
-    padding:2px;
+    padding:5px;
     border: 1px solid var(--secondary-color);
     border-radius: 5px;
     background-color: var(--secondary-color);
