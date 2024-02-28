@@ -21,7 +21,7 @@ body {
     background-color: #011627 !important;
 }
 
-h3{
+h1{
     color:var(--third-bg-color);
  
 }
@@ -34,7 +34,6 @@ h3{
     display: flex;
     flex-direction: column;
     margin: 20px;
-    padding: 2em;
     width: 15%;
     max-height: 100%; 
     height: auto; 
@@ -44,6 +43,9 @@ h3{
     overflow-x: auto;
     scrollbar-width: thin; 
     scrollbar-color: transparent transparent; 
+    -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
 
 }
 #conversations-list {
@@ -51,12 +53,14 @@ h3{
     overflow-y: auto;
     scrollbar-width: thin; 
     scrollbar-color: transparent transparent; 
+    padding:2em;
+    
 }
 
 
 .load-history{
     width:100%;
-    padding:5px;
+    padding:2px;
     border: 1px solid var(--secondary-color);
     border-radius: 5px;
     background-color: var(--secondary-color);
@@ -65,11 +69,17 @@ h3{
     white-space: nowrap; /* Evita que el texto se divida en varias líneas */
     text-overflow: ellipsis;
     margin-top:15px;
+    text-align: left;
 }
 #main-container{
     flex: 1;
     width:85%;
     margin:20px;
+    margin-left:0;
+    -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+
 }
 
 
@@ -89,12 +99,30 @@ h3{
     border-top-right-radius: 5px;
     border-bottom: 0;
 } 
+#header-chat-menu {
+    display:flex;
+    flex-direction:row;
+    justify-content: center;
+    background-color: var(--primary-bg-color);
+    height:65px;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    width: 100%;
+    top: 0;
+    clear:both;
+    border:1px;
+
+
+} 
 
 #chat-container {
     border-right:1px solid var(--secondary-color);
     border-left:1px solid var(--secondary-color) ;
+
     max-width: 100%;
-    height: calc(100vh - 240px);
+    height: calc(100vh - 210px);
     margin-top:0px !important;
     margin-left:0 !important;
     padding:50px;
@@ -120,11 +148,14 @@ h3{
     width: 100%;
     margin-top:5px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     border: 1px solid var(--secondary-color);
     border-top: 0;
     border-radius:0 0 5px 5px;
     align-items: center;
+ 
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
 }
 
 #footer input:active,
@@ -154,11 +185,11 @@ h3{
 }
 
 #clear-context-button{
-    float:right;
     color:var(--primary-color);
     background-color:var(--primary-bg-color);
     border-color:var(--primary-color);
     font-weight: bold;
+    width:80%;
 
 }
 
@@ -381,6 +412,7 @@ input:focus {
     color: var(--secondary-color);
 }
 
+
 #footer .form-group{
     width:80%;
     display:flex;
@@ -396,37 +428,35 @@ input:focus {
 
 
 #start-tour-button{
-    float:left;
-    clear:both;
+    font-size: 1.2em;
     background-color:#00000000;
     color:var(--secondary-color);
-
-    border-color:var(--secondary-color);
+    border: 3px solid grey;
     font-weight:bold;
+    padding:5px;
+    border-radius: 50px;
+ 
 }
 
 #start-tour-button:hover{
-    float:left;
-    clear:both;
-    background-color:var(--secondary-color);
+    background-color:#E9928721;
     color: var(--secondary-bg-color);
-    border-color:var(--secondary-color);
+    border-color:#E9928721;
+    ;
 }
 
 #toggle-sidebar-button{
-    background-color:var(--third-bg-color); 
-    color: var(--secondary-bg-color);
-    border-top:1px solid var(--third-bg-color);
-    border-bottom: 1px solid var(--third-bg-color); 
-    border-left: 1px solid var(--secondary-color);
-    border-right: 1px solid var(--secondary-color);
-    width:100%;
-
+    font-size: 1.2em;
+    padding:5px;
+    border: 3px solid grey;
+    border-radius: 30px;
+    background-color:#00000000;
+    
 
 }
 #toggle-sidebar-button:hover{
-    background-color: var(--secondadry-bg-color); 
-    color: var(--third-bg-color); 
+    background-color:#E9928721;
+    border-color:#E9928721;
 }
 
 
@@ -522,7 +552,7 @@ textarea{
 
 }
 #tokens {
-margin-left:1em;
+margin-left:5px;
 }
 @media (max-width: 1023px) {
     .popup-container {

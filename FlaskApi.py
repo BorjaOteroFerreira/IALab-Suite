@@ -18,7 +18,7 @@ class IASuiteApi:
         self.setup_routes()
 
     def logging_setup(self):
-        logging.basicConfig(filename='flask_log.log', level=logging.ERROR)
+        logging.basicConfig(filename='logs/flask_log.log', level=logging.ERROR)
 
 
     def setup_routes(self):

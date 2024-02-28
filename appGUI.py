@@ -1,13 +1,12 @@
-import json
-import os
+
 import sys
-import atexit
-from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtCore import  Qt, QUrl
+from PyQt5 import *
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtGui import QIcon
 from flask import request
-from IASuite import IASuiteApi
+from FlaskApi import IASuiteApi
 
 class EmbeddedFlaskApp(QMainWindow):
     def __init__(self):
@@ -31,8 +30,7 @@ class EmbeddedFlaskApp(QMainWindow):
         web_view.load(QUrl("http://127.0.0.1:8080")) 
         #web_view.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         layout.addWidget(web_view)
-        
-
+                
         self.setGeometry(100, 100, 1920, 1080)
         web_view.setZoomFactor(0.95)  
      

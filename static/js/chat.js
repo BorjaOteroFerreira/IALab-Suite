@@ -179,9 +179,9 @@ class Chat {
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val(); // Obtener el valor del input
-            var userMessageTrimed = userMessage.substring(0, 15); // Usando substring
+            var userMessageTrimed = userMessage.substring(0, 35); // Usando substring
             var currentDate = new Date(); // Obtener la fecha y hora actual
-            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate() + '-' + currentDate.getHours() + '.' + currentDate.getMinutes() + '.' + currentDate.getSeconds(); 
+            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate(); 
             var messageWithDateTime =   formattedDateTime + '-'  + userMessageTrimed; // Agregar la fecha y hora al mensaje
             if (this.chatId ===' '){
                 this.chatId = messageWithDateTime;
@@ -206,15 +206,16 @@ class Chat {
                     var conversationListDiv = $('#conversations-list');
                     var buttonExists = false;
                     $('.load-history').each(function() {
-                        if ($(this).text() === self.chatId) {
+                        if ($(this).text() === '📪 '+self.chatId) {
                             buttonExists = true;
                             return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
                         }
                     });
-
+                    console.log("Valor de self.chatId:", self.chatId);
+                    console.log("Número de botones existentes:", $('.load-history').length);
                     if (!buttonExists) {
                         var conversationListDiv = $('#conversations-list');
-                        const newChatHistory = $("<button class='load-history' onclick='chat.loadHistory("+self.chatId+")'>"+self.chatId+"</button>");
+                        const newChatHistory = $("<button class='load-history' onclick='chat.loadHistory("+self.chatId+")'>📪 "+self.chatId+"</button>");
                         conversationListDiv.prepend(newChatHistory);
                     }
                     self.showPopup(data);

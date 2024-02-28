@@ -1,10 +1,7 @@
 '''
 @author: Borja Otero Ferreira
 '''
-import json
-import os
 from llama_cpp import Llama as Model
-import llama_cpp
 import platform
 import time
 

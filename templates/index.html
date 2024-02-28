@@ -20,38 +20,44 @@
 <body>
 <div id="container">
     <div id="history-chats">
-        <h1>History Chats</h1>
+        <div id="header-chat-menu">
+            <button class="btn btn-secondary" id="clear-context-button" onclick="chat.newChat()">New chat 🧠</button>
+        </div>
         <div id = conversations-list>
             {% for chat_name in chat_list %}
-                <button value="{{ chat_name }}" onclick="chat.loadHistory(chat_name)" class="load-history">{{ chat_name }}</button>
+                <button value="{{ chat_name }}" onclick="chat.loadHistory('{{ chat_name }}')" class="load-history">📪 {{ chat_name }} </button>
             {% endfor %}
         </div>
     </div>
     <div id="main-container">
 
         <div id="header">
-            <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">How to use</button>
-            <label >Context used:</label><label id="tokens">0</label>
-            <button class="btn btn-secondary" id="clear-context-button" onclick="chat.newChat()">New chat</button>
+    
+            <label >Context used:</label><label id="tokens">0 Tokens</label>
+         
         </div>
-        <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
+
         <div id="chat-container" class="container mt-4">
             <div id="chat-list"></div>
         </div>
     
         <div id="footer" >
+            <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">❔</button>
+            <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">🧾</button>
+       
             <div class="form-group" style="position: relative;">
                 <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
                 <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
                 <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
             </div>
+            <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">⚙️</button>
         </div>
     </div>
     <div id="sidebar">
         <h5>Model configuration</h5>
         <div class="form-group">
             <label for="model-select">Model:</label>
-            <select class="form-control" id="model-select" name="models">
+            <select class="form-control" id="model-select" name="models" required>
                 {% for model_path in models_list %}
                     <option value="{{ model_path }}">{{ model_path }}</option>
                 {% endfor %}
@@ -59,7 +65,7 @@
         </div>
         <div class="form-group">
             <label for="format-select">Chat format:</label>
-            <select class="form-control" id="format-select" name="formats">
+            <select class="form-control" id="format-select" name="formats" required>
                 {% for format in format_list %}
                     <option value="{{ format }}">{{ format }}</option>
                 {% endfor %}
@@ -67,7 +73,7 @@
         </div>
         <div class="form-group">
             <label for="temperature">Temperature:</label>
-            <input type="number" id="temperature" class="form-control" step="0.01" placeholder="Example: 0.8">
+            <input type="number" id="temperature" class="form-control" step="0.01" min="0.00" max="1.00" placeholder="Example: 0.8">
         </div>
         <div class="form-group">
             <label for="context">Max. context:</label>
