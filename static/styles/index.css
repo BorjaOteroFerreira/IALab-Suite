@@ -61,15 +61,21 @@ h1{
 .load-history{
     width:100%;
     padding:2px;
-    border: 1px solid var(--secondary-color);
-    border-radius: 5px;
-    background-color: var(--secondary-color);
-    color: var(--secondary-bg-color);
+    background-color:var(--secondary-bg-color);
+    color: var(--secondary-color);
     overflow: hidden;
     white-space: nowrap; /* Evita que el texto se divida en varias líneas */
     text-overflow: ellipsis;
     margin-top:15px;
     text-align: left;
+    border:none;
+}
+.load-history:hover{
+    color: var(--secondary-bg-color);
+    border: 0px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color:var(--secondary-color);
+
 }
 #main-container{
     flex: 1;
@@ -189,7 +195,7 @@ h1{
     background-color:var(--primary-bg-color);
     border-color:var(--primary-color);
     font-weight: bold;
-    width:80%;
+    min-width:50%;
 
 }
 
