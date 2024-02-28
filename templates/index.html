@@ -19,7 +19,7 @@
 </head>
 <body>
 <div id="container">
-    <div id="history-chats">
+    <div id="chat-sidebar">
         <div id="header-chat-menu">
             <button class="btn btn-secondary" id="clear-context-button" onclick="chat.newChat()">New chat 🧠</button>
         </div>
@@ -42,18 +42,18 @@
         </div>
     
         <div id="footer" >
-            <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">&nbsp;❔&nbsp;</button>
-            <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">&nbsp;🧾&nbsp;</button>
+            <button id="start-tour-button" onclick="toggleSidebar('config-sidebar')">&nbsp;❔&nbsp;</button>
+            <button  id="start-tour-button" onclick="toggleSidebar('chat-sidebar')">&nbsp;🧾&nbsp;</button>
        
             <div class="form-group" style="position: relative;">
                 <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
                 <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
                 <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
             </div>
-            <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">&nbsp;⚙️&nbsp;</button>
+            <button id="toggle-config-button" onclick="chat.toggleSidebar('config-sidebar')">&nbsp;⚙️&nbsp;</button>
         </div>
     </div>
-    <div id="sidebar">
+    <div id="config-sidebar">
         <h5>Model configuration</h5>
         <div class="form-group">
             <label for="model-select">Model:</label>
@@ -100,7 +100,7 @@
     const chat = new Chat();
     const driver = window.driver.js.driver;
     const guiaConfiguracion = [
-    { element: '#toggle-sidebar-button', popover: { title: 'Settings menu',
+    { element: '#toggle-config-button', popover: { title: 'Settings menu',
                                                      description: 'Press the Menu button to open and close the model settings menu', position: 'right' } },
              { element: '#model-select', popover: { title: 'Select a model',
                                                      description: 'Choose the model you are going to use. Remember that you must download your model in .gguf format and move/copy it to the model\'s folder', position: 'right' } },
@@ -132,9 +132,9 @@
             steps: guiaConfiguracion
         });
         function toggleSidebar(){
-            var sidebar = document.getElementById('sidebar');
+            var sidebar = document.getElementById('config-sidebar');
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                chat.toggleSidebar(); // Llamar a toggleSidebar solo si el menú está oculto
+                chat.toggleSidebar('config-sidebar'); // Llamar a toggleSidebar solo si el menú está oculto
             }
             driverObj.drive(); 
         };

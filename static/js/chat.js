@@ -393,27 +393,24 @@ function sanitizeMessage(message) {
         console.log(str);
     }
 
-    toggleSidebar() {
-        var sidebar = document.getElementById('sidebar');
-        var chatContainer = document.getElementById('main-container');
-        
+    toggleSidebar(element) {
+        var sidebar = document.getElementById(element);        
         // Verificar si las media queries están activas
         var mediaQueriesActive = window.matchMedia("(max-width: 1023px)").matches || window.matchMedia("(max-height: 740px)").matches;
     
         // Solo ejecutar el código si las media queries no están activas
         if (!mediaQueriesActive) {
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'block';
-                chatContainer.style.marginRight = '20%'; // Ajustar el margen derecho para dejar espacio al sidebar
+                sidebar.style.display = 'inline-block';
             } else {
                 sidebar.style.display = 'none';
-                chatContainer.style.marginRight = '20px'; // Restaurar el margen derecho a 0
             }
         }
         else{
             sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
         }
     }
+    
     escapeHtml(text) {
         var map = {
             '&': '&amp;',
