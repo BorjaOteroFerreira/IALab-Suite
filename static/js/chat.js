@@ -97,7 +97,6 @@ class Chat {
                 if (data && Array.isArray(data)) {
                     self.conversationHistory = data; // Asigna los datos recuperados a conversationHistory
                     console.log('Historial cargado exitosamente:', self.conversationHistory);
-                    self.showPopup('Historial cargado con exito!');
                 } else {
                     console.error('Error: No se pudieron recuperar datos válidos del historial.');
                 }
