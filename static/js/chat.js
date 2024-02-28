@@ -261,7 +261,7 @@ class Chat {
         this.fullResponse = '';
     }
 
-    clearContext() {
+    newChat() {
         this.clearChat();
     }
 
@@ -287,6 +287,7 @@ class Chat {
             },
             success: function (data) {
                 self.showPopup('Model loaded successfully');
+                self.newChat()
                 console.log(data);
             },
             error: function (error) {
