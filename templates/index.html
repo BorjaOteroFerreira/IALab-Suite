@@ -20,7 +20,7 @@
 <body>
 <div id="container">
     <div id="history-chats">
-        <h1>History Chats</h1>
+        <h3>History Chats</h3>
         <div id = conversations-list>
             {% for chat_name in chat_list %}
                 <button value="{{ chat_name }}" onclick="chat.loadHistory(chat_name)" class="load-history">{{ chat_name }}</button>
