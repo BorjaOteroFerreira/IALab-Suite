@@ -85,7 +85,8 @@ class Chat {
         });
     }
 
-    cargarHistorial(nombre_chat) {
+    loadHistory(nombre_chat) {
+        nombre_chat = String(nombre_chat)
         const self = this;
         $.ajax({
             type: 'GET',
@@ -96,15 +97,53 @@ class Chat {
                 if (data && Array.isArray(data)) {
                     self.conversationHistory = data; // Asigna los datos recuperados a conversationHistory
                     console.log('Historial cargado exitosamente:', self.conversationHistory);
+                    self.showPopup('Historial cargado con exito!');
                 } else {
                     console.error('Error: No se pudieron recuperar datos válidos del historial.');
                 }
+                self.loadMessages();
             },
             error: function (error) {
                 self.showPopup('Error cargando historial','error')
                 console.error('Error al cargar el historial:', error); // Imprime el mensaje de error en la consola
             }
         });
+
+    }
+
+
+    loadMessages(){
+        $('#chat-list').empty();
+        // Suponiendo que this.chatHistory contiene los mensajes
+        for (var i = 0; i < this.conversationHistory.length; i++) {
+            var messageData = this.conversationHistory[i];
+            var sanitizedUserMessage = messageData.role === 'user' ? sanitizeMessage(messageData.content) : messageData.content;
+            const converter = new showdown.Converter();
+            messageData.content = converter.makeHtml(messageData.content);
+            if (messageData.role === 'user') {
+                var message = $('<div class="user-message-container-' + i +
+                                ' user-message-container"><label for="chat-user-' + i +
+                                '">User</label><div id="chat-user-' + i +
+                                '" class="user-message user-message-' + i + '">' +
+                                sanitizedUserMessage + '</div></div>');
+                $('#chat-list').append(message);
+            } else if (messageData.role === 'assistant') {
+                var divAssistant = $('<div class="assistant-message-container-' + i +
+                                    ' assistant-message-container"><label for="chat-assistant-' + i +
+                                    '">Assistant<br></label><div id="chat-assistant-' + i +
+                                    '" class="assistant-message">' + messageData.content + '</div></div>');
+                $('#chat-list').append(divAssistant);
+                divAssistant.find('pre code').each(function(i, block) {
+                    Prism.highlightElement(block);
+                });
+            }
+     
+    }
+
+// Función de ejemplo para sanear mensajes (puedes personalizarla según tus necesidades)
+function sanitizeMessage(message) {
+    return $('<div>').text(message).html();
+}
     }
 
     handleAssistantResponse(response) {
@@ -215,7 +254,8 @@ class Chat {
                     console.log("Número de botones existentes:", $('.load-history').length);
                     if (!buttonExists) {
                         var conversationListDiv = $('#conversations-list');
-                        const newChatHistory = $("<button class='load-history' onclick='chat.loadHistory("+self.chatId+")'>📪 "+self.chatId+"</button>");
+                        self.chatId+=String('.json');
+                        const newChatHistory = $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>");
                         conversationListDiv.prepend(newChatHistory);
                     }
                     self.showPopup(data);

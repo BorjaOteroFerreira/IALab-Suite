@@ -90,7 +90,7 @@ class IASuiteApi:
 
     def recuperar_historial(self):
         nombre_chat = request.args.get('nombre_chat')
-        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}')
         if os.path.exists(ruta_archivo):
             with open(ruta_archivo, 'r') as f:
                 historial = json.load(f)
