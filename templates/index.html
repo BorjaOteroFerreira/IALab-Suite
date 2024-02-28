@@ -20,7 +20,7 @@
 <body>
 <div id="container">
     <div id="history-chats">
-        <h3>History Chats</h3>
+        <h1>History Chats</h1>
         <div id = conversations-list>
             {% for chat_name in chat_list %}
                 <button value="{{ chat_name }}" onclick="chat.loadHistory(chat_name)" class="load-history">{{ chat_name }}</button>
@@ -32,7 +32,7 @@
         <div id="header">
             <button class="btn btn-primary" id="start-tour-button" onclick="toggleSidebar()">How to use</button>
             <label >Context used:</label><label id="tokens">0</label>
-            <button class="btn btn-secondary" id="clear-context-button" onclick="chat.clearContext()">Reset chat</button>
+            <button class="btn btn-secondary" id="clear-context-button" onclick="chat.newChat()">New chat</button>
         </div>
         <button id="toggle-sidebar-button" onclick="chat.toggleSidebar()">Menu</button>
         <div id="chat-container" class="container mt-4">
