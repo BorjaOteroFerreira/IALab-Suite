@@ -35,7 +35,7 @@ h1{
     flex-direction: column;
     margin: 20px;
     padding: 2em;
-    width: 20%;
+    width: 15%;
     max-height: 100%; 
     height: auto; 
     border: 1px solid var(--secondary-color);
@@ -56,7 +56,7 @@ h1{
 
 .load-history{
     width:100%;
-    padding:5px;
+    padding:2px;
     border: 1px solid var(--secondary-color);
     border-radius: 5px;
     background-color: var(--secondary-color);
@@ -68,7 +68,7 @@ h1{
 }
 #main-container{
     flex: 1;
-    width:80%;
+    width:85%;
     margin:20px;
 }
 
