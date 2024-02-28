@@ -6,14 +6,13 @@ from flask_socketio import SocketIO
 import os, signal
 from Assistant import Assistant 
 import logging
-from werkzeug.serving import *
 
 class IASuiteApi:
     def __init__(self):
         self.app = Flask(__name__, static_url_path='/static')
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
-        self.default_model_path = "models/lm-studio/gemma-2b-it-q8_0.gguf"
+        self.default_model_path = "models\lm-studio\gemma-2b-it-q8_0.gguf"
         self.default_chat_format = "gemma"
         self.assistant = None
         self.setup_routes()
@@ -189,4 +188,3 @@ class IASuiteApi:
     def stop_server(self):
         os.kill(os.getpid(), signal.SIGINT) 
         return 'Server shutting down...'
-    
