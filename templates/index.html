@@ -135,10 +135,19 @@
                                                         console.log("Hola MUNDO");
                                                         chat.toggleSidebar('chat-sidebar');
                                                         driverObj.moveNext();
+                                                        
                                                         }
                                                    }},
              { element: '#clear-context-button', popover: { title: 'Restart the conversation',
-                                                   description: 'I almost forgot!!😅 Press the Reset button to erase my memory and start a new conversation. I hope you enjoy it! 🤓 ', position: 'right' } }
+                                                   description: 'I almost forgot!!😅 Press the Reset button to erase my memory and start a new conversation. I hope you enjoy it! 🤓 ',
+                                                    position: 'right',
+                                                    onNextClick: () => { 
+                                                        console.log("Hola MUNDO");
+                                                        chat.toggleSidebar('chat-sidebar');
+                                                        driverObj.moveNext();
+                                                        
+                                                        }
+                                                    } }
          ];
         const driverObj = driver({
             showProgress: true,
