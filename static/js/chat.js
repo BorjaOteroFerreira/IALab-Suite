@@ -401,13 +401,25 @@ function sanitizeMessage(message) {
         // Solo ejecutar el código si las media queries no están activas
         if (!mediaQueriesActive) {
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'inline-block';
+                sidebar.style.display = 'flex';
+                sidebar.style.position = 'relative';
+                sidebar.style.width = '15%';
             } else {
                 sidebar.style.display = 'none';
+          
             }
         }
         else{
-            sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
+             if(sidebar.style.display === 'none' || sidebar.style.display === '') {
+                sidebar.style.display = 'block';
+                sidebar.style.position = 'fixed';
+                sidebar.style.width = '100%';
+            } 
+            else{
+                sidebar.style.display = 'none'
+         
+            }
+            
         }
     }
     

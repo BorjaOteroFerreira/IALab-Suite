@@ -31,12 +31,16 @@ h1{
     max-height:calc(100vh);
 }
 #chat-sidebar{
-    display: flex;
+    z-index:2;
+    position:relative !important;
+    display: none;
+    text-overflow: ellipsis;
     flex-direction: column;
-    margin: 20px;
-    width: 15%;
+    margin-right:10px;
+    width: 15% !important;
     max-height: 100%; 
     height: auto; 
+    background-color: #011627;
     border: 1px solid var(--secondary-color);
     border-radius: 5px;
     text-align: center;
@@ -46,28 +50,31 @@ h1{
     -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
-
 }
 #conversations-list {
+    z-index:2;
+
     position: relative;
     overflow-y: auto;
+    overflow-x:auto;
     scrollbar-width: thin; 
     scrollbar-color: transparent transparent; 
     padding:1em;
-    
+    text-overflow: ellipsis;
 }
 
 
 .load-history{
     width:100%;
     padding:2px;
-    background-color:var(--secondary-bg-color);
+    background-color: #00000000;
     color: var(--secondary-color);
     overflow: hidden;
     white-space: nowrap; /* Evita que el texto se divida en varias líneas */
     text-overflow: ellipsis;
     margin-top:15px;
     text-align: left;
+    font-weight: bold;
     border:none;
     font-size:0.85em;
 }
@@ -81,8 +88,7 @@ h1{
 #main-container{
     flex: 1;
     width:85%;
-    margin:20px;
-    margin-left:0;
+   
     -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
@@ -127,9 +133,8 @@ h1{
 #chat-container {
     border-right:1px solid var(--secondary-color);
     border-left:1px solid var(--secondary-color) ;
-
     max-width: 100%;
-    height: calc(100vh - 210px);
+    height: calc(100vh - 172px);
     margin-top:0px !important;
     margin-left:0 !important;
     padding:50px;
@@ -243,18 +248,27 @@ h1{
 }
 
 #config-sidebar {
-    height: 100vh;
-    width:19.8%;
-    display: none;
-    position: relative;
-    top: 0;
+    z-index:3;
+    width:19.8% !important;
+    display: none ;
+    position: relative !important;
     color: var(--primary-color);
-    right: 0;
     background-color: var(--secondary-bg-color);
     padding: 10px;
-    box-shadow: -5px 0 5px -5px #333;
-
-}
+    flex-direction: column;
+    margin-left:10px;
+    max-height: 100%; 
+    height: auto; 
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    text-align: center;
+    overflow-y: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent; 
+    -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    }
 
 #config-sidebar h5 {
     color: var(--primary-color);
@@ -561,8 +575,23 @@ margin-left:5px;
 }
 @media (max-width: 1023px) {
     #conversations-list {
-        position:fixed; 
+     
+        background-color: #00101c99;
+    }
+    #conversations-list,
+    #config-sidebar,
+    #chat-sidebar {
+        position: fixed !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        left: 0 !important;
+        z-index: 2!important;
+    }
 
+
+
+    .load-history{
+        font-size:1em;
     }
     .popup-container {
         position: absolute;
@@ -597,8 +626,10 @@ margin-left:5px;
         width:100%;
         margin-left:0;
         display: flex;
-        flex-direction: column;
-        justify-content: center; /* Centra verticalmente el contenido */
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: space-around;
         align-items: center; 
         
     }
@@ -630,11 +661,12 @@ margin-left:5px;
     .assistant-message-container {
        width:95%;
     }
-    #config-sidebar{
+    #config-sidebar #chat-sidebar{
         margin-top:90px;
-        width:100%;
-        display: none; 
-        position:fixed
+        width:100% !important;
+        display:none; 
+        position:fixed;
+        margin:0;
 
     }
     #toggle-config-button{
