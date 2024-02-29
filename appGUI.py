@@ -1,10 +1,11 @@
 
 import sys
-from PyQt5.QtCore import  Qt, QUrl
 from PyQt5 import *
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtCore import  Qt, QUrl
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QShortcut
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QKeySequence
+
 from flask import request
 from FlaskApi import IASuiteApi
 
@@ -31,7 +32,13 @@ class EmbeddedFlaskApp(QMainWindow):
         #web_view.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         layout.addWidget(web_view)
                 
-        self.setGeometry(100, 100, 1920, 1080)
+            # Atajo de teclado para alternar el modo de pantalla completa (Alt + Enter)
+        self.fullscreen_shortcut = QShortcut(QKeySequence(Qt.KeyboardModifier.AltModifier + Qt.Key.Key_P), self)
+        self.fullscreen_shortcut.activated.connect(self.toggle_fullscreen)
+
+        
+        
+        self.setGeometry(100, 100, 1440, 1280)
         web_view.setZoomFactor(0.95)  
      
         style_sheet = """
@@ -44,6 +51,13 @@ class EmbeddedFlaskApp(QMainWindow):
         self.setWindowIcon(QIcon('static/favicon.ico'))
         # Conectar la señal aboutToQuit de QApplication al método cleanup
         app.aboutToQuit.connect(self.cleanup)
+
+
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
 
     def run_flask_app(self):
         # Ejecutar la aplicación Flask en un hilo separado

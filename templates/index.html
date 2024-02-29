@@ -122,8 +122,15 @@
                                                      description: 'Here you can write your message to the assistant.', position: 'left' } },
              { element: '#send-button', popover: { title: 'Send your message',
                                                      description: 'Press send or [Enter] to send the message.', position: 'left' } },
-             { element: '#chat-list', popover: { title: 'Message List',
-                                                     description: 'In this window your instructions for the model and its answers will appear 😁', position: 'left' } },
+            { element: '#chat-list', popover: { title: 'Message List',
+                                                description: 'In this window your instructions for the model and its answers will appear 😁', 
+                                                position: 'left',
+                                                },
+                                                onPopoverRender: function() { 
+                                                console.log("Hola MUNDO");
+                                                toggleSidebar();
+                                            },
+                                            },
              { element: '#clear-context-button', popover: { title: 'Restart the conversation',
                                                    description: 'I almost forgot!!😅 Press the Reset button to erase my memory and start a new conversation. I hope you enjoy it! 🤓 ', position: 'right' } }
          ];
