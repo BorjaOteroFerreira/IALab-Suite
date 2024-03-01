@@ -134,7 +134,15 @@ your responses allways in markdown.
                 self.is_processing = False
 
                 
-
+    def crew_response(self, user_input):
+            try:
+                for chunk in self.model.create_chat_completion(messages=user_input, max_tokens=self.max_assistant_tokens, stream=True) or []:
+                    if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
+                        response_chunk = chunk['choices'][0]['delta']['content']
+                        yield f"data: {response_chunk}\n\n"
+                        time.sleep(0.01)
+            except Exception as e:
+                print(f"Error in get_assistant_response_stream: {e}")
 
     def stop_response(self):
         self.stop_emit = True
