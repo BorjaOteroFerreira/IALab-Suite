@@ -7,6 +7,7 @@ class Chat {
         this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
         this.currentResponse = '';
+        this.library ='llama';
         this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español'
         this.n_responses = 0;
         this.popupCount = 0;
@@ -36,36 +37,52 @@ class Chat {
     }
 
     onAssistantResponse(response) {
-      
-        const responseData = response.content["choices"][0];
-        const { id, model, created, object } = response.content;
-        const { index, delta, finish_reason } = responseData;
-        const responseId = id;
-        const responseModel = model;
-        const responseCreated = created;
-        const responseObject = object;
-        const choiceIndex = index;
-        const choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
-        this.fullResponse += choiceDelta; // Agregar a fullResponse
-        const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
-        const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
-        const totalAssistantTokens = response.total_assistant_tokens; 
-        this.totalTokensResponse = totalUserTokens + totalAssistantTokens
-
-        console.log("ID de la respuesta:", responseId);
-        console.log("Modelo utilizado:", responseModel);
-        console.log("Creación:", responseCreated);
-        console.log("Objeto:", responseObject);
-        console.log("Índice de la elección:", choiceIndex);
-        console.log("Contenido de la elección:", choiceDelta);
-        console.log("Razón de finalización:", choiceFinishReason);
-        console.log("Tokens del usuario : ", totalUserTokens);
-        console.log("Tokens Respuesta: ", totalAssistantTokens);
+        var delta = '';
+        var choiceDelta =''
+        
+        if (this.library === 'ollama'){
+            const responseData = response;
+            delta = responseData.content;
+            console.log(response)
+            this.fullResponse += delta; // Agregar a fullResponse
+            const totalUserTokens = responseData.total_user_tokens;  // Obtener el número total de tokens del usuario
+            const totalAssistantTokens = responseData.total_assistant_tokens; 
+            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
+            console.log("Contenido de la elección:", delta);
+            console.log("Tokens del usuario : ", totalUserTokens);
+            console.log("Tokens Respuesta: ", totalAssistantTokens);
+        }else{
+            const responseData = response.content["choices"][0];
+            const { id, model, created, object } = response.content;
+            const { index, delta, finish_reason } = responseData;
+            const responseId = id;
+            const responseModel = model;
+            const responseCreated = created;
+            const responseObject = object;
+            const choiceIndex = index;
+            choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
+            this.fullResponse += choiceDelta; // Agregar a fullResponse
+            const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
+            const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
+            const totalAssistantTokens = response.total_assistant_tokens; 
+            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
+            console.log("ID de la respuesta:", responseId);
+            console.log("Modelo utilizado:", responseModel);
+            console.log("Creación:", responseCreated);
+            console.log("Objeto:", responseObject);
+            console.log("Índice de la elección:", choiceIndex);
+            console.log("Contenido de la elección:", choiceDelta);
+            console.log("Razón de finalización:", choiceFinishReason);
+            console.log("Tokens del usuario : ", totalUserTokens);
+            console.log("Tokens Respuesta: ", totalAssistantTokens);
+   
+        }
 
         $('#stop-button').show();
         $('#send-button').prop('disabled', true);
         $('#send-button').hide();
-        this.handleAssistantResponse(choiceDelta);
+        var responseModel = this.library === 'ollama' ? delta : choiceDelta;
+        this.handleAssistantResponse(responseModel);
         this.scrollToBottom();
         /*console.log('Tokens received 🧠');**/
         
@@ -74,7 +91,7 @@ class Chat {
         $.ajax({
             type: 'POST',
             url: '/actualizar_historial', // Endpoint para actualizar el historial
-            data: JSON.stringify({ nombre_chat: chatId.replace(/\.json$/, ''), historial: content }), // Convertir a JSON
+            data: JSON.stringify({ nombre_chat: chatId, historial: content }), // Convertir a JSON
             contentType: 'application/json', // Asegura que el servidor entienda que es JSON
             success: function (data) {
                 
@@ -85,11 +102,9 @@ class Chat {
         });
     }
 
-    loadHistory(nombre_chat) {
-        nombre_chat = String(nombre_chat);
     
-        this.chatId = nombre_chat.replace(/\.json$/, '');
-   
+    loadHistory(nombre_chat) {
+        nombre_chat = String(nombre_chat)
         const self = this;
         $.ajax({
             type: 'GET',
@@ -115,40 +130,52 @@ class Chat {
 
 
     loadMessages(){
-        const self = this;
         $('#chat-list').empty();
-        var j = 1 ; 
         // Suponiendo que this.chatHistory contiene los mensajes
         for (var i = 0; i < this.conversationHistory.length; i++) {
-           
             var messageData = this.conversationHistory[i];
+            var sanitizedUserMessage = messageData.role === 'user' ? sanitizeMessage(messageData.content) : messageData.content;
             const converter = new showdown.Converter();
-            var sanitizedUserMessage = messageData.role === 'user' ? self.escapeHtml(messageData.content) : converter.makeHtml(messageData.content);
-           
-   
+            messageData.content = converter.makeHtml(messageData.content);
             if (messageData.role === 'user') {
-                var message = $('<div class="user-message-container-' + j +
-                                ' user-message-container"><label for="chat-user-' + j +
-                                '">User</label><div id="chat-user-' + j +
-                                '" class="user-message user-message-' + j + '">' +
+                var message = $('<div class="user-message-container-' + i +
+                                ' user-message-container"><label for="chat-user-' + i +
+                                '">User</label><div id="chat-user-' + i +
+                                '" class="user-message user-message-' + i + '">' +
                                 sanitizedUserMessage + '</div></div>');
                 $('#chat-list').append(message);
-               
-              
             } else if (messageData.role === 'assistant') {
-                var divAssistant = $('<div class="assistant-message-container-' + j +
-                                    ' assistant-message-container"><label for="chat-assistant-' + j +
-                                    '">Assistant<br></label><div id="chat-assistant-' + j +
+                var divAssistant = $('<div class="assistant-message-container-' + i +
+                                    ' assistant-message-container"><label for="chat-assistant-' + i +
+                                    '">Assistant<br></label><div id="chat-assistant-' + i +
                                     '" class="assistant-message">' + messageData.content + '</div></div>');
                 $('#chat-list').append(divAssistant);
-                j++;
                 divAssistant.find('pre code').each(function(i, block) {
                     Prism.highlightElement(block);
                 });
             }
      
-        }
-        this.n_responses = j-1;
+    }
+
+
+// Función de ejemplo para sanear mensajes (puedes personalizarla según tus necesidades)
+function sanitizeMessage(message) {
+    return $('<div>').text(message).html();
+}
+    }
+
+    deleteHistory(nombreChat){
+        $.ajax({
+            url: `/eliminar_historial?nombre_chat=${nombreChat}`,
+            type: 'DELETE',
+            success: function(result) {
+                console.log(`Historial ${nombreChat} eliminado exitosamente.`);
+            },
+            error: function(xhr, status, error) {
+                console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
+            }
+        });
+    
     }
 
     handleAssistantResponse(response) {
@@ -231,15 +258,15 @@ class Chat {
                 this.chatId = messageWithDateTime;
 
             }
-        
+            var url = this.library === 'ollama' ? 'v1/chat/completions' : '/user_input'
             var sanitizedUserMessage = this.escapeHtml(userMessage);
             this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage})
             const self = this;
             $.ajax({
                 type: 'POST',
-                url: '/user_input',
-                data: JSON.stringify({ content: self.conversationHistory }), 
-                contentType: 'application/json', 
+                url: url,
+                data: JSON.stringify({ content: self.conversationHistory }), // Convertir a JSON
+                contentType: 'application/json', // Asegura que el servidor entienda que es JSON
                 success: function (data) {
                     $('#stop-button').hide();
                     $('#send-button').show();
@@ -247,7 +274,21 @@ class Chat {
                     self.addToConversationHistory(); // Agregar la respuesta completa al historial
                     self.actualizarTokens();
                     self.guardarHistorial(self.chatId , self.conversationHistory);
-                    self.addRegisterToChatList();
+                    var conversationListDiv = $('#conversations-list');
+                    var buttonExists = false;
+                    $('.load-history').each(function() {
+                        if ($(this).text() === '📪 '+self.chatId) {
+                            buttonExists = true;
+                            return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
+                        }
+                    });
+                    console.log("Valor de self.chatId:", self.chatId);
+                    console.log("Número de botones existentes:", $('.load-history').length);
+                    if (!buttonExists) {
+                        var conversationListDiv = $('#conversations-list');
+                        const newChatHistory = $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>");
+                        conversationListDiv.prepend(newChatHistory);
+                    }
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -282,28 +323,13 @@ class Chat {
             
         }
     }
-    addRegisterToChatList(){
-        const self = this; 
-        var conversationListDiv = $('#conversations-list');
-        var buttonExists = false;
-        
-        $('.load-history').each(function() {
-            var text = $(this).text();
-            text = text.trim().replace(/\.json$/, '');                    
-            if (text === '📪 ' + self.chatId) {
-                buttonExists = true;
-                return false; 
-            }
-        });
-        if (!buttonExists) {
-            var conversationListDiv = $('#conversations-list');
-            self.chatId+=String('.json');
-            const newChatHistory = $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>");
-            conversationListDiv.prepend(newChatHistory);
-        }
-    }
+
+    // Método para agregar la respuesta completa al historial de conversación
     addToConversationHistory() {
+        // Agregar la respuesta completa al historial de conversación
         this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
+        
+        // Reiniciar la respuesta completa para futuras conversaciones
         this.fullResponse = '';
     }
 
@@ -315,6 +341,7 @@ class Chat {
         var selectedModel = $('#model-select').val();
         var selectedFormat = $('#format-select').val();
         var systemMessage = $('#system-message').val();
+        this.systemMessage = systemMessage;
         var gpuLayers = $('#gpu-layers').val();
         var temperature = $('#temperature').val();
         var n_ctx = $('#context').val();
@@ -399,35 +426,27 @@ class Chat {
         console.log(str);
     }
 
-    toggleSidebar(element) {
-        var sidebar = document.getElementById(element);
+    toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        var chatContainer = document.getElementById('main-container');
+        
         // Verificar si las media queries están activas
         var mediaQueriesActive = window.matchMedia("(max-width: 1023px)").matches || window.matchMedia("(max-height: 740px)").matches;
     
         // Solo ejecutar el código si las media queries no están activas
         if (!mediaQueriesActive) {
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'flex';
-                sidebar.style.width = '15%';
+                sidebar.style.display = 'block';
+                chatContainer.style.marginRight = '20%'; // Ajustar el margen derecho para dejar espacio al sidebar
             } else {
                 sidebar.style.display = 'none';
-          
+                chatContainer.style.marginRight = '20px'; // Restaurar el margen derecho a 0
             }
         }
         else{
-             if(sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'block';
-                sidebar.style.width = '100%';
-            } 
-            else{
-                sidebar.style.display = 'none';
-             
-         
-            }
-            
+            sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
         }
     }
-    
     escapeHtml(text) {
         var map = {
             '&': '&amp;',
