@@ -15,6 +15,7 @@ class Chat {
         this.totalTokensResponse =0;
         this.conversationStarted = false;
         this.chatId = ' ';
+        this.library = '';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
