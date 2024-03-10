@@ -156,6 +156,10 @@ class Chat {
             success: function(result) {
                 console.log(`Historial ${nombreChat} eliminado exitosamente.`);
                 self.removeFromConversationList(nombreChat);
+
+
+
+
             },
             error: function(xhr, status, error) {
                 console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
@@ -180,7 +184,7 @@ class Chat {
             if (elementToRemoveFormatted.length) {
                 elementToRemoveFormatted.remove();
             } else {
-                console.error('Element with ID ${chatId} not found in conversation list.');
+                console.error(`Element with ID ${chatId} not found in conversation list.`);
             }
         }
     }
@@ -336,6 +340,7 @@ class Chat {
             
         }
     }
+
 
 
     addToConversationHistory() {
