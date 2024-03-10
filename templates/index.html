@@ -25,8 +25,7 @@
         </div>
         <div id = conversations-list>
             {% for chat_name in chat_list %}
-                <button value="{{ chat_name }}" onclick="chat.loadHistory(encodeURIComponent('{{ chat_name }}'))" class="load-history">📪 {{ chat_name }} </button>
-            {% endfor %}
+                <div class='load-history' id="{{ chat_name }}"><button height='1em' width='1em' onclick="chat.deleteHistory('{{ chat_name }}')">❌</button><button  onclick="chat.loadHistory('{{ chat_name }}')">{{ chat_name }}</button></div>;            {% endfor %}
         </div>
     </div>
     <div id="main-container">

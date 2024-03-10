@@ -74,7 +74,7 @@ class Chat {
         $.ajax({
             type: 'POST',
             url: '/actualizar_historial', // Endpoint para actualizar el historial
-            data: JSON.stringify({ nombre_chat: chatId.replace(/\.json$/, ''), historial: content }), // Convertir a JSON
+            data: JSON.stringify({ nombre_chat: chatId, historial: content }), // Convertir a JSON
             contentType: 'application/json', // Asegura que el servidor entienda que es JSON
             success: function (data) {
                 
@@ -87,8 +87,6 @@ class Chat {
 
     loadHistory(nombre_chat) {
         nombre_chat = String(nombre_chat);
-    
-        this.chatId = nombre_chat.replace(/\.json$/, '');
    
         const self = this;
         $.ajax({
@@ -149,6 +147,42 @@ class Chat {
      
         }
         this.n_responses = j-1;
+    }
+    deleteHistory(nombreChat){
+        const self = this; 
+        $.ajax({
+            url: `/eliminar_historial?nombre_chat=${nombreChat}`,
+            type: 'DELETE',
+            success: function(result) {
+                console.log(`Historial ${nombreChat} eliminado exitosamente.`);
+                self.removeFromConversationList(nombreChat);
+            },
+            error: function(xhr, status, error) {
+                console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
+            }
+        });
+
+    }
+
+
+    removeFromConversationList(chatId) {
+        // Eliminar el elemento de la lista de conversaciones
+        const conversationListDiv = $('#conversations-list');
+        const elementToRemove = $('#' + chatId);
+
+        if (elementToRemove.length) {
+            elementToRemove.remove();
+        } else {
+            // Intentar encontrar el elemento con un selector que coincida con el formato de ID
+            const formattedIdSelector = '.load-history[id^="' + chatId + '"]';
+            const elementToRemoveFormatted = $(formattedIdSelector);
+
+            if (elementToRemoveFormatted.length) {
+                elementToRemoveFormatted.remove();
+            } else {
+                console.error('Element with ID ${chatId} not found in conversation list.');
+            }
+        }
     }
 
     handleAssistantResponse(response) {
@@ -223,31 +257,51 @@ class Chat {
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val(); // Obtener el valor del input
-            var userMessageTrimed = userMessage.substring(0, 35); // Usando substring
+            var userMessageTrimed = userMessage.substring(0, 35).trim(); // Usando substring
             var currentDate = new Date(); // Obtener la fecha y hora actual
-            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate(); 
+            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate()+'.'+currentDate.getHours()+'.'+currentDate.getMinutes()+'.'+currentDate.getSeconds(); 
             var messageWithDateTime =   formattedDateTime + '-'  + userMessageTrimed; // Agregar la fecha y hora al mensaje
             if (this.chatId ===' '){
-                this.chatId = messageWithDateTime;
+                this.chatId = messageWithDateTime.replace(' ','_');
 
             }
-        
+            var url = this.library === 'ollama' ? 'v1/chat/completions' : '/user_input'
             var sanitizedUserMessage = this.escapeHtml(userMessage);
             this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage})
             const self = this;
             $.ajax({
                 type: 'POST',
-                url: '/user_input',
-                data: JSON.stringify({ content: self.conversationHistory }), 
-                contentType: 'application/json', 
+                url: url,
+                data: JSON.stringify({ content: self.conversationHistory }), // Convertir a JSON
+                contentType: 'application/json', // Asegura que el servidor entienda que es JSON
                 success: function (data) {
                     $('#stop-button').hide();
                     $('#send-button').show();
                     $('#send-button').prop('disabled', false);
                     self.addToConversationHistory(); // Agregar la respuesta completa al historial
                     self.actualizarTokens();
+                   
+                    var conversationListDiv = $('#conversations-list');
+                    var buttonExists = false;
+                    $('.load-history').each(function() {
+                        console.log($(this).text())
+                        if ($(this).text() === '❌'+self.chatId) {
+                            
+                            buttonExists = true;
+                            return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
+                        }
+                    });
+                    console.log("Valor de self.chatId:", self.chatId);
+                    console.log("Número de botones existentes:", $('.load-history').length);
+                    var conversationListDiv = $('#conversations-list');
+                    var newChatHistory ='';
+           
+                    if(!buttonExists) {
+                      newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button  onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
+                      conversationListDiv.prepend(newChatHistory);
+                    }
+                   
                     self.guardarHistorial(self.chatId , self.conversationHistory);
-                    self.addRegisterToChatList();
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -282,26 +336,8 @@ class Chat {
             
         }
     }
-    addRegisterToChatList(){
-        const self = this; 
-        var conversationListDiv = $('#conversations-list');
-        var buttonExists = false;
-        
-        $('.load-history').each(function() {
-            var text = $(this).text();
-            text = text.trim().replace(/\.json$/, '');                    
-            if (text === '📪 ' + self.chatId) {
-                buttonExists = true;
-                return false; 
-            }
-        });
-        if (!buttonExists) {
-            var conversationListDiv = $('#conversations-list');
-            self.chatId+=String('.json');
-            const newChatHistory = $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>");
-            conversationListDiv.prepend(newChatHistory);
-        }
-    }
+
+
     addToConversationHistory() {
         this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
         this.fullResponse = '';
