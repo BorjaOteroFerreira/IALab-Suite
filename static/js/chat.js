@@ -513,6 +513,7 @@ class Chat {
         popup.textContent = message;
         container.appendChild(popup);
 
+        
         setTimeout(() => {
             popup.style.opacity = 1;
             setTimeout(() => {
@@ -522,7 +523,7 @@ class Chat {
                     if (container.childNodes.length === 0) {
                         document.body.removeChild(container);
                     }
-                    
+
                 }, 500); //seconds to complete disappearance animation
             }, 5500); //seconds before disappearing
         }, 100); // 0.1 seconds before displaying

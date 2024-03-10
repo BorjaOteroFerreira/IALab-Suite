@@ -147,3 +147,5 @@ your responses allways in markdown.
 
     def stop_response(self):
         self.stop_emit = True
+
+        
