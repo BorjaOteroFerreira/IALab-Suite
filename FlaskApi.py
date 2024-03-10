@@ -45,6 +45,7 @@ class IASuiteApi:
             return 'Response finished'
 
 
+
     def before_first_request(self):
         if self.assistant is None:
             self.assistant = Assistant(

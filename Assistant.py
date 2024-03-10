@@ -144,5 +144,6 @@ your responses allways in markdown.
             except Exception as e:
                 print(f"Error in get_assistant_response_stream: {e}")
 
+
     def stop_response(self):
         self.stop_emit = True
