@@ -16,6 +16,7 @@ class Chat {
         this.totalTokensResponse =0;
         this.conversationStarted = false;
         this.chatId = ' ';
+        this.library = '';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
@@ -102,9 +103,9 @@ class Chat {
         });
     }
 
-    
     loadHistory(nombre_chat) {
-        nombre_chat = String(nombre_chat)
+        nombre_chat = String(nombre_chat);
+   
         const self = this;
         $.ajax({
             type: 'GET',
@@ -125,9 +126,7 @@ class Chat {
                 console.error('Error al cargar el historial:', error); // Imprime el mensaje de error en la consola
             }
         });
-
     }
-
 
     loadMessages(){
         $('#chat-list').empty();
@@ -176,6 +175,44 @@ function sanitizeMessage(message) {
             }
         });
     
+    }
+    deleteHistory(nombreChat){
+        const self = this; 
+        $.ajax({
+            url: `/eliminar_historial?nombre_chat=${nombreChat}`,
+            type: 'DELETE',
+            success: function(result) {
+                console.log(`Historial ${nombreChat} eliminado exitosamente.`);
+                self.removeFromConversationList(nombreChat);
+                if (self.chatId === nombreChat){
+                    self.clearChat();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
+            }
+        });
+
+    }
+
+    removeFromConversationList(chatId) {
+        // Eliminar el elemento de la lista de conversaciones
+        const conversationListDiv = $('#conversations-list');
+        const elementToRemove = $('#' + chatId);
+
+        if (elementToRemove.length) {
+            elementToRemove.remove();
+        } else {
+            // Intentar encontrar el elemento con un selector que coincida con el formato de ID
+            const formattedIdSelector = '.load-history[id^="' + chatId + '"]';
+            const elementToRemoveFormatted = $(formattedIdSelector);
+
+            if (elementToRemoveFormatted.length) {
+                elementToRemoveFormatted.remove();
+            } else {
+                console.error(`Element with ID ${chatId} not found in conversation list.`);
+            }
+        }
     }
 
     handleAssistantResponse(response) {
@@ -250,12 +287,12 @@ function sanitizeMessage(message) {
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val(); // Obtener el valor del input
-            var userMessageTrimed = userMessage.substring(0, 35); // Usando substring
+            var userMessageTrimed = userMessage.substring(0, 35).trim(); // Usando substring
             var currentDate = new Date(); // Obtener la fecha y hora actual
-            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate(); 
+            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate()+'.'+currentDate.getHours()+'.'+currentDate.getMinutes()+'.'+currentDate.getSeconds(); 
             var messageWithDateTime =   formattedDateTime + '-'  + userMessageTrimed; // Agregar la fecha y hora al mensaje
             if (this.chatId ===' '){
-                this.chatId = messageWithDateTime;
+                this.chatId = messageWithDateTime.replace(' ','_');
 
             }
             var url = this.library === 'ollama' ? 'v1/chat/completions' : '/user_input'
@@ -273,22 +310,28 @@ function sanitizeMessage(message) {
                     $('#send-button').prop('disabled', false);
                     self.addToConversationHistory(); // Agregar la respuesta completa al historial
                     self.actualizarTokens();
-                    self.guardarHistorial(self.chatId , self.conversationHistory);
+                   
                     var conversationListDiv = $('#conversations-list');
                     var buttonExists = false;
                     $('.load-history').each(function() {
-                        if ($(this).text() === '📪 '+self.chatId) {
+                        console.log($(this).text())
+                        if ($(this).text() === '❌'+self.chatId) {
+                            
                             buttonExists = true;
                             return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
                         }
                     });
                     console.log("Valor de self.chatId:", self.chatId);
                     console.log("Número de botones existentes:", $('.load-history').length);
-                    if (!buttonExists) {
-                        var conversationListDiv = $('#conversations-list');
-                        const newChatHistory = $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>");
-                        conversationListDiv.prepend(newChatHistory);
+                    var conversationListDiv = $('#conversations-list');
+                    var newChatHistory ='';
+           
+                    if(!buttonExists) {
+                      newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button  onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
+                      conversationListDiv.prepend(newChatHistory);
                     }
+                   
+                    self.guardarHistorial(self.chatId , self.conversationHistory);
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -320,11 +363,9 @@ function sanitizeMessage(message) {
             var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
             userMessageCointainer.append(shareButton);
             this.scrollToBottom();
-            
         }
     }
 
-    // Método para agregar la respuesta completa al historial de conversación
     addToConversationHistory() {
         // Agregar la respuesta completa al historial de conversación
         this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
@@ -444,7 +485,15 @@ function sanitizeMessage(message) {
             }
         }
         else{
-            sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
+             if(sidebar.style.display === 'none' || sidebar.style.display === '') {
+                sidebar.style.display = 'block';
+                sidebar.style.width = '100%';
+            } 
+            else{
+                sidebar.style.display = 'none';
+             
+         
+            }
         }
     }
     escapeHtml(text) {
@@ -490,7 +539,6 @@ function sanitizeMessage(message) {
             container.style.bottom = '20px'; 
             document.body.appendChild(container);
         }
-
         const popup = document.createElement('div');
         popup.className = 'popup-notification';
         if (type === 'error') {

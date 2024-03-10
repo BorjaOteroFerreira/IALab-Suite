@@ -1,7 +1,7 @@
 '''
 @Author: Borja Otero Ferreira
 '''
-from flask import Flask, render_template, request,jsonify,json
+from flask import Flask, render_template, request,jsonify,json,Response
 from flask_socketio import SocketIO
 import os, signal
 from Assistant import Assistant 
@@ -34,6 +34,14 @@ class IASuiteApi:
         self.app.route('/stop_response', methods=['POST'])(self.stop_response)
         self.app.route('/v1/chat/completions', methods=['POST'])(self.ollama)
 
+
+    def ollama(self):
+            request_data = request.json  # Obtener los datos JSON del cuerpo de la solicitud
+            user_input = request_data.get('content')
+            user_input.pop(0)  # Elimina el mensaje del sistema
+            self.assistant.emit_ollama_response_stream(user_input,self.socketio)
+            print(f'\n\nInput Usuario: {user_input}\n\n')
+            return 'Response finished'
 
 
 

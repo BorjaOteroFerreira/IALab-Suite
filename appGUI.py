@@ -1,4 +1,3 @@
-
 import sys
 from PyQt5 import *
 from PyQt5.QtCore import  Qt, QUrl
