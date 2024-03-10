@@ -1,7 +1,7 @@
 '''
 @Author: Borja Otero Ferreira
 '''
-from flask import Flask, render_template, request,jsonify,json
+from flask import Flask, render_template, request,jsonify,json,Response
 from flask_socketio import SocketIO
 import os, signal
 from Assistant import Assistant 
@@ -33,7 +33,19 @@ class IASuiteApi:
         self.app.route('/load_model', methods=['POST'])(self.load_model)
         self.app.route('/unload_model', methods=['POST'])(self.unload_model)
         self.app.route('/stop_response', methods=['POST'])(self.stop_response)
+        self.app.route('/v1/chat/completions', methods=['POST'])(self.crew_response)
 
+
+    def crew_response(self):
+        try:
+            request_data = request.json
+            chat_history = request_data.get('messages', [])
+            print("Usuario dijo:", chat_history)
+            response = self.assistant.model.create_chat_completion(chat_history,stream=True)
+            return response
+
+        except Exception as e:
+            print(f"Error in handle_user_input_route: {e}")
 
 
     def before_first_request(self):
