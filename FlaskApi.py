@@ -12,8 +12,8 @@ class IASuiteApi:
         self.app = Flask(__name__, static_url_path='/static')
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
-        self.default_model_path = "models/lm-studio/gemma-2b-it-q8_0.gguf"
-        self.default_chat_format = "gemma"
+        self.default_model_path = "models/llama/llama-2-7b-chat.Q8_0.gguf"
+        self.default_chat_format = "llama2"
         self.assistant = None
         self.setup_routes()
 
