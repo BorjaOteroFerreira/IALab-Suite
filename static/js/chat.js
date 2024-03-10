@@ -156,6 +156,10 @@ class Chat {
             success: function(result) {
                 console.log(`Historial ${nombreChat} eliminado exitosamente.`);
                 self.removeFromConversationList(nombreChat);
+                if (self.chatId === nombreChat){
+                    self.clearChat();
+                }
+                
 
 
 
