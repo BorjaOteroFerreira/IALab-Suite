@@ -108,9 +108,7 @@ class Chat {
                 console.error('Error al cargar el historial:', error); // Imprime el mensaje de error en la consola
             }
         });
-
     }
-
 
     loadMessages(){
         const self = this;
@@ -159,11 +157,6 @@ class Chat {
                 if (self.chatId === nombreChat){
                     self.clearChat();
                 }
-                
-
-
-
-
             },
             error: function(xhr, status, error) {
                 console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
@@ -171,7 +164,6 @@ class Chat {
         });
 
     }
-
 
     removeFromConversationList(chatId) {
         // Eliminar el elemento de la lista de conversaciones
@@ -341,11 +333,8 @@ class Chat {
             var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
             userMessageCointainer.append(shareButton);
             this.scrollToBottom();
-            
         }
     }
-
-
 
     addToConversationHistory() {
         this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
@@ -469,7 +458,6 @@ class Chat {
              
          
             }
-            
         }
     }
     
@@ -516,7 +504,6 @@ class Chat {
             container.style.bottom = '20px'; 
             document.body.appendChild(container);
         }
-
         const popup = document.createElement('div');
         popup.className = 'popup-notification';
         if (type === 'error') {

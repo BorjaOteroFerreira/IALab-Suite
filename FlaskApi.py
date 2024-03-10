@@ -33,19 +33,16 @@ class IASuiteApi:
         self.app.route('/load_model', methods=['POST'])(self.load_model)
         self.app.route('/unload_model', methods=['POST'])(self.unload_model)
         self.app.route('/stop_response', methods=['POST'])(self.stop_response)
-        self.app.route('/v1/chat/completions', methods=['POST'])(self.crew_response)
+        self.app.route('/v1/chat/completions', methods=['POST'])(self.ollama)
 
 
-    def crew_response(self):
-        try:
-            request_data = request.json
-            chat_history = request_data.get('messages', [])
-            print("Usuario dijo:", chat_history)
-            response = self.assistant.model.create_chat_completion(chat_history,stream=True)
-            return response
-
-        except Exception as e:
-            print(f"Error in handle_user_input_route: {e}")
+    def ollama(self):
+            request_data = request.json  # Obtener los datos JSON del cuerpo de la solicitud
+            user_input = request_data.get('content')
+            user_input.pop(0)  # Elimina el mensaje del sistema
+            self.assistant.emit_ollama_response_stream(user_input,self.socketio)
+            print(f'\n\nInput Usuario: {user_input}\n\n')
+            return 'Response finished'
 
 
     def before_first_request(self):
