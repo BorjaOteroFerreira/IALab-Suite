@@ -4,7 +4,6 @@
 from llama_cpp import Llama as Model
 import platform
 import time
-import ollama
 
 class Assistant:
 
@@ -52,6 +51,7 @@ your responses allways in markdown.
 
     def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context):
 
+
         message = new_system_message if isinstance(new_system_message, str) and new_system_message != '' else self.default_system_message
         gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else self.gpu_layers
         ctx = context if isinstance(context, int)  else self.max_context_tokens
@@ -64,10 +64,13 @@ your responses allways in markdown.
         self.chat_format = format
         self.gpu_layers = gpu_layers
         self.stop_emit = False
+
         self.load_default_model()
 
     def unload_model(self):
         self.model = None
+
+
 
     def add_user_input(self, user_input,socket):
         if not self.is_processing:
@@ -130,41 +133,16 @@ your responses allways in markdown.
             finally:
                 self.is_processing = False
 
-    def emit_ollama_response_stream(self,user_input, socket):
-        '''
-        Obtiene la respuesta del asistente.
-
-        Parámetros:
-        - (obj) socket: Conexion para enviar el stream.
-        '''
-        client = ollama
-        total_user_tokens = 0
-        if not self.is_processing:
-            self.stop_emit = False
-            self.is_processing = True
-            full_response = ""
-            if(self.model is not None):
-                tokensInput = str(user_input[-1]["content"]).encode()  # Convertir a bytes
-                print(tokensInput)
-                tokens = self.model.tokenize(tokensInput)  
-                total_user_tokens = len(tokens)  # Contar los tokens de la entrada del usuario
-                print(total_user_tokens)
-            total_assistant_tokens = 0  # Inicializar el contador de tokens del asistente
+                
+    def crew_response(self, user_input):
             try:
-                for part in client.chat(model='Hax0r', messages=user_input, stream=True):
-                        chunk = part['message']['content']
-                        for char in chunk:
-                            full_response += char
-                            total_assistant_tokens+=1 # Contar los tokens en el chunk actual
-                            print(char, end='', flush=True)
-                        socket.emit('assistant_response', {
-                            'content': chunk,
-                            'total_user_tokens': total_user_tokens,
-                            'total_assistant_tokens': total_assistant_tokens
-                        }, namespace='/test')
+                for chunk in self.model.create_chat_completion(messages=user_input, max_tokens=self.max_assistant_tokens, stream=True) or []:
+                    if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
+                        response_chunk = chunk['choices'][0]['delta']['content']
+                        yield f"data: {response_chunk}\n\n"
                         time.sleep(0.01)
-            finally:
-                self.is_processing = False
+            except Exception as e:
+                print(f"Error in get_assistant_response_stream: {e}")
 
     def stop_response(self):
         self.stop_emit = True
