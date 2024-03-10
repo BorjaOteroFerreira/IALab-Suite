@@ -45,14 +45,6 @@ class IASuiteApi:
 
 
 
-    def ollama(self):
-        request_data = request.json  # Obtener los datos JSON del cuerpo de la solicitud
-        user_input = request_data.get('content')
-        user_input.pop(0)  # Elimina el mensaje del sistema
-        self.assistant.emit_ollama_response_stream(user_input,self.socketio)
-        print(f'\n\nInput Usuario: {user_input}\n\n')
-        return 'Response finished'
-
     def before_first_request(self):
         if self.assistant is None:
             self.assistant = Assistant(

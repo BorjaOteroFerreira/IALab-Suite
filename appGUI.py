@@ -70,6 +70,8 @@ class EmbeddedFlaskApp(QMainWindow):
 if __name__ == '__main__':
     app = QApplication([])
 
+    
+
     # Cambiar el nombre que se muestra en la barra de tareas de Mac
     app.setApplicationDisplayName("IALab_Suite")
 
