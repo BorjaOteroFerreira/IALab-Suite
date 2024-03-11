@@ -191,7 +191,7 @@ class IASuiteApi:
         # Filtrar solo los archivos con extensión .json
         for archivo in archivos:
             if archivo.endswith('.json'):
-                nombres_archivos_json.append(archivo)
+                nombres_archivos_json.append(archivo.replace('.json',''))
         # Ordenar la lista en orden inverso
         nombres_archivos_json.sort(reverse=True)
         return nombres_archivos_json

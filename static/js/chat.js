@@ -308,7 +308,7 @@ class Chat {
                     self.conversationStarted = false;
                 },
                 error: function (error) {
-                    self.showPopup(error, 'error');
+                    self.showPopup(error.JSON.stringify(), 'error');
                     console.error('Error:', error);
                     self.conversationStarted = false;
                 }
@@ -372,7 +372,7 @@ class Chat {
                 console.log(data);
             },
             error: function (error) {
-                self.showPopup(error, 'error');
+                self.showPopup(error.JSON.stringify(), 'error');
                 console.error('Error:', error);
             }
         });
@@ -389,7 +389,7 @@ class Chat {
                 console.log(data);
             },
             error: function (error) {
-                self.showPopup(error, 'error');
+                self.showPopup(error.JSON.stringify(), 'error');
                 console.error('Error:', error);
             }
         });
@@ -407,7 +407,7 @@ class Chat {
                 $('#send-button').show();
             },
             error: (error) => {
-                self.showPopup(error, 'error');
+                self.showPopup(error.JSON.stringify(), 'error');
                 console.error('Error:', error);
             }
         });
