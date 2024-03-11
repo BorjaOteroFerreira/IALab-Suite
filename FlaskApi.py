@@ -25,6 +25,7 @@ class IASuiteApi:
         self.app.before_request(self.before_first_request)
         self.app.route('/')(self.index)
         self.socketio.on_event('user_input', self.handle_user_input_route, namespace='/test')
+        self.app.route('/crear_historial', methods=['POST'])(self.crear_historial)
         self.app.route('/actualizar_historial', methods=['POST'])(self.actualizar_historial)
         self.app.route('/eliminar_historial', methods=['DELETE'])(self.eliminar_historial)
         self.app.route('/recuperar_historial', methods=['GET'])(self.recuperar_historial)
@@ -53,15 +54,20 @@ class IASuiteApi:
                 default_chat_format=self.default_chat_format
             )
 
-
     def index(self):
         models_list = self.get_models_list("models")
         format_list = self.get_format_list()
         chat_list = self.get_chat_list()
         return render_template('index.html', models_list=models_list, format_list=format_list, chat_list=chat_list)
+    
 
-
-
+    def crear_historial(self):
+        nombre_chat = request.form.get('nombre_chat')
+        historial = request.json.get('historial')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
+        with open(ruta_archivo, 'w') as f:
+            json.dump(historial, f, indent=4)
+        return jsonify({'message': f'Historial {nombre_chat} creado exitosamente.'}), 200
 
     def actualizar_historial(self):
         nombre_chat = request.json.get('nombre_chat')
@@ -86,7 +92,7 @@ class IASuiteApi:
 
     def eliminar_historial(self):
         nombre_chat = request.args.get('nombre_chat')
-        ruta_archivo = os.path.join('chats', f'{nombre_chat+'.json'}')
+        ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
         if os.path.exists(ruta_archivo):
             os.remove(ruta_archivo)
             return jsonify({'message': f'Historial {nombre_chat} eliminado exitosamente.'}), 200

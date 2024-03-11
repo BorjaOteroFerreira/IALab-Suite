@@ -7,7 +7,6 @@ class Chat {
         this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
         this.currentResponse = '';
-        this.library ='llama';
         this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español'
         this.n_responses = 0;
         this.popupCount = 0;
@@ -38,52 +37,36 @@ class Chat {
     }
 
     onAssistantResponse(response) {
-        var delta = '';
-        var choiceDelta =''
-        
-        if (this.library === 'ollama'){
-            const responseData = response;
-            delta = responseData.content;
-            console.log(response)
-            this.fullResponse += delta; // Agregar a fullResponse
-            const totalUserTokens = responseData.total_user_tokens;  // Obtener el número total de tokens del usuario
-            const totalAssistantTokens = responseData.total_assistant_tokens; 
-            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
-            console.log("Contenido de la elección:", delta);
-            console.log("Tokens del usuario : ", totalUserTokens);
-            console.log("Tokens Respuesta: ", totalAssistantTokens);
-        }else{
-            const responseData = response.content["choices"][0];
-            const { id, model, created, object } = response.content;
-            const { index, delta, finish_reason } = responseData;
-            const responseId = id;
-            const responseModel = model;
-            const responseCreated = created;
-            const responseObject = object;
-            const choiceIndex = index;
-            choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
-            this.fullResponse += choiceDelta; // Agregar a fullResponse
-            const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
-            const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
-            const totalAssistantTokens = response.total_assistant_tokens; 
-            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
-            console.log("ID de la respuesta:", responseId);
-            console.log("Modelo utilizado:", responseModel);
-            console.log("Creación:", responseCreated);
-            console.log("Objeto:", responseObject);
-            console.log("Índice de la elección:", choiceIndex);
-            console.log("Contenido de la elección:", choiceDelta);
-            console.log("Razón de finalización:", choiceFinishReason);
-            console.log("Tokens del usuario : ", totalUserTokens);
-            console.log("Tokens Respuesta: ", totalAssistantTokens);
-   
-        }
+      
+        const responseData = response.content["choices"][0];
+        const { id, model, created, object } = response.content;
+        const { index, delta, finish_reason } = responseData;
+        const responseId = id;
+        const responseModel = model;
+        const responseCreated = created;
+        const responseObject = object;
+        const choiceIndex = index;
+        const choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
+        this.fullResponse += choiceDelta; // Agregar a fullResponse
+        const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
+        const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
+        const totalAssistantTokens = response.total_assistant_tokens; 
+        this.totalTokensResponse = totalUserTokens + totalAssistantTokens
+
+        console.log("ID de la respuesta:", responseId);
+        console.log("Modelo utilizado:", responseModel);
+        console.log("Creación:", responseCreated);
+        console.log("Objeto:", responseObject);
+        console.log("Índice de la elección:", choiceIndex);
+        console.log("Contenido de la elección:", choiceDelta);
+        console.log("Razón de finalización:", choiceFinishReason);
+        console.log("Tokens del usuario : ", totalUserTokens);
+        console.log("Tokens Respuesta: ", totalAssistantTokens);
 
         $('#stop-button').show();
         $('#send-button').prop('disabled', true);
         $('#send-button').hide();
-        var responseModel = this.library === 'ollama' ? delta : choiceDelta;
-        this.handleAssistantResponse(responseModel);
+        this.handleAssistantResponse(choiceDelta);
         this.scrollToBottom();
         /*console.log('Tokens received 🧠');**/
         
@@ -129,52 +112,40 @@ class Chat {
     }
 
     loadMessages(){
+        const self = this;
         $('#chat-list').empty();
+        var j = 1 ; 
         // Suponiendo que this.chatHistory contiene los mensajes
         for (var i = 0; i < this.conversationHistory.length; i++) {
+           
             var messageData = this.conversationHistory[i];
-            var sanitizedUserMessage = messageData.role === 'user' ? sanitizeMessage(messageData.content) : messageData.content;
             const converter = new showdown.Converter();
-            messageData.content = converter.makeHtml(messageData.content);
+            var sanitizedUserMessage = messageData.role === 'user' ? self.escapeHtml(messageData.content) : converter.makeHtml(messageData.content);
+           
+   
             if (messageData.role === 'user') {
-                var message = $('<div class="user-message-container-' + i +
-                                ' user-message-container"><label for="chat-user-' + i +
-                                '">User</label><div id="chat-user-' + i +
-                                '" class="user-message user-message-' + i + '">' +
+                var message = $('<div class="user-message-container-' + j +
+                                ' user-message-container"><label for="chat-user-' + j +
+                                '">User</label><div id="chat-user-' + j +
+                                '" class="user-message user-message-' + j + '">' +
                                 sanitizedUserMessage + '</div></div>');
                 $('#chat-list').append(message);
+               
+              
             } else if (messageData.role === 'assistant') {
-                var divAssistant = $('<div class="assistant-message-container-' + i +
-                                    ' assistant-message-container"><label for="chat-assistant-' + i +
-                                    '">Assistant<br></label><div id="chat-assistant-' + i +
+                var divAssistant = $('<div class="assistant-message-container-' + j +
+                                    ' assistant-message-container"><label for="chat-assistant-' + j +
+                                    '">Assistant<br></label><div id="chat-assistant-' + j +
                                     '" class="assistant-message">' + messageData.content + '</div></div>');
                 $('#chat-list').append(divAssistant);
+                j++;
                 divAssistant.find('pre code').each(function(i, block) {
                     Prism.highlightElement(block);
                 });
             }
      
-    }
-
-
-// Función de ejemplo para sanear mensajes (puedes personalizarla según tus necesidades)
-function sanitizeMessage(message) {
-    return $('<div>').text(message).html();
-}
-    }
-
-    deleteHistory(nombreChat){
-        $.ajax({
-            url: `/eliminar_historial?nombre_chat=${nombreChat}`,
-            type: 'DELETE',
-            success: function(result) {
-                console.log(`Historial ${nombreChat} eliminado exitosamente.`);
-            },
-            error: function(xhr, status, error) {
-                console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
-            }
-        });
-    
+        }
+        this.n_responses = j-1;
     }
     deleteHistory(nombreChat){
         const self = this; 
@@ -367,10 +338,7 @@ function sanitizeMessage(message) {
     }
 
     addToConversationHistory() {
-        // Agregar la respuesta completa al historial de conversación
         this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
-        
-        // Reiniciar la respuesta completa para futuras conversaciones
         this.fullResponse = '';
     }
 
@@ -382,7 +350,6 @@ function sanitizeMessage(message) {
         var selectedModel = $('#model-select').val();
         var selectedFormat = $('#format-select').val();
         var systemMessage = $('#system-message').val();
-        this.systemMessage = systemMessage;
         var gpuLayers = $('#gpu-layers').val();
         var temperature = $('#temperature').val();
         var n_ctx = $('#context').val();
@@ -467,21 +434,19 @@ function sanitizeMessage(message) {
         console.log(str);
     }
 
-    toggleSidebar() {
-        var sidebar = document.getElementById('sidebar');
-        var chatContainer = document.getElementById('main-container');
-        
+    toggleSidebar(element) {
+        var sidebar = document.getElementById(element);
         // Verificar si las media queries están activas
         var mediaQueriesActive = window.matchMedia("(max-width: 1023px)").matches || window.matchMedia("(max-height: 740px)").matches;
     
         // Solo ejecutar el código si las media queries no están activas
         if (!mediaQueriesActive) {
             if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'block';
-                chatContainer.style.marginRight = '20%'; // Ajustar el margen derecho para dejar espacio al sidebar
+                sidebar.style.display = 'flex';
+                sidebar.style.width = '15%';
             } else {
                 sidebar.style.display = 'none';
-                chatContainer.style.marginRight = '20px'; // Restaurar el margen derecho a 0
+          
             }
         }
         else{
@@ -496,6 +461,7 @@ function sanitizeMessage(message) {
             }
         }
     }
+    
     escapeHtml(text) {
         var map = {
             '&': '&amp;',
