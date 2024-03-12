@@ -69,31 +69,34 @@ h1{
     color: var(--secondary-color);
     overflow: hidden;
     white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-    text-overflow: ellipsis;
     margin-top:15px;
     text-align: left;
     font-weight: bold;
     border:none;
-    font-size:0.7em;
 }
-.load-history:hover{
+
+.load-history button{
+    text-overflow: ellipsis;
+    border:none;
+    background-color: #00000000;
+    color:#fff;
+    font-size:0.8em;
+}
+.load-history button:hover{
     color: var(--secondary-bg-color);
     border: 0px solid var(--secondary-color);
     border-radius: 5px;
     background-color:var(--secondary-color);
-
+    font-size:0.9;
 }
+
 #main-container{
     flex: 1;
     width:85%;
-   
     -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
-
 }
-
-
 
 #header {
     background-color: var(--primary-bg-color);

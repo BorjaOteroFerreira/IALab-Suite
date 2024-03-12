@@ -4,7 +4,6 @@
 from llama_cpp import Llama as Model
 import platform
 import time
-
 import ollama
 
 class Assistant:
@@ -158,7 +157,7 @@ your responses allways in markdown.
                     print(total_user_tokens)
                 total_assistant_tokens = 0  # Inicializar el contador de tokens del asistente
                 try:
-                    for part in client.chat(model='Hax0r', messages=user_input, stream=True):
+                    for part in client.chat(model='gemma', messages=user_input, stream=True):
                             chunk = part['message']['content']
                             for char in chunk:
                                 full_response += char

@@ -15,7 +15,7 @@ class Chat {
         this.totalTokensResponse =0;
         this.conversationStarted = false;
         this.chatId = ' ';
-        this.library = 'llama';
+        this.library = 'ollama';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
@@ -37,40 +37,55 @@ class Chat {
     }
 
     onAssistantResponse(response) {
-      
-        const responseData = response.content["choices"][0];
-        const { id, model, created, object } = response.content;
-        const { index, delta, finish_reason } = responseData;
-        const responseId = id;
-        const responseModel = model;
-        const responseCreated = created;
-        const responseObject = object;
-        const choiceIndex = index;
-        const choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
-        this.fullResponse += choiceDelta; // Agregar a fullResponse
-        const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
-        const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
-        const totalAssistantTokens = response.total_assistant_tokens; 
-        this.totalTokensResponse = totalUserTokens + totalAssistantTokens
-
-        console.log("ID de la respuesta:", responseId);
-        console.log("Modelo utilizado:", responseModel);
-        console.log("Creación:", responseCreated);
-        console.log("Objeto:", responseObject);
-        console.log("Índice de la elección:", choiceIndex);
-        console.log("Contenido de la elección:", choiceDelta);
-        console.log("Razón de finalización:", choiceFinishReason);
-        console.log("Tokens del usuario : ", totalUserTokens);
-        console.log("Tokens Respuesta: ", totalAssistantTokens);
+        var delta = '';
+        var choiceDelta =''
+        if (this.library === 'ollama'){
+            const responseData = response;
+            delta = responseData.content;
+            this.fullResponse += delta; // Agregar a fullResponse
+            const totalUserTokens = responseData.total_user_tokens;  // Obtener el número total de tokens del usuario
+            const totalAssistantTokens = responseData.total_assistant_tokens; 
+            this.totalTokensResponse = totalUserTokens + totalAssistantTokens;
+            //console.log("Contenido de la elección:", delta);
+            //console.log("Tokens del usuario : ", totalUserTokens);
+            //console.log("Tokens Respuesta: ", totalAssistantTokens);
+            console.log(response)
+        }else{
+            //const responseData = response.content["choices"][0];
+            const { id, model, created, object } = response.content;
+            const { index, delta, finish_reason } = responseData;
+            const responseId = id;
+            const responseModel = model;
+            const responseCreated = created;
+            const responseObject = object;
+            const choiceIndex = index;
+            choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
+            this.fullResponse += choiceDelta; // Agregar a fullResponse
+            const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
+            const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
+            const totalAssistantTokens = response.total_assistant_tokens; 
+            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
+            console.log("ID de la respuesta:", responseId);
+            console.log("Modelo utilizado:", responseModel);
+            console.log("Creación:", responseCreated);
+            console.log("Objeto:", responseObject);
+            console.log("Índice de la elección:", choiceIndex);
+            console.log("Contenido de la elección:", choiceDelta);
+            console.log("Razón de finalización:", choiceFinishReason);
+            console.log("Tokens del usuario : ", totalUserTokens);
+            console.log("Tokens Respuesta: ", totalAssistantTokens);
+   
+        }
 
         $('#stop-button').show();
         $('#send-button').prop('disabled', true);
         $('#send-button').hide();
-        this.handleAssistantResponse(choiceDelta);
+        var responseModel = this.library === 'ollama' ? delta : choiceDelta;
+        this.handleAssistantResponse(responseModel);
         this.scrollToBottom();
-        /*console.log('Tokens received 🧠');**/
-        
+        /* console.log('Tokens received 🧠');**/
     }
+
     guardarHistorial(chatId, content) {
         $.ajax({
             type: 'POST',
@@ -202,10 +217,8 @@ class Chat {
         const tableRegex = /(?:\|.*(?:\|).*)+\|/gs;
         let htmlResponse = this.response.replace(tableRegex, (table) => {
             const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
-        
             // Filtrar las filas que contienen guiones
             const filteredRows = rows.filter(row => !row.some(cell => cell.includes('---')));
-        
             let htmlTable = '<table>';
             for (let i = 0; i < filteredRows.length; i++) {
                 htmlTable += '<tr>';
@@ -308,7 +321,7 @@ class Chat {
                     self.conversationStarted = false;
                 },
                 error: function (error) {
-                    self.showPopup(error.JSON.stringify(), 'error');
+                    self.showPopup(error, 'error');
                     console.error('Error:', error);
                     self.conversationStarted = false;
                 }
