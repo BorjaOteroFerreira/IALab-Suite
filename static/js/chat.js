@@ -4,10 +4,10 @@ class Chat {
         const textarea = document.getElementById('user-input');
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
-        this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
+        this.systemMessage = 'Eres un asistente en español.'
+        this.conversationHistory = [{'role': 'system', 'content': this.systemMessage}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
         this.currentResponse = '';
-        this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español'
         this.n_responses = 0;
         this.popupCount = 0;
         this.fullResponse = '';
@@ -15,7 +15,7 @@ class Chat {
         this.totalTokensResponse =0;
         this.conversationStarted = false;
         this.chatId = ' ';
-        this.library = '';
+        this.library = 'llama';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
@@ -353,6 +353,7 @@ class Chat {
         var gpuLayers = $('#gpu-layers').val();
         var temperature = $('#temperature').val();
         var n_ctx = $('#context').val();
+        this.systemMessage = systemMessage;
         const self = this;
         $.ajax({
 
@@ -366,6 +367,7 @@ class Chat {
                 gpu_layers: gpuLayers,
                 context: n_ctx
             },
+            
             success: function (data) {
                 self.showPopup('Model loaded successfully');
                 self.newChat()
@@ -376,7 +378,7 @@ class Chat {
                 console.error('Error:', error);
             }
         });
-        this.clearContext();
+        
     }
 
     unloadModel() {
