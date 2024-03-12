@@ -124,9 +124,10 @@ class IASuiteApi:
         n_gpu_layers = int(request.form.get('gpu_layers')) if request.form.get('gpu_layers') != '' else -1
         system_message = request.form.get('system_message')
         temperature = float(request.form.get('temperature')) if request.form.get('temperature') != '' else 0.81
+        max_response_tokens = request.form.get('max_response_tokens')
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
         self.assistant.unload_model()
-        self.assistant.load_model(selected_model,selected_format,temperature,n_gpu_layers,system_message,n_ctx)
+        self.assistant.load_model(selected_model,selected_format,temperature,n_gpu_layers,system_message,n_ctx,max_response_tokens)
         return f'''
                 \nModel:{selected_model}
                 \nformat: {selected_format}
@@ -134,6 +135,7 @@ class IASuiteApi:
                 \nlayers: {n_gpu_layers}
                 \nSM: {system_message}
                 \nctx: {n_ctx}
+                \nmax tokens: {n_ctx}
                 '''
 
     def unload_model(self):

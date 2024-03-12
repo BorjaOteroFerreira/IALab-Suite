@@ -15,7 +15,7 @@ class Chat {
         this.totalTokensResponse =0;
         this.conversationStarted = false;
         this.chatId = ' ';
-        this.library = 'ollama';
+        this.library = 'llama';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
         textarea.addEventListener('keydown', (e) => {
@@ -51,7 +51,7 @@ class Chat {
             //console.log("Tokens Respuesta: ", totalAssistantTokens);
             console.log(response)
         }else{
-            //const responseData = response.content["choices"][0];
+            const responseData = response.content["choices"][0];
             const { id, model, created, object } = response.content;
             const { index, delta, finish_reason } = responseData;
             const responseId = id;
@@ -266,7 +266,6 @@ class Chat {
 
     sendMessage() {
         if (!this.conversationStarted){
-         
             this.conversationStarted= true;
             this.currentResponse = ' ';
             this.n_responses += 1;
@@ -298,23 +297,17 @@ class Chat {
                     var conversationListDiv = $('#conversations-list');
                     var buttonExists = false;
                     $('.load-history').each(function() {
-                        console.log($(this).text())
                         if ($(this).text() === '❌'+self.chatId) {
-                            
                             buttonExists = true;
-                            return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
+                            return false; 
                         }
                     });
-                    console.log("Valor de self.chatId:", self.chatId);
-                    console.log("Número de botones existentes:", $('.load-history').length);
                     var conversationListDiv = $('#conversations-list');
                     var newChatHistory ='';
-           
                     if(!buttonExists) {
                       newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button  onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
                       conversationListDiv.prepend(newChatHistory);
-                    }
-                   
+                    }   
                     self.guardarHistorial(self.chatId , self.conversationHistory);
                     self.showPopup(data);
                     console.log(data);
@@ -366,6 +359,7 @@ class Chat {
         var gpuLayers = $('#gpu-layers').val();
         var temperature = $('#temperature').val();
         var n_ctx = $('#context').val();
+        var max_response_tokens = $('max-response-tokens').val();
         this.systemMessage = systemMessage;
         const self = this;
         $.ajax({
@@ -378,7 +372,8 @@ class Chat {
                 temperature: temperature,
                 system_message: systemMessage,
                 gpu_layers: gpuLayers,
-                context: n_ctx
+                context: n_ctx,
+                max_response_tokens : max_response_tokens
             },
             
             success: function (data) {

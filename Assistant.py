@@ -11,7 +11,7 @@ class Assistant:
     def __init__(self, default_model_path, default_chat_format):
         self.model = None
         self.max_context_tokens = 2048
-        self.max_assistant_tokens = 2048
+        self.max_assistant_tokens = 1024
         self.is_processing = False
         self.chat_format = default_chat_format
         self.model_path = default_model_path
@@ -50,7 +50,7 @@ your responses allways in markdown.
         self.context_window_start = 0
         self.stop_emit = False
 
-    def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context):
+    def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context,max_response_tokens):
 
 
         message = new_system_message if isinstance(new_system_message, str) and new_system_message != '' else self.default_system_message
@@ -58,11 +58,11 @@ your responses allways in markdown.
         ctx = context if isinstance(context, int)  else self.max_context_tokens
         temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
         self.default_system_message = new_system_message
-        print(new_system_message)
+        max_asistant_tokens = max_response_tokens if isinstance(max_response_tokens,int) else self.max_assistant_tokens
         self.model_path = model_path
         self.temperature = temperature
         self.max_context_tokens = ctx
-        self.max_assistant_tokens = self.max_assistant_tokens #TODO: change in interface
+        self.max_assistant_tokens = max_asistant_tokens #TODO: change in interface
         self.chat_format = format
         self.gpu_layers = gpu_layers
         self.stop_emit = False
