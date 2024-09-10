@@ -26,12 +26,14 @@ pre[class*=language-] {
 	padding: 1em;
 	margin: .5em 0;
 	overflow: auto;
-	border-radius: .3em
+	border-radius: .3em;
+	
 }
 
 :not(pre)>code[class*=language-],
 pre[class*=language-] {
-	background: #272822
+	background: #272822;
+
 }
 
 :not(pre)>code[class*=language-] {

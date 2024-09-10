@@ -1,17 +1,21 @@
 '''
 @author: Borja Otero Ferreira
 '''
+import copy
 from llama_cpp import Llama as Model
 import platform
 import time
 import ollama
-
+from cortex import Cortex
+from ragai2 import Rag
 class Assistant:
 
     def __init__(self, default_model_path, default_chat_format):
         self.model = None
-        self.max_context_tokens = 2048
-        self.max_assistant_tokens = 1024
+        self.tools= False
+        self.rag = False
+        self.max_context_tokens = 14000
+        self.max_assistant_tokens =2048
         self.is_processing = False
         self.chat_format = default_chat_format
         self.model_path = default_model_path
@@ -20,11 +24,11 @@ class Assistant:
         self.metal_options = {"device": "metal", "metal_device_id": 0}
         self.gpu_layers = -1
         self.default_system_message = '''
-You are an assistant with a kind and honest personality. 
-As an expert programmer and pentester, 
-you should examine the details provided to ensure that they are usable.
-If you don't know the answer to a question, don't share false information and don't stray from the question.
-your responses allways in markdown.
+Eres un asistente con una personalidad amable y honesta.
+Como programador experto y pentester,
+debe examinar los detalles proporcionados para asegurarse de que sean utilizables.
+Si no sabe la respuesta a una pregunta, no comparta información falsa y no se desvíe de la pregunta.
+sus respuestas siempre en rebajas.
 '''
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
@@ -51,9 +55,6 @@ your responses allways in markdown.
         self.stop_emit = False
 
     def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context,max_response_tokens):
-
-
-        message = new_system_message if isinstance(new_system_message, str) and new_system_message != '' else self.default_system_message
         gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else self.gpu_layers
         ctx = context if isinstance(context, int)  else self.max_context_tokens
         temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
@@ -66,43 +67,21 @@ your responses allways in markdown.
         self.chat_format = format
         self.gpu_layers = gpu_layers
         self.stop_emit = False
-
         self.load_default_model()
 
     def unload_model(self):
         self.model = None
 
+    def set_tools(self,tools):
+            self.tools = tools
 
+    def set_rag(self,rag):
+            self.rag = rag
 
     def add_user_input(self, user_input,socket):
         if not self.is_processing:
             self.emit_assistant_response_stream(user_input,socket)
   
-         
-
-    def get_assistant_response_stream(self, message_queue):
-        '''
-        Obtiene la respuesta del asistente.
-
-        Parámetros:
-        - (map[]) message_queue: Cola de mensajes para comunicarse con otros componentes como example_gui.py.
-        '''
-        if not self.is_processing:
-            self.stop_emit = False
-            response = ""
-            for chunk in self.model.create_chat_completion(messages=self.conversation_history[self.context_window_start:], 
-                                                           max_tokens=self.max_assistant_tokens, 
-                                                           stream=True):
-                if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
-                    response_chunk = chunk['choices'][0]['delta']['content']
-                    response += response_chunk
-                    message_queue.put({"role": "assistant", "content": response_chunk})
-
-            if not self.stop_emit:
-                self.conversation_history.append({"role": "assistant", "content": response})
-                print(response)
-            self.is_processing = False
-
     def emit_assistant_response_stream(self,user_input, socket):
         '''
         Obtiene la respuesta del asistente.
@@ -110,6 +89,7 @@ your responses allways in markdown.
         Parámetros:
         - (obj) socket: Conexion para enviar el stream.
         '''
+
         if not self.is_processing:
             self.stop_emit = False
             self.is_processing = True
@@ -120,22 +100,61 @@ your responses allways in markdown.
 
             total_user_tokens = len(tokens)  # Contar los tokens de la entrada del usuario
             total_assistant_tokens = 0  # Inicializar el contador de tokens del asistente
+            user_input_o = user_input
+            max_assistant_tokens = self.max_assistant_tokens if not self.tools else 100
             try:
+                if self.tools :
+                    user_input = self._instruccionesAdicionales(user_input)
                 for chunk in self.model.create_chat_completion(messages=user_input, max_tokens=self.max_assistant_tokens, stream=True):
                     if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
                         response_chunk = chunk['choices'][0]['delta']['content']
                         response += response_chunk  
                         total_assistant_tokens+=1 # Contar los tokens en el chunk actual
-                        socket.emit('assistant_response', {
-                            'content': chunk,
-                            'total_user_tokens': total_user_tokens,
-                            'total_assistant_tokens': total_assistant_tokens
-                        }, namespace='/test')
-                        time.sleep(0.01)
-            finally:
+                        if not self.tools and not self.rag: 
+                            socket.emit('assistant_response', {
+                                'content': chunk,
+                                'total_user_tokens': total_user_tokens,
+                                'total_assistant_tokens': total_assistant_tokens
+                            }, namespace='/test')
+                            time.sleep(0.01)
+
+                if self.rag: 
+                    Rag(self.model,user_input,socket)
+                if self.tools:
+                    Cortex(user_input_o, prompt=user_input, response=response, model=self.model,socket=socket )
+            finally:          
                 self.is_processing = False
 
-                
+
+    def _instruccionesAdicionales(self, prompt):
+            # Copia el historial de mensajes
+            prompt_copia = copy.deepcopy(prompt)        
+            # Modifica el primer mensaje del sistema
+            nuevo_mensaje_sistema =  f"""
+    TU PRINCIPAL OBJETIVO ES DETERMINAR QUE HERRAMIENTA NECESITAS
+    Funciones disponibles: 
+    [Funcion: 'buscar_en_internet' , query: 'url_o_consulta' ]
+    [Funcion: 'video_search_tool' , query: 'consulta']
+    responde unicamente con la o las herramientas a lanzar, ejemplo: 
+    supongamos que necesitas buscar el tiempo en internet , contestas: 
+    [Funcion: 'buscar_en_internet' , query: 'tiempo proximos dias' ]
+    Asegurate de que utilizas la sintaxis correcta al colocar un corchete al inicio y otro al final.
+    Puedes usar mas de una herramienta si lo necesitas.
+    Debes contestar solo con las funciones que usarias sin texto antes ni despues
+    SIEMPRE DEBES RESPONDER EN ESPAÑOL.
+    """     
+            if prompt_copia and prompt_copia[0]['role'] == 'system':
+                prompt_copia[0]['content'] = nuevo_mensaje_sistema 
+        
+            #prompt_copia.append({"role": "system", "content": nuevo_mensaje_sistema})
+        
+    
+            """for prompt in prompt_copia:
+                print(json.dumps(prompt))
+                pass
+            """
+            return prompt_copia
+                    
     def emit_ollama_response_stream(self,user_input, socket):
             '''
             Obtiene la respuesta del asistente.
@@ -172,8 +191,7 @@ your responses allways in markdown.
                 finally:
                     self.is_processing = False
 
-
     def stop_response(self):
         self.stop_emit = True
 
-        
+

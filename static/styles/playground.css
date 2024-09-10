@@ -6,26 +6,25 @@
     src: url('/static/fonts/HelveticaNeueLight.otf') format('truetype');
 }
 :root {
-    --primary-color: #43D9AD;/**#000000;*/
-    --secondary-color: #E99287;/**#5c5c5c;*/
-    --primary-bg-color: #010d17;/**#010d17;*/
-    --secondary-bg-color: #011627;/**#fefff5;*/
+    --primary-color: #0191bd;/**#43D9AD;*/
+    --secondary-color: white;/**#E99287;*/
+    --primary-bg-color: #000000;/**#010d17;*/
+    --secondary-bg-color: #131212;/**#011627;*/
     --third-bg-color:#5565E8;
     --comment-color: #e83e8c;
     --footer-bg: #010d17 ;
     --neue-font:'HelveticaNeueLight', sans-serif;
-    --hf-font: 'Segoe UI', Tahoma, sans-serif; 
     }
-/**crawAAO*/
+
 body {
-    /*font-family: Arial, sans-serif;*/
-    font-family:var(--hf-font);
+    font-family:var(--neue-font);
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-   background-color: #011627 !important;
+   /*background-color: #011627 !important;*/
+   background-color:#131212;
 }
 a{
     color:var(--comment-color)
@@ -40,26 +39,34 @@ h1{
     flex-direction:row;
     max-height:calc(100vh);
 }
+.info{
+    color:green !important;
+
+}
+.pensamiento{
+    color:rgba(0, 255, 255, 0.637) !important;
+}
+.tool{
+    color:rgba(224, 224, 65, 0.644) !important;
+}
 #chat-sidebar{
     z-index:2;
+    max-width:40%;
     position:relative !important;
-    display: none;
+    display: flex;
     text-overflow: ellipsis;
     flex-direction: column;
     margin-right:10px;
-    min-width: 15% !important;
+    min-width: 35% !important;
     max-height: 100%; 
     height: auto; 
     background-color: #011627;
     border: 1px solid var(--secondary-color);
     border-radius: 5px;
-    text-align: center;
-    overflow-x: auto;
-    scrollbar-width: thin; 
-    scrollbar-color: transparent transparent; 
-    -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
-    -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
-    box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    text-align: left;
+    -webkit-box-shadow: 28px 18px 78px -3px rgba(135, 213, 233, 0.21);
+    -moz-box-shadow: 28px 18px 78px -3px rgba(135, 213, 233, 0.21);
+    box-shadow: 28px 18px 78px -3px rgba(135, 213, 233, 0.21);
 }
 iframe{
     border-radius: 10px;
@@ -78,6 +85,9 @@ iframe{
     text-overflow: ellipsis;
 }
 
+#header-chat-menu label{
+    color:#00000000
+}
 
 .load-history{
     width:100%;
@@ -103,7 +113,6 @@ iframe{
 #main-container{
     flex: 1;
     width:85%;
-   
     -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
     box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
@@ -139,20 +148,55 @@ iframe{
     text-align: center;
     width: 100%;
     top: 0;
-
     border:1px;
-
-
 } 
 
-#chat-container {
+#consola-container{
+    width:100%;
+    padding:0;
+}
+#outputConsole{
+    min-width:100% !important;
+    padding:10px !important;
+    justify-content: left;
+    font-size:0.9em;
+}
+#outputConsole pre{
+    white-space: pre-wrap; /* Para que el texto se ajuste automáticamente al contenedor */
+    overflow-wrap: break-word
+}
+#consola {
+    background-color:#131212;
+    width:100%;
+    overflow-y: auto; 
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent;
+    min-height:100%;
+    height:calc(100vh - 130px);
+    padding:0!important;
+}
 
-    max-width: 1280;
+#bar-console{
+    width:100%;
+    height:30px; 
+    background-color:grey;
+    margin-bottom:0;
+    padding-left:5px;
+    text-align: center;
+    position:sticky
+}
+#consola h4{
+    color:white;
+    width:100%;    
+}
+#chat-container {
+    border-right:1px solid var(--secondary-color);
+    border-left:1px solid var(--secondary-color) ;
+    max-width: 100%;
     height: calc(100vh - 172px);
     margin-top:0px !important;
-    margin-left:auto !important;
+    margin-left:0 !important;
     padding:50px;
-    padding-right:40px;
     position: relative;
     overflow-y: scroll; 
     scrollbar-width: thin; 
@@ -169,21 +213,19 @@ iframe{
 
 #footer {
     /**background-color:var(--footer-bg)**/
-    width:50%;
-    max-width:1280px;
-    border-top:1px solid grey;
-    margin-right: 25%;
+
     padding: 10px;
     bottom: 0;
-    left:auto;
+    left:0;
+    width: 100%;
     margin-top:5px;
-    margin-left:auto;
     display: flex;
     flex-direction: row;
-
+    border: 1px solid var(--secondary-color);
+    border-top: 0;
     border-radius:0 0 5px 5px;
     align-items: center;
-    background-color: #011627;
+    background-color: #01162700;
     justify-content: space-evenly;
     flex-wrap: nowrap;
 }
@@ -192,13 +234,11 @@ iframe{
 #footer input:focus {
     outline: none !important;
     border: 1px solid var(--secondary-color) !important; 
-
 }
 
 #footer input {
     background-color:    var(--secondary-bg-color);
     color: var(--secondary-color);
-  
 }
 
 .user-message-container {
@@ -217,17 +257,17 @@ iframe{
 }
 
 #clear-context-button{
-    color:var(--primary-color);
+    color:var(--secondary-color);
     background-color:var(--primary-bg-color);
-    border-color:var(--primary-color);
+    border:3px solid var(--secondary-color);
     font-weight: bold;
     min-width:50%;
 
 }
 
 #clear-context-button:hover{
-    color:var(--primary-bg-color);
-    background-color: var(--primary-color);
+    color:var(--primary-color);
+    background-color: var(--secondary-color);
 
 }
 
@@ -604,12 +644,15 @@ margin-left:5px;
     #conversations-list {
         overflow-y:scroll;
         background-color: #00101c99;
-     
     }
 
     #header-caht-menu{
         display:block !important;
   
+    }
+
+    #tokens{
+        display:none;
     }
     #config-sidebar,
     #chat-sidebar {
@@ -645,8 +688,6 @@ margin-left:5px;
     #chat-container {
         margin-left: 0px; 
         padding:10px;
-        
-       
     }
     #model-form button {
         font-size: 12px; 
@@ -668,6 +709,7 @@ margin-left:5px;
         align-items: center; 
         
     }
+
     #send-button{   
         padding:1px;
         border:1px solid var(--secondary-color);

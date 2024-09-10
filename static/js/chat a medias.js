@@ -6,17 +6,14 @@ class Chat {
         this.socket.on('connect', () => this.onConnect());
         this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
-        this.socket.on('output_console', (response) => this.consoleOutputResponse(response));
         this.currentResponse = '';
-        this.library ='llama';
-        this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español';
+        this.systemMessage = 'Lo primero que debes hacer es determinar tu tarea principal y si necesitas usar una herramienta para realizar la tarea.Si necesitas una herramienta selecciona la herramienta correcta de la lista para la tarea y responde con este formato: "[Funcion: \'buscar_en_internet\', query: \'[lo que necesites buscar]\']\" ese es un ejemplo si deseas usar el buscador.\"[Funcion: \'abrir_archivo\', query: \'[ruta_al_archivo]\']\" ejemplo para abrir archivo del sistema. Si la pregunta no requiere informacion actualizada o uso de herramientas responde con normalidad.Lista de Herramientas:[acceso a busquedas en internet:USO: [Funcion: \'buscar_en_internet\', query: \'[lo que necesites buscar]\']],[acceso a ficheros del sistema: USO: [Funcion: \'abrir_archivo\', query: \'[ruta_al_archivo]\']] Siempre que te soliciten informacion actualizada debes usar la herramienta y query mas adecuadas para la tarea con el formato de uso. Siempre sigue estas normas. tu trabajo depende de ello. RESPONDE EN FORMATO MARKDOWN Lista las fuentes con formato de enlace markdown';
         this.n_responses = 0;
         this.popupCount = 0;
         this.fullResponse = '';
         this.totalTokens = 0;
         this.totalTokensResponse =0;
         this.conversationStarted = false;
-        this.memory=true;
         this.chatId = ' ';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
@@ -33,34 +30,23 @@ class Chat {
         $('#stop-button').hide();
     }
 
-    consoleOutputResponse(response){
-        var divConsole = $('#consola');
-        var role = response.role;
-        var divRespuesta = $('<div id="outputConsole" ><pre class='+role+'>'+response.content+'</pre></div>');
-        if (role === 'info')
-            divRespuesta = $('<div id="outputConsole" ><pre class='+role+'>ialab-suite@agent:~$ '+response.content+'</pre></div>');
-        divConsole.append(divRespuesta);
-        
-        this.scrollToBottom(divConsole[0]);
-    }
-
     assistantResponse(response) {
         this.onAssistantResponse(response);
 
     }
 
+
     onAssistantResponse(response) {
         var delta = '';
         var choiceDelta =''
-        
         if (this.library === 'ollama'){
             const responseData = response;
             delta = responseData.content;
-            console.log(response);
+            console.log(response)
             this.fullResponse += delta; // Agregar a fullResponse
             const totalUserTokens = responseData.total_user_tokens;  // Obtener el número total de tokens del usuario
             const totalAssistantTokens = responseData.total_assistant_tokens; 
-            this.totalTokensResponse = totalUserTokens + totalAssistantTokens;
+            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
             console.log("Contenido de la elección:", delta);
             console.log("Tokens del usuario : ", totalUserTokens);
             console.log("Tokens Respuesta: ", totalAssistantTokens);
@@ -78,7 +64,7 @@ class Chat {
             const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
             const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
             const totalAssistantTokens = response.total_assistant_tokens; 
-            this.totalTokensResponse = totalUserTokens + totalAssistantTokens;
+            this.totalTokensResponse = totalUserTokens + totalAssistantTokens
             console.log("ID de la respuesta:", responseId);
             console.log("Modelo utilizado:", responseModel);
             console.log("Creación:", responseCreated);
@@ -88,14 +74,15 @@ class Chat {
             console.log("Razón de finalización:", choiceFinishReason);
             console.log("Tokens del usuario : ", totalUserTokens);
             console.log("Tokens Respuesta: ", totalAssistantTokens);
+   
         }
+
         $('#stop-button').show();
         $('#send-button').prop('disabled', true);
         $('#send-button').hide();
         var responseModel = this.library === 'ollama' ? delta : choiceDelta;
         this.handleAssistantResponse(responseModel);
-        var chatContainer = $('#chat-container')[0];
-        this.scrollToBottom(chatContainer);
+        this.scrollToBottom();
         /*console.log('Tokens received 🧠');**/
         
     }
@@ -103,7 +90,7 @@ class Chat {
         $.ajax({
             type: 'POST',
             url: '/actualizar_historial', // Endpoint para actualizar el historial
-            data: JSON.stringify({ nombre_chat: chatId, historial: content }), // Convertir a JSON
+            data: JSON.stringify({ nombre_chat: chatId.replace(/\.json$/, ''), historial: content }), // Convertir a JSON
             contentType: 'application/json', // Asegura que el servidor entienda que es JSON
             success: function (data) {
                 
@@ -114,9 +101,26 @@ class Chat {
         });
     }
 
+    deleteHistory(nombreChat){
+        var nombreChat = nombreChat.trim().replace(/\.json$/,'');     
+        $.ajax({
+            url: `/eliminar_historial?nombre_chat=${nombreChat}`,
+            type: 'DELETE',
+            success: function(result) {
+                console.log(`Historial ${nombreChat} eliminado exitosamente.`);
+            },
+            error: function(xhr, status, error) {
+                console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
+            }
+        });
     
+    }
+
     loadHistory(nombre_chat) {
         nombre_chat = String(nombre_chat);
+    
+        this.chatId = nombre_chat.trim().replace(/\.json$/, '');
+   
         const self = this;
         $.ajax({
             type: 'GET',
@@ -127,89 +131,59 @@ class Chat {
                 if (data && Array.isArray(data)) {
                     self.conversationHistory = data; // Asigna los datos recuperados a conversationHistory
                     console.log('Historial cargado exitosamente:', self.conversationHistory);
-                    self.chatId=nombre_chat;
                 } else {
                     console.error('Error: No se pudieron recuperar datos válidos del historial.');
                 }
                 self.loadMessages();
             },
             error: function (error) {
-                self.showPopup('Error cargando historial','error');
+                self.showPopup('Error cargando historial','error')
                 console.error('Error al cargar el historial:', error); // Imprime el mensaje de error en la consola
             }
         });
+
     }
 
 
+
+
     loadMessages(){
+        const self = this;
         $('#chat-list').empty();
+        var j = 1 ; 
         // Suponiendo que this.chatHistory contiene los mensajes
         for (var i = 0; i < this.conversationHistory.length; i++) {
+           
             var messageData = this.conversationHistory[i];
-            var sanitizedUserMessage = messageData.role === 'user' ? sanitizeMessage(messageData.content) : messageData.content;
             const converter = new showdown.Converter();
-            messageData.content = converter.makeHtml(messageData.content);
+            var sanitizedUserMessage = messageData.role === 'user' ? self.escapeHtml(messageData.content) : converter.makeHtml(messageData.content);
+           
+   
             if (messageData.role === 'user') {
-                var message = $('<div class="user-message-container-' + i +
-                                ' user-message-container"><label for="chat-user-' + i +
-                                '">User</label><div id="chat-user-' + i +
-                                '" class="user-message user-message-' + i + '">' +
+                var message = $('<div class="user-message-container-' + j +
+                                ' user-message-container"><label for="chat-user-' + j +
+                                '">User</label><div id="chat-user-' + j +
+                                '" class="user-message user-message-' + j + '">' +
                                 sanitizedUserMessage + '</div></div>');
                 $('#chat-list').append(message);
+               
+              
             } else if (messageData.role === 'assistant') {
-                var divAssistant = $('<div class="assistant-message-container-' + i +
-                                    ' assistant-message-container"><label for="chat-assistant-' + i +
-                                    '">Assistant<br></label><div id="chat-assistant-' + i +
+                var divAssistant = $('<div class="assistant-message-container-' + j +
+                                    ' assistant-message-container"><label for="chat-assistant-' + j +
+                                    '">Assistant<br></label><div id="chat-assistant-' + j +
                                     '" class="assistant-message">' + messageData.content + '</div></div>');
                 $('#chat-list').append(divAssistant);
+                j++;
                 divAssistant.find('pre code').each(function(i, block) {
                     Prism.highlightElement(block);
                 });
             }
-    }
-
-        
-function sanitizeMessage(message) {
-    return $('<div>').text(message).html();
-}
-    }
-
-    deleteHistory(nombreChat){
-        const self = this; 
-        $.ajax({
-            url: `/eliminar_historial?nombre_chat=${nombreChat}`,
-            type: 'DELETE',
-            success: function(result) {
-                console.log(`Historial ${nombreChat} eliminado exitosamente.`);
-                self.removeFromConversationList(nombreChat);
-
-            },
-            error: function(xhr, status, error) {
-                console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
-            }
-        });
-    
-    }
-
-    
-    removeFromConversationList(chatId) {
-        // Eliminar el elemento de la lista de conversaciones
-        const conversationListDiv = $('#conversations-list');
-        const elementToRemove = $('#' + chatId);
-
-        if (elementToRemove.length) {
-            elementToRemove.remove();
-        } else {
-            // Intentar encontrar el elemento con un selector que coincida con el formato de ID
-            const formattedIdSelector = '.load-history[id^="' + chatId + '"]';
-            const elementToRemoveFormatted = $(formattedIdSelector);
-            if (elementToRemoveFormatted.length) {
-                elementToRemoveFormatted.remove();
-            } else {
-                console.error(`Element with ID ${chatId} not found in conversation list.`);
-            }
+     
         }
+        this.n_responses = j-1;
     }
+
     handleAssistantResponse(response) {
         response = response.replace(/<0x0A>/g, '\n');
     
@@ -261,7 +235,7 @@ function sanitizeMessage(message) {
         this.chatId=' ';
         var label = document.getElementById('tokens');
         label.textContent = ' ' + this.totalTokens + ' Tokens';
-        this.conversationHistory = [{'role':'system', 'content' : this.systemMessage}];
+        this.conversationHistory = [{'role':'system', 'content' : this.systemMessage}]
         $('#key-container').empty();
         let str = 'Chat emptied! 🗑️';
         this.showPopup(str);
@@ -269,7 +243,7 @@ function sanitizeMessage(message) {
     }
 
     actualizarTokens(){
-        this.totalTokens += this.totalTokensResponse;
+        this.totalTokens += this.totalTokensResponse
         this.totalTokensResponse = 0;
         var label = document.getElementById('tokens');
         label.textContent = ' ' + this.totalTokens + ' Tokens';
@@ -277,79 +251,36 @@ function sanitizeMessage(message) {
 
     sendMessage() {
         if (!this.conversationStarted){
+         
             this.conversationStarted= true;
             this.currentResponse = ' ';
             this.n_responses += 1;
             var userMessage = $('#user-input').val(); // Obtener el valor del input
-            var userMessageTrimed = userMessage.substring(0, 35).trim(); // Usando substring
+            var userMessageTrimed = userMessage.substring(0, 35); // Usando substring
             var currentDate = new Date(); // Obtener la fecha y hora actual
-            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate()+'.'+currentDate.getHours()+'.'+currentDate.getMinutes()+'.'+currentDate.getSeconds(); 
+            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate(); 
             var messageWithDateTime =   formattedDateTime + '-'  + userMessageTrimed; // Agregar la fecha y hora al mensaje
             if (this.chatId ===' '){
-                this.chatId = messageWithDateTime.replace(' ','_');
+                this.chatId = messageWithDateTime;
 
             }
-            var url = this.library === 'ollama' ? 'v1/chat/completions' : '/user_input';
+        
             var sanitizedUserMessage = this.escapeHtml(userMessage);
-            if(this.memory){
-                this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
-            }
-            else{
-                var mensajeSistema = ""+
-                "Funciones disponibles: "+
-                "[Funcion: \'buscar_en_internet\' , query: \'url_o_consulta\' ]"+
-                "[Funcion: \'cripto_price\' , query: \'zilliqa,ethereum,\'"+
-                "[Funcion: \'video_search_tool\' , query: \'consulta\']"+
-                "Necesitas utilizar alguna para responder?"+ 
-                "responde con la herramienta a lanzar, ejemplo:"+
-                "supongamos que necesitas buscar el tiempo en internet , contestas:"+ 
-                "[Funcion: \'buscar_en_internet , query: \'tiempo proximos dias\' ]"+
-                "Puedes usar mas de una funcion. Responde solo con las funciones que usaras en el formato adecuado entre [], sin texto antes ni despues de los corchetes";
-                this.conversationHistory = [{'role':'system', 'content' : mensajeSistema}];
-                if(this.conversationHistory.length - 1 > 0){
-                    var mensajeAsistente = this.conversationHistory[this.conversationHistory.length - 1];
-                    this.conversationHistory.push(mensajeAsistente);
-                }
-                if(this.conversationHistory.length - 2 > 0 ){
-                    var mensajeUsuario = this.conversationHistory[this.conversationHistory.length -2];
-                    this.conversationHistory.push(mensajeUsuario);
-                }
-             
-                this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
-            }
+            this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage})
             const self = this;
-            self.conversationHistory[self.conversationHistory.length -1]['content'];/*+=". Puedes usar mas de una herramienta. Pero debe estar en la lista de herramientas."*/;
             $.ajax({
                 type: 'POST',
-                url: url,
-                data: JSON.stringify({ content: self.conversationHistory}), // Convertir a JSON
-                contentType: 'application/json', // Asegura que el servidor entienda que es JSON
+                url: '/user_input',
+                data: JSON.stringify({ content: self.conversationHistory }), 
+                contentType: 'application/json', 
                 success: function (data) {
                     $('#stop-button').hide();
                     $('#send-button').show();
                     $('#send-button').prop('disabled', false);
                     self.addToConversationHistory(); // Agregar la respuesta completa al historial
                     self.actualizarTokens();
-                   
-                    var conversationListDiv = $('#conversations-list');
-                    var buttonExists = false;
-                    $('.load-history').each(function() {
-                        console.log($(this).text())
-                        if ($(this).text() === '❌'+self.chatId) {
-                            
-                            buttonExists = true;
-                            return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
-                        }
-                    });
-                    console.log("Valor de self.chatId:", self.chatId);
-                    console.log("Número de botones existentes:", $('.load-history').length);
-                    var conversationListDiv = $('#conversations-list');
-                    var newChatHistory ='';
-                    if(!buttonExists) {
-                      newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button  onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
-                      conversationListDiv.prepend(newChatHistory);
-                    }
                     self.guardarHistorial(self.chatId , self.conversationHistory);
+                    self.addRegisterToChatList();
                     self.showPopup(data);
                     console.log(data);
                     self.conversationStarted = false;
@@ -369,7 +300,6 @@ function sanitizeMessage(message) {
                             '" class="user-message user-message-' + this.n_responses + '">' + 
                             sanitizedUserMessage + '</div></div>');
             var chatList = $('#chat-list');
-        
             chatList.append(message);
           
             var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + 
@@ -381,22 +311,34 @@ function sanitizeMessage(message) {
             var shareButton = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
             var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
             userMessageCointainer.append(shareButton);
-            var chatContainer = $('#chat-container')[0];
-            this.scrollToBottom(chatContainer);
+            this.scrollToBottom();
             
         }
     }
-
-    // Método para agregar la respuesta completa al historial de conversación
-    addToConversationHistory() {
-        if (this.memory){
-            // Agregar la respuesta completa al historial de conversación
-            this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
-            
-            // Reiniciar la respuesta completa para futuras conversaciones
-            this.fullResponse = '';
+    addRegisterToChatList(){
+        const self = this; 
+        var conversationListDiv = $('#button-list');
+        var buttonExists = false;
+        $('.load-history').each(function() {
+            var text = $(this).text();
+            text = text.trim().replace(/\.json$/, ''); 
+            console.log( 'TEXTO: '+ text +  ' - ID:' + self.chatId)
+            if (text === '📪 ' + self.chatId) {
+                buttonExists = true;
+                return false; 
+            }
+        });
+        if (!buttonExists) {
+            var conversationListDiv = $('#button-list');
+            var idchat = self.chatId.trim().replace(/\.json$/, '');
+            const newChatHistory = $("<div class='load-history'><button height='1em' width='1em' onclick=deleteHistory('"+idchat+"')>❌</button><button  onclick=chat.loadHistory('"+self.chatId+"')>📪 "+idchat+"</button><div>");
+            conversationListDiv.prepend(newChatHistory);
+        }
     }
-}
+    addToConversationHistory() {
+        this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
+        this.fullResponse = '';
+    }
 
     newChat() {
         this.clearChat();
@@ -406,7 +348,6 @@ function sanitizeMessage(message) {
         var selectedModel = $('#model-select').val();
         var selectedFormat = $('#format-select').val();
         var systemMessage = $('#system-message').val();
-        this.systemMessage = systemMessage;
         var gpuLayers = $('#gpu-layers').val();
         var temperature = $('#temperature').val();
         var n_ctx = $('#context').val();
@@ -425,7 +366,7 @@ function sanitizeMessage(message) {
             },
             success: function (data) {
                 self.showPopup('Model loaded successfully');
-                self.newChat();
+                self.newChat()
                 console.log(data);
             },
             error: function (error) {
@@ -470,9 +411,9 @@ function sanitizeMessage(message) {
         });
     }
 //** UTILS */
-    scrollToBottom(id) {
+    scrollToBottom() {
         var chatContainer = $('#chat-container')[0];
-        id.scrollTop = id.scrollHeight;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
     copyToClipboard(button) {
@@ -513,10 +454,13 @@ function sanitizeMessage(message) {
             } 
             else{
                 sidebar.style.display = 'none';
+             
+         
             }
             
         }
     }
+    
     escapeHtml(text) {
         var map = {
             '&': '&amp;',

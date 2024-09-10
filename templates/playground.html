@@ -1,0 +1,97 @@
+<!-- @Author: Borja Otero Ferreira -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IALab Suite | @FerreDev </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/playground.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/HelveticaNeueLight.otf') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/driver.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/prism.css') }}">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script> 
+    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>   
+    <script src="{{ url_for('static', filename='js/driver.js') }}"></script>  
+    <script src="{{ url_for('static', filename='js/showdown.min.js') }}"></script>  
+</head>
+<body>
+<div id="container">
+    <div id="chat-sidebar">
+        <div id="header-chat-menu">
+            <button class="btn btn-secondary" id="clear-context-button" onclick="chat.newChat()">New chat 🧠</button>
+        </div>
+        <div id="consola-container">
+            <div id="bar-console">
+                <h4>ialab-suite@agent:~</h4>
+            </div>
+            <div id="consola">
+            <div id="outputConsole" class="info"><pre class="info">ialab-suite@agent:~$ echo 'this is the output'</pre></div>
+            </div>
+        </div>
+    </div>
+    <div id="main-container">
+        <div id="header">
+            <h5>CORTEX PLAYGROUND</h5>
+            <label >Context used:</label><label id="tokens">0 Tokens</label>
+        </div>
+        <div id="chat-container" class="container mt-4">
+            <div id="chat-list"></div>
+        </div>
+        <div id="footer" >
+            <button  id="start-tour-button" onclick="chat.toggleSidebar('chat-sidebar')">&nbsp;🪲&nbsp;</button>
+            <div class="form-group" style="position: relative;">
+                <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
+                <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
+                <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
+            </div>
+            <button id="toggle-config-button" onclick="chat.toggleSidebar('config-sidebar')">&nbsp;⚙️&nbsp;</button>
+        </div>
+    </div>
+    <div id="config-sidebar">
+        <h5>Model configuration</h5>
+        <div class="form-group">
+            <label for="model-select">Model:</label>
+            <select class="form-control" id="model-select" name="models" required>
+                {% for model_path in models_list %}
+                    <option value="{{ model_path }}">{{ model_path }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="format-select">Chat format:</label>
+            <select class="form-control" id="format-select" name="formats" required>
+                {% for format in format_list %}
+                    <option value="{{ format }}">{{ format }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="temperature">Temperature:</label>
+            <input type="number" id="temperature" class="form-control" step="0.01" min="0.00" max="1.00" placeholder="Example: 0.8">
+        </div>
+        <div class="form-group">
+            <label for="context">Max. context:</label>
+            <input type="number" id="context" class="form-control" placeholder="Example: 2048">
+        </div>
+        <div class="form-group">
+            <label for="system-message">System message:</label>
+            <textarea class="form-control" id="system-message" rows="3" placeholder="Example: You are a assistant with a friendly and honest personality. As an expert programmer and pentester, you should examine the details provided to ensure that they are usable.
+            If you don't know the answer to a question, don't share false information.Don't deviate from the question"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="gpu-layers">GPU layers:</label>
+            <input type="number" id="gpu-layers" class="form-control" placeholder="Example: 8">
+        </div>
+        <button type="button" class="btn btn-primary" id="apply" onclick="chat.applyConfig()">Apply configuration</button>
+        <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    const chat = new Chat();
+</script>

@@ -1,12 +1,17 @@
 //@author: Borja Otero Ferreira
 class Chat {
     constructor() {
+        this.tools= false;
+        this.rag =  false;
+        const checkbox = document.getElementById('checkbox-3');
+        const checkboxrag = document.getElementById("checkbox-4");
         const textarea = document.getElementById('user-input');
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
         this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
         this.socket.on('output_console', (response) => this.consoleOutputResponse(response));
+        this.socket.on('utilidades', (response) => this.cargarUtiles(response));
         this.currentResponse = '';
         this.library ='llama';
         this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español';
@@ -26,8 +31,46 @@ class Chat {
                                                             this.sendMessage();
                                                             }
                                                     });
-    }
+
+      
+        // Agregar evento change al checkbox
+        checkbox.addEventListener('change', () => {
+            // Actualizar this.memory según el estado del checkbox
+           
+            this.tools = checkbox.checked;
+        });
+        checkboxrag.addEventListener('change', () => {
+            // Actualizar this.memory según el estado del checkbox
+           
+            this.rag = checkboxrag.checked;
+        });
+       }                                             
+    
 /** METHODS */
+
+cargarUtiles(response) {
+    // Obtener el div donde se cargarán los resultados
+    var divResultados = document.getElementById('resultados'+ this.n_responses);
+  
+
+    // Recorrer la lista de IDs de video recibidos
+    response.ids.forEach(function(id) {
+        // Crear un elemento iframe para cada ID de video
+        var iframe = document.createElement('iframe');
+        iframe.width = "64px";
+        iframe.height = "32px";
+        iframe.src = "https://www.youtube.com/embed/" + id;
+        iframe.frameborder = "0";
+        iframe.allow = "encrypted-media; picture-in-picture";
+        iframe.allowfullscreen = true;
+
+        // Agregar el iframe al div
+        divResultados.appendChild(iframe);
+    });
+}
+
+
+
     onConnect() {
         console.log('Connected! ✅');
         $('#stop-button').hide();
@@ -291,38 +334,14 @@ function sanitizeMessage(message) {
             }
             var url = this.library === 'ollama' ? 'v1/chat/completions' : '/user_input';
             var sanitizedUserMessage = this.escapeHtml(userMessage);
-            if(this.memory){
-                this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
-            }
-            else{
-                var mensajeSistema = ""+
-                "Funciones disponibles: "+
-                "[Funcion: \'buscar_en_internet\' , query: \'url_o_consulta\' ]"+
-                "[Funcion: \'cripto_price\' , query: \'zilliqa,ethereum,\'"+
-                "[Funcion: \'video_search_tool\' , query: \'consulta\']"+
-                "Necesitas utilizar alguna para responder?"+ 
-                "responde con la herramienta a lanzar, ejemplo:"+
-                "supongamos que necesitas buscar el tiempo en internet , contestas:"+ 
-                "[Funcion: \'buscar_en_internet , query: \'tiempo proximos dias\' ]"+
-                "Puedes usar mas de una funcion. Responde solo con las funciones que usaras en el formato adecuado entre [], sin texto antes ni despues de los corchetes";
-                this.conversationHistory = [{'role':'system', 'content' : mensajeSistema}];
-                if(this.conversationHistory.length - 1 > 0){
-                    var mensajeAsistente = this.conversationHistory[this.conversationHistory.length - 1];
-                    this.conversationHistory.push(mensajeAsistente);
-                }
-                if(this.conversationHistory.length - 2 > 0 ){
-                    var mensajeUsuario = this.conversationHistory[this.conversationHistory.length -2];
-                    this.conversationHistory.push(mensajeUsuario);
-                }
-             
-                this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
-            }
+            this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
+
             const self = this;
             self.conversationHistory[self.conversationHistory.length -1]['content'];/*+=". Puedes usar mas de una herramienta. Pero debe estar en la lista de herramientas."*/;
             $.ajax({
                 type: 'POST',
                 url: url,
-                data: JSON.stringify({ content: self.conversationHistory}), // Convertir a JSON
+                data: JSON.stringify({ content: self.conversationHistory, tools: this.tools, rag: this.rag}), // Convertir a JSON
                 contentType: 'application/json', // Asegura que el servidor entienda que es JSON
                 success: function (data) {
                     $('#stop-button').hide();
@@ -364,8 +383,7 @@ function sanitizeMessage(message) {
             $('#user-input').val('');
             $('#user-input').focus();
             var message = $('<div class="user-message-container-' + this.n_responses + 
-                            ' user-message-container"><label for="chat-user-' + this.n_responses + 
-                            '">User</label><div id="chat-user-' + this.n_responses + 
+                            ' user-message-container"><div id="chat-user-' + this.n_responses + 
                             '" class="user-message user-message-' + this.n_responses + '">' + 
                             sanitizedUserMessage + '</div></div>');
             var chatList = $('#chat-list');
@@ -373,9 +391,8 @@ function sanitizeMessage(message) {
             chatList.append(message);
           
             var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + 
-                                ' assistant-message-container"><label for="chat-assistant-' + this.n_responses + 
-                                '">Assistant<br></label><div id="chat-assistant-' + this.n_responses + 
-                                '" class="assistant-message"></div></div>');
+                                ' assistant-message-container"><div id="contenedor_respuesta"><div id="chat-assistant-' + this.n_responses + 
+                                '" class="assistant-message"></div><div id="resultados'+ this.n_responses+ '" class="resultados"></div></div></div>');
             chatList.append(divAssistant);
 
             var shareButton = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
@@ -389,13 +406,10 @@ function sanitizeMessage(message) {
 
     // Método para agregar la respuesta completa al historial de conversación
     addToConversationHistory() {
-        if (this.memory){
             // Agregar la respuesta completa al historial de conversación
             this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
-            
             // Reiniciar la respuesta completa para futuras conversaciones
             this.fullResponse = '';
-    }
 }
 
     newChat() {
