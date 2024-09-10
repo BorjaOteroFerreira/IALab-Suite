@@ -29,7 +29,7 @@ class IASuiteApi:
         self.app = Flask(__name__, static_url_path='/static')
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
-        self.default_model_path = "models/vision/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf"
+        self.default_model_path = "models/lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct-Q8_0.gguf"
         self.default_chat_format = "llama-3"
         self.assistant = None
         self.setup_routes()

@@ -2,7 +2,7 @@ import json
 import os
 import requests
 from langchain.tools import tool
-from pruebas.send_to_console import SendToConsole
+from send_to_console import SendToConsole
 from langchain_community.document_loaders.chromium import AsyncChromiumLoader  # Assuming Chromium is available
 from langchain.document_transformers.html2text import Html2TextTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
