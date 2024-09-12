@@ -135,6 +135,7 @@ sus respuestas siempre en rebajas.
     Funciones disponibles: 
     [Funcion: 'buscar_en_internet' , query: 'url_o_consulta' ]
     [Funcion: 'video_search_tool' , query: 'consulta']
+    [Funcion: 'cripto_price' , query: 'bitcoin,optimism']
     responde unicamente con la o las herramientas a lanzar, ejemplo: 
     supongamos que necesitas buscar el tiempo en internet , contestas: 
     [Funcion: 'buscar_en_internet' , query: 'tiempo proximos dias' ]
