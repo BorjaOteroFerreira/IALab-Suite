@@ -8,20 +8,19 @@ class Chat {
         const textarea = document.getElementById('user-input');
         this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
         this.socket.on('connect', () => this.onConnect());
-        this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
+        this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español';
+        this.conversationHistory = [{'role': 'system', 'content': this.systemMessage}];
         this.socket.on('assistant_response', (response) => this.assistantResponse(response));
         this.socket.on('output_console', (response) => this.consoleOutputResponse(response));
         this.socket.on('utilidades', (response) => this.cargarUtiles(response));
         this.currentResponse = '';
         this.library ='llama';
-        this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español';
         this.n_responses = 0;
         this.popupCount = 0;
         this.fullResponse = '';
         this.totalTokens = 0;
         this.totalTokensResponse =0;
         this.conversationStarted = false;
-        this.memory=true;
         this.chatId = ' ';
         this.adjustTextareaHeight();
         textarea.addEventListener('input', () => this.adjustTextareaHeight());  
@@ -32,27 +31,19 @@ class Chat {
                                                             }
                                                     });
 
-      
-        // Agregar evento change al checkbox
+        // Agregar evento change a los checkbox
         checkbox.addEventListener('change', () => {
-            // Actualizar this.memory según el estado del checkbox
-           
             this.tools = checkbox.checked;
         });
         checkboxrag.addEventListener('change', () => {
-            // Actualizar this.memory según el estado del checkbox
-           
             this.rag = checkboxrag.checked;
         });
        }                                             
     
 /** METHODS */
-
 cargarUtiles(response) {
     // Obtener el div donde se cargarán los resultados
     var divResultados = document.getElementById('resultados'+ this.n_responses);
-  
-
     // Recorrer la lista de IDs de video recibidos
     response.ids.forEach(function(id) {
         // Crear un elemento iframe para cada ID de video
@@ -63,13 +54,10 @@ cargarUtiles(response) {
         iframe.frameborder = "0";
         iframe.allow = "encrypted-media; picture-in-picture";
         iframe.allowfullscreen = true;
-
         // Agregar el iframe al div
         divResultados.appendChild(iframe);
     });
 }
-
-
 
     onConnect() {
         console.log('Connected! ✅');
@@ -83,19 +71,16 @@ cargarUtiles(response) {
         if (role === 'info')
             divRespuesta = $('<div id="outputConsole" ><pre class='+role+'>ialab-suite@agent:~$ '+response.content+'</pre></div>');
         divConsole.append(divRespuesta);
-        
         this.scrollToBottom(divConsole[0]);
     }
 
     assistantResponse(response) {
         this.onAssistantResponse(response);
-
     }
 
     onAssistantResponse(response) {
         var delta = '';
         var choiceDelta =''
-        
         if (this.library === 'ollama'){
             const responseData = response;
             delta = responseData.content;
@@ -157,7 +142,6 @@ cargarUtiles(response) {
         });
     }
 
-    
     loadHistory(nombre_chat) {
         nombre_chat = String(nombre_chat);
         const self = this;
@@ -182,7 +166,6 @@ cargarUtiles(response) {
             }
         });
     }
-
 
     loadMessages(){
         $('#chat-list').empty();
@@ -239,7 +222,6 @@ function sanitizeMessage(message) {
         // Eliminar el elemento de la lista de conversaciones
         const conversationListDiv = $('#conversations-list');
         const elementToRemove = $('#' + chatId);
-
         if (elementToRemove.length) {
             elementToRemove.remove();
         } else {
@@ -262,17 +244,14 @@ function sanitizeMessage(message) {
         } else {
             this.currentResponse += response;
         }
-        
         const converter = new showdown.Converter();
         this.response = converter.makeHtml(this.currentResponse);
     
         const tableRegex = /(?:\|.*(?:\|).*)+\|/gs;
         let htmlResponse = this.response.replace(tableRegex, (table) => {
             const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
-        
             // Filtrar las filas que contienen guiones
             const filteredRows = rows.filter(row => !row.some(cell => cell.includes('---')));
-        
             let htmlTable = '<table>';
             for (let i = 0; i < filteredRows.length; i++) {
                 htmlTable += '<tr>';
@@ -605,4 +584,5 @@ function sanitizeMessage(message) {
         textarea.style.height = '0';
         textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     }
-}
+}  
+    

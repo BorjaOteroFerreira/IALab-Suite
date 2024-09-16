@@ -50,10 +50,6 @@
             <label id="tools">RAG</label>
             <input type='checkbox' class='ios8-switch ios8-switch-lg' id='checkbox-4'>
             <label for='checkbox-4'></label>
-            
-            
-            
-       
             <div class="form-group" style="position: relative;">
                 <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
                 <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
@@ -62,8 +58,6 @@
             <button  id="start-tour-button" onclick="chat.toggleSidebar('chat-sidebar')">🧾</button>
             <button id="toggle-config-button" onclick="chat.toggleSidebar('config-sidebar')">&nbsp;⚙️&nbsp;</button>
             <button id="start-tour-button" onclick="toggleSidebar()">&nbsp;❔&nbsp;</button>
-
-            
         </div>
     </div>
     <div id="config-sidebar">
@@ -105,9 +99,7 @@
         <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
     </div>
 </div>
-
 </body>
-
 </html>
 <script>
     const chat = new Chat();
