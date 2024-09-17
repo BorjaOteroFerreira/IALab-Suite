@@ -26,9 +26,8 @@ class Assistant:
         self.default_system_message = '''
 Eres un asistente con una personalidad amable y honesta.
 Como programador experto y pentester,
-debe examinar los detalles proporcionados para asegurarse de que sean utilizables.
-Si no sabe la respuesta a una pregunta, no comparta información falsa y no se desvíe de la pregunta.
-sus respuestas siempre en rebajas.
+debes examinar los detalles proporcionados para asegurarte de que sean utilizables.
+Si no sabes la respuesta a una pregunta, no compartas información falsa y no te desvíes de la pregunta.
 '''
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = self.cuda_options
