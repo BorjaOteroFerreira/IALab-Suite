@@ -6,6 +6,8 @@ import threading
 import time
 from tools.search_tools import SearchTools
 from tools.video_search_tool import YoutubeVideoSearchTool
+from tools.cripto_price import CriptoPrice
+from tools.generate_image import ImageGenerationTool
 import os
 import pyttsx3
 from colorama import Fore, Style
@@ -26,19 +28,21 @@ class Cortex:
         self.response_queue = queue.Queue()
         self.tools = {
             'buscar_en_internet': SearchTools.search_internet,
-            'video_search_tool': YoutubeVideoSearchTool.run
+            'video_search_tool': YoutubeVideoSearchTool.run,
+            'cripto_price': CriptoPrice.get_price,
+            'generate_image': ImageGenerationTool.run
         }
 
         print(f'\n{Fore.BLUE}🧠 Razonando\n💭 {response}{Style.RESET_ALL}')
         print(f'PROMPT{self.prompt}')
-        self.detectar_necesidad_herramienta(response, model)
+        self._detectar_necesidad_herramienta(response, model)
 
-    def enviar_a_consola(self, mensaje, rol):
+    def _enviar_a_consola(self, mensaje, rol):
         self.socket.emit('output_console', {'content': mensaje, 'role': rol}, namespace='/test')
 
-    def detectar_necesidad_herramienta(self, response, model):
+    def _detectar_necesidad_herramienta(self, response, model):
         print('Detectar necesidad de herramienta')
-        self.enviar_a_consola(self.output_console, 'pensamiento')
+        self._enviar_a_consola(self.output_console, 'pensamiento')
 
         patrones_regex = [  r'herramienta\s*\'([^\']+)\'.*consulta\s*\'([^\']+)\'',
                             r"\[Funcion:\s*'([^']+)',\s*query:\s*'([^']+)'\]",
@@ -69,17 +73,14 @@ class Cortex:
                             r'función\s*\"([^"]+)\"\s+con\s+las\s+consultas\s+"([^"]+)"\s+y\s+"([^"]+)"',
                             r"\[Funcion '(\w+)' query='(.+?)'\]",
                             r"\[Funcion\s+'([^']+)'\s*,\s*query\s*=\s*'([^']+)' \]",
-                            r"\[Funcion\s+'([^']+)'\s*,\s*Query\s*=\s*'([^']+)' \]"
-
-                            
-                            
+                            r"\[Funcion\s+'([^']+)'\s*,\s*Query\s*=\s*'([^']+)' \]"        
 
 ]
 
-        coincidencias = self.extraer_coincidencias(response, patrones_regex)
-        self.usar_herramientas(coincidencias, model)
+        coincidencias = self._extraer_coincidencias(response, patrones_regex)
+        self._usar_herramientas(coincidencias, model)
 
-    def extraer_coincidencias(self, response, patrones_regex):
+    def _extraer_coincidencias(self, response, patrones_regex):
         coincidencias = set()
         herramientas_ejecutadas = set()
         for regex_pattern in patrones_regex:
@@ -92,14 +93,14 @@ class Cortex:
 
         return list(coincidencias)
 
-    def usar_herramientas(self, coincidencias, model):
-        addon = ''
+    def _usar_herramientas(self, coincidencias, model):
+        addon = 'No te olvides de incluir las imagenes en el formato proporcionado por la herramienta en tu respuesta.'
         for funcion_texto, query_texto in coincidencias:
             print("")
             funcion_texto = funcion_texto.replace("'", "")
             query_texto = query_texto.replace("'", "").split(',') if 'cripto_price' in funcion_texto else query_texto
             print(f'\n{Fore.GREEN}[->] Usando {funcion_texto} con consulta {query_texto}...{Style.RESET_ALL}')
-            self.enviar_a_consola(f'[->] Usando {funcion_texto} con consulta {query_texto}...', 'info')
+            self._enviar_a_consola(f'[->] Usando {funcion_texto} con consulta {query_texto}...', 'info')
 
             resultado_herramienta = self.ejecutar_herramienta(funcion_texto, query_texto)
             addon += resultado_herramienta
@@ -114,10 +115,18 @@ class Cortex:
             if nombre_herramienta == "video_search_tool":
                 resultado_herramienta, ids = self.tools[nombre_herramienta](consulta)
                 self.socket.emit('utilidades', {"ids": ids}, namespace='/test')
+            elif nombre_herramienta == "generate_image":
+                resultado_herramienta = self.tools[nombre_herramienta](consulta)
+                imagen = f"<img src='{resultado_herramienta}' width='590' height='345'>", 
+                clean_url = str(imagen).replace(",", "").replace("(", "").replace(")", "")
+
+                resultado_herramienta = f'Aqui tienes la imagen: {clean_url}, no acortes ni alteres la  url ni la etiqueta img. Incluyela en tu respuesta final sin texto adicional despues de la etiqueta'
+                self.socket.emit('assistant_response', {'content': resultado_herramienta}, namespace='/test')
+                print("Enviado")
             else:
                 resultado_herramienta = self.tools[nombre_herramienta](consulta)
             self.output_console = resultado_herramienta
-            self.enviar_a_consola(self.output_console, 'tool')
+            self._enviar_a_consola(self.output_console, 'tool')
             return resultado_herramienta
         except Exception as e:
             print(f'Error usando la herramienta {nombre_herramienta}: {e}')
@@ -125,13 +134,13 @@ class Cortex:
 
     def crear_response_final(self, addon, model):
         self.prompt[0]['content'] = self.original_prompt[0]['content']
-        herramientas = f'Utiliza esta información proporcionada por la herramienta, dale sentido, inserta los enlaces consultados: {addon}. Responde en completo español.'
+        herramientas = f'Utiliza esta información proporcionada por la herramienta, inserta los enlaces e imagenes en tu respuesta : {addon}. Responde en completo español.'
         self.prompt.append({"role": "assistant", "content": herramientas})
         self.generar_response(model)
 
     def generar_response(self, model):
         salida = '[>] Generando response informada...✍️'
-        self.enviar_a_consola(salida, 'info')
+        self._enviar_a_consola(salida, 'info')
         print(f'\n{Fore.GREEN}{salida}{Style.RESET_ALL}')
         response = self.transmitir_response(model, self.prompt)
         salida_final = f'\n{Fore.GREEN}✍️FINAL {response}{Style.RESET_ALL}\n\n{Fore.BLUE}¿Puedo ayudarte en algo más?{Style.RESET_ALL}\n'
@@ -185,6 +194,7 @@ class Cortex:
                 engine.runAndWait()  # Wait for each chunk to be spoken
         engine.stop()
         return True
+    
 
                 
 

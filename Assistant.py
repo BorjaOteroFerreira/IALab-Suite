@@ -14,8 +14,8 @@ class Assistant:
         self.model = None
         self.tools= False
         self.rag = False
-        self.max_context_tokens = 14000
-        self.max_assistant_tokens =2048
+        self.max_context_tokens = 4096
+        self.max_assistant_tokens = 2048
         self.is_processing = False
         self.chat_format = default_chat_format
         self.model_path = default_model_path
@@ -105,11 +105,11 @@ sus respuestas siempre en rebajas.
             try:
                 if self.tools :
                     user_input = self._instruccionesAdicionales(user_input)
-                for chunk in self.model.create_chat_completion(messages=user_input, max_tokens=self.max_assistant_tokens, stream=True):
+                for chunk in self.model.create_chat_completion(messages=user_input, max_tokens=max_assistant_tokens, stream=True):
                     if 'content' in chunk['choices'][0]['delta'] and not self.stop_emit:
                         response_chunk = chunk['choices'][0]['delta']['content']
                         response += response_chunk  
-                        total_assistant_tokens+=1 # Contar los tokens en el chunk actual
+                        total_assistant_tokens += 1 # Contar los tokens en el chunk actual
                         if not self.tools and not self.rag: 
                             socket.emit('assistant_response', {
                                 'content': chunk,
@@ -136,6 +136,7 @@ sus respuestas siempre en rebajas.
     [Funcion: 'buscar_en_internet' , query: 'url_o_consulta' ]
     [Funcion: 'video_search_tool' , query: 'consulta']
     [Funcion: 'cripto_price' , query: 'bitcoin,optimism']
+    [Funcion: 'generate_image' , query: 'prompt']
     responde unicamente con la o las herramientas a lanzar, ejemplo: 
     supongamos que necesitas buscar el tiempo en internet , contestas: 
     [Funcion: 'buscar_en_internet' , query: 'tiempo proximos dias' ]
