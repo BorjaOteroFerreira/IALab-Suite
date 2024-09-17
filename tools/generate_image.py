@@ -4,7 +4,11 @@ from typing import List
 from pydantic import BaseModel, Field
 from langchain.tools import tool
 from gradio_client import Client
-#os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
+from huggingface_hub import login
+
+# Reemplaza 'your_token' por tu token de Hugging Face
+login(token="huggingface_token")
+
 
 class ImageGenerationResult(BaseModel):
     file_path: str
@@ -46,8 +50,6 @@ class ImageGenerationTool:
         Returns:
             List[ImageGenerationResult]: Una lista con la URL del archivo generado y la semilla utilizada.
         """
-
-     
         try:
             # Crear el cliente de Gradio
             client = Client("black-forest-labs/FLUX.1-dev")
@@ -55,7 +57,7 @@ class ImageGenerationTool:
             result = client.predict(
                 prompt=prompt,
                 seed=seed,
-                randomize_seed=randomize_seed,
+                randomize_seed=randomize_seed, 
                 width=width,
                 height=height,
                 guidance_scale=guidance_scale,
@@ -65,16 +67,16 @@ class ImageGenerationTool:
 
             images_folder = "static/tools/generate_image"
             temp_file_path = result[0]
-            file_name = "image.webp"
+            file_name = f"{prompt}.webp"
             # Definir la ruta completa del archivo en la carpeta 'static/images'
             destination_path = os.path.join(images_folder, file_name)
-
             # Mover la imagen desde la carpeta temporal a 'static/images'
             shutil.move(temp_file_path, destination_path)
-
-            generated_seed = result[1]  # La semilla usada está en el segundo índice
             # Devolver la URL de la imagen generada y la semilla
-            return str(images_folder + "/" + file_name)
-            
+            imagen = f"<img src='static/tools/generate_image/{file_name}' width='590' height='345'>", 
+            respuesta = f'IMAGEN de {prompt} -> {imagen}, ES IMPORTANTISIMO QUE INCLUYAS LA ETIQUETA DE IMAGEN EN TU RESPUESTA RESPETANDO EL FORMATO,  sin texto adicional despues de la etiqueta y sin acortar ni alterar la url'
+            return str(respuesta)
         except Exception as e:
-            return str("/static/images/images.png")
+            print(e)
+            respuesta = f'IMAGEN de {prompt} : /static/tools/generate_image/pj.png, ES IMPORTANTISIMO QUE INCLUYAS LA ETIQUETA DE IMAGEN EN TU RESPUESTA RESPETANDO EL FORMATO,  sin texto adicional despues de la etiqueta y sin acortar ni alterar la url'
+            return respuesta

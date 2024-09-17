@@ -94,48 +94,35 @@ class Cortex:
         return list(coincidencias)
 
     def _usar_herramientas(self, coincidencias, model):
-        addon = 'No te olvides de incluir las imagenes en el formato proporcionado por la herramienta en tu respuesta.'
+        resultado_herramienta = ''
         for funcion_texto, query_texto in coincidencias:
             print("")
             funcion_texto = funcion_texto.replace("'", "")
             query_texto = query_texto.replace("'", "").split(',') if 'cripto_price' in funcion_texto else query_texto
             print(f'\n{Fore.GREEN}[->] Usando {funcion_texto} con consulta {query_texto}...{Style.RESET_ALL}')
             self._enviar_a_consola(f'[->] Usando {funcion_texto} con consulta {query_texto}...', 'info')
-
             resultado_herramienta = self.ejecutar_herramienta(funcion_texto, query_texto)
-            addon += resultado_herramienta
             print(f'{Fore.YELLOW}[!] Eureka!:{Style.RESET_ALL}\n{Fore.MAGENTA}{resultado_herramienta}{Style.RESET_ALL}')
-
-        self.crear_response_final(addon, model)
+        self.crear_response_final(resultado_herramienta, model)
        
 
     def ejecutar_herramienta(self, nombre_herramienta, consulta):
-        print("Herramienta", nombre_herramienta, consulta)
         try:
             if nombre_herramienta == "video_search_tool":
                 resultado_herramienta, ids = self.tools[nombre_herramienta](consulta)
                 self.socket.emit('utilidades', {"ids": ids}, namespace='/test')
-            elif nombre_herramienta == "generate_image":
-                resultado_herramienta = self.tools[nombre_herramienta](consulta)
-                imagen = f"<img src='{resultado_herramienta}' width='590' height='345'>", 
-                clean_url = str(imagen).replace(",", "").replace("(", "").replace(")", "")
-
-                resultado_herramienta = f'Aqui tienes la imagen: {clean_url}, no acortes ni alteres la  url ni la etiqueta img. Incluyela en tu respuesta final sin texto adicional despues de la etiqueta'
-                self.socket.emit('assistant_response', {'content': resultado_herramienta}, namespace='/test')
-                print("Enviado")
             else:
                 resultado_herramienta = self.tools[nombre_herramienta](consulta)
             self.output_console = resultado_herramienta
             self._enviar_a_consola(self.output_console, 'tool')
             return resultado_herramienta
         except Exception as e:
-            print(f'Error usando la herramienta {nombre_herramienta}: {e}')
-            return 'Ha habido un error, asegúrate de que has usado una herramienta existente y la sintaxis es correcta'
+            return f'Error usando la herramienta {nombre_herramienta}: {e}'
 
-    def crear_response_final(self, addon, model):
+    def crear_response_final(self, info_herramienta, model):
         self.prompt[0]['content'] = self.original_prompt[0]['content']
-        herramientas = f'Utiliza esta información proporcionada por la herramienta, inserta los enlaces e imagenes en tu respuesta : {addon}. Responde en completo español.'
-        self.prompt.append({"role": "assistant", "content": herramientas})
+        respuesta = f'Utiliza esta información proporcionada por la herramienta, inserta los enlaces e imagenes en tu respuesta : {info_herramienta}. Responde en completo español.'
+        self.prompt.append({"role": "assistant", "content": respuesta})
         self.generar_response(model)
 
     def generar_response(self, model):
