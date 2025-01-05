@@ -7,8 +7,6 @@ from gradio_client import Client
 from huggingface_hub import login
 
 
-
-
 class ImageGenerationResult(BaseModel):
     file_path: str
 
@@ -30,7 +28,7 @@ class ImageGenerationTool:
         width: int = 512,
         height: int = 512,
         guidance_scale: float = 3.5,
-        num_inference_steps: int = 28,
+        num_inference_steps: int = 18,
         randomize_seed: bool = True,
         seed: float = 0
     ) -> List[ImageGenerationResult]:
@@ -50,13 +48,11 @@ class ImageGenerationTool:
             List[ImageGenerationResult]: Una lista con la URL del archivo generado y la semilla utilizada.
         """
         try: 
-            login(token="huggingface_token", add_to_git_credential=True)
+            login(token="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", add_to_git_credential=True)
         except Exception as e:
             raise Exception("No se pudo iniciar sesión en Hugging Face Hub. Por favor, verifica tu token.", e)
         
         try:
-            # Reemplaza 'your_token' por tu token de Hugging Face
-
             # Crear el cliente de Gradio
             client = Client("black-forest-labs/FLUX.1-dev")
             # Realizar la predicción para generar la imagen
@@ -80,9 +76,8 @@ class ImageGenerationTool:
             shutil.move(temp_file_path, destination_path)
             # Devolver la URL de la imagen generada
             imagen = f"<img src='static/tools/generate_image/{file_name}' width='590' height='345'>", 
-            respuesta = f'IMAGEN de {prompt} -> {imagen}, ES IMPORTANTISIMO QUE RESPONDAS SOLO CON LA ETIQUETA DE IMAGEN EN TU RESPUESTA RESPETANDO EL FORMATO,  sin texto adicional despues de la etiqueta y sin acortar ni alterar la url'
+            respuesta = f'IMAGEN de {prompt} -> {imagen}, ES IMPORTANTISIMO QUE RESPONDAS SOLO CON LA ETIQUETA DE IMAGEN EN TU RESPUESTA RESPETANDO EL FORMATO,  sin texto adicional despues de la etiqueta. NO ALTERES LA URL'
             return str(respuesta)
         except Exception as e:
             print(e)
-            respuesta = f"IMAGEN de {prompt} -> <img src='/static/tools/generate_image/pj.png' width='590' height='345'>, ES IMPORTANTISIMO QUE RESPONDAS SOLO CON LA ETIQUETA DE IMAGEN EN TU RESPUESTA RESPETANDO EL FORMATO,  sin texto adicional despues de la etiqueta. NO ALTERES LA URL"
-            return respuesta
+

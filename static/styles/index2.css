@@ -82,27 +82,63 @@ iframe{
     text-overflow: ellipsis;
 }
 
-.load-history{
-    width:100%;
-    padding:2px;
-    background-color: #00000000;
+/* Style for the load history button container */
+.load-history {
+    width: 100%;
+    padding: 2px;
+    background-color: transparent;
     color: var(--secondary-color);
     overflow: hidden;
-    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    white-space: nowrap;
     text-overflow: ellipsis;
-    margin-top:15px;
+    margin-top: 15px;
     text-align: left;
     font-weight: bold;
-    border:none;
-    font-size:0.85em;
+    border: none;
+    font-size: 0.85em;
+}
+
+/* Style for the actual button inside load-history */
+.load-history button {
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    color: var(--secondary-color);
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Hover effect */
+.load-history button:hover {
+    color:#191A1A !important;
+}
+
+/* Remove the btnLoadHistory class styles to avoid conflicts */
+.btnLoadHistory {
+    background-color: transparent !important;
+    color: var(--secondary-color) !important;
+    border: none !important;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Focus state - removes the outline but maintains accessibility */
+.load-history button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(233, 146, 135, 0.2);
+    color:#191A1A !important;
 }
 .load-history:hover{
-    color: var(--secondary-bg-color);
     border: 0px solid var(--secondary-color);
     border-radius: 5px;
     background-color:var(--secondary-color);
-}
 
+}
+.load-history:hover button{
+    color:#191A1A !important;
+}
 #main-container{
     flex: 1;
     width:100%;
@@ -729,6 +765,9 @@ margin-left:5px;
     .load-history{
         font-size:1em;
     }
+
+    
+
     .popup-container {
         position: absolute;
         width:300px;
@@ -748,9 +787,9 @@ margin-left:5px;
     #chat-container {
         margin-left: 0px; 
         padding:10px;
-        
-       
     }
+
+
     #model-form button {
         font-size: 12px; 
         padding: 5px 10px; 

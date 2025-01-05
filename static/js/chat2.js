@@ -316,7 +316,7 @@ function sanitizeMessage(message) {
             this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
 
             const self = this;
-            self.conversationHistory[self.conversationHistory.length -1]['content'];/*+=". Puedes usar mas de una herramienta. Pero debe estar en la lista de herramientas."*/;
+            self.conversationHistory[self.conversationHistory.length -1]['content'];;
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -344,7 +344,7 @@ function sanitizeMessage(message) {
                     var conversationListDiv = $('#conversations-list');
                     var newChatHistory ='';
                     if(!buttonExists) {
-                      newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button  onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
+                      newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button  height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button class='btnLoadHistory' onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
                       conversationListDiv.prepend(newChatHistory);
                     }
                     self.guardarHistorial(self.chatId , self.conversationHistory);

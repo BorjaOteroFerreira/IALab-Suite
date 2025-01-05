@@ -29,8 +29,8 @@ class IASuiteApi:
         self.app = Flask(__name__, static_url_path='/static')
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
-        self.default_model_path = "models/vision/Meta-Llama-3.1-8B-Instruct-Q8_0.gguf"
-        self.default_chat_format = "llama-3"
+        self.default_model_path = "models/matteogeniaccio/phi-4/phi-4-Q4_K_M.gguf"
+        self.default_chat_format = "chatml"
         self.assistant = None
         self.setup_routes()
 
@@ -87,6 +87,7 @@ class IASuiteApi:
         nombre_chat = nombre_chat.replace('/', '-')
         nombre_chat = nombre_chat.replace(':', '-')
         nombre_chat = nombre_chat.replace(' ', '_')
+        nombre_chat = nombre_chat.replace('?', '')
         #print(nombre_chat)
         historial = request.json.get('historial')
         ruta_archivo = os.path.join('chats', f'{nombre_chat}.json')
@@ -143,7 +144,7 @@ class IASuiteApi:
         temperature = float(request.form.get('temperature')) if request.form.get('temperature') != '' else 0.81
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
         self.assistant.unload_model()
-        self.assistant.load_model(selected_model,selected_format,temperature,n_gpu_layers,system_message,n_ctx,n_ctx)
+        self.assistant.load_model(selected_model, selected_format, temperature, n_gpu_layers, system_message,n_ctx, n_ctx)
         return f'''
                 \nModel:{selected_model}
                 \nformat: {selected_format}
@@ -189,6 +190,6 @@ class IASuiteApi:
     def stop_server(self):
         os.kill(os.getpid(), signal.SIGINT) 
         return 'Server shutting down...'
-    
 
+    
 

@@ -26,7 +26,7 @@
         </div>
         <div id = conversations-list>
             {% for chat_name in chat_list %}
-                <div class='load-history' id="{{ chat_name }}"><button height='1em' width='1em' onclick="chat.deleteHistory('{{ chat_name }}')">❌</button><button  onclick="chat.loadHistory('{{ chat_name }}')">{{ chat_name }}</button></div>
+                <div class='load-history' id="{{ chat_name }}"><button height='1em' width='1em' onclick="chat.deleteHistory('{{ chat_name }}')">❌</button><button class="btnLoadHistory"  onclick="chat.loadHistory('{{ chat_name }}')">{{ chat_name }}</button></div>
 
             {% endfor %}
         </div>
