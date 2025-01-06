@@ -73,7 +73,9 @@ class Cortex:
                             r'función\s*\"([^"]+)\"\s+con\s+las\s+consultas\s+"([^"]+)"\s+y\s+"([^"]+)"',
                             r"\[Funcion '(\w+)' query='(.+?)'\]",
                             r"\[Funcion\s+'([^']+)'\s*,\s*query\s*=\s*'([^']+)' \]",
-                            r"\[Funcion\s+'([^']+)'\s*,\s*Query\s*=\s*'([^']+)' \]"        
+                            r"\[Funcion\s+'([^']+)'\s*,\s*Query\s*=\s*'([^']+)' \]",   
+                            r"\[\s*Funcion:\s*'([^']+)',\s*query:\s*'([^']+)'\s*\]"
+     
 
 ]
 

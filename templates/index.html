@@ -26,7 +26,7 @@
         </div>
         <div id = conversations-list>
             {% for chat_name in chat_list %}
-                <div class='load-history' id="{{ chat_name }}"><button height='1em' width='1em' onclick="chat.deleteHistory('{{ chat_name }}')">❌</button><button  onclick="chat.loadHistory('{{ chat_name }}')">{{ chat_name }}</button></div>
+                <div class='load-history' id="{{ chat_name }}"><button height='1em' width='1em' onclick="chat.deleteHistory('{{ chat_name }}')">❌</button><button class="btnLoadHistory"  onclick="chat.loadHistory('{{ chat_name }}')">{{ chat_name }}</button></div>
 
             {% endfor %}
         </div>
@@ -34,7 +34,7 @@
     <div id="main-container">
 
         <div id="header">
-    
+         
             <label >Context used:</label><label id="tokens">0 Tokens</label>
          
         </div>
@@ -44,15 +44,20 @@
         </div>
     
         <div id="footer" >
-            <button id="start-tour-button" onclick="toggleSidebar()">&nbsp;❔&nbsp;</button>
-            <button  id="start-tour-button" onclick="chat.toggleSidebar('chat-sidebar')">&nbsp;🧾&nbsp;</button>
-       
+            <label id="tools">Tools</label>
+            <input type='checkbox' class='ios8-switch ios8-switch-lg' id='checkbox-3'>
+            <label for='checkbox-3'></label>
+            <label id="tools">RAG</label>
+            <input type='checkbox' class='ios8-switch ios8-switch-lg' id='checkbox-4'>
+            <label for='checkbox-4'></label>
             <div class="form-group" style="position: relative;">
                 <button  id="stop-button" onclick="chat.stopResponse()">Stop</button>
                 <textarea class="form-control" id="user-input" placeholder="Write your message"></textarea>
                 <button class="btn btn-primary" id="send-button" onclick="chat.sendMessage()">Send</button>
             </div>
+            <button  id="start-tour-button" onclick="chat.toggleSidebar('chat-sidebar')">🧾</button>
             <button id="toggle-config-button" onclick="chat.toggleSidebar('config-sidebar')">&nbsp;⚙️&nbsp;</button>
+            <button id="start-tour-button" onclick="toggleSidebar()">&nbsp;❔&nbsp;</button>
         </div>
     </div>
     <div id="config-sidebar">
@@ -94,9 +99,7 @@
         <button type="button" class="btn btn-secondary" id="unmount" onclick="chat.unloadModel()">Unmount</button>
     </div>
 </div>
-
 </body>
-
 </html>
 <script>
     const chat = new Chat();

@@ -80,7 +80,7 @@ class IASuiteApi:
         models_list = self.get_models_list("models")
         format_list = self.get_format_list()
         chat_list = self.get_chat_list()
-        return render_template('index2.html', models_list=models_list, format_list=format_list, chat_list=chat_list)
+        return render_template('index.html', models_list=models_list, format_list=format_list, chat_list=chat_list)
 
     def actualizar_historial(self):
         nombre_chat = request.json.get('nombre_chat')

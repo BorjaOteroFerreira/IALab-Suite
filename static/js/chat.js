@@ -1,594 +1,622 @@
-//@author: Borja Otero Ferreira
-class Chat {
+// Manejador de WebSocket
+class ManejadorWebSocket {
+    constructor(dominio, puerto, ruta) {
+        this.socket = io.connect(`http://${dominio}:${puerto}${ruta}`);
+        this.configurarEscuchadores();
+    }
+
+    configurarEscuchadores() {
+        this.socket.on('connect', () => this.alConectar());
+    }
+
+    alConectar() {
+        console.log('¡Conectado! ✅');
+    }
+}
+
+// Gestor de Interfaz de Usuario
+class GestorUI {
     constructor() {
-        const textarea = document.getElementById('user-input');
-        this.socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-        this.socket.on('connect', () => this.onConnect());
-        this.conversationHistory = [{'role': 'system', 'content': 'Eres un asistente en español'}];
-        this.socket.on('assistant_response', (response) => this.assistantResponse(response));
-        this.socket.on('output_console', (response) => this.consoleOutputResponse(response));
-        this.currentResponse = '';
-        this.library ='llama';
-        this.systemMessage = 'Eres un asistente en español. Debes responder siemrpe en español';
-        this.n_responses = 0;
-        this.popupCount = 0;
-        this.fullResponse = '';
-        this.totalTokens = 0;
-        this.totalTokensResponse =0;
-        this.conversationStarted = false;
-        this.memory=true;
-        this.chatId = ' ';
-        this.adjustTextareaHeight();
-        textarea.addEventListener('input', () => this.adjustTextareaHeight());  
-        textarea.addEventListener('keydown', (e) => {
-                                                        if (e.which === 13 && !e.shiftKey) {
-                                                            e.preventDefault();
-                                                            this.sendMessage();
-                                                            }
-                                                    });
-    }
-/** METHODS */
-    onConnect() {
-        console.log('Connected! ✅');
-        $('#stop-button').hide();
+        this.configurarEscuchadoresEventos();
     }
 
-    consoleOutputResponse(response){
-        var divConsole = $('#consola');
-        var role = response.role;
-        var divRespuesta = $('<div id="outputConsole" ><pre class='+role+'>'+response.content+'</pre></div>');
-        if (role === 'info')
-            divRespuesta = $('<div id="outputConsole" ><pre class='+role+'>ialab-suite@agent:~$ '+response.content+'</pre></div>');
-        divConsole.append(divRespuesta);
-        
-        this.scrollToBottom(divConsole[0]);
+    static mostrarNotificacion(mensaje, tipo = 'info') {
+        let contenedor = this.obtenerOCrearContenedorNotificaciones();
+        const notificacion = this.crearElementoNotificacion(mensaje, tipo);
+        contenedor.appendChild(notificacion);
+        this.animarNotificacion(notificacion, contenedor);
     }
 
-    assistantResponse(response) {
-        this.onAssistantResponse(response);
-
-    }
-
-    onAssistantResponse(response) {
-        var delta = '';
-        var choiceDelta =''
-        
-        if (this.library === 'ollama'){
-            const responseData = response;
-            delta = responseData.content;
-            console.log(response);
-            this.fullResponse += delta; // Agregar a fullResponse
-            const totalUserTokens = responseData.total_user_tokens;  // Obtener el número total de tokens del usuario
-            const totalAssistantTokens = responseData.total_assistant_tokens; 
-            this.totalTokensResponse = totalUserTokens + totalAssistantTokens;
-            console.log("Contenido de la elección:", delta);
-            console.log("Tokens del usuario : ", totalUserTokens);
-            console.log("Tokens Respuesta: ", totalAssistantTokens);
-        }else{
-            const responseData = response.content["choices"][0];
-            const { id, model, created, object } = response.content;
-            const { index, delta, finish_reason } = responseData;
-            const responseId = id;
-            const responseModel = model;
-            const responseCreated = created;
-            const responseObject = object;
-            const choiceIndex = index;
-            choiceDelta = delta && Object.keys(delta).length !== 0 ? delta.content : ''; // Verificar si delta no está vacío
-            this.fullResponse += choiceDelta; // Agregar a fullResponse
-            const choiceFinishReason = finish_reason != null ? finish_reason : 'None';
-            const totalUserTokens = response.total_user_tokens;  // Obtener el número total de tokens del usuario
-            const totalAssistantTokens = response.total_assistant_tokens; 
-            this.totalTokensResponse = totalUserTokens + totalAssistantTokens;
-            console.log("ID de la respuesta:", responseId);
-            console.log("Modelo utilizado:", responseModel);
-            console.log("Creación:", responseCreated);
-            console.log("Objeto:", responseObject);
-            console.log("Índice de la elección:", choiceIndex);
-            console.log("Contenido de la elección:", choiceDelta);
-            console.log("Razón de finalización:", choiceFinishReason);
-            console.log("Tokens del usuario : ", totalUserTokens);
-            console.log("Tokens Respuesta: ", totalAssistantTokens);
+    static obtenerOCrearContenedorNotificaciones() {
+        let contenedor = document.getElementById('notification-container');
+        if (!contenedor) {
+            contenedor = document.createElement('div');
+            contenedor.id = 'notification-container';
+            contenedor.className = 'popup-container';
+            contenedor.style.left = '20px';
+            contenedor.style.bottom = '20px';
+            document.body.appendChild(contenedor);
         }
-        $('#stop-button').show();
-        $('#send-button').prop('disabled', true);
-        $('#send-button').hide();
-        var responseModel = this.library === 'ollama' ? delta : choiceDelta;
-        this.handleAssistantResponse(responseModel);
-        var chatContainer = $('#chat-container')[0];
-        this.scrollToBottom(chatContainer);
-        /*console.log('Tokens received 🧠');**/
-        
+        return contenedor;
     }
-    guardarHistorial(chatId, content) {
+
+    static crearElementoNotificacion(mensaje, tipo) {
+        const notificacion = document.createElement('div');
+        notificacion.className = 'popup-notification';
+        if (tipo === 'error') notificacion.classList.add('popup-error');
+        notificacion.textContent = mensaje;
+        return notificacion;
+    }
+
+    static animarNotificacion(notificacion, contenedor) {
+        setTimeout(() => {
+            notificacion.style.opacity = 1;
+            setTimeout(() => {
+                notificacion.style.opacity = 0;
+                setTimeout(() => {
+                    contenedor.removeChild(notificacion);
+                    if (contenedor.childNodes.length === 0) {
+                        document.body.removeChild(contenedor);
+                    }
+                }, 500);
+            }, 5500);
+        }, 100);
+    }
+
+    static desplazarAlFinal(elemento) {
+        elemento.scrollTop = elemento.scrollHeight;
+    }
+
+    static ajustarAlturaTextarea(textarea) {
+        const alturaLinea = parseFloat(getComputedStyle(textarea).lineHeight);
+        const maxLineas = 20;
+        const alturaMaxima = maxLineas * alturaLinea;
+        textarea.style.height = '0';
+        textarea.style.height = `${Math.min(textarea.scrollHeight, alturaMaxima)}px`;
+    }
+
+    configurarEscuchadoresEventos() {
+        const textarea = document.getElementById('user-input');
+        textarea.addEventListener('input', () => GestorUI.ajustarAlturaTextarea(textarea));
+    }
+
+    static alternarBarraLateral(elemento) {
+        const barra = document.getElementById(elemento);
+        const mediaQuerysActivas = window.matchMedia("(max-width: 1023px)").matches || 
+                                 window.matchMedia("(max-height: 740px)").matches;
+
+        if (!mediaQuerysActivas) {
+            if (barra.style.display === 'none' || barra.style.display === '') {
+                barra.style.display = 'flex';
+                barra.style.width = '15%';
+            } else {
+                barra.style.display = 'none';
+            }
+        } else {
+            if (barra.style.display === 'none' || barra.style.display === '') {
+                barra.style.display = 'block';
+                barra.style.width = '100%';
+            } else {
+                barra.style.display = 'none';
+            }
+        }
+    }
+}
+
+// Gestor de Conversaciones
+class GestorConversaciones {
+    constructor(mensajeSistema) {
+        this.historial = [{ role: 'system', content: mensajeSistema }];
+        this.respuestaActual = '';
+        this.respuestaCompleta = '';
+        this.idChat = ' ';
+        this.conversacionIniciada = false;
+    }
+
+    agregarMensajeUsuario(mensaje) {
+        this.historial.push({ role: 'user', content: mensaje });
+    }
+
+    agregarMensajeAsistente(mensaje) {
+        this.historial.push({ role: 'assistant', content: mensaje });
+    }
+
+    limpiarHistorial() {
+        this.historial = [this.historial[0]]; // Mantener mensaje del sistema
+        this.respuestaActual = '';
+        this.respuestaCompleta = '';
+        this.idChat = ' ';
+    }
+
+    generarIdChat(mensajeUsuario) {
+        const fechaActual = new Date();
+        const fechaFormateada = `${fechaActual.getFullYear()}.${fechaActual.getMonth() + 1}.${fechaActual.getDate()}.${fechaActual.getHours()}.${fechaActual.getMinutes()}.${fechaActual.getSeconds()}`;
+        const mensajeRecortado = mensajeUsuario.substring(0, 35).trim();
+        return `${fechaFormateada}-${mensajeRecortado}`.replace(' ', '_');
+    }
+
+    guardarHistorial(idChat, contenido) {
         $.ajax({
             type: 'POST',
-            url: '/actualizar_historial', // Endpoint para actualizar el historial
-            data: JSON.stringify({ nombre_chat: chatId, historial: content }), // Convertir a JSON
-            contentType: 'application/json', // Asegura que el servidor entienda que es JSON
-            success: function (data) {
-                
+            url: '/actualizar_historial',
+            data: JSON.stringify({ nombre_chat: idChat, historial: contenido }),
+            contentType: 'application/json',
+            success: function(data) {
+                console.log('Historial guardado con éxito');
             },
-            error: function (error) {
-                console.error('Error al guardar el historial:', error); // Imprimir el mensaje de error en la consola
+            error: function(error) {
+                console.error('Error al guardar el historial:', error);
             }
         });
     }
 
-    
-    loadHistory(nombre_chat) {
-        nombre_chat = String(nombre_chat);
+    cargarHistorial(nombreChat) {
+        nombreChat = String(nombreChat);
         const self = this;
         $.ajax({
             type: 'GET',
-            url: `/recuperar_historial?nombre_chat=${nombre_chat}`,
+            url: `/recuperar_historial?nombre_chat=${nombreChat}`,
             contentType: 'application/json',
-            success: function (data) {
-                // Verifica si se recuperaron datos válidos
+            success: function(data) {
                 if (data && Array.isArray(data)) {
-                    self.conversationHistory = data; // Asigna los datos recuperados a conversationHistory
-                    console.log('Historial cargado exitosamente:', self.conversationHistory);
-                    self.chatId=nombre_chat;
+                    self.historial = data;
+                    self.idChat = nombreChat;
+                    console.log('Historial cargado exitosamente:', self.historial);
                 } else {
                     console.error('Error: No se pudieron recuperar datos válidos del historial.');
                 }
-                self.loadMessages();
+                self.cargarMensajes();
             },
-            error: function (error) {
-                self.showPopup('Error cargando historial','error');
-                console.error('Error al cargar el historial:', error); // Imprime el mensaje de error en la consola
+            error: function(error) {
+                GestorUI.mostrarNotificacion('Error cargando historial', 'error');
+                console.error('Error al cargar el historial:', error);
             }
         });
     }
 
-
-    loadMessages(){
-        $('#chat-list').empty();
-        // Suponiendo que this.chatHistory contiene los mensajes
-        for (var i = 0; i < this.conversationHistory.length; i++) {
-            var messageData = this.conversationHistory[i];
-            var sanitizedUserMessage = messageData.role === 'user' ? sanitizeMessage(messageData.content) : messageData.content;
-            const converter = new showdown.Converter();
-            messageData.content = converter.makeHtml(messageData.content);
-            if (messageData.role === 'user') {
-                var message = $('<div class="user-message-container-' + i +
-                                ' user-message-container"><label for="chat-user-' + i +
-                                '">User</label><div id="chat-user-' + i +
-                                '" class="user-message user-message-' + i + '">' +
-                                sanitizedUserMessage + '</div></div>');
-                $('#chat-list').append(message);
-            } else if (messageData.role === 'assistant') {
-                var divAssistant = $('<div class="assistant-message-container-' + i +
-                                    ' assistant-message-container"><label for="chat-assistant-' + i +
-                                    '">Assistant<br></label><div id="chat-assistant-' + i +
-                                    '" class="assistant-message">' + messageData.content + '</div></div>');
-                $('#chat-list').append(divAssistant);
-                divAssistant.find('pre code').each(function(i, block) {
-                    Prism.highlightElement(block);
-                });
-            }
-    }
-
-        
-function sanitizeMessage(message) {
-    return $('<div>').text(message).html();
-}
-    }
-
-    deleteHistory(nombreChat){
-        const self = this; 
+    eliminarHistorial(nombreChat) {
+        const self = this;
         $.ajax({
             url: `/eliminar_historial?nombre_chat=${nombreChat}`,
             type: 'DELETE',
             success: function(result) {
                 console.log(`Historial ${nombreChat} eliminado exitosamente.`);
-                self.removeFromConversationList(nombreChat);
-
+                self.eliminarDeListaConversaciones(nombreChat);
             },
             error: function(xhr, status, error) {
                 console.error(`Error al eliminar el historial ${nombreChat}: ${xhr.status}`);
             }
         });
-    
     }
 
-    
-    removeFromConversationList(chatId) {
-        // Eliminar el elemento de la lista de conversaciones
-        const conversationListDiv = $('#conversations-list');
-        const elementToRemove = $('#' + chatId);
-
-        if (elementToRemove.length) {
-            elementToRemove.remove();
+    eliminarDeListaConversaciones(idChat) {
+        const listaConversaciones = $('#conversations-list');
+        const elementoAEliminar = $('#' + idChat);
+        if (elementoAEliminar.length) {
+            elementoAEliminar.remove();
         } else {
-            // Intentar encontrar el elemento con un selector que coincida con el formato de ID
-            const formattedIdSelector = '.load-history[id^="' + chatId + '"]';
-            const elementToRemoveFormatted = $(formattedIdSelector);
-            if (elementToRemoveFormatted.length) {
-                elementToRemoveFormatted.remove();
+            const selectorIdFormateado = '.load-history[id^="' + idChat + '"]';
+            const elementoAEliminarFormateado = $(selectorIdFormateado);
+            if (elementoAEliminarFormateado.length) {
+                elementoAEliminarFormateado.remove();
             } else {
-                console.error(`Element with ID ${chatId} not found in conversation list.`);
+                console.error(`Elemento con ID ${idChat} no encontrado en la lista de conversaciones.`);
             }
         }
-    }
-    handleAssistantResponse(response) {
-        response = response.replace(/<0x0A>/g, '\n');
-    
-        if (!this.conversationStarted) {
-            this.currentResponse = response;
-            this.conversationStarted = true;
-        } else {
-            this.currentResponse += response;
-        }
-        
-        const converter = new showdown.Converter();
-        this.response = converter.makeHtml(this.currentResponse);
-    
-        const tableRegex = /(?:\|.*(?:\|).*)+\|/gs;
-        let htmlResponse = this.response.replace(tableRegex, (table) => {
-            const rows = table.trim().split('\n').map(row => row.trim().split('|').filter(cell => cell.trim() !== ''));
-        
-            // Filtrar las filas que contienen guiones
-            const filteredRows = rows.filter(row => !row.some(cell => cell.includes('---')));
-        
-            let htmlTable = '<table>';
-            for (let i = 0; i < filteredRows.length; i++) {
-                htmlTable += '<tr>';
-                for (let j = 0; j < filteredRows[i].length; j++) {
-                    htmlTable += (i === 0) ? `<th>${filteredRows[i][j]}</th>` : `<td>${filteredRows[i][j]}</td>`;
-                }
-                htmlTable += '</tr>';
-            }
-            htmlTable += '</table>';
-            return htmlTable;
-        });
-    
-        var divAssistant = $('#chat-assistant-' + this.n_responses);
-        divAssistant.html(htmlResponse);
-    
-        document.querySelectorAll('pre').forEach(function(pre) {
-            pre.classList.add('line-numbers');
-        });
-    
-        divAssistant.find('pre code').each(function(i, block) {
-            Prism.highlightElement(block);
-        });
     }
 
-    clearChat() {
-        $('#chat-list').html('');
-        this.currentResponse = '';
+    cargarMensajes() {
+        $('#chat-list').empty();
+        for (let i = 0; i < this.historial.length; i++) {
+            const mensajeData = this.historial[i];
+            if (mensajeData.role === 'system') continue;
+
+            const converter = new showdown.Converter();
+            const contenidoHtml = converter.makeHtml(mensajeData.content);
+
+            if (mensajeData.role === 'user') {
+                const mensaje = $(`
+                    <div class="user-message-container-${i} user-message-container">
+                        <label for="chat-user-${i}">Usuario</label>
+                        <div id="chat-user-${i}" class="user-message user-message-${i}">
+                            ${this.escaparHtml(mensajeData.content)}
+                        </div>
+                    </div>`);
+                $('#chat-list').append(mensaje);
+            } else if (mensajeData.role === 'assistant') {
+                const divAsistente = $(`
+                    <div class="assistant-message-container-${i} assistant-message-container">
+                        <label for="chat-assistant-${i}">Asistente<br></label>
+                        <div id="chat-assistant-${i}" class="assistant-message">
+                            ${contenidoHtml}
+                        </div>
+                    </div>`);
+                $('#chat-list').append(divAsistente);
+                divAsistente.find('pre code').each(function(i, block) {
+                    Prism.highlightElement(block);
+                });
+            }
+        }
+    }
+}
+
+// Gestor de Tokens
+class GestorTokens {
+    constructor() {
         this.totalTokens = 0;
-        this.chatId=' ';
-        var label = document.getElementById('tokens');
-        label.textContent = ' ' + this.totalTokens + ' Tokens';
-        this.conversationHistory = [{'role':'system', 'content' : this.systemMessage}];
-        $('#key-container').empty();
-        let str = 'Chat emptied! 🗑️';
-        this.showPopup(str);
-        console.log(str);
+        this.totalTokensRespuesta = 0;
     }
 
-    actualizarTokens(){
-        this.totalTokens += this.totalTokensResponse;
-        this.totalTokensResponse = 0;
-        var label = document.getElementById('tokens');
-        label.textContent = ' ' + this.totalTokens + ' Tokens';
+    actualizarTokens(tokensRespuesta) {
+        this.totalTokens += tokensRespuesta;
+        this.actualizarVisualizacion();
     }
 
-    sendMessage() {
-        if (!this.conversationStarted){
-            this.conversationStarted= true;
-            this.currentResponse = ' ';
-            this.n_responses += 1;
-            var userMessage = $('#user-input').val(); // Obtener el valor del input
-            var userMessageTrimed = userMessage.substring(0, 35).trim(); // Usando substring
-            var currentDate = new Date(); // Obtener la fecha y hora actual
-            var formattedDateTime = currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1) + '.' + currentDate.getDate()+'.'+currentDate.getHours()+'.'+currentDate.getMinutes()+'.'+currentDate.getSeconds(); 
-            var messageWithDateTime =   formattedDateTime + '-'  + userMessageTrimed; // Agregar la fecha y hora al mensaje
-            if (this.chatId ===' '){
-                this.chatId = messageWithDateTime.replace(' ','_');
+    actualizarVisualizacion() {
+        const etiqueta = document.getElementById('tokens');
+        etiqueta.textContent = ` ${this.totalTokens} Tokens`;
+    }
 
+    reiniciar() {
+        this.totalTokens = 0;
+        this.totalTokensRespuesta = 0;
+        this.actualizarVisualizacion();
+    }
+}
+
+// Clase Principal Chat
+class Chat {
+    constructor() {
+        this.inicializar();
+        this.configurarComponentes();
+        this.configurarEscuchadores();
+    }
+
+    // Método para alternar la barra lateral
+    toggleSidebar(elementId) {
+            GestorUI.alternarBarraLateral(elementId);
+    }
+
+    inicializar() {
+        this.herramientas = false;
+        this.rag = false;
+        this.biblioteca = 'llama';
+        this.numRespuestas = 0;
+        this.mensajeSistema = 'Eres un asistente en español. Debes responder siempre en español';
+    }
+
+    configurarComponentes() {
+        this.manejadorWS = new ManejadorWebSocket(document.domain, location.port, '/test');
+        this.gestorUI = new GestorUI();
+        this.gestorConversaciones = new GestorConversaciones(this.mensajeSistema);
+        this.gestorTokens = new GestorTokens();
+        
+        this.manejadorWS.socket.on('assistant_response', respuesta => this.manejarRespuestaAsistente(respuesta));
+        this.manejadorWS.socket.on('output_console', respuesta => this.manejarSalidaConsola(respuesta));
+        this.manejadorWS.socket.on('utilidades', respuesta => this.manejarUtilidades(respuesta));
+    }
+
+    configurarEscuchadores() {
+        const checkboxHerramientas = document.getElementById('checkbox-3');
+        const checkboxRag = document.getElementById('checkbox-4');
+        const areaTexto = document.getElementById('user-input');
+
+        checkboxHerramientas.addEventListener('change', () => this.herramientas = checkboxHerramientas.checked);
+        checkboxRag.addEventListener('change', () => this.rag = checkboxRag.checked);
+        areaTexto.addEventListener('keydown', (e) => {
+            if (e.which === 13 && !e.shiftKey) {
+                e.preventDefault();
+                this.enviarMensaje();
             }
-            var url = this.library === 'ollama' ? 'v1/chat/completions' : '/user_input';
-            var sanitizedUserMessage = this.escapeHtml(userMessage);
-            if(this.memory){
-                this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
+        });
+
+        $('#stop-button').hide();
+    }
+
+    manejarRespuestaAsistente(respuesta) {
+        let delta = '';
+        let deltaEleccion = '';
+        
+        if (this.biblioteca === 'ollama') {
+            delta = respuesta.content;
+            this.gestorConversaciones.respuestaCompleta += delta;
+            const tokensUsuarioTotal = respuesta.total_user_tokens;
+            const tokensAsistenteTotal = respuesta.total_assistant_tokens;
+            this.gestorTokens.totalTokensRespuesta = tokensUsuarioTotal + tokensAsistenteTotal;
+        } else {
+            const datosRespuesta = respuesta.content.choices[0];
+            deltaEleccion = datosRespuesta.delta && Object.keys(datosRespuesta.delta).length !== 0 
+                ? datosRespuesta.delta.content 
+                : '';
+            this.gestorConversaciones.respuestaCompleta += deltaEleccion;
+            this.gestorTokens.totalTokensRespuesta = respuesta.total_user_tokens + respuesta.total_assistant_tokens;
+        }
+
+        $('#stop-button').show();
+        $('#send-button').prop('disabled', true).hide();
+
+        const respuestaModelo = this.biblioteca === 'ollama' ? delta : deltaEleccion;
+        this.procesarRespuestaAsistente(respuestaModelo);
+        GestorUI.desplazarAlFinal($('#chat-container')[0]);
+    }
+
+    procesarRespuestaAsistente(respuesta) {
+        respuesta = respuesta.replace(/<0x0A>/g, '\n');
+
+        if (!this.gestorConversaciones.conversacionIniciada) {
+            this.gestorConversaciones.respuestaActual = respuesta;
+            this.gestorConversaciones.conversacionIniciada = true;
+        } else {
+            this.gestorConversaciones.respuestaActual += respuesta;
+        }
+
+        const converter = new showdown.Converter();
+        const respuestaHtml = converter.makeHtml(this.gestorConversaciones.respuestaActual);
+
+        // Procesar tablas
+        const regexTabla = /(?:\|.*(?:\|).*)+\|/gs;
+        let respuestaHtmlProcesada = respuestaHtml.replace(regexTabla, (tabla) => {
+            const filas = tabla.trim().split('\n')
+                .map(fila => fila.trim().split('|')
+                .filter(celda => celda.trim() !== ''));
+            const filasFiltradas = filas.filter(fila => !fila.some(celda => celda.includes('---')));
+            
+            let tablaHtml = '<table>';
+                filasFiltradas.forEach((fila, i) => {
+                    tablaHtml += '<tr>';
+                    fila.forEach(celda => {
+                        tablaHtml += i === 0 
+                            ? `<th>${celda}</th>` 
+                            : `<td>${celda}</td>`;
+                    });
+                    tablaHtml += '</tr>';
+                });
+                tablaHtml += '</table>';
+                return tablaHtml;
+            });
+    
+            const divAsistente = $(`#chat-assistant-${this.numRespuestas}`);
+            divAsistente.html(respuestaHtmlProcesada);
+    
+            document.querySelectorAll('pre').forEach(pre => {
+                pre.classList.add('line-numbers');
+            });
+    
+            divAsistente.find('pre code').each((i, bloque) => {
+                Prism.highlightElement(bloque);
+            });
+        }
+    
+        manejarSalidaConsola(respuesta) {
+            const divConsola = $('#consola');
+            const { role, content } = respuesta;
+            let divRespuesta;
+            
+            if (role === 'info') {
+                divRespuesta = $(`<div id="outputConsole"><pre class="${role}">ialab-suite@agent:~$ ${content}</pre></div>`);
+            } else {
+                divRespuesta = $(`<div id="outputConsole"><pre class="${role}">${content}</pre></div>`);
             }
-            else{
-                var mensajeSistema = ""+
-                "Funciones disponibles: "+
-                "[Funcion: \'buscar_en_internet\' , query: \'url_o_consulta\' ]"+
-                "[Funcion: \'cripto_price\' , query: \'zilliqa,ethereum,\'"+
-                "[Funcion: \'video_search_tool\' , query: \'consulta\']"+
-                "Necesitas utilizar alguna para responder?"+ 
-                "responde con la herramienta a lanzar, ejemplo:"+
-                "supongamos que necesitas buscar el tiempo en internet , contestas:"+ 
-                "[Funcion: \'buscar_en_internet , query: \'tiempo proximos dias\' ]"+
-                "Puedes usar mas de una funcion. Responde solo con las funciones que usaras en el formato adecuado entre [], sin texto antes ni despues de los corchetes";
-                this.conversationHistory = [{'role':'system', 'content' : mensajeSistema}];
-                if(this.conversationHistory.length - 1 > 0){
-                    var mensajeAsistente = this.conversationHistory[this.conversationHistory.length - 1];
-                    this.conversationHistory.push(mensajeAsistente);
-                }
-                if(this.conversationHistory.length - 2 > 0 ){
-                    var mensajeUsuario = this.conversationHistory[this.conversationHistory.length -2];
-                    this.conversationHistory.push(mensajeUsuario);
-                }
-             
-                this.conversationHistory.push({'role': 'user', 'content': sanitizedUserMessage});
+            
+            divConsola.append(divRespuesta);
+            GestorUI.desplazarAlFinal(divConsola[0]);
+        }
+    
+        manejarUtilidades(respuesta) {
+            const divResultados = document.getElementById(`resultados${this.numRespuestas}`);
+            
+            respuesta.ids.forEach(id => {
+                const iframe = document.createElement('iframe');
+                iframe.width = "64px";
+                iframe.height = "32px";
+                iframe.src = `https://www.youtube.com/embed/${id}`;
+                iframe.frameborder = "0";
+                iframe.allow = "encrypted-media; picture-in-picture";
+                iframe.allowfullscreen = true;
+                divResultados.appendChild(iframe);
+            });
+        }
+    
+        enviarMensaje() {
+            if (!this.gestorConversaciones.conversacionIniciada) {
+                const entradaUsuario = $('#user-input').val();
+                if (!entradaUsuario.trim()) return;
+    
+                this.prepararNuevoMensaje(entradaUsuario);
+                this.enviarMensajeAlServidor(entradaUsuario);
             }
-            const self = this;
-            self.conversationHistory[self.conversationHistory.length -1]['content'];/*+=". Puedes usar mas de una herramienta. Pero debe estar en la lista de herramientas."*/;
+        }
+    
+        prepararNuevoMensaje(entradaUsuario) {
+            this.gestorConversaciones.conversacionIniciada = true;
+            this.numRespuestas++;
+            
+            if (this.gestorConversaciones.idChat === ' ') {
+                this.gestorConversaciones.idChat = this.gestorConversaciones.generarIdChat(entradaUsuario);
+            }
+    
+            this.gestorConversaciones.agregarMensajeUsuario(this.escaparHtml(entradaUsuario));
+            this.agregarMensajeUsuarioUI(entradaUsuario);
+            
+            $('#user-input').val('').focus();
+        }
+    
+        agregarMensajeUsuarioUI(mensaje) {
+            const mensajeUsuario = $(`
+                <div class="user-message-container-${this.numRespuestas} user-message-container">
+                    <div id="chat-user-${this.numRespuestas}" class="user-message user-message-${this.numRespuestas}">
+                        ${this.escaparHtml(mensaje)}
+                    </div>
+                </div>
+            `);
+    
+            const divAsistente = $(`
+                <div class="assistant-message-container-${this.numRespuestas} assistant-message-container">
+                    <div id="contenedor_respuesta">
+                        <div id="chat-assistant-${this.numRespuestas}" class="assistant-message"></div>
+                        <div id="resultados${this.numRespuestas}" class="resultados"></div>
+                    </div>
+                </div>
+            `);
+    
+            const botonCompartir = $(`<button id="share" onclick="chat.compartirChat(${this.numRespuestas})">Compartir</button>`);
+            
+            $('#chat-list').append(mensajeUsuario, divAsistente);
+            $(`.assistant-message-container-${this.numRespuestas}`).append(botonCompartir);
+            
+            GestorUI.desplazarAlFinal($('#chat-container')[0]);
+        }
+    
+        enviarMensajeAlServidor(entradaUsuario) {
+            const url = this.biblioteca === 'ollama' ? 'v1/chat/completions' : '/user_input';
+            const datos = {
+                content: this.gestorConversaciones.historial,
+                tools: this.herramientas,
+                rag: this.rag
+            };
+    
             $.ajax({
                 type: 'POST',
                 url: url,
-                data: JSON.stringify({ content: self.conversationHistory}), // Convertir a JSON
-                contentType: 'application/json', // Asegura que el servidor entienda que es JSON
-                success: function (data) {
-                    $('#stop-button').hide();
-                    $('#send-button').show();
-                    $('#send-button').prop('disabled', false);
-                    self.addToConversationHistory(); // Agregar la respuesta completa al historial
-                    self.actualizarTokens();
-                   
-                    var conversationListDiv = $('#conversations-list');
-                    var buttonExists = false;
-                    $('.load-history').each(function() {
-                        console.log($(this).text())
-                        if ($(this).text() === '❌'+self.chatId) {
-                            
-                            buttonExists = true;
-                            return false; // Salir del bucle each() si se encuentra un botón con el mismo texto
-                        }
-                    });
-                    console.log("Valor de self.chatId:", self.chatId);
-                    console.log("Número de botones existentes:", $('.load-history').length);
-                    var conversationListDiv = $('#conversations-list');
-                    var newChatHistory ='';
-                    if(!buttonExists) {
-                      newChatHistory = $("<div class='load-history' id='"+self.chatId+"'><button height='1em' width='1em' onclick=chat.deleteHistory('"+self.chatId+"')>❌</button><button class='btnLoadHistory' onclick=chat.loadHistory('"+self.chatId+"')>"+self.chatId+"</button></div>"); // $("<button class='load-history' onclick=chat.loadHistory('"+self.chatId+"')>📪 "+self.chatId+"</button>") 
-                      conversationListDiv.prepend(newChatHistory);
-                    }
-                    self.guardarHistorial(self.chatId , self.conversationHistory);
-                    self.showPopup(data);
-                    console.log(data);
-                    self.conversationStarted = false;
-                },
-                error: function (error) {
-                    self.showPopup(error, 'error');
-                    console.error('Error:', error);
-                    self.conversationStarted = false;
+                data: JSON.stringify(datos),
+                contentType: 'application/json',
+                success: respuesta => this.manejarExitoEnvio(respuesta),
+                error: error => this.manejarErrorEnvio(error)
+            });
+        }
+    
+        manejarExitoEnvio(respuesta) {
+            $('#stop-button').hide();
+            $('#send-button').show().prop('disabled', false);
+            
+            this.gestorConversaciones.agregarMensajeAsistente(this.gestorConversaciones.respuestaCompleta);
+            this.gestorTokens.actualizarTokens(this.gestorTokens.totalTokensRespuesta);
+    
+            this.actualizarListaConversaciones();
+            this.gestorConversaciones.guardarHistorial(
+                this.gestorConversaciones.idChat, 
+                this.gestorConversaciones.historial
+            );
+    
+            GestorUI.mostrarNotificacion(respuesta);
+            this.gestorConversaciones.conversacionIniciada = false;
+        }
+    
+        manejarErrorEnvio(error) {
+            GestorUI.mostrarNotificacion(error, 'error');
+            console.error('Error:', error);
+            this.gestorConversaciones.conversacionIniciada = false;
+        }
+    
+        actualizarListaConversaciones() {
+            const self = this;
+            const listaConversaciones = $('#conversations-list');
+            let existeBoton = false;
+            // Recorre cada elemento de la clase '.load-history'
+            $('.load-history').each(function() {
+                if ($(this).text() === '❌' + self.gestorConversaciones.idChat) {
+                    existeBoton = true;
+                    return false; // Rompe el bucle si ya existe
                 }
             });
-            console.log('Prompt sent! 🔤');
-            $('#user-input').val('');
-            $('#user-input').focus();
-            var message = $('<div class="user-message-container-' + this.n_responses + 
-                            ' user-message-container"><label for="chat-user-' + this.n_responses + 
-                            '">User</label><div id="chat-user-' + this.n_responses + 
-                            '" class="user-message user-message-' + this.n_responses + '">' + 
-                            sanitizedUserMessage + '</div></div>');
-            var chatList = $('#chat-list');
+            // Si el botón no existe, crea uno nuevo
+            if (!existeBoton) {
+                const nuevoHistorialChat = $(`
+                    <div class='load-history' id='${self.gestorConversaciones.idChat}'>
+                        <button height='1em' width='1em' onclick="chat.gestorConversaciones.eliminarHistorial('${self.gestorConversaciones.idChat}')">❌</button>
+                        <button class='btnLoadHistory' onclick="chat.gestorConversaciones.cargarHistorial('${self.gestorConversaciones.idChat}')">
+                            ${self.gestorConversaciones.idChat}
+                        </button>
+                    </div>
+                `);
+                listaConversaciones.prepend(nuevoHistorialChat);
+            }
+        }
         
-            chatList.append(message);
-          
-            var divAssistant = $('<div class="assistant-message-container-' + this.n_responses + 
-                                ' assistant-message-container"><label for="chat-assistant-' + this.n_responses + 
-                                '">Assistant<br></label><div id="chat-assistant-' + this.n_responses + 
-                                '" class="assistant-message"></div></div>');
-            chatList.append(divAssistant);
-
-            var shareButton = $('<button id="share" onclick="chat.shareChat(' + this.n_responses + ')">Share</button>');
-            var userMessageCointainer = $('.assistant-message-container-' + this.n_responses);
-            userMessageCointainer.append(shareButton);
-            var chatContainer = $('#chat-container')[0];
-            this.scrollToBottom(chatContainer);
-            
+        limpiarChat() {
+            $('#chat-list').html('');
+            this.gestorConversaciones.limpiarHistorial();
+            this.gestorTokens.reiniciar();
+            $('#key-container').empty();
+            GestorUI.mostrarNotificacion('¡Chat vaciado! 🗑️');
         }
-    }
-
-    // Método para agregar la respuesta completa al historial de conversación
-    addToConversationHistory() {
-        if (this.memory){
-            // Agregar la respuesta completa al historial de conversación
-            this.conversationHistory.push({'role': 'assistant', 'content': this.fullResponse});
-            
-            // Reiniciar la respuesta completa para futuras conversaciones
-            this.fullResponse = '';
-    }
-}
-
-    newChat() {
-        this.clearChat();
-    }
-
-    applyConfig() {
-        var selectedModel = $('#model-select').val();
-        var selectedFormat = $('#format-select').val();
-        var systemMessage = $('#system-message').val();
-        this.systemMessage = systemMessage;
-        var gpuLayers = $('#gpu-layers').val();
-        var temperature = $('#temperature').val();
-        var n_ctx = $('#context').val();
-        const self = this;
-        $.ajax({
-
-            type: "POST",
-            url: "/load_model",
-            data: {
-                model_path: selectedModel,
-                format: selectedFormat,
-                temperature: temperature,
-                system_message: systemMessage,
-                gpu_layers: gpuLayers,
-                context: n_ctx
-            },
-            success: function (data) {
-                self.showPopup('Model loaded successfully');
-                self.newChat();
-                console.log(data);
-            },
-            error: function (error) {
-                self.showPopup(error, 'error');
-                console.error('Error:', error);
-            }
-        });
-        this.clearContext();
-    }
-
-    unloadModel() {
-        const self = this;
-        $.ajax({
-            type: "POST",
-            url: "/unload_model",
-            success: function (data) {
-                self.showPopup(data);
-                console.log(data);
-            },
-            error: function (error) {
-                self.showPopup(error, 'error');
-                console.error('Error:', error);
-            }
-        });
-    }
-
-    stopResponse() {
-        const self = this;
-        $.ajax({
-            type: "POST",
-            url: "/stop_response",
-            success: (data) => {
-                console.log(data);
-                self.showPopup(data);
-                $('#stop-button').hide();
-                $('#send-button').show();
-            },
-            error: (error) => {
-                self.showPopup(error, 'error');
-                console.error('Error:', error);
-            }
-        });
-    }
-//** UTILS */
-    scrollToBottom(id) {
-        var chatContainer = $('#chat-container')[0];
-        id.scrollTop = id.scrollHeight;
-    }
-
-    copyToClipboard(button) {
-        var codeContent = $(button).siblings('code').html();
-        codeContent = codeContent.replace(/<br>/g, '\n');
-        codeContent = codeContent.replace(/^[^\n]*\n/, '');
-
-        var textarea = document.createElement('textarea');
-        textarea.textContent = codeContent;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        let str = 'Copied to clipboard! 📋';
-        this.showPopup(str);
-        console.log(str);
-    }
-
-    toggleSidebar(element) {
-        var sidebar = document.getElementById(element);
-        // Verificar si las media queries están activas
-        var mediaQueriesActive = window.matchMedia("(max-width: 1023px)").matches || window.matchMedia("(max-height: 740px)").matches;
     
-        // Solo ejecutar el código si las media queries no están activas
-        if (!mediaQueriesActive) {
-            if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'flex';
-                sidebar.style.width = '15%';
+        aplicarConfiguracion() {
+            const modeloSeleccionado = $('#model-select').val();
+            const formatoSeleccionado = $('#format-select').val();
+            const mensajeSistema = $('#system-message').val();
+            const capasGPU = $('#gpu-layers').val();
+            const temperatura = $('#temperature').val();
+            const contexto = $('#context').val();
+    
+            $.ajax({
+                type: "POST",
+                url: "/load_model",
+                data: {
+                    model_path: modeloSeleccionado,
+                    format: formatoSeleccionado,
+                    temperature: temperatura,
+                    system_message: mensajeSistema,
+                    gpu_layers: capasGPU,
+                    context: contexto
+                },
+                success: data => {
+                    GestorUI.mostrarNotificacion('Modelo cargado exitosamente');
+                    this.limpiarChat();
+                },
+                error: error => {
+                    GestorUI.mostrarNotificacion(error, 'error');
+                    console.error('Error:', error);
+                }
+            });
+        }
+    
+        compartirChat(numeroRespuesta) {
+            if (navigator.share) {
+                const pregunta = $(`.user-message-${numeroRespuesta}`).text();
+                const respuesta = $(`#chat-assistant-${numeroRespuesta}`).html();
+                const respuestaCompleta = `Usuario: \n${pregunta}\n\nAsistente:\n${respuesta}`;
+                
+                navigator.share({
+                    title: pregunta,
+                    text: respuestaCompleta.replace(/<br>/g, '\n'),
+                    url: '/'
+                })
+                .then(() => GestorUI.mostrarNotificacion('Chat compartido exitosamente'))
+                .catch(error => console.error('Error al compartir chat:', error));
             } else {
-                sidebar.style.display = 'none';
-          
+                GestorUI.mostrarNotificacion('Función de compartir no soportada en este navegador. 😤', 'error');
             }
         }
-        else{
-             if(sidebar.style.display === 'none' || sidebar.style.display === '') {
-                sidebar.style.display = 'block';
-                sidebar.style.width = '100%';
-            } 
-            else{
-                sidebar.style.display = 'none';
-            }
-            
+    
+        escaparHtml(texto) {
+            const mapeo = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return texto.replace(/[&<>"']/g, m => mapeo[m]);
+        }
+    
+        detenerRespuesta() {
+            $.ajax({
+                type: "POST",
+                url: "/stop_response",
+                success: data => {
+                    console.log(data);
+                    GestorUI.mostrarNotificacion(data);
+                    $('#stop-button').hide();
+                    $('#send-button').show();
+                },
+                error: error => {
+                    GestorUI.mostrarNotificacion(error, 'error');
+                    console.error('Error:', error);
+                }
+            });
         }
     }
-    escapeHtml(text) {
-        var map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, function (m) {
-            return map[m];
-        });
-    }
-
-    shareChat(responseNumber) {
-        const self = this;
-        let str_success = 'Chat shared successfully';
-        if (navigator.share) {
-            var ask = $('.user-message-' + responseNumber).text();
-            var response = $('#chat-assistant-' + responseNumber).html();
-            var fullResponse = "User: \n" + ask + "\n\nAssistant:\n" + response;
-            fullResponse = fullResponse.replace(/<br>/g, '\n');
-            navigator.share({
-                title: ask,
-                text: fullResponse,
-                url: '/'
-            })
-                .then(() => { console.log(str_success); self.showPopup(str_success); })
-                .catch((error) => console.error('Error sharing chat:', error));
-        } else {
-            self.showPopup('Sharing function not supported in this browser. 😤', 'error');
-        }
-    }
-
-    showPopup(message, type) {
-        let container = document.getElementById('notification-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'notification-container';
-            container.className = 'popup-container';
-            container.style.left = '20px'; 
-            container.style.bottom = '20px'; 
-            document.body.appendChild(container);
-        }
-
-        const popup = document.createElement('div');
-        popup.className = 'popup-notification';
-        if (type === 'error') {
-            popup.classList.add('popup-error');
-        }
-        popup.textContent = message;
-        container.appendChild(popup);
-
-        setTimeout(() => {
-            popup.style.opacity = 1;
-            setTimeout(() => {
-                popup.style.opacity = 0;
-                setTimeout(() => {
-                    container.removeChild(popup);
-                    if (container.childNodes.length === 0) {
-                        document.body.removeChild(container);
-                    }
-                }, 500); //seconds to complete disappearance animation
-            }, 5500); //seconds before disappearing
-        }, 100); // 0.1 seconds before displaying
-    }
-
-    adjustTextareaHeight() {
-        const textarea = document.getElementById('user-input');
-        const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight);
-        const maxLines = 20; 
-        const maxHeight = maxLines * lineHeight; 
-        textarea.style.height = '0';
-        textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-    }
-}
+    
+// Exportar para su uso
+window.Chat = Chat;
