@@ -6,8 +6,8 @@ from llama_cpp import Llama as Model
 import platform
 import time
 import ollama
-from cortex import Cortex
-from ragai2 import Rag
+from Cortex import Cortex
+from Rag import Retriever
 class Assistant:
 
     def __init__(self, default_model_path, default_chat_format):
@@ -118,7 +118,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                             time.sleep(0.01)
 
                 if self.rag: 
-                    Rag(self.model,user_input,socket)
+                    Retriever(self.model,user_input,socket)
                 if self.tools:
                     Cortex(user_input_o, prompt=user_input, response=response, model=self.model,socket=socket )
             finally:          

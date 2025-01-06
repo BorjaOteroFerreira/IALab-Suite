@@ -43,7 +43,7 @@ h1{
     max-height:calc(100vh);
 }
 #chat-sidebar{
-    z-index:0;
+    z-index:3;
     display:none;
     position:relative !important;
     text-overflow: ellipsis;
@@ -80,6 +80,7 @@ iframe{
     scrollbar-color: transparent transparent; 
     padding:1em;
     text-overflow: ellipsis;
+    height:100vh;
 }
 
 /* Style for the load history button container */
@@ -254,7 +255,8 @@ input[type="checkbox"].ios8-switch:checked + label:before {
 }
 
 #footer {
-    width: 100%;
+    width: 50%;
+
     min-width:720px;
     position: absolute;
     bottom: 0;
@@ -271,7 +273,7 @@ input[type="checkbox"].ios8-switch:checked + label:before {
     flex-wrap: nowrap;
     background-color: #191A1A;
     border-radius: 0 0 5px 5px;
-    z-index:5
+    z-index:2
 }
 
 #footer input:active,
@@ -346,9 +348,6 @@ input[type="checkbox"].ios8-switch:checked + label:before {
     justify-content: center;
     align-content: flex-start;
     margin-left:10px
- 
-
-
 }
 
 
@@ -400,20 +399,18 @@ input[type="checkbox"].ios8-switch:checked + label:before {
     display: none ;
     position: relative !important;
     color: var(--primary-color);
-    background-color: var(--primary-bg-color);
-    padding: 10px;
+    background-color: #1F2222;
+    padding: 20px;
     flex-direction: column;
     max-height: 100%; 
     height: auto; 
-    border: 1px solid var(--secondary-bg-color);
+    border: none;
     border-radius: 5px;
     text-align: center;
     overflow-y: auto;
     scrollbar-width: thin; 
     scrollbar-color: transparent transparent; 
-    -webkit-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
-    -moz-box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
-    box-shadow: 28px 18px 78px -3px rgba(233,146,135,0.21);
+    height:100vh;
     }
 
 #config-sidebar h5 {
@@ -437,6 +434,7 @@ input[type="checkbox"].ios8-switch:checked + label:before {
     border: 1px solid var(--primary-color);
     background-color: var(--secondary-bg-color);
     color: var(--primary-color);
+    min-height:45px;
 }
 button:active,
 button:focus {
@@ -473,8 +471,8 @@ input:focus {
 #config-sidebar select {
     width: 100%;
     padding: 8px;
-    height:35px;
-    background-color: #33333300;
+    height:45px;
+    background-color: #1F2222;
     border: 1px solid var(--primary-color);
     border-radius: 2px;
     color: var(--primary-color);
@@ -587,6 +585,7 @@ input:focus {
     background-color:var(--secondary-bg-color);
     margin-top:20px;
 }
+
 
 .form-control{
     background-color: #999;

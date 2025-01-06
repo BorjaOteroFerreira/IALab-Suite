@@ -6,6 +6,7 @@ import time
 import pickle
 from typing import List, Dict, Tuple
 from PyPDF2 import PdfReader
+from llama_cpp import Llama
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_community.embeddings import GPT4AllEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -15,7 +16,6 @@ from langchain_community.document_loaders import (
     UnstructuredEPubLoader, UnstructuredHTMLLoader, UnstructuredMarkdownLoader,
     UnstructuredODTLoader, UnstructuredPowerPointLoader,
 )
-from llama_cpp import Llama
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class PaginatedPDFLoader:
             documents.append(Document(page_content=text, metadata={"page_num": page_num + 1, "file_name": os.path.basename(self.file_path)}))
         return documents
 
-class Rag:
+class Retriever:
     LOADER_MAPPING: Dict[str, Tuple[type, Dict]] = {
         ".csv": (CSVLoader, {}),
         ".doc": (UnstructuredWordDocumentLoader, {}),
@@ -53,7 +53,7 @@ class Rag:
         self.model = model
         self.prompt = prompt
         self.socket = socket
-        self.source_dir = 'rag'
+        self.source_dir = 'documents'
         self.llm_context = 8192
         self.max_tokens = int(0.5 * self.llm_context)
         self.vectorstore_path = "chroma_db"

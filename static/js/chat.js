@@ -270,6 +270,7 @@ class Chat {
         this.inicializar();
         this.configurarComponentes();
         this.configurarEscuchadores();
+        GestorUI.ajustarAlturaTextarea(document.getElementById('user-input'));
     }
 
     // Método para alternar la barra lateral
@@ -307,6 +308,7 @@ class Chat {
             if (e.which === 13 && !e.shiftKey) {
                 e.preventDefault();
                 this.enviarMensaje();
+                GestorUI.ajustarAlturaTextarea(areaTexto);
             }
         });
 
@@ -374,17 +376,22 @@ class Chat {
                 tablaHtml += '</table>';
                 return tablaHtml;
             });
-    
-            const divAsistente = $(`#chat-assistant-${this.numRespuestas}`);
-            divAsistente.html(respuestaHtmlProcesada);
-    
-            document.querySelectorAll('pre').forEach(pre => {
-                pre.classList.add('line-numbers');
-            });
-    
-            divAsistente.find('pre code').each((i, bloque) => {
-                Prism.highlightElement(bloque);
-            });
+        // Encontrar el contenedor específico para esta respuesta
+        const divAsistente = $(`#chat-assistant-${this.numRespuestas}`);
+        if (divAsistente.length === 0) {
+            console.error(`No se encontró el contenedor para la respuesta ${this.numRespuestas}`);
+            return;
+        }
+
+        // Actualizar solo el contenedor específico
+        divAsistente.html(respuestaHtmlProcesada);
+
+        // Aplicar formato a los bloques de código
+        divAsistente.find('pre').addClass('line-numbers');
+        divAsistente.find('pre code').each((i, bloque) => {
+            Prism.highlightElement(bloque);
+        });
+
         }
     
         manejarSalidaConsola(respuesta) {

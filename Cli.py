@@ -1,7 +1,7 @@
 '''
 @Author: Borja Otero Ferreira
 '''
-from FlaskApi import IASuiteApi
+from Api import IASuiteApi
 from flask_cors import CORS 
 
 
