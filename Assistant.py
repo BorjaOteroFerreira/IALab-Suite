@@ -7,7 +7,7 @@ import platform
 import time
 import ollama
 from Cortex import Cortex
-from Rag import Retriever
+from Rag2 import Retriever
 class Assistant:
 
     def __init__(self, default_model_path, default_chat_format):
