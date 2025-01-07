@@ -32,9 +32,9 @@ class DocumentStore:
         self.index_path = index_path
         self.document_index = self.load_index()
         self.document_hashes: Set[str] = {
-            DocumentHasher.compute_hash(content)
+            DocumentHasher.compute_hash(page["content"])
             for pages in self.document_index.values()
-            for content in pages.values()
+            for page in pages.values()
         }
         self.document_summaries = {}
 
@@ -52,13 +52,13 @@ class DocumentStore:
         """Check if document content already exists in the store."""
         return DocumentHasher.compute_hash(content) in self.document_hashes
 
-    def add_document(self, file_name: str, page_num: int, content: str):
+    def add_document(self, file_name: str, page_num: int, content: str, metadata: Dict):
         """Add a document to the store if it's not a duplicate."""
         content_hash = DocumentHasher.compute_hash(content)
         if content_hash not in self.document_hashes:
             if file_name not in self.document_index:
                 self.document_index[file_name] = {}
-            self.document_index[file_name][page_num] = content
+            self.document_index[file_name][page_num] = {"content": content, "metadata": metadata}
             self.document_hashes.add(content_hash)
             return True
         return False
@@ -77,7 +77,8 @@ class PaginatedPDFLoader:
                 page_content=text,
                 metadata={
                     "page_num": page_num + 1,
-                    "file_name": os.path.basename(self.file_path)
+                    "file_name": os.path.basename(self.file_path),
+                    "file_path": self.file_path
                 }
             ))
         return documents
@@ -122,10 +123,10 @@ class Retriever:
 
     def load_documents(self, source_dir: str) -> List[Document]:
         """Load documents with deduplication."""
-        all_files = [
+        all_files = (
             f for ext in self.LOADER_MAPPING 
             for f in glob.glob(os.path.join(source_dir, f"**/*{ext}"), recursive=True)
-        ]
+        )
         documents = []
         for file_path in all_files:
             try:
@@ -137,8 +138,11 @@ class Retriever:
                         self.doc_store.add_document(
                             doc.metadata["file_name"],
                             doc.metadata["page_num"],
-                            doc.page_content
+                            doc.page_content,
+                            doc.metadata
                         )
+                # Free memory after processing each file
+                del loaded_docs
             except Exception as e:
                 logger.error(f"Error loading document {file_path}: {e}")
         return documents
@@ -159,6 +163,9 @@ class Retriever:
         )
         all_splits = text_splitter.split_documents(self.docs)
         
+        # Free memory after splitting documents
+        del self.docs
+        
         # Initialize embeddings
         model_name = "all-MiniLM-L6-v2.gguf2.f16.gguf"
         embeddings = GPT4AllEmbeddings(
@@ -175,6 +182,9 @@ class Retriever:
             persist_directory=self.vectorstore_path,
         )
         self.retriever = self.vectorstore.as_retriever()
+        
+        # Free memory after creating vectorstore
+        del all_splits
         logger.debug("Vectorstore initialized successfully.")
 
     def index_documents(self):
@@ -197,31 +207,113 @@ class Retriever:
             summaries.append(summary["choices"][0]["message"]["content"])
         return " ".join(summaries)
 
+    def get_page_content(self, file_name: str, page_num: int) -> str:
+        """Obtiene el contenido de una página específica de un documento."""
+        if file_name in self.doc_store.document_index:
+            if page_num in self.doc_store.document_index[file_name]:
+                return self.doc_store.document_index[file_name][page_num]["content"]
+        return "Página no encontrada"
+
+    def get_document_pages(self, file_name: str) -> Dict[int, str]:
+        """Obtiene todas las páginas de un documento específico."""
+        return {page_num: page["content"] for page_num, page in self.doc_store.document_index.get(file_name, {}).items()}
+
+    def search_in_page(self, file_name: str, page_num: int, query: str) -> str:
+        """Busca un término específico en una página particular."""
+        content = self.get_page_content(file_name, page_num)
+        if content != "Página no encontrada":
+            # Realizar búsqueda de similitud en el contenido de la página
+            return self.perform_similarity_search(content, query)
+        return "Página no encontrada"
+
+    def perform_similarity_search(self, content: str, query: str) -> str:
+        """Realiza una búsqueda de similitud en un contenido específico."""
+        # Crear un documento temporal para la búsqueda
+        temp_doc = Document(page_content=content)
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+            chunk_size=1024
+        )
+        splits = text_splitter.split_documents([temp_doc])
+        
+        # Crear una colección temporal en el vectorstore
+        temp_vectorstore = Chroma.from_documents(
+            documents=splits,
+            embedding=self.vectorstore._embedding_function,
+            collection_name="temp_search"
+        )
+        
+        # Realizar búsqueda
+        results = temp_vectorstore.similarity_search(query, k=1)
+        
+        # Limpiar la colección temporal
+        temp_vectorstore = None
+        
+        return results[0].page_content if results else "No se encontraron resultados relevantes"
+
+    def advanced_search(self, query: str) -> List[Document]:
+        """Realiza una búsqueda avanzada en todos los documentos."""
+        results = self.vectorstore.similarity_search(query, k=10)
+        return results
+
+    def search_in_document(self, file_name: str, query: str) -> Dict[int, str]:
+        """Busca un término específico en todas las páginas de un documento."""
+        if file_name in self.doc_store.document_index:
+            results = {}
+            for page_num, page_data in self.doc_store.document_index[file_name].items():
+                content = page_data["content"]
+                if query.lower() in content.lower():
+                    results[page_num] = content
+            return results
+        return {"error": "Documento no encontrado"}
+
     def prepare_chat_history(self):
         question = self.prompt[-1]['content']
         
-        # Search for specific page references
-        match = re.search(r'página (\d+)', question, re.IGNORECASE)
-        if match:
-            page_num = int(match.group(1))
-            file_name_match = re.search(
-                r'(?:en|del|de|documento|pdf) ([^\.]+\.pdf)', 
-                question, 
-                re.IGNORECASE
-            )
-            if file_name_match:
-                file_name = file_name_match.group(1).strip()
-                docs = [doc for doc in self.docs 
-                       if doc.metadata.get("page_num") == page_num 
-                       and doc.metadata.get("file_name") == file_name]
+        # Mejorar la detección de referencias a páginas y documentos
+        page_match = re.search(r'página (\d+)', question, re.IGNORECASE)
+        file_match = re.search(r'(?:en|del|de|documento|pdf) ([^\.]+\.pdf)', question, re.IGNORECASE)
+        
+        if page_match and file_match:
+            page_num = int(page_match.group(1))
+            file_name = file_match.group(1).strip()
+            
+            # Buscar específicamente en la página solicitada
+            content = self.get_page_content(file_name, page_num)
+            if content != "Página no encontrada":
+                # Si hay una consulta específica, buscar en la página
+                query_terms = re.sub(r'página \d+|(?:en|del|de|documento|pdf) [^\.]+\.pdf', '', question).strip()
+                if query_terms:
+                    content = self.search_in_page(file_name, page_num, query_terms)
+                
+                doc = Document(
+                    page_content=content,
+                    metadata={"file_name": file_name, "page_num": page_num}
+                )
+                docs = [doc]
             else:
-                docs = [doc for doc in self.docs 
-                       if doc.metadata.get("page_num") == page_num]
+                docs = self.vectorstore.similarity_search(question.lower(), k=10)
+        elif file_match:
+            file_name = file_match.group(1).strip()
+            query_terms = re.sub(r'(?:en|del|de|documento|pdf) [^\.]+\.pdf', '', question).strip()
+            if query_terms:
+                search_results = self.search_in_document(file_name, query_terms)
+                docs = [
+                    Document(page_content=content, metadata={"file_name": file_name, "page_num": page_num})
+                    for page_num, content in search_results.items()
+                ]
+            else:
+                docs = self.vectorstore.similarity_search(question.lower(), k=10)
         else:
             docs = self.vectorstore.similarity_search(question.lower(), k=10)
         
-        docs = self.truncate_docs(docs, self.max_tokens)
-        doc_txt = self.format_docs(docs)
+        # Check if the documents fit into the context
+        if self.fits_in_context(docs):
+            doc_txt = self.format_docs(docs)
+        else:
+            # Perform similarity search if documents don't fit in context
+            docs = self.vectorstore.similarity_search(question.lower(), k=10)
+            docs = self.truncate_docs(docs, self.max_tokens)
+            doc_txt = self.format_docs(docs)
         
         system_message = f"""Analiza estos fragmentos y responde la pregunta 
         de manera precisa. Si la información no está en los fragmentos, 
@@ -231,6 +323,14 @@ class Retriever:
         Pregunta: {question}\n"""
 
         self.chat_history = [{"role": "system", "content": system_message}]
+        
+        # Free memory after preparing chat history
+        del docs
+
+    def fits_in_context(self, docs: List[Document]) -> bool:
+        """Check if the documents fit into the context size."""
+        total_tokens = sum(len(doc.page_content.split()) for doc in docs)
+        return total_tokens <= self.max_tokens
 
     def truncate_docs(self, docs: List[Document], max_tokens: int) -> List[Document]:
         truncated_docs = []

@@ -14,7 +14,7 @@ class Assistant:
         self.model = None
         self.tools= False
         self.rag = False
-        self.max_context_tokens = 4096
+        self.max_context_tokens = 8192
         self.max_assistant_tokens = 2048
         self.is_processing = False
         self.chat_format = default_chat_format
@@ -41,15 +41,16 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         self.load_default_model()
 
     def load_default_model(self):
-        self.model = Model(
-            model_path=self.model_path,
-            verbose=True,
-            n_gpu_layers=self.gpu_layers,
-            n_ctx=self.max_context_tokens,
-            **self.device_options,
-            chat_format=self.chat_format,
-            temp=self.temperature,
-        )
+        if self.model is None:
+            self.model = Model(
+                model_path=self.model_path,
+                verbose=True,
+                n_gpu_layers=self.gpu_layers,
+                n_ctx=self.max_context_tokens,
+                **self.device_options,
+                chat_format=self.chat_format,
+                temp=self.temperature,
+            )
         self.context_window_start = 0
         self.stop_emit = False
 
@@ -70,6 +71,9 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
 
     def unload_model(self):
         self.model = None
+        # Liberar memoria
+        import gc
+        gc.collect()
 
     def set_tools(self,tools):
             self.tools = tools
@@ -123,6 +127,9 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                     Cortex(user_input_o, prompt=user_input, response=response, model=self.model,socket=socket )
             finally:          
                 self.is_processing = False
+                # Liberar memoria
+                import gc
+                gc.collect()
 
 
     def _instruccionesAdicionales(self, prompt):

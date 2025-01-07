@@ -29,7 +29,7 @@ class IASuiteApi:
         self.app = Flask(__name__, static_url_path='/static')
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
-        self.default_model_path = "models/matteogeniaccio/phi-4/phi-4-Q4_K_M.gguf"
+        self.default_model_path = "models\lmstudio-community\Llama-3.2-3B-Instruct-GGUF\Llama-3.2-3B-Instruct-Q8_0.gguf"
         self.default_chat_format = "chatml"
         self.assistant = None
         self.setup_routes()
