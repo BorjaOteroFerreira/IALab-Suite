@@ -50,6 +50,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 **self.device_options,
                 chat_format=self.chat_format,
                 temp=self.temperature,
+                use_mmap=True,
             )
         self.context_window_start = 0
         self.stop_emit = False
