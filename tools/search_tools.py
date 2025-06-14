@@ -11,19 +11,13 @@ from requests_html import HTMLSession
 from sumy.parsers.html import HtmlParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer
+
 class SearchTools:
 
     @staticmethod
     @tool("Search the internet")
     def search_internet(query):
-        """Searches the internet for a given topic and returns relevant results.
-
-        Args:
-            query (str): The search query.
-
-        Returns:
-            str: A formatted string containing search results, including title, link, snippet, and content (if available).
-        """
+        """Searches the internet for a given topic and returns relevant results."""
 
         top_result_to_return = 5
         url = "https://google.serper.dev/search"
@@ -32,7 +26,6 @@ class SearchTools:
             'X-API-KEY': os.environ.get('SERPER_API_KEY'),
             'content-type': 'application/json'
         }
-
         try:
             session = HTMLSession()
             response = session.post(url, headers=headers, json=payload)
@@ -58,7 +51,6 @@ class SearchTools:
                         f"traduce todo a español.",
                         "\n-----------------"
                     ]))
-                  
                 except KeyError:
                     pass  # Skip links with missing information
 
@@ -92,3 +84,44 @@ class SearchTools:
         except Exception as e:
             print(f"Error extracting content: {e}")
             return "Content extraction failed."
+
+    @staticmethod
+    @tool("Get IP Information")
+    def get_ip_info(ip_address):
+        """Fetches geolocation and other information about a given IP address."""
+
+        url = f"https://freeipapi.com/api/json/{ip_address}"
+
+        try:
+            # Realizar la solicitud HTTP para obtener la información de la IP
+            response = requests.get(url)
+
+            # Verificar que la solicitud fue exitosa
+            if response.status_code == 200:
+                data = response.json()
+
+                # Devolver la información de la IP en formato de texto
+                ip_info = (
+                    f"Información de la IP proporcionada:\n"
+                    f"Dirección IP: {data.get('ipAddress')}\n"
+                    f"Versión de IP: {data.get('ipVersion')}\n"
+                    f"Ubicación: {data.get('cityName')}, {data.get('regionName')}, {data.get('countryName')}\n"
+                    f"Código de país: {data.get('countryCode')}\n"
+                    f"Código postal: {data.get('zipCode')}\n"
+                    f"Latitud: {data.get('latitude')}\n"
+                    f"Longitud: {data.get('longitude')}\n"
+                    f"Continente: {data.get('continent')} ({data.get('continentCode')})\n"
+                    f"Moneda: {data.get('currency', {}).get('name')} ({data.get('currency', {}).get('code')})\n"
+                    f"Idioma: {data.get('language')}\n"
+                    f"Zona horaria: {data.get('timeZone')}\n"
+                    f"Proxies detectados: {'Sí' if data.get('isProxy') else 'No'}"
+                )
+                return data
+            else:
+                return f"Error al obtener la información de la IP. Código de estado: {response.status_code}"
+
+        except requests.exceptions.RequestException as e:
+            return f"Ocurrió un error al intentar obtener los datos: {e}"
+
+
+

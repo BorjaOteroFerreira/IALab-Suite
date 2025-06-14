@@ -17,13 +17,13 @@ class EmbeddedFlaskApp(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        # Crear un widget contenedor
+        # widget contenedor
         container = QWidget(self)
         self.setCentralWidget(container)
-        # Crear un diseño vertical para el widget contenedor
+        # diseño vertical para el widget contenedor
         layout = QVBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
-        # Crear un visor web utilizando WebEngineView
+        # visor web utilizando WebEngineView
         web_view = QWebEngineView(self)
         web_view.load(QUrl("http://127.0.0.1:8080")) 
         #web_view.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
@@ -51,7 +51,7 @@ class EmbeddedFlaskApp(QMainWindow):
             self.showFullScreen()
 
     def run_flask_app(self):
-        # Ejecutar la aplicación Flask en un hilo separado
+        # Ejecuta la aplicación Flask en un hilo separado
         flask_thread = Thread(target=lambda: self.flask_app.app.run(host='0.0.0.0', port=8080, debug=True, use_reloader=False))
         flask_thread.start()
 

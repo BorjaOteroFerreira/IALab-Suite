@@ -14,12 +14,12 @@ class Assistant:
         self.model = None
         self.tools= False
         self.rag = False
-        self.max_context_tokens = 8192
+        self.max_context_tokens = 12000
         self.max_assistant_tokens = 2048
         self.is_processing = False
         self.chat_format = default_chat_format
         self.model_path = default_model_path
-        self.temperature = 0.81
+        self.temperature = 0.3
         self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
         self.metal_options = {"device": "metal", "metal_device_id": 0}
         self.gpu_layers = -1
@@ -140,10 +140,13 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
             nuevo_mensaje_sistema =  f"""
     TU PRINCIPAL OBJETIVO ES DETERMINAR QUE HERRAMIENTA NECESITAS
     Funciones disponibles: 
-    [Funcion: 'buscar_en_internet' , query: 'url_o_consulta' ]
     [Funcion: 'video_search_tool' , query: 'consulta']
     [Funcion: 'cripto_price' , query: 'bitcoin,optimism']
     [Funcion: 'generate_image' , query: 'prompt']
+    [Funcion: 'get_ip_info' , query: 'ip'] 
+    [Funcion: 'cve_search' , query: 'CVE-XXXX-XXXXX'] 
+    [Funcion: 'advanced_search' , query: 'consulta']
+    
     responde unicamente con la o las herramientas a lanzar, ejemplo: 
     supongamos que necesitas buscar el tiempo en internet , contestas: 
     [Funcion: 'buscar_en_internet' , query: 'tiempo proximos dias' ]

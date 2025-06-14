@@ -29,7 +29,7 @@ class IASuiteApi:
         self.app = Flask(__name__, static_url_path='/static')
         self.socketio = SocketIO(self.app, async_mode='threading')
         self.logging_setup()
-        self.default_model_path = "Z:/Modelos LM Studio/matteogeniaccio/phi-4/phi-4-Q4_K_M.gguf"
+        self.default_model_path = "Z:/Modelos LM Studio/lmstudio-community/gemma-3-12b-it-GGUF/gemma-3-12b-it-Q4_K_M.gguf"
         self.default_chat_format = "chatml"
         self.assistant = None
         self.setup_routes()
@@ -53,7 +53,7 @@ class IASuiteApi:
         self.app.route('/playground')(self.playground)
 
     def playground(self):
-        models_list = self.get_models_list("models")
+        models_list = self.get_models_list("Z:/Modelos LM Studio/")
         format_list = self.get_format_list()
         chat_list = self.get_chat_list()
         return render_template('playground.html', models_list=models_list, format_list=format_list, chat_list=chat_list)
@@ -77,7 +77,7 @@ class IASuiteApi:
             )
 
     def index(self):
-        models_list = self.get_models_list("models")
+        models_list = self.get_models_list("Z:\\Modelos LM Studio\\")
         format_list = self.get_format_list()
         chat_list = self.get_chat_list()
         return render_template('index.html', models_list=models_list, format_list=format_list, chat_list=chat_list)
