@@ -1,0 +1,277 @@
+.message {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.message-header {
+  padding: 8px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.user-message .message-header {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.assistant-message .message-header {
+  background-color: #f1f8e9;
+  color: #558b2f;
+}
+
+.message-content {
+  flex: 1;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+}
+
+.user-message .message-content {
+  background-color: #2a2c4e;
+}
+
+.assistant-message .message-content {
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+}
+
+.message-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-color);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.message-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 5px;
+}
+
+/* Estilo para bloques de código */
+pre {
+  position: relative;
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 15px 0;
+  overflow-x: auto;
+}
+
+pre code {
+  font-family: 'Consolas', 'Monaco', 'Andale Mono', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.copy-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.copy-button:hover {
+  opacity: 1;
+}
+
+/* Estilo para tablas */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 15px 0;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+/* Efecto de escritura */
+.typing:after {
+  content: '▋';
+  display: inline-block;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Estilos para el componente Message */
+.message-wrapper {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-message .message-avatar {
+  background-color: #3b76d9;
+}
+
+.assistant-message .message-avatar {
+  background-color: #4a4c5e;
+}
+
+.avatar-content {
+  font-size: 18px;
+}
+
+/* Estilos para el mensaje que está siendo escrito */
+.message-wrapper.typing .message-content {
+  position: relative;
+}
+
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  display: block;
+  margin-right: 5px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 50%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  25%, 75% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+}
+
+/* Estilos para bloques de markdown */
+.message-text p {
+  margin-bottom: 16px;
+}
+
+.message-text p:last-child {
+  margin-bottom: 0;
+}
+
+.message-text h1, 
+.message-text h2, 
+.message-text h3, 
+.message-text h4 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.message-text ul, 
+.message-text ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.message-text li {
+  margin-bottom: 8px;
+}
+
+.message-text blockquote {
+  border-left: 4px solid var(--accent-color);
+  padding-left: 16px;
+  margin: 16px 0;
+  color: var(--text-secondary);
+}
+
+.message-text img {
+  max-width: 100%;
+  border-radius: 4px;
+  margin: 16px 0;
+}
+
+.message-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.message-text table th,
+.message-text table td {
+  border: 1px solid #3a3c4e;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.message-text table th {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.message-text a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.message-text a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .message-wrapper {
+    margin-bottom: 16px;
+  }
+  
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+  
+  .message-content {
+    padding: 12px;
+  }
+  
+  .message-text {
+    font-size: 14px;
+  }
+}
