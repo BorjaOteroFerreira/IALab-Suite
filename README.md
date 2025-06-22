@@ -158,17 +158,29 @@ SERPER_API_KEY=your_serper_api_key_here
 
 ## 🎯 Usage
 
-### 🚀 Start the Server
+### 🚀 Start the Application
 
+#### Option 1: Quick Start (Production Build)
 ```bash
 # From the project root
+python build_frontend.py
+```
+
+#### Option 2: Development Mode
+```bash
+# Terminal 1: Start the backend server
 cd Backend-API
 python start_server.py
+
+# Terminal 2: Start the React development server
+cd Frontend-React
+npm start
 ```
 
 ### 🌐 Access the Application
 
-Open your browser and go to: `http://localhost:8081`
+- **Production Build**: Open your browser and go to: `http://localhost:3000`
+- **Development Mode**: Open your browser and go to: `http://localhost:3000` (React dev server)
 
 ### 💬 Use the Chat
 
@@ -294,13 +306,21 @@ DELETE /api/delete-chat
 cd Frontend-React
 npm start
 ```
-This will start the development server at `http://localhost:3000`
+This will start the React development server at `http://localhost:3000`
 
 ### 🐍 Backend Development
 ```bash
 cd Backend-API
 python start_server.py
 ```
+This will start the Flask API server at `http://localhost:8081`
+
+### 🔄 Full Development Setup
+For development, you'll need both servers running:
+1. **Backend**: `http://localhost:8081` (Flask API)
+2. **Frontend**: `http://localhost:3000` (React dev server)
+
+The React development server will proxy API requests to the Flask backend automatically.
 
 ### 🛠️ Creating New Tools
 
