@@ -4,48 +4,34 @@ import queue
 import re 
 import threading 
 import time 
-from tools.search_tools import SearchTools 
-from tools.video_search_tool import YoutubeVideoSearchTool 
-from tools.cripto_price import CriptoPrice
-from tools.generate_image import ImageGenerationTool
-import os
-import copy
-import datetime
-import queue
-import re
-import threading
-import time
-from tools.search_tools import SearchTools
-from tools.video_search_tool import YoutubeVideoSearchTool
-from tools.cripto_price import CriptoPrice
-from tools.generate_image import ImageGenerationTool
-from tools.advanced_search import AdvancedSearchTools
-from SocketResponseHandler import SocketResponseHandler
-
 import os
 import pyttsx3
 from colorama import Fore, Style
 
-os.environ["YOUTUBE_API_KEY"] = 'YOUR_API_KEY_HERE'
-os.environ["SERPER_API_KEY"] = 'YOUR_API_KEY_HERE'
+from tools.tool_registry import ToolRegistry
+from SocketResponseHandler import SocketResponseHandler
+
+os.environ["YOUTUBE_API_KEY"] = 'AIzaSyDIfrz9h4Y7KKExF-j8VNztYGypt6EYC_o'
+os.environ["SERPER_API_KEY"] = 'efdb015cbec193833a7ace9fc226bea17c6c5268'
 
 
 class Cortex:
-    def __init__(self, prompt_o, prompt, response, model, socket):        # Inicializar propiedades (response ahora es ignorado, se determinará internamente)
+    def __init__(self, prompt_o, prompt, response, model, socket, assistant=None):        
+        # Inicializar propiedades (response ahora es ignorado, se determinará internamente)
         self.original_prompt = prompt_o
         self.prompt = prompt
         self.socket = socket
+        self.assistant = assistant  # Referencia al assistant para acceder a stop_emit
         self.fecha = datetime.datetime.now()
         self.engine_lock = threading.Lock()
         self.response_queue = queue.Queue()
-        self.tools = {
-            'buscar_en_internet': SearchTools.search_internet,
-            'video_search_tool': YoutubeVideoSearchTool.run,
-            'cripto_price': CriptoPrice.get_price,
-            'generate_image': ImageGenerationTool.run,
-            'get_ip_info': SearchTools.get_ip_info,
-            'advanced_search': AdvancedSearchTools.advanced_search,
-        }
+          # Inicializar el registry de herramientas
+        self.tool_registry = ToolRegistry()
+        # Registrar automáticamente todas las herramientas disponibles
+        self.tool_registry.discover_tools()
+        
+        # Obtener las herramientas disponibles del registry
+        self.tools = self._get_available_tools_dict()
 
         self.patrones_regex = [
             r'herramienta\s*\'([^\']+)\'.*consulta\s*\'([^\']+)\'',
@@ -89,18 +75,15 @@ class Cortex:
         self.final_response = self.process_tool_needs(herramientas_necesarias, model)
 
     def _determinar_herramientas_necesarias(self, model):
-        """Determina qué herramientas necesita usando el modelo"""
-        # Crear prompt para determinar herramientas
-        instrucciones_herramientas = """
+        """Determina qué herramientas necesita usando el modelo"""        # Crear prompt para determinar herramientas usando el registry
+        base_instructions = """
 TU PRINCIPAL OBJETIVO ES DETERMINAR QUE HERRAMIENTA NECESITAS
-Funciones disponibles: 
-[Funcion: 'video_search_tool' , query: 'consulta']
-[Funcion: 'cripto_price' , query: 'bitcoin,optimism']
-[Funcion: 'generate_image' , query: 'prompt']
-[Funcion: 'get_ip_info' , query: 'ip'] 
-[Funcion: 'cve_search' , query: 'CVE-XXXX-XXXXX'] 
-[Funcion: 'advanced_search' , query: 'consulta']
-
+"""
+        
+        # Obtener las instrucciones dinámicas de herramientas
+        tool_instructions = self._get_tool_instructions()
+        
+        additional_instructions = """
 responde unicamente con la o las herramientas a lanzar, ejemplo: 
 supongamos que necesitas buscar el tiempo en internet , contestas: 
 [Funcion: 'buscar_en_internet' , query: 'tiempo proximos dias' ]
@@ -109,6 +92,8 @@ Puedes usar mas de una herramienta si lo necesitas.
 Debes contestar solo con las funciones que usarias sin texto antes ni despues
 SIEMPRE DEBES RESPONDER EN ESPAÑOL.
 """
+        
+        instrucciones_herramientas = base_instructions + tool_instructions + additional_instructions
 
         # Crear una copia del prompt original y modificar el mensaje del sistema
         prompt_herramientas = copy.deepcopy(self.original_prompt)
@@ -121,7 +106,6 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             for chunk in model.create_chat_completion(messages=prompt_herramientas, max_tokens=200, stream=True):
                 if 'content' in chunk['choices'][0]['delta']:
                     response += chunk['choices'][0]['delta']['content']
-            
             print(f'\n{Fore.BLUE}🧠 Determinando herramientas necesarias\n💭 {response}{Style.RESET_ALL}')
             return response.strip()
         except Exception as e:
@@ -136,13 +120,18 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         print('Iniciando proceso iterativo de detección y uso de herramientas')
         self._enviar_a_consola(self.output_console, 'pensamiento')
         
-   
         herramientas_usadas = []
         resultados_herramientas = []
         iterations = 0
         current_response = response
         
         while iterations < self.max_iterations:
+            # Verificar si se debe detener la respuesta
+            if self.assistant and self.assistant.stop_emit:
+                print(f"{Fore.RED}🛑 Stop signal detected, breaking tool iterations{Style.RESET_ALL}")
+                self._enviar_a_consola("🛑 Process stopped by user", 'info')
+                break
+                
             iterations += 1
             print(f"\n{Fore.CYAN}[*] Iteración {iterations} de detección de herramientas{Style.RESET_ALL}")
             self._enviar_a_consola(f"[*] Iteración {iterations} de detección de herramientas", 'info')
@@ -158,6 +147,11 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
                 
             # Ejecutar las herramientas detectadas
             for funcion_texto, query_texto in coincidencias:
+                # Verificar si se debe detener antes de ejecutar cada herramienta
+                if self.assistant and self.assistant.stop_emit:
+                    print(f"{Fore.RED}🛑 Stop signal detected during tool execution{Style.RESET_ALL}")
+                    return "🛑 Process stopped by user"
+                    
                 if (funcion_texto, query_texto) not in herramientas_usadas:  # Evitar repetir exactamente la misma consulta
                     resultado = self._ejecutar_herramienta_individual(funcion_texto, query_texto)
                     resultados_herramientas.append((funcion_texto, query_texto, resultado))
@@ -166,7 +160,8 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             # Consultar al modelo para decidir si necesita más herramientas
             if herramientas_usadas:
                 current_response = self._consultar_modelo_para_decision(model, resultados_herramientas)
-          # Generar respuesta final
+        
+        # Generar respuesta final
         final_response = self.generar_respuesta_final(model, resultados_herramientas)
         return final_response
 
@@ -176,9 +171,13 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         
         print(f"\n{Fore.BLUE}[*] Consultando al modelo para decisión de herramientas adicionales{Style.RESET_ALL}")
         self._enviar_a_consola("[*] Consultando al modelo para decisión de herramientas adicionales", 'info')
-        
         response_decision = ""
         for chunk in model.create_chat_completion(messages=prompt_decision, max_tokens=1024, stream=True):
+            # Verificar si se debe detener
+            if self.assistant and self.assistant.stop_emit:
+                print(f"{Fore.RED}🛑 Stop signal detected during decision consultation{Style.RESET_ALL}")
+                return "🛑 Process stopped by user"
+                
             if 'content' in chunk['choices'][0]['delta']:
                 fragmento = chunk['choices'][0]['delta']['content']
                 response_decision += fragmento
@@ -193,11 +192,12 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         """Prepara el prompt para consultar al modelo sobre decisiones de herramientas adicionales"""
         # Copia del prompt original para no modificarlo
         decision_prompt = copy.deepcopy(self.original_prompt)
-        
-        # Información sobre las herramientas disponibles
+          # Información sobre las herramientas disponibles usando el registry
         herramientas_info = "Tienes disponibles las siguientes herramientas:\n"
-        for tool_name in self.tools.keys():
-            herramientas_info += f"- {tool_name}\n"
+        for tool_name in self.tool_registry.list_tools():
+            tool_info = self.tool_registry.get_tool_info(tool_name)
+            if tool_info:
+                herramientas_info += f"- {tool_name}: {tool_info.get('description', 'Sin descripción')}\n"
           # Información sobre los resultados de las herramientas ya utilizadas
         resultados_info = "He utilizado las siguientes herramientas con estos resultados:\n\n"
         for funcion, query, resultado in resultados_herramientas:
@@ -224,7 +224,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         # Añadir un mensaje de asistente para mantener la alternancia de roles
         decision_prompt.append({"role": "assistant", "content": "He ejecutado las herramientas solicitadas y tengo los resultados."})
         
-        # Añadir la información al prompt
+        # Añadir la información al prompt        
         decision_prompt.append({"role": "user", "content": herramientas_info + resultados_info + instruccion})
         
         return decision_prompt
@@ -243,6 +243,11 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         return list(coincidencias)
 
     def _ejecutar_herramienta_individual(self, funcion_texto, query_texto):
+        # Verificar si se debe detener antes de ejecutar la herramienta
+        if self.assistant and self.assistant.stop_emit:
+            print(f"{Fore.RED}🛑 Stop signal detected before tool execution{Style.RESET_ALL}")
+            return "🛑 Process stopped by user"
+            
         print("")
         funcion_texto = funcion_texto.replace("'", "")
         query_texto = query_texto.replace("'", "").split(',') if 'cripto_price' in funcion_texto else query_texto
@@ -250,20 +255,35 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         self._enviar_a_consola(f'[->] Usando {funcion_texto} con consulta {query_texto}...', 'info')
         resultado_herramienta = self.ejecutar_herramienta(funcion_texto, query_texto)
         print(f'{Fore.YELLOW}[!] Eureka!:{Style.RESET_ALL}\n{Fore.MAGENTA}{resultado_herramienta}{Style.RESET_ALL}')
-        return resultado_herramienta
-
+        return resultado_herramienta    
+    
     def ejecutar_herramienta(self, nombre_herramienta, consulta):
+        """Ejecuta una herramienta usando el registry"""
         try:
-            if nombre_herramienta == "video_search_tool":
-                resultado_herramienta, ids = self.tools[nombre_herramienta](consulta)
+            # Usar el registry para ejecutar la herramienta
+            resultado_ejecucion = self.tool_registry.execute_tool(nombre_herramienta, consulta)
+            
+            # Verificar si la ejecución fue exitosa
+            if not resultado_ejecucion.success:
+                error_msg = f'Error usando la herramienta {nombre_herramienta}: {resultado_ejecucion.error}'
+                print(f"{Fore.RED}{error_msg}{Style.RESET_ALL}")
+                return error_msg
+            
+            # Extraer los datos del resultado
+            resultado_herramienta = resultado_ejecucion.data
+            
+            # Manejo especial para herramientas que devuelven múltiples valores
+            if nombre_herramienta == "video_search_tool" and isinstance(resultado_herramienta, tuple):
+                resultado_herramienta, ids = resultado_herramienta
                 SocketResponseHandler.emit_utilities_data(self.socket, {"ids": ids})
-            else:
-                resultado_herramienta = self.tools[nombre_herramienta](consulta)
+            
             self.output_console = resultado_herramienta
             self._enviar_a_consola(self.output_console, 'tool')
             return resultado_herramienta
         except Exception as e:
-            return f'Error usando la herramienta {nombre_herramienta}: {e}'
+            error_msg = f'Error usando la herramienta {nombre_herramienta}: {e}'
+            print(f"{Fore.RED}{error_msg}{Style.RESET_ALL}")
+            return error_msg
 
     def generar_respuesta_final(self, model, resultados_herramientas):
         """Genera la respuesta final incorporando los resultados de todas las herramientas"""
@@ -282,8 +302,8 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         
         # Añadir un mensaje de asistente para mantener la alternancia de roles
         prompt_final.append({"role": "assistant", "content": "He recopilado toda la información necesaria de las herramientas."})
-        
         prompt_final.append({"role": "user", "content": info_consolidada})
+
           # Generar la respuesta final con todos los resultados
         response_final = self.transmitir_response(model, prompt_final)
         
@@ -306,8 +326,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         tokensInput = user_question.encode()
         tokens = model.tokenize(tokensInput)
         total_user_tokens = len(tokens)
-        total_assistant_tokens = 0        
-        # Usar el método estático unificado para manejar el streaming
+        total_assistant_tokens = 0          
         response_completa, total_assistant_tokens = SocketResponseHandler.stream_chat_completion(
             model=model,
             messages=prompt,
@@ -316,13 +335,11 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             user_tokens=total_user_tokens,
             process_line_breaks=True,
             response_queue=self.response_queue,
-            link_remover_func=self.eliminar_enlaces
-        )
-        
-        # Enviar señal de finalización
+            link_remover_func=self.eliminar_enlaces,
+            stop_condition=lambda: self.assistant.stop_emit if self.assistant else False
+        )        
         self.response_queue.put(None)        
-        SocketResponseHandler.emit_finalization_signal(self.socket)
-        
+        SocketResponseHandler.emit_finalization_signal(self.socket, total_user_tokens, total_assistant_tokens)
         return response_completa
 
     def eliminar_enlaces(self, linea):
@@ -350,7 +367,27 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         return True
 
     def extraer_urls(self, texto):
-        """Extrae URLs de un texto para investigación adicional"""        # Patrón de expresión regular para encontrar URLs
+        """Extrae URLs de un texto para investigación adicional"""       
         patron_url = r'https?://\S+|www\.\S+'
         urls = re.findall(patron_url, texto)
         return urls
+    
+    def _get_available_tools_dict(self):
+        """Obtiene un diccionario de herramientas disponibles desde el registry"""
+        available_tools = {}
+        for tool_name in self.tool_registry.list_tools():
+            # Crear una función wrapper que use el registry para ejecutar la herramienta
+            def tool_wrapper(query, name=tool_name):
+                result = self.tool_registry.execute_tool(name, query)
+                return result.data if result.success else f"Error: {result.error}"
+            available_tools[tool_name] = tool_wrapper
+        return available_tools
+    
+    def _get_tool_instructions(self):
+        """Genera las instrucciones de herramientas disponibles para el modelo"""
+        instructions = "Funciones disponibles:\n"
+        for tool_name in self.tool_registry.list_tools():
+            tool_info = self.tool_registry.get_tool_info(tool_name)
+            if tool_info:
+                instructions += f"[Funcion: '{tool_name}' , query: '{tool_info.get('description', 'consulta')}']\n"
+        return instructions
