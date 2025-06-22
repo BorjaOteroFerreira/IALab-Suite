@@ -134,6 +134,41 @@
   }
 }
 
+@supports (-webkit-touch-callout: none) {
+  .chat-sidebar {
+    /* Forzar repaint en Safari */
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  .chat-list {
+    /* Forzar renderizado de la lista */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: contents;
+  }
+  
+  .chat-item {
+    /* Asegurar que cada item se renderice */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  
+  .chat-list {
+    min-height: 100px !important;
+  }
+  
+  .chat-item {
+
+    margin: 5px 0 !important;
+  }
+}
+
+
 /* Fix adicional para iPhone con notch */
 @media screen and (max-width: 430px) {
   @supports (-webkit-touch-callout: none) and (max-device-width: 430px) {

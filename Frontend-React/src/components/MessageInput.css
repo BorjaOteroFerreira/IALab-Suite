@@ -141,7 +141,7 @@
   color: var(--accent-error);
 }
 
-/* Responsive mejorado */
+/* Responsive */
 @media (max-width: 768px) {
   .message-input-container {
     padding: var(--space-3);

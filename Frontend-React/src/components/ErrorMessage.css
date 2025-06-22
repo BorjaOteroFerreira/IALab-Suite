@@ -1,6 +1,5 @@
 /* 
- * Error Message - Modern Professional UI
- * Accessible, responsive, and production-ready
+ * Error Message 
  */
 
 .error-message {
@@ -55,7 +54,7 @@
   100% { transform: translateX(100%); }
 }
 
-/* Error type variants */
+/* Variantes de tipo de error */
 .error-network {
   border-left-color: var(--warning);
   border-color: rgba(251, 146, 60, 0.2);
@@ -80,7 +79,7 @@
     rgba(79, 70, 229, 0.05) 100%);
 }
 
-/* Error icon with better visual hierarchy */
+/* Icono de error*/
 .error-icon {
   font-size: 20px;
   display: flex;
@@ -95,7 +94,7 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* Error content with improved typography */
+/* Contenido error */
 .error-content {
   flex: 1;
   min-width: 0;
@@ -118,7 +117,7 @@
   line-height: 1.5;
 }
 
-/* Enhanced error tips */
+/* Error tips */
 .error-tips {
   margin: var(--spacing-sm) 0 var(--spacing-xs) 0;
   padding-left: var(--spacing-md);
@@ -142,7 +141,7 @@
   font-weight: bold;
 }
 
-/* Modern action buttons */
+/* Botones de accion*/
 .error-actions {
   display: flex;
   flex-direction: column;
@@ -196,7 +195,7 @@
   border-color: var(--border-focus);
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .error-message {
     flex-direction: column;
@@ -239,7 +238,7 @@
   }
 }
 
-/* Accessibility improvements */
+/* Accessibility  */
 .error-message:focus-within {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
@@ -263,7 +262,7 @@
   }
 }
 
-/* High contrast mode support */
+/* Soporte de alto contraste */
 @media (prefers-contrast: high) {
   .error-message {
     border-width: 2px;

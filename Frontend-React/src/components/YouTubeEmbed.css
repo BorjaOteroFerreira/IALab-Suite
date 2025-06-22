@@ -1,6 +1,5 @@
 /* 
- * Media Embed Styles - Modern Professional UI
- * For future multimedia content integration
+ * Media Embed Styles
  */
 
 .media-embeds {
@@ -91,7 +90,7 @@
   opacity: 0.5;
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .media-grid {
     grid-template-columns: 1fr;

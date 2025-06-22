@@ -82,45 +82,7 @@ const LinkRenderer = ({ href, children }) => {
   );
 };
 
-// Función para procesar texto y convertir URLs de YouTube en componentes embebidos
-const processYouTubeLinks = (text) => {
-  const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([^&\n?#\s]+))/g;
-  
-  const parts = [];
-  let lastIndex = 0;
-  let match;
-  
-  while ((match = youtubeRegex.exec(text)) !== null) {
-    // Agregar texto antes del enlace
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-    
-    // Agregar el componente de YouTube
-    const videoId = extractYouTubeVideoId(match[1]);
-    if (videoId) {
-      parts.push(
-        <div key={match.index}>
-          <a href={match[1]} target="_blank" rel="noopener noreferrer" className="youtube-link">
-            {match[1]}
-          </a>
-          <YouTubeEmbed videoId={videoId} />
-        </div>
-      );
-    } else {
-      parts.push(match[1]);
-    }
-    
-    lastIndex = match.index + match[0].length;
-  }
-  
-  // Agregar el texto restante
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
-  
-  return parts.length > 1 ? parts : text;
-};
+
 
 // Componente ChatSidebar
 function ChatSidebar({ visible, onLoadChat, onDeleteChat, onClose }) {

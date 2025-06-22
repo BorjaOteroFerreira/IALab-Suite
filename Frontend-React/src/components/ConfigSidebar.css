@@ -1,6 +1,6 @@
 /* 
- * Config Sidebar - Modern Professional UI
- * Glassmorphism design with smooth animations and accessibility
+ * Config Sidebar 
+ * Glassmorphism design con smooth animations y accesibilidad
  */
 
 .config-sidebar {
@@ -111,14 +111,14 @@
   letter-spacing: -0.02em;
 }
 
-/* Fallback for browsers that don't support text clipping */
+/* Fallback para navegadores que no soportan click en el texto */
 @supports not (background-clip: text) {
   .sidebar-header h5 {
     color: var(--text-primary);
   }
 }
 
-/* Modern header with gradient - deprecated, using sidebar-header instead */
+/*  cabecera con gradiente - todo:  usar sidebar-header*/
 .config-sidebar h5:not(.sidebar-header h5) {
   margin-bottom: var(--spacing-lg);
   font-weight: 700;
@@ -170,7 +170,7 @@
   transform: scale(0.95);
 }
 
-/* Form groups with better spacing */
+/* Form groups */
 .form-group {
   margin-bottom: var(--spacing-md);
   position: relative;
@@ -185,7 +185,7 @@
   letter-spacing: 0.01em;
 }
 
-/* Label mejorado para el selector de modelos */
+/* Label  para el selector de modelos */
 .model-label {
   font-size: var(--font-size-sm) !important;
   font-weight: 600 !important;
@@ -197,7 +197,7 @@
   letter-spacing: 0.01em;
 }
 
-/* Modern form controls with glassmorphism */
+/* Controles de formulario con glassmorphism */
 .form-control {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -266,7 +266,7 @@
   font-weight: 600;
 }
 
-/* Enhanced select with custom styling */
+/* Selector de capas gpu */
 select.form-control {
   cursor: pointer;
   background: rgba(80, 80, 80, 0.8);
@@ -326,7 +326,7 @@ option.placeholder-option {
   font-weight: 400;
 }
 
-/* Estilos modernos para las opciones de modelos */
+/* Estilos  para las opciones de modelos */
 select.form-control option.model-option {
   background: rgba(70, 70, 70, 0.95);
   color: var(--text-primary);
@@ -363,7 +363,7 @@ select.form-control option:focus {
   color: var(--text-primary);
 }
 
-/* Flecha personalizada del select con mejor contraste */
+/* Flecha personalizada del select*/
 select.form-control {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' opacity='0.7' d='M8 12L3 7h10z'/%3E%3C/svg%3E");
 }
@@ -372,7 +372,7 @@ select.form-control::-ms-expand {
   display: none;
 }
 
-/* Textarea with better UX */
+/* Textarea  */
 textarea.form-control {
   min-height: 100px;
   resize: vertical;
@@ -380,7 +380,7 @@ textarea.form-control {
   line-height: 1.6;
 }
 
-/* Number input without spinners */
+/* Input numerico sin spiners */
 input[type="number"].form-control {
   appearance: textfield;
   -moz-appearance: textfield;
@@ -392,7 +392,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* Modern button group */
+/* button group */
 .config-buttons {
   display: flex;
   gap: var(--spacing-sm);
@@ -400,7 +400,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   flex-wrap: wrap;
 }
 
-/* Enhanced buttons with glassmorphism */
+/*  Botones con glassmorphism */
 .btn {
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
@@ -482,7 +482,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   outline-offset: 2px;
 }
 
-/* Loading state */
+/* Cargar estado */
 .btn.loading {
   position: relative;
   color: transparent;
@@ -508,7 +508,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   to { transform: rotate(360deg); }
 }
 
-/* Slider styles for GPU Layers */
+/* Slider para capas gpu */
 .slider {
   -webkit-appearance: none;
   appearance: none;
@@ -583,7 +583,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   font-weight: 500;
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .config-sidebar {
     position: fixed;
@@ -647,7 +647,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   }
 }
 
-/* Accessibility improvements */
+/* Accessibilidad */
 .form-control:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
@@ -664,7 +664,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   }
 }
 
-/* High contrast mode support */
+/* Soporte para contraste alto */
 @media (prefers-contrast: high) {
   .config-sidebar {
     background: var(--surface);
@@ -697,7 +697,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   }
 }
 
-/* ===== SELECTOR MODERNO DE MODELOS ===== */
+/* ===== SELECTOR  DE MODELOS ===== */
 
 /* Botón trigger del selector */
 .model-selector-trigger {
@@ -908,7 +908,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   background: linear-gradient(135deg, #1e40af, #4a4320);
 }
 
-/* Card Icon */
+/* Icono del card */
 .model-card-icon {
   font-size: 1.5em;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
@@ -974,7 +974,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   text-transform: capitalize;
 }
 
-/* Selected Indicator */
+/* Indicador seleccionado */
 .selected-indicator {
   font-size: 16px;
   color: var(--success, #10b981);
@@ -1011,4 +1011,4 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   }
 }
 
-/* ===== FIN SELECTOR MODERNO ===== */
+/* ===== FIN SELECTOR  ===== */

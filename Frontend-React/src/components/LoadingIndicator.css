@@ -140,7 +140,7 @@
   }
 }
 
-/* Modern saving indicator with progress */
+/* saving indicator with progress */
 .saving-indicator {
   display: flex;
   flex-direction: column;
@@ -190,7 +190,7 @@
   100% { transform: translateX(100%); }
 }
 
-/* Loading message with better typography */
+/* Loading message */
 .loading-message {
   margin-left: var(--spacing-sm);
   font-style: normal;
@@ -200,7 +200,7 @@
   opacity: 0.8;
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .typing-indicator {
     margin-left: var(--spacing-sm);
@@ -217,7 +217,7 @@
   }
 }
 
-/* Accessibility improvements */
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .typing-indicator span,
   .spinner-ring,
@@ -231,7 +231,7 @@
   }
 }
 
-/* Dark theme optimizations */
+/* Optimizacion Tema Dark */
 @media (prefers-color-scheme: dark) {
   .progress-bar {
     background: rgba(255, 255, 255, 0.1);

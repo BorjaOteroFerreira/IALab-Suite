@@ -6,7 +6,6 @@ Socket Response Handler - Clase centralizada para el envío de respuestas al fro
 class SocketResponseHandler:
     """
     Clase estática para centralizar el envío de respuestas al frontend por socket.
-    Evita la duplicación de código en Assistant.py, Cortex.py y otros módulos.
     """
     
     @staticmethod
@@ -39,7 +38,7 @@ class SocketResponseHandler:
     @staticmethod
     def emit_streaming_response_legacy(socket, content, total_user_tokens=0, total_assistant_tokens=0, finished=False):
         """
-        Método legacy para compatibilidad con el código existente
+        Método legacy para compatibilidad con el código actual
         """
         response_data = {
             'content': content,
