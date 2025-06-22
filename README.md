@@ -34,11 +34,12 @@
 
 ### 🎯 Integrated Tools
 - 🔍 **Internet Search**: Serper API integration
+- 🔎 **Advanced Search**: Specialized searches with Google dorks
 - 🎥 **Video Search**: YouTube API integration
 - 💰 **Cryptocurrency Prices**: Real-time information
 - 🖼️ **Image Generation**: AI image generation tool
 - 🌐 **IP Information**: Geographic data retrieval
-- 🔎 **Advanced Search**: Specialized searches with Google dorks
+
 
 ## 🏗️ Architecture
 
