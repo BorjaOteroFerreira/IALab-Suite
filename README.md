@@ -9,11 +9,9 @@
 
 ### Responsive Inteface
 <p align="center">
-  <img src="media/chat_pic.png" height="600"/>
   <img src ="media/chat_pic_pan.png" width="600" />
 </p>
-### Tool usage
-#### You can develop your own tools for the model in a very simple and modular way.
+
 <p align="center">
   <img src ="media/toolsearch.png" width="600" />
 </p>
