@@ -4,7 +4,7 @@
 from flask import Flask, render_template, request, jsonify, json, send_from_directory
 from llama_cpp.llama_chat_format import LlamaChatCompletionHandlerRegistry
 from flask_socketio import SocketIO
-import os, signal
+import os, signal, time
 from Assistant import Assistant 
 import logging
 
@@ -186,8 +186,7 @@ class IASuiteApi:
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
         self.assistant.unload_model()
         self.assistant.load_model(selected_model, selected_format, temperature, n_gpu_layers, system_message,n_ctx, n_ctx)
-        return f'''
-                \nModel:{selected_model}
+        return f'''                \nModel:{selected_model}
                 \nformat: {selected_format}
                 \ntemp: {temperature}
                 \nlayers: {n_gpu_layers}
@@ -200,8 +199,17 @@ class IASuiteApi:
         return 'Model uninstalled 🫗!'
 
     def stop_response(self):
-        self.assistant.stop_response()
-        return "Finishing response...\nPlease wait ⏳"
+        try:
+            self.assistant.stop_response()
+            # Emitir señal de parada via WebSocket
+            self.socketio.emit('response_stopped', {
+                'message': 'Response stopped by user',
+                'timestamp': time.time()
+            }, namespace='/test')
+            return {"status": "success", "message": "Response stopped successfully"}
+        except Exception as e:
+            print(f"Error stopping response: {e}")
+            return {"status": "error", "message": f"Error stopping response: {str(e)}"}
 
     def get_models_list(self, folder_path):
         models_list = []

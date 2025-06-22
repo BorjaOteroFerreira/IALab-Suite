@@ -142,14 +142,22 @@ export const ChatProvider = ({ children }) => {
             finalizationProcessedRef.current = false;
           }, 100);
         }
-
-        // NOTA: Los tokens ahora se cuentan en tiempo real arriba, no aquí
       }
+    });    newSocket.on('output_console', (response) => {
+      console.log('Output de consola:', response);
+      // TODO: implementar un área de consola visible en la UI 
     });
 
-    newSocket.on('output_console', (response) => {
-      console.log('Output de consola:', response);
-      // Podríamos implementar un área de consola visible en la UI si se necesita
+    // Listener para respuesta detenida
+    newSocket.on('response_stopped', (response) => {
+      console.log('🛑 Respuesta detenida por el usuario:', response);
+      setCurrentResponse('');
+      currentResponseRef.current = '';
+      setIsLoading(false);
+      addMessageToChat('system', '⏹️ Respuesta detenida por el usuario');
+      
+      // Resetear el flag de finalización
+      finalizationProcessedRef.current = false;
     });
 
     setSocket(newSocket);
@@ -243,7 +251,7 @@ export const ChatProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
-      // Añadir mensaje de error al chat      addMessageToChat('system', 'Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.');
+      // Añadir mensaje de error al chat addMessageToChat('system', 'Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.');
       setIsLoading(false);
       showError(error);
     }

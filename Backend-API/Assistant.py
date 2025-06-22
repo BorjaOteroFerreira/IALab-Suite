@@ -118,10 +118,9 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                     '',  # Sin contenido aún
                     user_tokens=total_user_tokens,  # Solo tokens del usuario
                     finished=False                )
-            try:
-                # Si hay herramientas, ir directamente a Cortex sin procesar aquí
+            try:                # Si hay herramientas, ir directamente a Cortex sin procesar aquí
                 if self.tools:
-                    Cortex(user_input_o, prompt=user_input, response="", model=self.model, socket=socket)
+                    Cortex(user_input_o, prompt=user_input, response="", model=self.model, socket=socket, assistant=self)
                     return  # Salir temprano, Cortex se encarga de todo
                   # Solo procesar normalmente si no hay herramientas usando el método unificado
                 response, total_assistant_tokens = SocketResponseHandler.stream_chat_completion(
@@ -152,43 +151,18 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 # Liberar memoria
                 import gc
                 gc.collect()
-    def emit_ollama_response_stream(self,user_input, socket):
-            '''
-            Obtiene la respuesta del asistente.
-
-            Parámetros:
-            - (obj) socket: Conexion para enviar el stream.
-            '''
-            client = ollama
-            total_user_tokens = 0
-            if not self.is_processing:
-                self.stop_emit = False
-                self.is_processing = True
-                full_response = ""
-                if(self.model is not None):
-                    tokensInput = str(user_input[-1]["content"]).encode()  # Convertir a bytes
-                    print(tokensInput)
-                    tokens = self.model.tokenize(tokensInput)  
-                    total_user_tokens = len(tokens)  # Contar los tokens de la entrada del usuario
-                    print(total_user_tokens)
-                total_assistant_tokens = 0  # Inicializar el contador de tokens del asistente
-                try:
-                    for part in client.chat(model='gemma', messages=user_input, stream=True):
-                            chunk = part['message']['content']
-                            for char in chunk:
-                                full_response += char
-                                total_assistant_tokens+=1 # Contar los tokens en el chunk actual
-                                print(char, end='', flush=True)
-                            socket.emit('assistant_response', {
-                                'content': chunk,
-                                'total_user_tokens': total_user_tokens,
-                                'total_assistant_tokens': total_assistant_tokens
-                            }, namespace='/test')
-                            time.sleep(0.01)
-                finally:
-                    self.is_processing = False
+    
 
     def stop_response(self):
         self.stop_emit = True
+        print("🛑 Stop signal activada")
+        # Emitir señal de finalización inmediata
+        try:
+            from SocketResponseHandler import SocketResponseHandler
+            # Si tenemos un socket activo, emitir señal de parada
+            # Nota: Necesitaríamos guardar la referencia del socket para esto
+            print("🛑 Response stopping...")
+        except Exception as e:
+            print(f"Error emitiendo señal de parada: {e}")
 
 
