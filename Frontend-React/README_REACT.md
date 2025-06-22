@@ -10,16 +10,16 @@ IALab-Suite/
 ├── Assistant.py           # Lógica de asistente
 ├── ...
 ├── frontend/              # Aplicación React
-│   ├── public/            # Archivos estáticos
-│   ├── src/               # Código fuente de React
-│   │   ├── components/    # Componentes React
-│   │   ├── context/       # Contextos para gestión de estado
-│   │   ├── hooks/         # Hooks personalizados
-│   │   ├── services/      # Servicios para API
-│   │   ├── App.js         # Componente principal
-│   │   └── index.js       # Punto de entrada
-│   └── package.json       # Dependencias
-└── start_react_app.py     # Script para iniciar la aplicación
+    ├── public/            # Archivos estáticos
+    ├── src/               # Código fuente de React
+    │   ├── components/    # Componentes React
+    │   ├── context/       # Contextos para gestión de estado
+    │   ├── hooks/         # Hooks personalizados
+    │   ├── services/      # Servicios para API
+    │   ├── App.js         # Componente principal
+    │   └── index.js       # Punto de entrada
+    └── package.json       # Dependencias
+
 ```
 
 ## Requisitos previos
