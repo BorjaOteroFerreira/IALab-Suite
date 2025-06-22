@@ -7,7 +7,7 @@
 [![React](https://img.shields.io/badge/react-18.2+-61DAFB.svg)](https://reactjs.org/)
 [![Flask](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 
-### Responsive Inteface
+
 <p align="center">
   <img src ="media/chat_pic_pan.png" width="600" />
 </p>
