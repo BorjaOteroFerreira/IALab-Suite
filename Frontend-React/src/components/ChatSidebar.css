@@ -1,0 +1,199 @@
+/* Chat Sidebar - Diseño Moderno de Producción */
+.chat-sidebar {
+  width: 320px;
+  height: 100vh;
+  background: var(--surface-bg);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  transition: transform var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-sidebar.hidden {
+  transform: translateX(-100%);
+}
+
+/* Header del Sidebar */
+.header-chat-menu {
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
+}
+
+.header-chat-menu button {
+  width: 100%;
+  background: var(--primary-bg);
+  color: var(--text-primary);
+  border-radius: var(--border-radius);
+  padding: var(--space-4);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.header-chat-menu button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.header-chat-menu button::before {
+  content: '✨';
+  font-size: 18px;
+}
+
+/* Lista de Conversaciones */
+.conversations-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.conversations-list:empty::after {
+  content: 'No hay conversaciones guardadas';
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--space-8);
+  display: block;
+}
+
+/* Item de Conversación */
+.load-history {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: stretch;
+  box-shadow: var(--shadow-sm);
+}
+
+.load-history:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-primary);
+}
+
+/* Botón de Cargar */
+.load-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.load-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--accent-primary);
+}
+
+/* Botón de Eliminar */
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: var(--space-3);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.delete-btn:hover {
+  background: var(--accent-error);
+  color: var(--text-primary);
+}
+
+/* Overlay para cerrar sidebar en móvil */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Estados de Carga */
+.conversations-list.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-sidebar {
+    width: 280px;
+  }
+}
+
+@media (max-width: 640px) {
+  .chat-sidebar {
+    width: 100vw;
+  }
+  
+  .header-chat-menu {
+    padding: var(--space-4) var(--space-3) var(--space-3);
+  }
+  
+  .conversations-list {
+    padding: var(--space-3);
+  }
+}

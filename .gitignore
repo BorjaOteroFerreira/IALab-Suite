@@ -1,15 +1,40 @@
-__pycache__/*.*
-pruebas/
-models/*.*
-*gguf
-*pyc
-chats/*.json
-*.bin
-*.log
+# Node dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# System files
 .DS_Store
-models/Publisher/.DS_Store
-models/Publisher/Repository/.DS_Store
-locales
-IALabSuite.sh
-llama_cpp/
-static/tools/generate_image/image.webp
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.*.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Mac system files
+*.DS_Store
+
+# Optional npm cache directory
+.npm/
+
+# Parcel cache
+.cache/
+
+# Local development SSL certs
+*.pem
+
+# React Native specific
+.expo/

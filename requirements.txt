@@ -1,5 +1,0 @@
-Flask==2.2.5
-flask-socketio==5.3.6
-Flask-Cors==4.0.0
-Sumy 
-PyPDF2==3.0.1

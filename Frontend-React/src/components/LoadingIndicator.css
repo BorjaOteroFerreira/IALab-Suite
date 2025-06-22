@@ -1,0 +1,239 @@
+/* 
+ * Loading Indicator - Modern Professional UI
+ * Optimized for production with smooth animations and accessibility
+ */
+
+/* Base styles for all loading indicators */
+.loading-text {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 500;
+  opacity: 0.9;
+  letter-spacing: 0.02em;
+}
+
+/* Enhanced typing indicator with glassmorphism */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--spacing-sm) 0;
+  margin-left: var(--spacing-md);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  width: fit-content;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  margin: 0 2px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing-bounce 1.4s infinite ease-in-out;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.16s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes typing-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  40% {
+    transform: translateY(-12px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Modern model loading indicator */
+.model-loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
+  gap: var(--spacing-md);
+}
+
+.spinner-ring {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  border-top: 3px solid var(--primary);
+  border-right: 3px solid var(--primary-light);
+  animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  position: relative;
+}
+
+.spinner-ring::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--primary-light);
+  animation: spin 1.5s linear infinite reverse;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Sophisticated thinking indicator */
+.thinking-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  gap: var(--spacing-sm);
+}
+
+.thinking-indicator .dots {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-light);
+}
+
+.thinking-indicator .dots span {
+  height: 10px;
+  width: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.4);
+}
+
+.thinking-indicator .dots span:nth-child(2) { animation-delay: 0.4s; }
+.thinking-indicator .dots span:nth-child(3) { animation-delay: 0.8s; }
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+}
+
+/* Modern saving indicator with progress */
+.saving-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  gap: var(--spacing-sm);
+}
+
+.progress-bar {
+  width: 120px;
+  height: 6px;
+  background: var(--surface-variant);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), var(--success-light));
+  border-radius: var(--radius-full);
+  width: 0%;
+  animation: fill 2.5s ease-in-out infinite;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes fill {
+  0% { width: 0%; }
+  70% { width: 100%; }
+  100% { width: 100%; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Loading message with better typography */
+.loading-message {
+  margin-left: var(--spacing-sm);
+  font-style: normal;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .typing-indicator {
+    margin-left: var(--spacing-sm);
+    padding: var(--spacing-xs);
+  }
+  
+  .spinner-ring {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .progress-bar {
+    width: 100px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .typing-indicator span,
+  .spinner-ring,
+  .thinking-indicator .dots span,
+  .progress-fill {
+    animation: none;
+  }
+  
+  .typing-indicator span {
+    opacity: 0.7;
+  }
+}
+
+/* Dark theme optimizations */
+@media (prefers-color-scheme: dark) {
+  .progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

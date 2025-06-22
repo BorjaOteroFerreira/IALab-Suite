@@ -1,0 +1,119 @@
+/* 
+ * Modern Font System
+ * Optimized web fonts with fallbacks and performance
+ */
+
+/* Custom Fonts */
+@font-face {
+  font-family: 'HelveticaNeueLight';
+  src: local('Helvetica Neue Light'), 
+       local('HelveticaNeue-Light'),
+       url('./fonts/HelveticaNeueLight.otf') format('opentype');
+  font-display: swap;
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HelveticaNeueUltraLight';
+  src: local('Helvetica Neue Ultra Light'), 
+       local('HelveticaNeue-UltraLight'),
+       url('./fonts/HelveticaNeueUltraLight.otf') format('opentype');
+  font-display: swap;
+  font-weight: 200;
+  font-style: normal;
+}
+
+/* Font Stack Definitions */
+:root {
+  --font-sans: 
+    'HelveticaNeueLight',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+    
+  --font-mono: 
+    'SF Mono',
+    'Monaco',
+    'Cascadia Code',
+    'Roboto Mono',
+    'Courier New',
+    monospace;
+    
+  --font-display: 
+    'HelveticaNeueUltraLight',
+    'HelveticaNeueLight',
+    var(--font-sans);
+}
+
+/* Global Font Application */
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 
+    'kern' 1,      /* Kerning */
+    'liga' 1,      /* Ligatures */
+    'calt' 1,      /* Contextual alternates */
+    'ss01' 1;      /* Stylistic set 1 */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Specific Font Applications */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 200;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 
+    'kern' 0,      /* Disable kerning for monospace */
+    'liga' 0,      /* Disable ligatures for code */
+    'calt' 0;      /* Disable contextual alternates */
+}
+
+/* Typography Utilities */
+.text-light {
+  font-weight: 300;
+}
+
+.text-normal {
+  font-weight: 400;
+}
+
+.text-medium {
+  font-weight: 500;
+}
+
+.text-semibold {
+  font-weight: 600;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+/* Letter Spacing Utilities */
+.tracking-tight {
+  letter-spacing: -0.025em;
+}
+
+.tracking-normal {
+  letter-spacing: 0;
+}
+
+.tracking-wide {
+  letter-spacing: 0.025em;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
+}

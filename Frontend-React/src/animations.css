@@ -1,0 +1,374 @@
+/* 
+ * Modern Animation System
+ * Smooth, performant animations for production UI
+ */
+
+/* Core Animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(8px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from { 
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from { 
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% { 
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  60% { 
+    opacity: 1;
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Component Animations */
+.chat-sidebar:not(.hidden) {
+  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.config-sidebar:not(.hidden) {
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.message {
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.message-content.assistant {
+  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.message-content.user {
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Enhanced Message Styles */
+.message-content.user {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-top-right-radius: var(--radius-xs);
+  margin-left: auto;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.message-content.user::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+}
+
+.message-content.assistant {
+  background: var(--surface);
+  color: var(--text-primary);
+  border-top-left-radius: var(--radius-xs);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+/* Enhanced Code Blocks */
+pre {
+  background: var(--surface-variant) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--spacing-md) !important;
+  overflow-x: auto !important;
+  margin: var(--spacing-md) 0 !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  position: relative !important;
+}
+
+pre::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--border-focus), 
+    transparent);
+}
+
+code {
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace !important;
+  padding: 2px 6px !important;
+  background: var(--surface-variant) !important;
+  color: var(--accent) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.9em !important;
+}
+
+pre code {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  padding: 0 !important;
+}
+
+/* Interactive Elements */
+.hover-lift {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Button Animations */
+.send-button, .btn-primary {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.send-button::before, .btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.6s;
+}
+
+.send-button:hover::before, .btn-primary:hover::before {
+  left: 100%;
+}
+
+.send-button:hover, .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.send-button:active, .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+/* Stop Button */
+.stop-button {
+  background: linear-gradient(135deg, var(--error), var(--error-dark));
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stop-button:hover {
+  background: linear-gradient(135deg, var(--error-dark), var(--error));
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+/* History Items */
+.load-history {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.load-history::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  transition: left 0.4s;
+}
+
+.load-history:hover::before {
+  left: 100%;
+}
+
+.load-history:hover {
+  transform: translateX(4px);
+  background: var(--surface-variant);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Loading States */
+.loading-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Responsive Animations */
+@media (max-width: 768px) {
+  .message-content {
+    max-width: 92%;
+  }
+  
+  .message-content.user,
+  .message-content.assistant {
+    animation-duration: 0.2s;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .chat-sidebar:not(.hidden),
+  .config-sidebar:not(.hidden),
+  .message,
+  .message-content.assistant,
+  .message-content.user {
+    animation: none;
+  }
+  
+  .hover-lift:hover,
+  .send-button:hover,
+  .btn-primary:hover,
+  .load-history:hover {
+    transform: none;
+  }
+}
+
+/* Performance Optimizations */
+.message-content,
+.chat-sidebar,
+.config-sidebar,
+.send-button,
+.btn-primary,
+.load-history {
+  will-change: transform;
+}
+
+.message-content.user,
+.message-content.assistant {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Focus Animations */
+.focus-ring {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  transition: outline-color 0.2s;
+}
+
+/* Stagger Animation for Multiple Elements */
+.stagger-children > * {
+  animation-delay: calc(var(--stagger-delay, 0.1s) * var(--child-index, 0));
+}

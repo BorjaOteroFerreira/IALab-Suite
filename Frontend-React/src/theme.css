@@ -1,0 +1,198 @@
+/* 
+ * Theme Configuration - Modern Production UI
+ * Global theme utilities and configurations
+ */
+
+/* Theme Variables - Already defined in index.css but extended here */
+:root {
+  /* Additional theme utilities */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Z-index scale */
+  --z-base: 1;
+  --z-dropdown: 1000;
+  --z-modal: 1100;
+  --z-overlay: 1200;
+  --z-tooltip: 1300;
+  
+  /* Layout constraints */
+  --max-width-xs: 20rem;    /* 320px */
+  --max-width-sm: 24rem;    /* 384px */
+  --max-width-md: 28rem;    /* 448px */
+  --max-width-lg: 32rem;    /* 512px */
+  --max-width-xl: 36rem;    /* 576px */
+  --max-width-2xl: 42rem;   /* 672px */
+  --max-width-3xl: 48rem;   /* 768px */
+  --max-width-4xl: 56rem;   /* 896px */
+  --max-width-5xl: 64rem;   /* 1024px */
+  --max-width-6xl: 72rem;   /* 1152px */
+  --max-width-7xl: 80rem;   /* 1280px */
+  --max-width-full: 100%;
+}
+
+/* Theme Modifier Classes */
+.theme-light {
+  --background: hsl(0, 0%, 100%);
+  --surface: hsl(0, 0%, 98%);
+  --surface-variant: hsl(0, 0%, 96%);
+  --text-primary: hsl(0, 0%, 9%);
+  --text-secondary: hsl(0, 0%, 45%);
+  --border: hsl(0, 0%, 90%);
+  --border-light: hsl(0, 0%, 94%);
+}
+
+.theme-dark {
+  --background: hsl(222, 84%, 5%);
+  --surface: hsl(217, 32%, 7%);
+  --surface-variant: hsl(217, 24%, 10%);
+  --text-primary: hsl(0, 0%, 98%);
+  --text-secondary: hsl(0, 0%, 65%);
+  --border: hsl(217, 16%, 18%);
+  --border-light: hsl(217, 16%, 15%);
+}
+
+/* Utility Classes */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card-hover {
+  transition: all var(--transition-base);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Interactive States */
+.interactive {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.interactive:hover {
+  opacity: 0.8;
+}
+
+.interactive:active {
+  transform: scale(0.98);
+}
+
+/* Focus Styles */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Loading States */
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--surface-variant) 25%, 
+    var(--surface) 50%, 
+    var(--surface-variant) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 2s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Scroll Enhancements */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+.scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-variant) transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--surface-variant);
+  border-radius: var(--radius-full);
+}
+
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--border-focus);
+}
+
+/* Text Selection */
+::selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--text-primary);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: currentColor;
+    --border-light: currentColor;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+  }
+  
+  .glass {
+    backdrop-filter: none;
+    background: var(--surface);
+    border-width: 2px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  * {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  
+  .glass {
+    background: white !important;
+    border: 1px solid black !important;
+  }
+  
+  .chat-sidebar,
+  .config-sidebar {
+    display: none !important;
+  }
+}
