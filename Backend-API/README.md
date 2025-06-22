@@ -68,7 +68,7 @@ CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
 **IMPORTANT:** If you have already installed the CPU-only version of the package, you must reinstall it from scratch. Consider the following command:
 
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+CMAKE_ARGS="--DGGML_CUDA=ON" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
 
 ### Installation with Metal on MacOS (M1/M2/M3) 
@@ -100,13 +100,13 @@ export CUDA_PATH=/usr/local/cuda
 ```
 
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+CMAKE_ARGS="-DGGML_CUDA=ON" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
 ```
 
 If you get an error for not finding the cuda architecture, you can try this command:
 
 ```bash
-CUDA_ARCH=sm_86 CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+CUDA_ARCH=sm_86 CMAKE_ARGS="-DGGML_CUDA=ON" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
 ```
 
 In my case the architecture of the card is ampere so it corresponds to sm_86, change it to the one that corresponds to your graphics card
@@ -155,7 +155,7 @@ Open a command prompt and set the following environment variables.
 
 ```bash
 set FORCE_CMAKE=1
-set CMAKE_ARGS=-DLLAMA_CUBLAS=OFF
+set CMAKE_ARGS=-DGGML_CUDA=OFF
 ```
 
 If you have an NVIDIA GPU, make sure DLLAMA_CUBLAS is set to ON.

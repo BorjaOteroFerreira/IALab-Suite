@@ -99,8 +99,9 @@ pip install --upgrade --quiet llama-cpp-python
 
 **For GPU with CUDA:**
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DGGML_CUDA=ON" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
+
 
 **For macOS with Metal (M1/M2/M3):**
 ```bash
