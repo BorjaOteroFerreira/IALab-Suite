@@ -37,7 +37,7 @@
 - 🔎 **Advanced Search**: Specialized searches with Google dorks
 - 🎥 **Video Search**: YouTube API integration
 - 💰 **Cryptocurrency Prices**: Real-time information
-- 🖼️ **Image Generation**: AI image generation tool
+- 🖼️ **Image Generation**: AI image generation tool with Gradle API integration
 - 🌐 **IP Information**: Geographic data retrieval
 
 
