@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useChatContext } from '../hooks/useChatContext';
+import { useChatContext } from '../../hooks/useChatContext';
 import './ConfigSidebar.css';
 
 const ConfigSidebar = ({ visible, onClose }) => {

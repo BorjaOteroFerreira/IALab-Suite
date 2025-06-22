@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, memo } from 'react';
-import { useChatContext } from '../hooks/useChatContext';
+import { useChatContext } from '../../hooks/useChatContext';
 import ReactMarkdown from 'react-markdown';
-import MessageInput from './MessageInput';
+import MessageInput from '../MessageInput/MessageInput';
 import './ChatContainer.css';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
