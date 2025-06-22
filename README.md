@@ -160,10 +160,10 @@ SERPER_API_KEY=your_serper_api_key_here
 
 ### 🚀 Start the Application
 
-#### Option 1: Quick Start (Production Build)
+#### Option 1: Quick Start (Production Build) Not avaiable now.
 ```bash
 # From the project root
-python build_frontend.py
+python build_frontend.py 
 ```
 
 #### Option 2: Development Mode
@@ -179,7 +179,6 @@ npm start
 
 ### 🌐 Access the Application
 
-- **Production Build**: Open your browser and go to: `http://localhost:3000`
 - **Development Mode**: Open your browser and go to: `http://localhost:3000` (React dev server)
 
 ### 💬 Use the Chat
