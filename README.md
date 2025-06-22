@@ -14,7 +14,6 @@ For production environments use another wsgi server.<br>
   <img src="media/chat_pic.png" height="600"/>
 </p>
 
-### Desktop Interface
 <p align="center">
   <img src ="media/chat_pic_pan.png" width="600" />
 </p>
