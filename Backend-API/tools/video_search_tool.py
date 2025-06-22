@@ -2,9 +2,10 @@ from typing import List
 from pydantic import BaseModel, Field
 from langchain.tools import tool
 import requests
-from datetime import datetime, timezone,timedelta
+from datetime import datetime, timezone, timedelta
 import os
 
+from .base_tool import BaseTool, ToolMetadata, ToolCategory
 
 
 class VideoSearchResult(BaseModel):
@@ -14,31 +15,49 @@ class VideoSearchResult(BaseModel):
     channel_title: str
     days_since_published: int
 
+
 class YoutubeVideoSearchToolInput(BaseModel):
     """Input for YoutubeVideoSearchTool."""
     keyword: str = Field(..., description="The search keyword.")
     max_results: int = Field(5, description="The maximum number of results to return.")
 
-class YoutubeVideoSearchTool:
-    @staticmethod
-    @tool("Search YouTube Videos")
-    def run(keyword: str, max_results: int = 4) -> List[VideoSearchResult]:
+
+class YoutubeVideoSearchTool(BaseTool):
+    
+    @property
+    def metadata(self) -> ToolMetadata:
+        return ToolMetadata(
+            name="video_search_tool",
+            description="Busca videos en YouTube basado en palabras clave",
+            category=ToolCategory.MEDIA,
+            requires_api_key=True,
+            api_key_env_var="YOUTUBE_API_KEY"
+        )
+    
+    @classmethod
+    def get_tool_name(cls) -> str:
+        return "video_search_tool"
+    
+    def execute(self, query: str, **kwargs):
+        """Ejecuta búsqueda de videos en YouTube"""
+        max_results = kwargs.get('max_results', 4)
+        return self._search_youtube_videos(query, max_results)
+    
+    def _search_youtube_videos(self, keyword: str, max_results: int = 4):
         """
-        Searches YouTube videos based on a keyword and returns a list of video search results.
+        Busca videos en YouTube basado en palabras clave.
 
         Parameters:
-            keyword (str): The search keyword.
-            max_results (int, optional): The maximum number of results to return. Defaults to 5.
+            keyword (str): La palabra clave de búsqueda.
+            max_results (int, optional): El número máximo de resultados a devolver. Por defecto 4.
 
         Returns:
-            List[VideoSearchResult]: A list of video search results.
+            tuple: Una tupla con los resultados y los IDs de videos.
         """
-
-
         # Obtener la fecha y hora actual
         fecha_actual = datetime.now()
 
-        # Restar tres días
+        # Restar 30 días
         fecha_resta = fecha_actual - timedelta(days=30)
 
         # Formatear en formato RFC 3339
@@ -52,8 +71,9 @@ class YoutubeVideoSearchTool:
             "type": "video",
             "key": api_key,
             "order": "date",
-            "publishedAfter" : fecha_rfc3339
+            "publishedAfter": fecha_rfc3339
         }
+        
         try:            
             response = requests.get(url, params=params)
             response.raise_for_status()
@@ -78,13 +98,23 @@ class YoutubeVideoSearchTool:
                 title=title,
                 channel_id=channel_id,
                 channel_title=channel_title,
-                days_since_published=days_since_published            ))
+                days_since_published=days_since_published
+            ))
 
         results_str = '\n'.join(str(result) for result in reversed(results))
         if results_str != '':
             print(ids)
-            #instruccion =f' \nlos videos de youtube debes mostrarlos en este formaro:\n<div class="widget-youtube"><iframe width="590" height="345" src="https://www.youtube.com/embed/idVideo" frameborder="0" allow=" encrypted-media; picture-in-picture" allowfullscreen></iframe></div><br>\n\n'
-
             return f'{results_str}', ids  # Devolver resultado y IDs
         else: 
             return f'', []  # Devolver cadena vacía y lista vacía de IDs
+
+    # Mantener el método estático original para compatibilidad con LangChain si es necesario
+    @staticmethod
+    @tool("Search YouTube Videos")
+    def run(keyword: str, max_results: int = 4) -> List[VideoSearchResult]:
+        """
+        Método estático legacy para compatibilidad con LangChain.
+        No se usa en el nuevo sistema de registry.
+        """
+        tool_instance = YoutubeVideoSearchTool()
+        return tool_instance._search_youtube_videos(keyword, max_results)

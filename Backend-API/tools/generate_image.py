@@ -6,6 +6,8 @@ from langchain.tools import tool
 from gradio_client import Client
 from huggingface_hub import login
 
+from .base_tool import BaseTool, ToolMetadata, ToolCategory
+
 
 class ImageGenerationResult(BaseModel):
     file_path: str
@@ -21,7 +23,32 @@ class ImageGenerationToolInput(BaseModel):
     seed: float = Field(0, description="La semilla utilizada.")
 
 
-class ImageGenerationTool:
+class ImageGenerationTool(BaseTool):
+    
+    @property
+    def metadata(self) -> ToolMetadata:
+        return ToolMetadata(
+            name="generate_image",
+            description="Genera imágenes basadas en prompts de texto usando IA",
+            category=ToolCategory.IMAGE,
+            requires_api_key=True,
+            api_key_env_var="HUGGINGFACE_TOKEN"
+        )
+    
+    @classmethod
+    def get_tool_name(cls) -> str:
+        return "generate_image"
+    
+    def execute(self, query: str, **kwargs):
+        """Ejecuta generación de imagen"""
+        width = kwargs.get('width', 1024)
+        height = kwargs.get('height', 1024)
+        guidance_scale = kwargs.get('guidance_scale', 3.5)
+        num_inference_steps = kwargs.get('num_inference_steps', 28)
+        randomize_seed = kwargs.get('randomize_seed', True)
+        seed = kwargs.get('seed', 0)
+        
+        return self.run(query, width, height, guidance_scale, num_inference_steps, randomize_seed, seed)
     @staticmethod
     @tool("Generate Image with Flux")
     def run(

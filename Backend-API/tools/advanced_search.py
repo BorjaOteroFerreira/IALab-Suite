@@ -10,9 +10,40 @@ from requests_html import HTMLSession
 from sumy.parsers.html import HtmlParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer
-from tools.search_tools import SearchTools
 
-class AdvancedSearchTools:
+from .base_tool import BaseTool, ToolMetadata, ToolCategory
+
+# Importar la función search_internet directamente
+def _get_search_internet_function():
+    """Obtiene la función search_internet de SearchTools de manera segura"""
+    try:
+        from .search_tools import SearchTools
+        instance = SearchTools()
+        return instance.search_internet
+    except Exception:
+        # Fallback: función dummy si no se puede importar
+        return lambda query: "Error: No se pudo cargar la función de búsqueda en internet"
+
+_search_internet = _get_search_internet_function()
+
+class AdvancedSearchTools(BaseTool):
+    
+    @property
+    def metadata(self) -> ToolMetadata:
+        return ToolMetadata(
+            name="advanced_search",
+            description="Realiza búsquedas avanzadas OSINT con técnicas especializadas",
+            category=ToolCategory.SEARCH,
+            requires_api_key=False
+        )
+    
+    @classmethod
+    def get_tool_name(cls) -> str:
+        return "advanced_search"
+    
+    def execute(self, query: str, **kwargs):
+        """Ejecuta búsqueda avanzada"""
+        return self.advanced_search(query)
     """
     Clase que proporciona herramientas de búsqueda OSINT
     """
@@ -963,7 +994,7 @@ class AdvancedSearchTools:
         
             all_engines = {
             "duckduckgo": AdvancedSearchTools.search_duckduckgo,
-            "google": SearchTools.search_internet,
+            "google": _search_internet,
             "bing": AdvancedSearchTools.search_bing,
             "yandex": AdvancedSearchTools.search_yandex,
             "startpage": AdvancedSearchTools.search_startpage,
@@ -1091,62 +1122,51 @@ class AdvancedSearchTools:
             internal_links = []
             external_links = []
             
-            for link in all_links[:30]:  # Limitar a 30 enlaces para evitar respuestas muy largas
-                href = link['href']
-                if href.startswith('#') or not href.strip():
-                    continue
-                    
-                if href.startswith('/') or domain in href:
-                    internal_links.append(href)
-                else:
+            for link in all_links[:30]:
+                href = link.get('href')
+                if href:
                     if href.startswith(('http://', 'https://')):
-                        external_links.append(href)
+                        parsed_link = urlparse(href)
+                        if parsed_link.netloc == domain:
+                            internal_links.append(href)
+                        else:
+                            external_links.append(href)
+                    elif href.startswith('/'):
+                        internal_links.append(f"https://{domain}{href}")
             
-            # Obtener servidores
-            server = response.headers.get('Server', 'No disponible')
-            powered_by = response.headers.get('X-Powered-By', 'No disponible')
+            # Obtener información del servidor
+            server_info = response.headers.get('Server', 'No especificado')
+            content_type = response.headers.get('Content-Type', 'No especificado')
             
-            # Verificar tecnologías (simulado)
-            technologies = []
-            if 'WordPress' in response.text:
-                technologies.append('WordPress')
-            if 'jQuery' in response.text:
-                technologies.append('jQuery')
-            if 'Bootstrap' in response.text:
-                technologies.append('Bootstrap')
-            if 'react' in response.text.lower() or 'reactjs' in response.text.lower():
-                technologies.append('React')
-            if 'angular' in response.text.lower():
-                technologies.append('Angular')
-            if 'google analytics' in response.text.lower() or 'ga.js' in response.text:
-                technologies.append('Google Analytics')
+            # Crear resumen del análisis
+            analysis = f"""
+ANÁLISIS RÁPIDO DEL SITIO WEB: {url}
+=====================================
+
+Información básica:
+- Título: {title}
+- Descripción: {description}
+- Palabras clave: {keywords}
+- Servidor: {server_info}
+- Tipo de contenido: {content_type}
+
+Encabezados H1:
+{h1_text}
+
+Enlaces encontrados:
+- Enlaces internos: {len(internal_links)}
+- Enlaces externos: {len(external_links)}
+
+Primeros 5 enlaces externos:
+{chr(10).join(external_links[:5]) if external_links else "No hay enlaces externos"}
+
+Información técnica:
+- Código de estado: {response.status_code}
+- Tamaño de respuesta: {len(response.content)} bytes
+- Tiempo de carga: Disponible tras la solicitud
+"""
             
-            # Verificar presencia de robots.txt
-            robots_url = f"{urlparse(url).scheme}://{urlparse(url).netloc}/robots.txt"
-            try:
-                robots_response = requests.get(robots_url, timeout=5)
-                robots_content = robots_response.text if robots_response.status_code == 200 else "No disponible"
-            except:
-                robots_content = "Error al acceder"
-            
-            # Devolver la información recopilada
-            result = (
-                f"Análisis de {url}\n\n"
-                f"Título: {title}\n"
-                f"Descripción: {description}\n"
-                f"Palabras clave: {keywords}\n\n"
-                f"Encabezados H1 (max 5):\n   - {h1_text}\n\n"
-                f"Tecnologías detectadas: {', '.join(technologies) if technologies else 'Ninguna detectada'}\n"
-                f"Servidor: {server}\n"
-                f"Powered By: {powered_by}\n\n"
-                f"Enlaces internos encontrados: {len(internal_links)}\n"
-                f"Enlaces externos encontrados: {len(external_links)}\n\n"
-                f"Robots.txt:\n{robots_content[:500] + '...' if len(robots_content) > 500 else robots_content}\n\n"
-                f"Nota: Este análisis es básico y no intrusivo. Para un análisis más completo,"
-                f" se recomienda utilizar herramientas especializadas."
-            )
-            
-            return result
+            return analysis
             
         except Exception as e:
             return f"Error durante el análisis del sitio web: {str(e)}"

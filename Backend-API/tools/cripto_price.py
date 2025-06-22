@@ -3,11 +3,31 @@
 """
 
 import requests
+from .base_tool import BaseTool, ToolMetadata, ToolCategory
 
-
-
-
-class CriptoPrice():
+class CriptoPrice(BaseTool):
+    
+    @property
+    def metadata(self) -> ToolMetadata:
+        return ToolMetadata(
+            name="cripto_price",
+            description="Obtiene el precio actual de criptomonedas en USD",
+            category=ToolCategory.FINANCE,
+            requires_api_key=False
+        )
+    
+    @classmethod
+    def get_tool_name(cls) -> str:
+        return "cripto_price"
+    
+    def execute(self, query: str, **kwargs):
+        """Ejecuta consulta de precios de criptomonedas"""
+        # Convertir query string a lista si es necesario
+        if isinstance(query, str):
+            criptos = [c.strip() for c in query.split(',')]
+        else:
+            criptos = query
+        return self.get_price(criptos)
 
     @staticmethod
     def get_price(criptos: list):
