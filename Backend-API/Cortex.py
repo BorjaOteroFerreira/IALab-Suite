@@ -26,8 +26,8 @@ import os
 import pyttsx3
 from colorama import Fore, Style
 
-os.environ["YOUTUBE_API_KEY"] = 'AIzaSyDIfrz9h4Y7KKExF-j8VNztYGypt6EYC_o'
-os.environ["SERPER_API_KEY"] = 'efdb015cbec193833a7ace9fc226bea17c6c5268'
+os.environ["YOUTUBE_API_KEY"] = 'YOUR_API_KEY_HERE'
+os.environ["SERPER_API_KEY"] = 'YOUR_API_KEY_HERE'
 
 
 class Cortex:
@@ -354,37 +354,3 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         patron_url = r'https?://\S+|www\.\S+'
         urls = re.findall(patron_url, texto)
         return urls
-    
-    def _instruccionesAdicionales(self, prompt):
-            # Copia el historial de mensajes
-            prompt_copia = copy.deepcopy(prompt)        
-            # Modifica el primer mensaje del sistema
-            nuevo_mensaje_sistema =  f"""
-    TU PRINCIPAL OBJETIVO ES DETERMINAR QUE HERRAMIENTA NECESITAS
-    Funciones disponibles: 
-    [Funcion: 'video_search_tool' , query: 'consulta']
-    [Funcion: 'cripto_price' , query: 'bitcoin,optimism']
-    [Funcion: 'generate_image' , query: 'prompt']
-    [Funcion: 'get_ip_info' , query: 'ip'] 
-    [Funcion: 'cve_search' , query: 'CVE-XXXX-XXXXX'] 
-    [Funcion: 'advanced_search' , query: 'consulta']
-    
-    responde unicamente con la o las herramientas a lanzar, ejemplo: 
-    supongamos que necesitas buscar el tiempo en internet , contestas: 
-    [Funcion: 'buscar_en_internet' , query: 'tiempo proximos dias' ]
-    Asegurate de que utilizas la sintaxis correcta al colocar un corchete al inicio y otro al final.
-    Puedes usar mas de una herramienta si lo necesitas.
-    Debes contestar solo con las funciones que usarias sin texto antes ni despues
-    SIEMPRE DEBES RESPONDER EN ESPAÑOL.
-    """     
-            if prompt_copia and prompt_copia[0]['role'] == 'system':
-                prompt_copia[0]['content'] = nuevo_mensaje_sistema 
-        
-            #prompt_copia.append({"role": "system", "content": nuevo_mensaje_sistema})
-        
-    
-            """for prompt in prompt_copia:
-                print(json.dumps(prompt))
-                pass
-            """
-            return prompt_copia
