@@ -1,0 +1,146 @@
+/* Safari Mobile Viewport Fix */
+/* Este archivo contiene correcciones específicas para Safari móvil */
+
+/* Fix para el viewport en Safari móvil */
+@supports (-webkit-appearance: none) and (not (overflow: -webkit-marquee)) and (not (-ms-ime-align: auto)) {
+  /* Solo se aplica en Safari */
+  
+  html {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+  
+  body {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+  
+  #root {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+  
+  .app-layout {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available;
+  }
+  
+  .chat-container {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available;
+    overflow: hidden;
+  }
+  
+  .main-container {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Correcciones adicionales para Safari iOS */
+@media screen and (max-width: 768px) {
+  @supports (-webkit-touch-callout: none) {
+    /* Header fijo en Safari */
+    .app-header {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface-elevated);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    
+    /* Chat list con scroll específico para Safari */
+    .chat-list {
+      -webkit-overflow-scrolling: touch;
+      overflow-y: auto;
+      flex: 1;
+      height: 0; /* Truco para forzar el flex */
+    }
+    
+    /* Input area fija en Safari */
+    .input-area {
+      position: -webkit-sticky;
+      position: sticky;
+      bottom: 0;
+      background: var(--surface-elevated);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+      /* Prevenir zoom en inputs en Safari */
+    input[type="text"],
+    input[type="email"], 
+    input[type="password"],
+    textarea {
+      font-size: 16px !important;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 0;
+    }
+    
+    /* Mejorar scroll en Safari */
+    .messages-list {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}
+
+/* Correcciones específicas para scroll en Safari Mobile */
+/* Fix crítico para chat-list scroll */
+@supports (-webkit-touch-callout: none) {
+  .chat-list {
+    /* Forzar scroll en Safari */
+    -webkit-overflow-scrolling: touch !important;
+    will-change: scroll-position;
+    transform: translateZ(0); /* Activar aceleración por hardware */
+    /* Asegurar que el contenedor tenga altura definida */
+    min-height: 0 !important;
+    max-height: calc(100vh - 200px) !important;
+    max-height: calc(100dvh - 200px) !important;
+    /* Evitar problemas de render */
+    contain: layout style paint;
+  }
+  
+  /* Container padre también necesita altura específica */
+  .chat-container {
+    overflow: hidden !important;
+    /* Asegurar altura específica en Safari */
+    max-height: calc(100vh - 64px) !important;
+    max-height: calc(100dvh - 64px) !important;
+    contain: layout;
+  }
+  
+  /* Mensajes individuales - evitar colapso */
+  .message {
+    flex-shrink: 0;
+    min-height: fit-content;
+    contain: layout style;
+  }
+}
+
+/* Corrección adicional para Safari en landscape */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  @supports (-webkit-touch-callout: none) {
+    .chat-list {
+      max-height: calc(100vh - 150px) !important;
+      max-height: calc(100dvh - 150px) !important;
+    }
+    
+    .chat-container {
+      max-height: calc(100vh - 100px) !important;
+      max-height: calc(100dvh - 100px) !important;
+    }
+  }
+}
+
+/* Fix adicional para iPhone con notch */
+@media screen and (max-width: 430px) {
+  @supports (-webkit-touch-callout: none) and (max-device-width: 430px) {
+    .chat-list {
+      max-height: calc(100vh - 220px) !important;
+      max-height: calc(100dvh - 220px) !important;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+  }
+}

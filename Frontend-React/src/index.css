@@ -236,6 +236,117 @@ body::before {
   }
 }
 
+/* Reglas específicas para móvil - viewport y scroll */
+@media (max-width: 768px) {
+  html {
+    /* Prevenir zoom horizontal */
+    overflow-x: hidden;
+    /* Asegurar altura de viewport móvil */
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height para móviles modernos */
+    /* Safari específico */
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    /* Prevenir scroll horizontal */
+    overflow-x: hidden;
+    /* Asegurar que el body use toda la altura disponible */
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available; /* Safari específico */
+    /* Prevenir elastic scroll en iOS */
+    position: relative; /* Cambio de fixed a relative para Safari */
+    width: 100%;
+    /* Safari móvil fix */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #root {
+    /* Usar toda la altura de viewport */
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available; /* Safari específico */
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* Scroll suave en móvil */
+    -webkit-overflow-scrolling: touch;
+    /* Safari fix */
+    position: relative;
+  }
+  
+  /* Mejorar área táctil en móvil */
+  button, 
+  input, 
+  textarea,
+  select,
+  .clickable {
+    min-height: 44px;
+    touch-action: manipulation; /* Prevenir double-tap zoom */
+  }
+  
+  /* Prevenir zoom en inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px !important; /* Prevenir zoom en iOS */
+  }
+}
+
+/* Reglas para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px; /* Texto base más pequeño */
+  }
+  
+  body {
+    /* Reducir el padding/margin por defecto del navegador */
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Landscape móvil */
+@media (max-width: 768px) and (orientation: landscape) {
+  html {
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
+  }
+  
+  #root {
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
+  }
+}
+
+/* Safari específico - CSS adicional */
+@supports (-webkit-touch-callout: none) {
+  /* Estas reglas solo se aplican en Safari */
+  .app-layout {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available;
+  }
+  
+  .chat-container {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available;
+  }
+  
+  body {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available;
+  }
+}
+
 /* Ensure immediate visual feedback */
 .modern-ui {
   background: var(--glass-bg);

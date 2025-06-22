@@ -3,8 +3,13 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 64px);
+  height: calc(100dvh - 64px); /* Dynamic viewport height para Safari */
   background: transparent;
   position: relative;
+  /* Safari específico para scroll */
+  min-height: -webkit-fill-available;
+  /* Permitir scroll vertical para leer mensajes previos */
+  overflow-y: auto;
 }
 
 /* Header del Chat */
@@ -44,6 +49,13 @@
   flex-direction: column;
   gap: var(--space-6);
   scroll-behavior: smooth;
+  /* Fixes para Safari mobile scroll */
+  -webkit-overflow-scrolling: touch;
+  min-height: 0; /* Necesario para flex scroll en Safari */
+  position: relative; /* Para Safari webkit */
+  /* Correcciones adicionales Safari */
+  will-change: scroll-position;
+  contain: layout style;
 }
 
 /* Mensajes Modernos */
@@ -353,43 +365,158 @@ input[type="checkbox"] {
   }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive mejorado */
+@media (max-width: 768px) {  .chat-container {
+    height: calc(100dvh - 60px); /* Dynamic viewport height para Safari */
+    /* Safari móvil específico */
+    min-height: -webkit-fill-available;
+    /* Permitir scroll vertical para leer mensajes previos */
+    overflow-y: auto;
+  }
+  
+  .chat-header {
+    padding: var(--space-3) 0 var(--space-2) 0;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  
+  .chat-header .tokens-info {
+    font-size: 12px;
+    gap: var(--space-1);
+  }
+  
+  .chat-header .tokens-badge {
+    padding: var(--space-1) var(--space-2);
+    font-size: 11px;
+  }    .chat-list {
+    padding: var(--space-3) 0;
+    gap: var(--space-4);
+    /* Correcciones específicas Safari móvil */
+    overflow-y: auto; /* Scroll vertical explícito */
+    -webkit-overflow-scrolling: touch;
+    max-height: calc(100vh - 180px);
+    max-height: calc(100dvh - 180px);
+    min-height: 0;
+    will-change: scroll-position;
+    contain: layout style;
+  }
+  
   .message {
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
   
   .message.user, .message.assistant {
-    max-width: 95%;
+    max-width: 100%;
+  }
+  
+  .message.user {
+    margin-left: 5%;
+    margin-right: 0;
+  }
+  
+  .message.assistant {
+    margin-right: 5%;
+    margin-left: 0;
   }
   
   .avatar {
     width: 32px;
     height: 32px;
     font-size: 14px;
+    flex-shrink: 0;
   }
   
   .message-content {
     padding: var(--space-3) var(--space-4);
     border-radius: var(--border-radius);
+    font-size: 14px;
+    line-height: 1.5;
   }
   
   .footer {
-    padding: var(--space-4);
+    padding: var(--space-3);
+    background: var(--surface-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
   }
   
   .tools-container {
-    gap: var(--space-6);
-    margin-bottom: var(--space-4);
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
   }
   
   .sidebar-buttons {
     gap: var(--space-2);
+    justify-content: center;
   }
   
   .sidebar-buttons button {
     width: 40px;
     height: 40px;
     font-size: 16px;
+    padding: var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-container {
+    height: calc(100vh - 55px);
+    height: calc(100dvh - 55px); /* Dynamic viewport height para Safari */
+    min-height: -webkit-fill-available;
+    overflow-y: auto; /* Permitir scroll vertical */
+  }
+  
+  .chat-header {
+    padding: var(--space-2) 0;
+  }
+  
+  .chat-header .tokens-info {
+    font-size: 11px;
+  }
+  
+  .chat-header .tokens-badge {
+    font-size: 10px;
+    padding: 2px var(--space-1);
+  }    .chat-list {
+    padding: var(--space-2) 0;
+    gap: var(--space-3);
+    /* Correcciones específicas Safari móvil */
+    overflow-y: auto; /* Scroll vertical explícito */
+    -webkit-overflow-scrolling: touch;
+    max-height: calc(100vh - 160px);
+    max-height: calc(100dvh - 160px);
+    min-height: 0;
+    will-change: scroll-position;
+  }
+  
+  .message.user {
+    margin-left: 2%;
+  }
+  
+  .message.assistant {
+    margin-right: 2%;
+  }
+  
+  .avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .message-content {
+    padding: var(--space-2) var(--space-3);
+    font-size: 13px;
+  }
+  
+  .footer {
+    padding: var(--space-2);
+  }
+  
+  .sidebar-buttons button {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
   }
 }

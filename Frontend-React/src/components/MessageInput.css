@@ -141,28 +141,106 @@
   color: var(--accent-error);
 }
 
-/* Responsive */
+/* Responsive mejorado */
 @media (max-width: 768px) {
   .message-input-container {
     padding: var(--space-3);
     gap: var(--space-2);
+    background: var(--surface-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+  }
+  
+  .input-wrapper {
+    position: relative;
   }
   
   .message-textarea {
     padding: var(--space-3);
     font-size: 16px; /* Evita zoom en iOS */
+    min-height: 44px;
+    max-height: 120px;
+    border-radius: var(--space-3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .message-textarea:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2);
   }
   
   .send-button {
     min-height: 44px;
-    padding: 0 var(--space-4);
-    font-size: 14px;
+    min-width: 44px;
+    padding: 0 var(--space-3);
+    font-size: 18px;
+    border-radius: var(--space-3);
+    flex-shrink: 0;
   }
   
   .stop-button {
     top: -48px;
     padding: var(--space-2) var(--space-3);
     font-size: 12px;
+    border-radius: var(--space-2);
+  }
+  
+  .character-count {
+    font-size: 11px;
+    position: absolute;
+    bottom: var(--space-1);
+    right: var(--space-2);
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-input-container {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+  
+  .message-textarea {
+    padding: var(--space-2);
+    font-size: 16px;
+    min-height: 40px;
+    max-height: 100px;
+  }
+  
+  .send-button {
+    min-height: 40px;
+    min-width: 40px;
+    font-size: 16px;
+    padding: 0 var(--space-2);
+  }
+  
+  .stop-button {
+    top: -44px;
+    padding: var(--space-1) var(--space-2);
+    font-size: 11px;
+  }
+  
+  .character-count {
+    font-size: 10px;
+    bottom: 2px;
+    right: var(--space-1);
+  }
+}
+
+/* Landscape móvil */
+@media (max-width: 768px) and (orientation: landscape) {
+  .message-input-container {
+    padding: var(--space-2) var(--space-3);
+  }
+  
+  .message-textarea {
+    max-height: 80px;
+  }
+  
+  .stop-button {
+    top: -40px;
   }
 }
 
