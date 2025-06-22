@@ -12,10 +12,11 @@ For production environments use another wsgi server.<br>
 ### Responsive Inteface
 <p align="center">
   <img src="media/chat_pic.png" height="600"/>
+  <img src ="media/chat_pic_pan.png" width="600" />
 </p>
 
 <p align="center">
-  <img src ="media/chat_pic_pan.png" width="600" />
+  
 </p>
 
 ## Dependencies
