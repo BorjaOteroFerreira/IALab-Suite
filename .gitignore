@@ -38,3 +38,5 @@ yarn-error.log*
 
 # React Native specific
 .expo/
+
+build_frontend.py
