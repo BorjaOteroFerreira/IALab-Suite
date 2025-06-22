@@ -123,39 +123,63 @@ const processYouTubeLinks = (text) => {
 };
 
 // Componente ChatSidebar
-function ChatSidebar({ visible, onLoadChat, onDeleteChat }) {
+function ChatSidebar({ visible, onLoadChat, onDeleteChat, onClose }) {
   const { chatList, fetchChatList } = useChatContext();
 
   useEffect(() => {
     if (visible) {
+      console.log('ChatSidebar: Cargando lista de chats...');
       fetchChatList();
     }
   }, [visible, fetchChatList]);
 
-  if (!visible) return null;
+  useEffect(() => {
+    console.log('ChatSidebar: Lista de chats actualizada:', chatList);
+  }, [chatList]);
 
-  return (
-    <div className="chat-sidebar">
-      <h3>📁 Historial</h3>
+  if (!visible) return null;  return (
+    <div className={`chat-sidebar ${visible ? 'visible' : ''}`}>
+      <div className="sidebar-header">
+        <h3>📁 Historial de Chat</h3>
+        <button 
+          className="close-btn"
+          onClick={onClose}
+          title="Cerrar"
+        >
+          ✕
+        </button>
+      </div>
+      
       <div className="chat-list">
-        {chatList.map((chatName, idx) => (
-          <div key={idx} className="chat-item">
-            <button
-              onClick={() => onDeleteChat(chatName)}
-              className="delete-chat-btn"
-              title="Eliminar chat"
-            >
-              🗑️
-            </button>
-            <button
-              onClick={() => onLoadChat(chatName)}
-              className="chat-name-btn"
-              title={`Cargar: ${chatName}`}
-            >
-              {chatName}
-            </button>
+        {Array.isArray(chatList) && chatList.length > 0 ? (
+          chatList.map((chatName, idx) => (
+            <div key={idx} className="chat-item">
+              <button
+                onClick={() => onDeleteChat(chatName)}
+                className="delete-chat-btn"
+                title="Eliminar chat"
+              >
+                🗑️
+              </button>
+              <button
+                onClick={() => onLoadChat(chatName)}
+                className="chat-name-btn"
+                title={`Cargar: ${chatName}`}
+              >
+                {chatName}
+              </button>
+            </div>
+          ))
+        ) : (
+          <div style={{ 
+            textAlign: 'center', 
+            color: 'var(--text-secondary)', 
+            padding: '2rem',
+            fontStyle: 'italic'
+          }}>
+            No hay conversaciones guardadas
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
@@ -228,19 +252,10 @@ function ChatComponent() {
     if (window.confirm(`¿Estás seguro de que quieres eliminar "${chatName}"?`)) {
       deleteChat(chatName);
     }
-  };
-
-  return (
+  };  return (
     <div className="app-layout">
-      {/* Sidebar de Historial */}
-      <ChatSidebar 
-        visible={chatSidebarVisible} 
-        onLoadChat={handleLoadChat}
-        onDeleteChat={handleDeleteChat}
-      />
-
       {/* Contenedor principal */}
-      <div className={`main-container ${chatSidebarVisible ? 'sidebar-left-open' : ''} ${configSidebarVisible ? 'sidebar-right-open' : ''}`}>
+      <div className={`main-container ${configSidebarVisible ? 'sidebar-right-open' : ''}`}>
         {/* Header */}
         <header className="app-header">
           <div className="header-left">
@@ -434,11 +449,27 @@ function ChatComponent() {
           </form>
         </div>      </div>
 
+      {/* Overlay y Sidebar de Chat - Solo renderizar cuando esté visible */}
+      {chatSidebarVisible && (
+        <>
+          <div 
+            className="sidebar-overlay"
+            onClick={() => setChatSidebarVisible(false)}
+          />
+          <ChatSidebar 
+            visible={chatSidebarVisible} 
+            onLoadChat={handleLoadChat}
+            onDeleteChat={handleDeleteChat}
+            onClose={() => setChatSidebarVisible(false)}
+          />
+        </>
+      )}
+
       {/* Overlay y Sidebar de Configuración - Solo renderizar cuando esté visible */}
       {configSidebarVisible && (
         <>
           <div 
-            className={`config-sidebar-overlay ${configSidebarVisible ? 'visible' : ''}`}
+            className="sidebar-overlay"
             onClick={() => setConfigSidebarVisible(false)}
           />
           <ConfigSidebarComponent 

@@ -181,14 +181,46 @@ export const ChatProvider = ({ children }) => {
   const hideError = useCallback(() => {
     setError(null);
   }, []);
-
   // Función para cargar la lista de chats
   const fetchChatList = useCallback(async () => {
-    try {
-      const response = await axios.get('/recuperar_historial');
+    try {      console.log('🔄 fetchChatList: Iniciando solicitud...');
+      console.log('🔄 fetchChatList: User Agent:', navigator.userAgent);
+      console.log('🔄 fetchChatList: Es Safari iOS:', /iPad|iPhone|iPod/.test(navigator.userAgent));
+      
+      // Fix específico para Safari iOS - evitar cache
+      const isSafariIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const config = {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      };
+      
+      if (isSafariIOS) {
+        config.params = { _t: Date.now() }; // Timestamp para evitar cache
+      }
+      
+      const response = await axios.get('/recuperar_historial', config);
+      
+      console.log('✅ fetchChatList: Respuesta recibida');
+      console.log('✅ fetchChatList: Status:', response.status);
+      console.log('✅ fetchChatList: Headers:', response.headers);
+      console.log('✅ fetchChatList: Data raw:', response.data);
+      console.log('✅ fetchChatList: Tipo de data:', typeof response.data);
+      console.log('✅ fetchChatList: Es array:', Array.isArray(response.data));
+      
+      if (Array.isArray(response.data)) {
+        console.log('✅ fetchChatList: Longitud del array:', response.data.length);
+        console.log('✅ fetchChatList: Primer elemento:', response.data[0]);
+      }
+      
       setChatList(response.data);
+      console.log('✅ fetchChatList: setChatList ejecutado');
     } catch (error) {
-      console.error('Error al cargar la lista de chats:', error);
+      console.error('❌ fetchChatList: Error al cargar la lista de chats:', error);
+      console.error('❌ fetchChatList: Error response:', error.response);
+      console.error('❌ fetchChatList: Error status:', error.response?.status);
       showError(error);
     }
   }, [showError]);

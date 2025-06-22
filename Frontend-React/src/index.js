@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import './fonts.css';
 import './safari-mobile-fix.css';
+import './safari-ios-debug.css'; // Debug específico para Safari iOS
 import './fontLoader';
 import App from './App'; // Usando la versión completa con el nuevo diseño
 

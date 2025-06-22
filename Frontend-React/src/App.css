@@ -463,16 +463,62 @@
   padding: 2rem;
   overflow-y: auto;
   box-shadow: 0 0 30px rgba(0,0,0,0.2);
+  /* Transición suave */
+  transition: transform 0.3s ease;
 }
 
 .chat-sidebar {
   left: 0;
-  width: 280px;
+  width: 320px;
+  height: 100vh;
+  background: var(--surface-elevated);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border-primary);
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  color: var(--text-primary);
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  transform: translateX(-100%);
+  box-shadow: 0 0 30px rgba(0,0,0,0.2);
+  
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-variant) transparent;
+}
+
+.chat-sidebar.visible {
+  transform: translateX(0);
 }
 
 .config-sidebar {
   right: 0;
   width: 320px;
+  /* Oculto por defecto */
+  transform: translateX(100%);
+}
+
+.config-sidebar.visible {
+  transform: translateX(0);
+}
+
+/* Overlay para cerrar sidebar */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+  opacity: 1;
+  visibility: visible;
 }
 
 .sidebar-header {
@@ -966,19 +1012,52 @@
     font-size: 0.7rem;
     padding: 0.25rem 0.5rem;
     min-width: auto;
-  }
-  
-  /* Sidebars en móvil */
+  }    /* Sidebars en móvil - Mayor prioridad */
   .chat-sidebar,
   .config-sidebar {
-    width: 100vw;
-    height: 100vh;
-    padding: 1rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-  }    /* Chat container ajustado */
+    width: 100vw !important;
+    height: 100vh !important;
+    padding: 1rem !important;
+    position: fixed !important;
+    top: 0 !important;
+    z-index: 1000 !important; /* Mayor que el desktop */
+    /* Transición suave para mostrar/ocultar */
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+  
+  .chat-sidebar {
+    left: 0 !important;
+  }
+  
+  .config-sidebar {
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(100%) !important;
+  }
+    /* Mostrar sidebars cuando están visibles */
+  .chat-sidebar.visible {
+    transform: translateX(0) !important;
+  }
+  
+  .config-sidebar.visible {
+    transform: translateX(0) !important;
+  }
+  
+  /* Overlay para cerrar sidebar */  .sidebar-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 999 !important; /* Justo debajo de los sidebars */
+    opacity: 1 !important;
+    visibility: visible !important;
+  }/* Chat container ajustado */
   .chat-container {
     height: calc(100vh - 60px);
     height: calc(100dvh - 60px); /* Dynamic viewport height para Safari */
