@@ -12,11 +12,16 @@ For production environments use another wsgi server.<br>
 ### Responsive Inteface
 <p align="center">
   <img src="media/chat_pic.png" height="600"/>
-</p>
-
-<p align="center">
   <img src ="media/chat_pic_pan.png" width="600" />
 </p>
+### Tool usage
+#### You can develop your own tools for the model in a very simple and modular way.
+<p align="center">
+  <img src ="media/toolsearch.png" width="600" />
+</p>
+
+
+### RAG - Retrieval Augmented Generation included.
 
 ## Dependencies
 
