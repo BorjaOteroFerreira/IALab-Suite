@@ -7,6 +7,15 @@
 [![React](https://img.shields.io/badge/react-18.2+-61DAFB.svg)](https://reactjs.org/)
 [![Flask](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 
+
+<p align="center">
+  <img src ="media/chat_pic_pan.png" width="600" />
+</p>
+
+<p align="center">
+  <img src ="media/toolsearch.png" width="600" />
+</p>
+
 ## 📋 Table of Contents
 
 - [🚀 Features](#-features)
@@ -34,11 +43,12 @@
 
 ### 🎯 Integrated Tools
 - 🔍 **Internet Search**: Serper API integration
+- 🔎 **Advanced Search**: Specialized searches with Google dorks
 - 🎥 **Video Search**: YouTube API integration
 - 💰 **Cryptocurrency Prices**: Real-time information
-- 🖼️ **Image Generation**: AI image generation tool
+- 🖼️ **Image Generation**: AI image generation tool with Gradle API integration
 - 🌐 **IP Information**: Geographic data retrieval
-- 🔎 **Advanced Search**: Specialized searches with Google dorks
+
 
 ## 🏗️ Architecture
 
