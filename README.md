@@ -1,239 +1,407 @@
+# 🤖 IALab-Suite
 
+**A complete AI tools suite with React interface and Flask backend for testing Large Language Models (LLM) using llama.cpp**
 
-# IALab-Suite 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![React](https://img.shields.io/badge/react-18.2+-61DAFB.svg)](https://reactjs.org/)
+[![Flask](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 
-### Flask API Rest for Testing LLM Models with Llama.cpp Library. Try large language models without code.
+## 📋 Table of Contents
 
-This Flask application offers a unique local chat experience for testing Large Language Model (LLM) using the Llama.cpp library. Unlike many online platforms, this chat operates entirely offline, ensuring user privacy by eliminating the need for internet access and avoiding data sharing with third-party companies. Users can confidently mount and evaluate LLM models in the GGUF format without compromising their data security. 
-The app is under active development, with a focus on enhancing features and maintaining robust privacy measures.
+- [🚀 Features](#-features)
+- [🏗️ Architecture](#-architecture)
+- [📦 Installation](#-installation)
+- [🔧 Configuration](#-configuration)
+- [🎯 Usage](#-usage)
+- [🛠️ Available Tools](#️-available-tools)
+- [📂 Project Structure](#-project-structure)
+- [🔄 API](#-api)
+- [🧪 Development](#-development)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
-For production environments use another wsgi server.<br>
+## 🚀 Features
 
-### Responsive Inteface
-<p align="center">
-  <img src="media/chat_pic.png" height="600"/>
-  <img src ="media/chat_pic_pan.png" width="600" />
-</p>
-### Tool usage
-#### You can develop your own tools for the model in a very simple and modular way.
-<p align="center">
-  <img src ="media/toolsearch.png" width="600" />
-</p>
+### 🌟 Main Features
+- **🔒 Total Privacy**: Works completely offline, without sending data to third parties
+- **🎨 Modern Interface**: Responsive React frontend with modern design
+- **🔌 Modular Architecture**: Extensible and modular tool system
+- **⚡ Real Time**: Bidirectional communication with WebSockets
+- **🧠 Multiple Models**: Support for any GGUF model
+- **📚 Integrated RAG**: Retrieval Augmented Generation system included
+- **🛠️ AI Tools**: Complete set of tools for the assistant
 
+### 🎯 Integrated Tools
+- 🔍 **Internet Search**: Serper API integration
+- 🎥 **Video Search**: YouTube API integration
+- 💰 **Cryptocurrency Prices**: Real-time information
+- 🖼️ **Image Generation**: AI image generation tool
+- 🌐 **IP Information**: Geographic data retrieval
+- 🔎 **Advanced Search**: Specialized searches with Google dorks
 
-### RAG - Retrieval Augmented Generation included.
-
-## Dependencies
-
-- Flask
-- flask_socketio
-- CORS
-- llama-cpp-python
-
-```bash
-pip install Flask flask-socketio flask-cors 
+## 🏗️ Architecture
 
 ```
+IALab-Suite/
+├── 🖥️ Frontend-React/          # Modern user interface
+├── 🔧 Backend-API/             # Flask API with WebSockets
+├── 🛠️ tools/                  # Modular tools
+└── 📁 chats/                  # Conversation storage
+```
 
-Or in the proyect folder 
+### 🔧 Main Components
 
+- **🧠 Cortex**: AI-powered tool processing engine
+- **🤖 Assistant**: Main AI assistant logic
+- **🔍 RAG**: Retrieval Augmented Generation system
+- **🌐 API React**: Flask server serving the React frontend
+- **📡 SocketIO**: Real-time communication
+
+## 📦 Installation
+
+### 📋 Prerequisites
+
+- **Python 3.8+**
+- **Node.js 16+**
+- **npm or yarn**
+- **Git**
+
+### 🛠️ Step-by-Step Installation
+
+#### 1. 📥 Clone the Repository
 ```bash
+git clone https://github.com/your-username/IALab-Suite.git
+cd IALab-Suite
+```
+
+#### 2. 🐍 Set up Python Environment
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+
+# Install Python dependencies
 pip install -r requirements.txt
 ```
 
-## llama-cpp-python installation
+#### 3. ⚙️ Install llama-cpp-python
 
-There are different options for installing the llama-cpp package:
-
-- CPU Usage
-- CPU + GPU (using one of the many BLAS backends)
-- Metal GPU (MacOS with Apple Silicon chip)
-
-### Installation CPU Only (Any processor compatible with AVX2)
-
+**For CPU only:**
 ```bash
 pip install --upgrade --quiet llama-cpp-python
 ```
 
-### Installation with OpenBLAS / cuBLAS / CLBlast
-
-llama.cpp supports multiple BLAS backends for faster processing. Use the FORCE_CMAKE=1 environment variable to force the use of cmake and install the pip package for the desired BLAS backend.
-
-Example installation with cuBLAS backend:
-
-```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
-```
-
-**IMPORTANT:** If you have already installed the CPU-only version of the package, you must reinstall it from scratch. Consider the following command:
-
+**For GPU with CUDA:**
 ```bash
 CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
 
-### Installation with Metal on MacOS (M1/M2/M3) 
-
-llama.cpp supports Apple Silicon as a first-class citizen, optimized through ARM NEON, Accelerate, and Metal frameworks. Use the FORCE_CMAKE=1 environment variable to force the use of cmake and install the pip package for Metal support.
-
-Open a terminal and check these examples.
-
-Example installation with Metal support:
-
-```bash
-CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
-```
-
-**IMPORTANT:** If you have already installed a CPU-only version of the package, you must reinstall it from scratch: consider the following command:
-
+**For macOS with Metal (M1/M2/M3):**
 ```bash
 CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python --no-cache-dir
 ```
 
-### Installation with CUDA on Linux 
+#### 4. 🎨 Set up React Frontend
+```bash
+cd Frontend-React
+npm install
+npm run build
+cd ..
+```
+
+#### 5. 🔑 Configure Environment Variables
+```bash
+# Create .env file in Backend-API/
+cp Backend-API/.env.example Backend-API/.env
+
+# Edit Backend-API/.env with your API keys
+YOUTUBE_API_KEY=your_youtube_api_key
+SERPER_API_KEY=your_serper_api_key
+```
+
+#### 6. 📁 Download Models
+```bash
+# Create models directory
+mkdir -p Backend-API/models/llama
+
+# Download example model (Llama 2 7B)
+wget -O Backend-API/models/llama/llama-2-7b-chat.Q8_0.gguf \
+  "https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf"
+```
+
+## 🔧 Configuration
+
+### 🔑 Required API Keys
+
+1. **YouTube API Key**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a project and enable YouTube Data API v3
+   - Create an API key
+
+2. **Serper API Key**:
+   - Sign up at [Serper.dev](https://serper.dev/)
+   - Get your free API key
+
+### ⚙️ System Configuration
+
+Edit `Backend-API/.env`:
+```env
+YOUTUBE_API_KEY=your_youtube_api_key_here
+SERPER_API_KEY=your_serper_api_key_here
+```
+
+## 🎯 Usage
+
+### 🚀 Start the Server
 
 ```bash
-export CXX=$(which g++) 
+# From the project root
+cd Backend-API
+python start_server.py
 ```
 
+### 🌐 Access the Application
+
+Open your browser and go to: `http://localhost:8081`
+
+### 💬 Use the Chat
+
+1. **Select a model** from the dropdown menu
+2. **Type your question** in the chat field
+3. **Press Enter** or click send
+4. **Watch the tools** execute in real-time
+5. **Receive the complete response** with enriched information
+
+## 🛠️ Available Tools
+
+### 🔍 Internet Search
+```python
+# Example of automatic usage
+"What's the weather in Madrid today?"
+```
+
+### 🎥 Video Search
+```python
+# The assistant will search for videos automatically
+"Show me videos about Python programming"
+```
+
+### 💰 Cryptocurrency Prices
+```python
+# Query real-time prices
+"What's the current price of Bitcoin and Ethereum?"
+```
+
+### 🖼️ Image Generation
+```python
+# Generate images with AI
+"Generate an image of a space cat"
+```
+
+### 🌐 IP Information
+```python
+# Get geographic information
+"Where is the IP 8.8.8.8 from?"
+```
+
+### 🔎 Advanced Search
+```python
+# Specialized searches
+"Search for technical information about vulnerabilities"
+```
+
+## 📂 Project Structure
+
+```
+IALab-Suite/
+├── 📁 Backend-API/
+│   ├── 🧠 Cortex.py              # Tool processing engine
+│   ├── 🤖 Assistant.py           # Main assistant logic
+│   ├── 🔍 Rag.py                 # RAG system
+│   ├── 🌐 Api_react.py           # Flask API for React
+│   ├── 📡 SocketResponseHandler.py # WebSocket handling
+│   ├── 🚀 start_server.py        # Main server
+│   ├── 📁 tools/                 # Modular tools
+│   │   ├── 🔍 search_tools.py    # Internet search
+│   │   ├── 🎥 video_search_tool.py # Video search
+│   │   ├── 💰 cripto_price.py     # Cryptocurrency prices
+│   │   ├── 🖼️ generate_image.py   # Image generation
+│   │   └── 🔎 advanced_search.py  # Advanced search
+│   ├── 📁 templates/             # HTML templates
+│   ├── 📁 static/                # Static files
+│   ├── 📁 models/                # LLM models
+│   ├── 📁 documents/             # Documents for RAG
+│   └── 📁 chats/                 # Conversation history
+├── 📁 Frontend-React/
+│   ├── 📁 src/
+│   │   ├── 📱 App.js              # Main component
+│   │   ├── 📁 components/         # React components
+│   │   ├── 📁 context/            # State contexts
+│   │   ├── 📁 hooks/              # Custom hooks
+│   │   └── 📁 services/           # API services
+│   ├── 📁 public/                # Public files
+│   ├── 📁 build/                 # Production build
+│   └── 📦 package.json           # Node.js dependencies
+├── 📄 README.md                  # This file
+├── 📄 requirements.txt           # Python dependencies
+└── 📄 LICENSE                    # MIT License
+```
+
+## 🔄 API
+
+### 📡 WebSocket Events
+
+#### 📤 Client Events
+- `message`: Send message to assistant
+- `disconnect`: Disconnect from server
+
+#### 📥 Server Events
+- `response`: Assistant response (streaming)
+- `console_output`: Console output (tools)
+- `utilities_data`: Utilities data (videos, images)
+- `finalization_signal`: Completion signal
+
+### 🌐 REST Endpoints
+
+#### 📊 System Information
+```http
+GET /api/system-info
+```
+
+#### 📁 Model Management
+```http
+GET /api/models
+POST /api/load-model
+```
+
+#### 💬 Chat Management
+```http
+GET /api/chats
+POST /api/save-chat
+DELETE /api/delete-chat
+```
+
+## 🧪 Development
+
+### 🔧 Frontend Development
 ```bash
-export CUDA_PATH=/usr/local/cuda 
+cd Frontend-React
+npm start
 ```
+This will start the development server at `http://localhost:3000`
 
+### 🐍 Backend Development
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+cd Backend-API
+python start_server.py
 ```
 
-If you get an error for not finding the cuda architecture, you can try this command:
+### 🛠️ Creating New Tools
 
-```bash
-CUDA_ARCH=sm_86 CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+1. **Create tool file** in `Backend-API/tools/`
+2. **Implement the class** with `run()` method
+3. **Register in Cortex.py**:
+
+```python
+# In Cortex.py
+self.tools = {
+    'my_new_tool': MyNewTool.run,
+    # ... other tools
+}
 ```
 
-In my case the architecture of the card is ampere so it corresponds to sm_86, change it to the one that corresponds to your graphics card
+### 📝 Tool Example
 
-
-### Installation on Windows
-
-If you want to install llama-cpp-python by compiling it from the source, you can follow most of the instructions in the repository itself. However, there are some specific instructions for Windows that might be helpful.
-
-#### Requirements to install llama-cpp-python
-
-- git
-- python
-- cmake
-- Visual Studio Community / Enterprise (ensure you install this with the following setup)
-  - Desktop development with C++
-  - Python development
-  - Embedded Linux development with C++
-
-- Download and install CUDA Toolkit 12.3 from the [official Nvidia website](https://developer.nvidia.com/cuda-12-3-0-download-archive?target_os=Windows).
-
-  Verify the installation with `nvcc --version` and `nvidia-smi`.
-
-  Copy the files from: 
-  ```
-  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.\extras\visual_studio_integration\MSBuildExtensions
-  ```
-  To the folder:
-  
-  For Enterprise version:
-  ```
-  C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations
-  ```
-  For Community version:
-  ```
-  C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
-  ```
-
-Clone the git repository recursively to also get the llama.cpp submodule.
-
-```bash
-git clone --recursive -j8 https://github.com/abetlen/llama-cpp-python.git
+```python
+# Backend-API/tools/my_tool.py
+class MyTool:
+    @staticmethod
+    def run(query):
+        """
+        Execute the tool with the given query
+        
+        Args:
+            query (str): Input query
+            
+        Returns:
+            str: Tool result
+        """
+        # Your logic here
+        return f"Result for: {query}"
 ```
 
-Open a command prompt and set the following environment variables.
+## 🤝 Contributing
 
-```bash
-set FORCE_CMAKE=1
-set CMAKE_ARGS=-DLLAMA_CUBLAS=OFF
-```
+Contributions are welcome! 🎉
 
-If you have an NVIDIA GPU, make sure DLLAMA_CUBLAS is set to ON.
+### 📋 How to Contribute
 
-#### Compilation and Installation
+1. **🍴 Fork** the project
+2. **🌿 Create a branch** for your feature: `git checkout -b feature/AmazingFeature`
+3. **💾 Commit** your changes: `git commit -m 'Add some AmazingFeature'`
+4. **📤 Push** to the branch: `git push origin feature/AmazingFeature`
+5. **🔄 Open a Pull Request**
 
-Now you can navigate to the llama-cpp-python directory and install the package.
+### 🐛 Report Bugs
 
-```bash
-python3 -m pip install -e .
-```
+Open an [issue](https://github.com/your-username/IALab-Suite/issues) describing:
+- 📝 Bug description
+- 🔄 Steps to reproduce
+- 📱 Environment (OS, Python version, etc.)
+- 📸 Screenshots if relevant
 
-**IMPORTANT:** If you have already installed a CPU-only version of the package, you must reinstall it from scratch: consider the following command:
+### 💡 Request Features
 
-```bash
-python3 -m pip install -e . --force-reinstall --no-cache-dir
-```
+Open an [issue](https://github.com/your-username/IALab-Suite/issues) with:
+- 📝 Detailed description
+- 🎯 Use cases
+- 📊 Expected benefits
 
-## **IMPORTANT (Mac / Linux / Windows):**
-After installation:
+## 📊 System Information
 
-Go to the llama-cpp installation folder
+### 🧪 Tested on:
+- **💻 macOS**: MacBook Pro M3-Pro (11 CPU cores, 14 GPU cores, 18GB RAM)
+- **🐧 Linux**: AMD Ryzen 5600X, NVIDIA RTX 3060 (12GB VRAM, 32GB RAM)
+- **🪟 Windows**: Various configurations
 
-If you don't know where the directory is located, you can always do a quick search for the file llama_chat_format.py
+### 🐍 Compatible Versions:
+- **Python**: 3.8 - 3.12
+- **Node.js**: 16+
+- **React**: 18.2+
+- **Flask**: 2.0+
 
-Rename the file llama_chat_format.py to llama_chat_format.bk and paste the attached file into this repository.
+## 🔗 Useful Links
 
-This solution is provisional but necessary to be able to use models like Mixtral and others that need templates that are not included by default in the llama-cpp library. In the future I will implement a template editor to create, load and save templates without having to replace library files.
+- 📚 [llama.cpp Documentation](https://github.com/ggerganov/llama.cpp)
+- 🤗 [GGUF Models on Hugging Face](https://huggingface.co/models?search=gguf)
+- 🎥 [YouTube Data API](https://developers.google.com/youtube/v3)
+- 🔍 [Serper API](https://serper.dev/)
 
-## Usage
+## 💖 Support the Project
 
-Download the [model](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q8_0.gguf?download=true) and place it in the models/llama folder.
-The path looks like this:
+If this project has been useful to you, consider:
 
-```bash
-models/llama/llama-2-7b-chat.Q8_0.gguf
-```
+- ⭐ Giving the repository a star
+- 🐛 Reporting bugs or improvements
+- 💝 Contributing with code
+- ☕ Buy me a coffee: [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/borjaoteroferreira)
 
-This model is used as the default model, (dont need llama_chat_format.py file sustitution).
+## 📄 License
 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for more details.
 
+---
 
-You can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
+<div align="center">
 
+**🤖 Made with ❤️ for the AI community**
 
-[TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)[ Size - 8.87 GB | Max ram required - 	11.37 GB ] (need llama_chat_format.py sustitution and use Custom-IALab chat format)
+**⭐ If you like this project, give it a star! ⭐**
 
-
-The path looks like this:
-```bash
-models/TheBloke/mixtral_7bx2_moe/mixtral_7bx2_moe.Q5_0.gguf
-```
-
-**IMPORTANT:** Remember to use models of size according to the available RAM of your graphics card.
-In the case of MacOs with Metal, the maximum memory that can be used for inference is limited, around 65-75% of the total memory.
-For use with CPU the limit is the total memory of the CPU on both Windows and Mac.
-
-Run the App:
-
-```bash
-python app.py
-```
-
-## Contribution
-Contributions are welcome! If you find any bugs or have suggestions to improve this Framework, feel free to open an issue or submit a pull request. 
-
-OR...
-
-```javascript
-!pullrequest && !putIssue ? user.donate(CoffeeWhitPaypal) : null;
-
-```
-
-console.log( [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/borjaoteroferreira) );
-
-
-#### __Tested in MacBook-Pro M3-Pro 11 cpu cores , 14 gpu cores, 18 unify memory (Sonoma 14.1) & AMD Ryzen 5600x, Nvidia RTX 3060 gaming OC 12GB, 32GB cpu Memory (Linux/Windows). Tested with 12gb max size models__ | __Python version 3.11.7__ | 
-
-## Code & license 
-This code released under the [MIT License](https://github.com/BorjaOteroFerreira/IALab-Suite/blob/main/LICENSE)
-
+</div>
