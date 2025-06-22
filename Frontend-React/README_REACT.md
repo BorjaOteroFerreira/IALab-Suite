@@ -5,11 +5,8 @@ Este proyecto integra un frontend en React con el backend de Flask existente par
 ## Estructura del proyecto
 
 ```
-IALab-Suite/           
-├── Api_react.py           # Backend Flask para servir React
-├── Assistant.py           # Lógica de asistente
-├── ...
-├── frontend/              # Aplicación React
+
+├── Frontend-React/        # Aplicación React
     ├── public/            # Archivos estáticos
     ├── src/               # Código fuente de React
     │   ├── components/    # Componentes React
