@@ -11,8 +11,9 @@ from colorama import Fore, Style
 from tools.tool_registry import ToolRegistry
 from SocketResponseHandler import SocketResponseHandler
 
-os.environ["YOUTUBE_API_KEY"] = 'YOUR_API_KEY'
-os.environ["SERPER_API_KEY"] = 'YOUR_API_KEY'
+os.environ["YOUTUBE_API_KEY"] = 'AIzaSyDIfrz9h4Y7KKExF-j8VNztYGypt6EYC_o'
+os.environ["SERPER_API_KEY"] = 'efdb015cbec193833a7ace9fc226bea17c6c5268'
+
 
 
 class Cortex:

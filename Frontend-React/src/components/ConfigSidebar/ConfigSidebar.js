@@ -363,8 +363,8 @@ const ConfigSidebar = ({ visible, onClose }) => {
             className="form-control"
             id="context"
             name="context"
-            placeholder="Ejemplo: 2048"
-            value={modelConfig.context || 2048}
+            placeholder="Ejemplo: 8192"
+            value={modelConfig.context || 8192}
             onChange={handleChange}
           />
         </div>
