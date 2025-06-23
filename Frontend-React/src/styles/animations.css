@@ -103,20 +103,16 @@
   animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* Animaciones y color, sin layout ni márgenes */
 .message-content.assistant {
   animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .message-content.user {
   animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* Enhanced Message Styles */
-.message-content.user {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
   border-top-right-radius: var(--radius-xs);
-  margin-left: auto;
   box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
@@ -128,19 +124,9 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.3), 
-    transparent);
-}
-
-.message-content.assistant {
-  background: var(--surface);
-  color: var(--text-primary);
-  border-top-left-radius: var(--radius-xs);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
+  height: 100%;
+  background: rgba(255,255,255,0.02);
+  pointer-events: none;
 }
 
 /* Enhanced Code Blocks */

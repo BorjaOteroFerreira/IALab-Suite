@@ -1,5 +1,5 @@
-/* Safari Mobile Viewport Fix */
-/* Este archivo contiene correcciones específicas para Safari móvil */
+/* Safari Viewport Fix */
+
 
 /* Fix para el viewport en Safari móvil */
 @supports (-webkit-appearance: none) and (not (overflow: -webkit-marquee)) and (not (-ms-ime-align: auto)) {

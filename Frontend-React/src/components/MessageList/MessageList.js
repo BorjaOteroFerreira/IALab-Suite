@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import CodeBlock from '../CodeBlock/CodeBlock';
 import { LinkRenderer } from '../YoutubeRender/YouTubeRenderer';
+import './MessageList.css';
 
 function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
   const renderMarkdown = (content) => (

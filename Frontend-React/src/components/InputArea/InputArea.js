@@ -1,10 +1,12 @@
 import React, { useRef, useEffect } from 'react';
+import './InputArea.css';
 
 function InputArea({ 
   input, 
   setInput, 
   onSubmit, 
   isLoading, 
+  tokensCount, 
   currentResponse, 
   onStopResponse 
 }) {
@@ -38,11 +40,16 @@ function InputArea({
   return (
     <div className="input-area">
       <form onSubmit={handleSubmit} className="message-form">
+        {/* Contador de tokens encima del input */}
+        <span className="tokens-counter">
+          Contexto usado: {tokensCount} Tokens
+        </span>
         <div className="input-container">
           <textarea
             ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}            onKeyDown={(e) => {
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 e.target.form.requestSubmit();
@@ -53,7 +60,6 @@ function InputArea({
             disabled={isLoading}
             rows={1}
           />
-          
           {isLoading && currentResponse ? (
             <button
               type="button"

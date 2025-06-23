@@ -1,4 +1,5 @@
 import React from 'react';
+import './YoutubeRender.css';
 
 // Función para extraer ID de video de YouTube desde diferentes formatos de URL
 const extractYouTubeVideoId = (url) => {

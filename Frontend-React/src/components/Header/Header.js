@@ -1,9 +1,9 @@
 import React from 'react';
+import './Header.css';
 
 function Header({ 
   tools, 
   rag, 
-  tokensCount, 
   chatSidebarVisible, 
   configSidebarVisible,
   onToggleTools, 
@@ -16,9 +16,6 @@ function Header({
     <header className="app-header">
       <div className="header-left">
         <h1 className="app-title">🤖 AI Lab Suite</h1>
-        <span className="tokens-counter">
-          Contexto usado: {tokensCount} Tokens
-        </span>
       </div>
       
       <div className="header-controls">
@@ -62,10 +59,10 @@ function Header({
         
         <button
           onClick={onClearChat}
-          className="header-button danger"
+          className="header-button"
           title="Nuevo chat"
         >
-          🗑️
+          ➕
         </button>
       </div>
     </header>

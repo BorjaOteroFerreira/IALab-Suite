@@ -1,6 +1,5 @@
-/* Variables CSS mejoradas para mejor visibilidad */
 :root {
-  /* Colores principales más sólidos */
+  /* Colores principales */
   --bg-primary: #0f0f23;
   --surface-primary: #1a1a2e;
   --surface-secondary: #16213e;
@@ -8,24 +7,24 @@
   --surface-hover: #2d2d5a;
   --surface-disabled: #1a1a2e;
   
-  /* Bordes más visibles */
+  /* Bordes */
   --border-primary: rgba(255, 255, 255, 0.2);
   --border-secondary: rgba(255, 255, 255, 0.15);
   --border-hover: rgba(99, 102, 241, 0.5);
   --border-light: rgba(255, 255, 255, 0.1);
   
-  /* Texto más contrastado */
+  /* Texto  */
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.8);
   --text-disabled: rgba(255, 255, 255, 0.4);
   --text-placeholder: rgba(255, 255, 255, 0.5);
   
-  /* Colores de acento más visibles */
+  /* Colores de acento */
   --accent-primary: #6366f1;
   --accent-primary-alpha: rgba(99, 102, 241, 0.2);
   --accent-hover: #5b5ee7;
   
-  /* Colores de error más visibles */
+  /* Colores de error  */
   --error-bg: #dc2626;
   --error-hover: #b91c1c;
   --error-text: #ffffff;
@@ -53,7 +52,7 @@
   --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Layout Principal con mejor espaciado */
+/* Layout Principal  */
 .app-layout {
   display: flex;
   height: 100vh;  height: 100dvh; /* Dynamic viewport height para Safari */
@@ -78,9 +77,8 @@
   margin-left: 280px;
 }
 
-/* Eliminamos el margen derecho para que el sidebar se superponga */
 
-/* Header con bordes más visibles */
+/* Header  */
 .app-header {
   background: var(--surface-elevated);
   backdrop-filter: blur(20px);
@@ -112,13 +110,15 @@
 }
 
 .tokens-counter {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  padding: 0.5rem 1rem;
-  background: var(--surface-secondary);
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--border-secondary); /* Borde más visible */
-  white-space: nowrap;
+  display: block;
+  font-style: italic;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+  font-size: 0.85em;
+  margin-bottom: 4px;
 }
 
 .header-controls {
@@ -232,134 +232,12 @@
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
-/* Área de Mensajes centrada */
-.messages-container {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  justify-content: center; /* Centrar horizontalmente */
-}
-
-.messages-list {
-  height: 100%;
-  overflow-y: auto;
-  padding: 2rem;
-  scroll-behavior: smooth;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 900px; /* Ancho máximo para el chat */
-  width: 100%;
-}
-
-.welcome-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 3rem;
-}
-
-.welcome-message h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.welcome-message p {
-  font-size: 1.25rem;
-  opacity: 0.8;
-  max-width: 600px;
-  line-height: 1.6;
-}
-
-/* Mensajes con bordes más visibles */
-.message {
-  display: flex;
-  gap: 1.25rem;
-  align-items: flex-start;
-  max-width: 100%;
-}
-
-.message.user {
-  flex-direction: row-reverse;
-  justify-content: flex-start;
-}
-
-.message-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Sombra más visible */
-  border: 2px solid var(--border-primary); /* Borde para definición */
-}
-
-.message.user .message-avatar {
-  background: var(--accent-primary);
-  color: white;
-  border-color: var(--accent-primary);
-}
-
-.message.assistant .message-avatar {
-  background: var(--surface-secondary);
-  border-color: var(--border-secondary);
-  color: var(--accent-primary);
-}
-
-.message-content {
-  flex: 1;
-  min-width: 0;
-  margin-top: 0.25rem;
-}
-
-.user-message {
-  background: var(--accent-primary);
-  color: white;
-  padding: 1.25rem 1.5rem;
-  border-radius: var(--radius-xl);
-  border-bottom-right-radius: var(--radius-sm);
-  max-width: 85%;
-  margin-left: auto;
-  font-size: 1rem;
-  line-height: 1.6;
-  box-shadow: 0 4px 16px var(--accent-primary-alpha); /* Sombra más visible */
-  border: 1px solid rgba(255,255,255,0.1); /* Borde sutil */
-}
-
-.assistant-message {
-  background: var(--surface-secondary);
-  border: 2px solid var(--border-secondary); /* Borde más grueso */
-  padding: 1.25rem 1.5rem;
-  border-radius: var(--radius-xl);
-  border-bottom-left-radius: var(--radius-sm);
-  max-width: 95%;
-  font-size: 1rem;
-  line-height: 1.7;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.assistant-message.streaming {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-primary-alpha), 0 4px 12px rgba(0,0,0,0.1);
-}
+/* Eliminado: .messages-container, .messages-list, .message, .message.user, .message.assistant, .message-avatar, .message-content, .user-message, .assistant-message, .typing-indicator, etc. (migrado a MessageList.css) */
 
 /* Área de Input centrada */
 .input-area {
-  padding: 2rem;
-  border-top: 2px solid var(--border-primary); /* Borde más visible */
+  padding: 0.25rem 0.5rem !important;
+  border-top: 2px solid var(--border-primary); /* Borde */
   background: var(--surface-elevated);
   backdrop-filter: blur(20px);
   display: flex;
@@ -375,15 +253,16 @@
   display: flex;
   gap: 1rem;
   align-items: flex-end;
+  margin-bottom: 6px;
 }
 
 .message-textarea {
   flex: 1;
   resize: none;
-  border: 2px solid var(--border-secondary); /* Borde más visible */
+  border: 2px solid var(--border-secondary); 
   border-radius: var(--radius-xl);
   padding: 1.25rem 1.5rem;
-  background: var(--surface-secondary); /* Fondo más sólido */
+  background: var(--surface-secondary); 
   color: var(--text-primary);
   font-size: 1rem;
   line-height: 1.6;
@@ -409,7 +288,7 @@
 .send-button {
   width: 56px;
   height: 56px;
-  border: 2px solid var(--accent-primary); /* Borde visible */
+  border: 2px solid var(--accent-primary); 
   border-radius: var(--radius-xl);
   background: var(--accent-primary);
   color: white;
@@ -458,7 +337,7 @@
   top: 0;
   height: 100vh;
   background: var(--surface-elevated);
-  border: 2px solid var(--border-primary); /* Borde más visible */
+  border: 2px solid var(--border-primary); 
   z-index: 100;
   padding: 2rem;
   overflow-y: auto;
@@ -527,7 +406,7 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-secondary); /* Borde más visible */
+  border-bottom: 2px solid var(--border-secondary);
 }
 
 .sidebar-header h3 {
@@ -539,7 +418,7 @@
 
 .close-btn {
   background: var(--error-bg);
-  border: 2px solid var(--error-border); /* Borde visible */
+  border: 2px solid var(--error-border); 
   color: var(--error-text);
   padding: 0.75rem;
   border-radius: var(--radius-md);
@@ -558,7 +437,7 @@
   border-color: var(--error-hover);
 }
 
-/* Chat List con elementos más visibles */
+/* Chat List */
 .chat-list {
   display: flex;
   flex-direction: column;
@@ -569,7 +448,7 @@
   display: flex;
   align-items: center;
   background: var(--surface-secondary);
-  border: 2px solid var(--border-secondary); /* Borde más visible */
+  border: 2px solid var(--border-secondary); 
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: all 0.2s ease;
@@ -618,7 +497,7 @@
   color: var(--accent-primary);
 }
 
-/* Formularios con elementos más visibles */
+/* Formularios */
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -627,7 +506,7 @@
   display: block;
   margin-bottom: 0.75rem;
   font-size: 0.9rem;
-  color: var(--text-primary); /* Color más visible */
+  color: var(--text-primary); 
   font-weight: 600;
 }
 
@@ -636,7 +515,7 @@
   padding: 1rem;
   background: var(--surface-secondary);
   color: var(--text-primary);
-  border: 2px solid var(--border-secondary); /* Borde más visible */
+  border: 2px solid var(--border-secondary);
   border-radius: var(--radius-lg);
   font-size: 0.9rem;
   transition: all 0.2s ease;
@@ -661,7 +540,7 @@
   appearance: none;
   height: 8px;
   background: var(--surface-secondary);
-  border: 2px solid var(--border-secondary); /* Borde visible */
+  border: 2px solid var(--border-secondary);
   border-radius: 4px;
   outline: none;
   margin: 0.5rem 0;
@@ -670,10 +549,10 @@
 .range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px; /* Más grande */
+  width: 24px; 
   height: 24px;
   background: var(--accent-primary);
-  border: 2px solid white; /* Borde para contraste */
+  border: 2px solid white; 
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
@@ -795,7 +674,7 @@
   border: 1px solid var(--border-secondary);
 }
 
-/* Mejora para los mensajes con código */
+/* Mensajes con código */
 .assistant-message p:last-child {
   margin-bottom: 0;
 }
@@ -864,56 +743,6 @@
 .assistant-message a:hover {
   color: var(--accent-hover);
   text-decoration-color: var(--accent-hover);
-}
-
-/* ===== YOUTUBE EMBED STYLES ===== */
-
-.youtube-embed-container {
-  position: relative;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
-  height: 0;
-  overflow: hidden;
-  max-width: 100%;
-  background: var(--surface-variant);
-  margin: var(--spacing-md) 0;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-light);
-}
-
-.youtube-embed-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  border-radius: var(--radius-lg);
-}
-
-.youtube-link {
-  color: var(--primary) !important;
-  text-decoration: none;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-  margin-bottom: var(--spacing-xs);
-}
-
-.youtube-link:hover {
-  background: rgba(99, 102, 241, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-}
-
-.youtube-link::before {
-  content: "▶️";
-  font-size: 0.9em;
 }
 
 /* Responsive design mejorado para dispositivos móviles */

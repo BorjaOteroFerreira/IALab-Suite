@@ -1,9 +1,8 @@
 /* 
- * Component Library - Modern Professional UI
- * Reusable components and utilities for production
+ * Component Library 
  */
 
-/* Button Variants */
+/* Variantes Botones */
 .btn-outline {
   background: transparent;
   border: 2px solid var(--primary);
@@ -114,7 +113,7 @@
   color: var(--text-secondary);
 }
 
-/* Avatar Components */
+/* Componentes avatar */
 .avatar {
   display: inline-flex;
   align-items: center;
@@ -398,4 +397,19 @@
 @media print {
   .print-hidden { display: none !important; }
   .print-block { display: block !important; }
+}
+
+.welcome-message {
+  text-align: center;
+  margin: 0 auto;
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  padding: 2.5rem 0 2.5rem 0;
+  border: none;
+  box-shadow: none;
 }

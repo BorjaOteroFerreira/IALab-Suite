@@ -83,6 +83,7 @@ function ChatComponent() {
           isLoading={isLoading}
           currentResponse={currentResponse}
           onStopResponse={stopResponse}
+          tokensCount={tokensCount}
         />
       </div>
 
