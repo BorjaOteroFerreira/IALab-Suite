@@ -54,19 +54,14 @@ const ConfigSidebar = ({ visible, onClose }) => {
     
     // Quitar extensiones comunes
     cleanName = cleanName.replace(/\.(gguf|bin|pt|pth|safetensors)$/i, '');
-    
     // Quitar información de cuantización del nombre (Q4, Q3, Q8, etc.)
     cleanName = cleanName.replace(/[-_]?Q\d+(_K|_M|_KM|_KS)?/gi, '');
-    
     // Quitar información de tamaño del nombre (7b, 13b, etc.)
     cleanName = cleanName.replace(/[-_]?(\d+)\.?\d*[Bb]/gi, '');
-    
     // Reemplazar guiones y guiones bajos con espacios
     cleanName = cleanName.replace(/[-_]/g, ' ');
-    
     // Limpiar espacios múltiples
     cleanName = cleanName.replace(/\s+/g, ' ').trim();
-    
     // Capitalizar las primeras letras de cada palabra
     cleanName = cleanName.replace(/\b\w/g, l => l.toUpperCase());
     
@@ -74,18 +69,14 @@ const ConfigSidebar = ({ visible, onClose }) => {
   };  // Función para obtener información adicional del modelo
   const getModelInfo = (modelPath) => {
     if (!modelPath) return { size: null, type: null, quantization: null, icon: '🤖', hasVision: false };
-    
     const fileName = modelPath.split('\\').pop() || modelPath.split('/').pop();
     
     // Detectar tamaño del modelo
     const size = fileName.match(/(\d+)\.?\d*[Bb]/i);
-    
     // Detectar tipo de modelo
     const type = fileName.match(/(chat|instruct|base|code)/i);
-    
     // Detectar cuantización (Q4, Q3, Q8, etc.)
     const quantization = fileName.match(/Q(\d+)(_K|_M|_KM|_KS)?/i);
-    
     // Verificar si hay un archivo con "mmproj" en el nombre en la misma carpeta del modelo
     let hasVision = false;
     

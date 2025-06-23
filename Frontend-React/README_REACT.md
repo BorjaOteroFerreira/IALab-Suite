@@ -12,7 +12,7 @@ Este proyecto integra un frontend en React con el backend de Flask existente par
     │   ├── components/    # Componentes React
     │   ├── context/       # Contextos para gestión de estado
     │   ├── hooks/         # Hooks personalizados
-    │   ├── services/      # Servicios para API
+    │   ├── styles/        # Estilos Css
     │   ├── App.js         # Componente principal
     │   └── index.js       # Punto de entrada
     └── package.json       # Dependencias
@@ -65,5 +65,3 @@ Esto iniciará el servidor de desarrollo de React en `http://localhost:3000` que
 ## Notas importantes
 
 - La aplicación React usa Socket.io para la comunicación en tiempo real con el backend
-- Las APIs del backend Flask se mantienen igual que en la versión original
-- Se ha añadido CORS para permitir que el frontend de desarrollo se comunique con el backend

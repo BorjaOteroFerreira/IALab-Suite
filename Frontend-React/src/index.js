@@ -5,7 +5,7 @@ import './styles/index.css';
 import './styles/fonts.css';
 import './styles/safari-mobile-fix.css';
 import './fontLoader';
-import App from './App'; // Usando la versión completa con el nuevo diseño
+import App from './App'; 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

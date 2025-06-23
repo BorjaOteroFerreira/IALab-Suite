@@ -17,7 +17,7 @@ class Assistant:
         self.model = None
         self.temperature = 0.3
         self.max_context_tokens = 8192
-        self.max_assistant_tokens = 2048
+        self.max_assistant_tokens = 8192
         self.gpu_layers = -1
         self.is_processing = False
         self.stop_emit = False
@@ -106,7 +106,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
             total_user_tokens = len(tokens)  # Contar los tokens de la entrada del usuario
             total_assistant_tokens = 0  # Inicializar el contador de tokens del asistente
             user_input_o = user_input           
-            max_assistant_tokens = self.max_assistant_tokens if not self.tools else 100
+            max_assistant_tokens = self.max_assistant_tokens #if not self.tools else 100
             # Enviar tokens del usuario al inicio del stream
             if not self.tools and not self.rag:
                 SocketResponseHandler.emit_streaming_response(
@@ -141,7 +141,6 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 
                 if self.rag: 
                     Retriever(self.model,user_input,socket)
-                # La llamada a Cortex ahora se hace al principio si hay herramientas
             finally:          
                 self.is_processing = False
                 # Liberar memoria
