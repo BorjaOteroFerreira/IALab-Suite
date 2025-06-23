@@ -39,16 +39,10 @@ class IASuiteApi:
         logging.basicConfig(filename='logs/flask_log.log', level=logging.ERROR)    
     def setup_routes(self):
         self.app.before_request(self.before_first_request)        
-        
         # Ruta raíz para mostrar index vacío de templates
         self.app.route('/')(self.serve_empty_index)
-  
-        
-  
-        
         # Ruta específica para archivos de fuentes
         self.app.route('/fonts/<path:filename>')(self.serve_fonts)
-        
         # API REST endpoints
         self.app.route('/api/models-and-formats', methods=['GET'])(self.get_models_and_formats)
         self.socketio.on_event('user_input', self.handle_user_input_route, namespace='/test')
