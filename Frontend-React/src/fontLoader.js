@@ -1,6 +1,6 @@
 // Este archivo requiere las fuentes directamente para que webpack las incluya
-import helveticaNeueLightFont from './fonts/HelveticaNeueLight.otf';
-import helveticaNeueUltraLightFont from './fonts/HelveticaNeueUltraLight.otf';
+import helveticaNeueLightFont from './styles/fonts/HelveticaNeueLight.otf';
+import helveticaNeueUltraLightFont from './styles/fonts/HelveticaNeueUltraLight.otf';
 
 // Exportamos las rutas de las fuentes para usarlas en la aplicación
 export const fonts = {

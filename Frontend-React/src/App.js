@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
-import './theme.css';
-import './components.css';
-import './animations.css';
-import './fonts.css';
-import './safari-mobile-fix.css';
+import './styles/App.css';
+import './styles/theme.css';
+import './styles//components.css';
+import './styles//animations.css';
+import './styles//fonts.css';
+import './styles//safari-mobile-fix.css';
 import { ChatProvider } from './context/ChatContext';
 import { useChatContext } from './hooks/useChatContext';
 import ConfigSidebarComponent from './components/ConfigSidebar/ConfigSidebar';

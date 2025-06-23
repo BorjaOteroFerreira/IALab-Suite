@@ -16,7 +16,7 @@ function copyFontsToPublic() {
       targetDir: path.join(__dirname, 'build', 'static', 'fonts')
     },
     {
-      sourceDir: path.join(__dirname, 'src', 'fonts'),
+      sourceDir: path.join(__dirname, 'src', 'styles', 'fonts'), // actualizado a styles/fonts
       targetDir: path.join(__dirname, 'build', 'static', 'media', 'fonts')
     }
   ];

@@ -5,21 +5,15 @@
 
 /* Custom Fonts */
 @font-face {
-  font-family: 'HelveticaNeueLight';
-  src: local('Helvetica Neue Light'), 
-       local('HelveticaNeue-Light'),
-       url('./fonts/HelveticaNeueLight.otf') format('opentype');
-  font-display: swap;
+  font-family: 'Helvetica Neue Light';
+  src: url('./fonts/HelveticaNeueLight.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'HelveticaNeueUltraLight';
-  src: local('Helvetica Neue Ultra Light'), 
-       local('HelveticaNeue-UltraLight'),
-       url('./fonts/HelveticaNeueUltraLight.otf') format('opentype');
-  font-display: swap;
+  font-family: 'Helvetica Neue UltraLight';
+  src: url('./fonts/HelveticaNeueUltraLight.otf') format('opentype');
   font-weight: 200;
   font-style: normal;
 }

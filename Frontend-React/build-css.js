@@ -10,19 +10,19 @@ const path = require('path');
 
 // CSS files in order of importance
 const CSS_FILES = [
-  'src/index.css',
-  'src/fonts.css',
-  'src/theme.css',
-  'src/components.css',
-  'src/animations.css',
-  'src/App.css',
-  'src/components/ChatContainer.css',
-  'src/components/MessageInput.css',
-  'src/components/ChatSidebar.css',
-  'src/components/ConfigSidebar.css',
-  'src/components/LoadingIndicator.css',
-  'src/components/ErrorMessage.css',
-  'src/components/YouTubeEmbed.css'
+  'src/styles/index.css',
+  'src/styles/fonts.css',
+  'src/styles/theme.css',
+  'src/styles/components.css',
+  'src/styles/animations.css',
+  'src/styles/App.css',
+  'src/components/ChatContainer/ChatContainer.css',
+  'src/components/MessageInput/MessageInput.css',
+  'src/components/ChatSidebar/ChatSidebar.css',
+  'src/components/ConfigSidebar/ConfigSidebar.css',
+  'src/components/LoadingIndicator/LoadingIndicator.css',
+  'src/components/ErrorMessage/ErrorMessage.css',
+  'src/components/YouTubeEmbed/YouTubeEmbed.css'
 ];
 
 console.log('🎨 Building CSS for production...');
