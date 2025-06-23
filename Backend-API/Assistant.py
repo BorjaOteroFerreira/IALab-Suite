@@ -12,13 +12,11 @@ from SocketResponseHandler import SocketResponseHandler
 
 class Assistant:
     
-    def __init__(self, default_model_path, default_chat_format):
+    def __init__(self):
         # Estado del modelo
         self.model = None
-        self.model_path = default_model_path
-        self.chat_format = default_chat_format
         self.temperature = 0.3
-        self.max_context_tokens = 12000
+        self.max_context_tokens = 8192
         self.max_assistant_tokens = 2048
         self.gpu_layers = -1
         self.is_processing = False
@@ -31,7 +29,6 @@ Como programador experto y pentester,
 debes examinar los detalles proporcionados para asegurarte de que sean utilizables.
 Si no sabes la respuesta a una pregunta, no compartas información falsa y no te desvíes de la pregunta.
 '''
-        
         # Configuración de dispositivo según el sistema operativo
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = {"device": "cuda", "cuda_device_id": 0}
@@ -42,13 +39,11 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         else:
             raise RuntimeError("Sistema operativo no compatible")
         
-        print("🤖 Assistant inicializado (modelo no cargado - usar load_model() para cargar)")
     
-    def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context, max_response_tokens):
+    def load_model(self, model_path, new_temperature, n_gpu_layer, new_system_message, context, max_response_tokens):
         """Carga un modelo específico con configuración personalizada"""
         # Validar y establecer parámetros
         self.model_path = model_path
-        self.chat_format = format
         self.temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
         self.gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else self.gpu_layers
         self.max_context_tokens = context if isinstance(context, int) else self.max_context_tokens
@@ -161,7 +156,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         try:
             from SocketResponseHandler import SocketResponseHandler
             # Si tenemos un socket activo, emitir señal de parada
-            # Nota: Necesitaríamos guardar la referencia del socket para esto
+            # TODO:  guardar la referencia del socket para esto
             print("🛑 Response stopping...")
         except Exception as e:
             print(f"Error emitiendo señal de parada: {e}")

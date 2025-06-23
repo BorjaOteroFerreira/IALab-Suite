@@ -116,13 +116,10 @@ class IASuiteApi:
         return 'Response finished'
 
     def before_first_request(self):
-        # Solo inicializar el asistente sin cargar modelo automáticamente
+        # Inicializar el asistente 
         if self.assistant is None:
-            self.assistant = Assistant(
-                default_model_path=self.default_model_path,
-                default_chat_format=self.default_chat_format
-            )
-            print("🤖 Asistente inicializado (modelo no cargado automáticamente)")
+            self.assistant = Assistant()
+            print("🤖 Asistente inicializado")
 
     def actualizar_historial(self):
         nombre_chat = request.json.get('nombre_chat')
@@ -178,16 +175,14 @@ class IASuiteApi:
 
     def load_model(self):
         selected_model = request.form.get('model_path')
-        selected_format = request.form.get('format')
-        print(selected_format)
         n_gpu_layers = int(request.form.get('gpu_layers')) if request.form.get('gpu_layers') != '' else -1
         system_message = request.form.get('system_message')
         temperature = float(request.form.get('temperature')) if request.form.get('temperature') != '' else 0.81
         n_ctx = int(request.form.get('context')) if request.form.get('context') != '' else 2048
         self.assistant.unload_model()
-        self.assistant.load_model(selected_model, selected_format, temperature, n_gpu_layers, system_message,n_ctx, n_ctx)
-        return f'''                \nModel:{selected_model}
-                \nformat: {selected_format}
+        self.assistant.load_model(selected_model, temperature, n_gpu_layers, system_message,n_ctx, n_ctx)
+        return f'''
+                \nModel:{selected_model}
                 \ntemp: {temperature}
                 \nlayers: {n_gpu_layers}
                 \nSM: {system_message}
