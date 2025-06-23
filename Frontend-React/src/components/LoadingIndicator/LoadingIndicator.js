@@ -10,7 +10,7 @@ const LoadingIndicator = ({ type = 'default', message = '' }) => {
   const renderIndicator = () => {
     switch(type) {
       case 'modelLoad':
-        // Indicador para carga de modelo (más grande/prominente)
+        // Indicador para carga de modelo 
         return (
           <div className="model-loading-indicator">
             <div className="spinner-ring"></div>

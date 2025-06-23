@@ -9,64 +9,66 @@ import ollama
 from Cortex import Cortex
 from Rag import Retriever
 from SocketResponseHandler import SocketResponseHandler
-class Assistant:
 
+class Assistant:
+    
     def __init__(self, default_model_path, default_chat_format):
+        # Estado del modelo
         self.model = None
-        self.tools= False
-        self.rag = False
+        self.model_path = default_model_path
+        self.chat_format = default_chat_format
+        self.temperature = 0.3
         self.max_context_tokens = 12000
         self.max_assistant_tokens = 2048
-        self.is_processing = False
-        self.chat_format = default_chat_format
-        self.model_path = default_model_path
-        self.temperature = 0.3
-        self.cuda_options = {"device": "cuda", "cuda_device_id": 0}
-        self.metal_options = {"device": "metal", "metal_device_id": 0}
         self.gpu_layers = -1
+        self.is_processing = False
+        self.stop_emit = False
+        self.tools = False
+        self.rag = False
         self.default_system_message = '''
 Eres un asistente con una personalidad amable y honesta.
 Como programador experto y pentester,
 debes examinar los detalles proporcionados para asegurarte de que sean utilizables.
 Si no sabes la respuesta a una pregunta, no compartas información falsa y no te desvíes de la pregunta.
 '''
+        
+        # Configuración de dispositivo según el sistema operativo
         if platform.system() == 'Windows' or platform.system() == 'Linux':
-            self.device_options = self.cuda_options
+            self.device_options = {"device": "cuda", "cuda_device_id": 0}
             self.use_nmap = True
         elif platform.system() == 'Darwin':
-            self.device_options = self.metal_options
+            self.device_options = {"device": "metal", "metal_device_id": 0}
             self.use_nmap = True
         else:
             raise RuntimeError("Sistema operativo no compatible")
-        # No cargar modelo automáticamente - dejar que se cargue manualmente
-
-    def load_default_model(self):
-        if self.model is None:
-            self.model = Model(
-                model_path=self.model_path,
-                verbose=True,
-                n_gpu_layers=self.gpu_layers,
-                n_ctx=self.max_context_tokens,
-                **self.device_options,
-                temp=self.temperature,
-                use_mmap=True,
-            )
-        self.context_window_start = 0
-        self.stop_emit = False
-
-    def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context,max_response_tokens):
-        gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else self.gpu_layers
-        ctx = context if isinstance(context, int)  else self.max_context_tokens
-        temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
-        self.default_system_message = new_system_message
-        max_asistant_tokens = max_response_tokens if isinstance(max_response_tokens,int) else self.max_assistant_tokens
+        
+        print("🤖 Assistant inicializado (modelo no cargado - usar load_model() para cargar)")
+    
+    def load_model(self, model_path, format, new_temperature, n_gpu_layer, new_system_message, context, max_response_tokens):
+        """Carga un modelo específico con configuración personalizada"""
+        # Validar y establecer parámetros
         self.model_path = model_path
-        self.temperature = temperature
-        self.max_context_tokens = ctx
-        self.max_assistant_tokens = max_asistant_tokens #TODO: change in interface
-        self.gpu_layers = gpu_layers
+        self.chat_format = format
+        self.temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
+        self.gpu_layers = int(n_gpu_layer) if isinstance(n_gpu_layer, int) else self.gpu_layers
+        self.max_context_tokens = context if isinstance(context, int) else self.max_context_tokens
+        self.max_assistant_tokens = max_response_tokens if isinstance(max_response_tokens, int) else self.max_assistant_tokens
+        self.default_system_message = new_system_message if new_system_message else self.default_system_message
+      
+        if self.model is not None:
+            self.unload_model()
+
+        self.model = Model(
+            model_path=self.model_path,
+            verbose=True,
+            n_gpu_layers=self.gpu_layers,
+            n_ctx=self.max_context_tokens,
+            **self.device_options,
+            temp=self.temperature,
+            use_mmap=True,
+        )
         self.stop_emit = False
-        self.load_default_model()
+        print(f"✅ Modelo {model_path} cargado con éxito")
 
     def unload_model(self):
         self.model = None
@@ -74,7 +76,6 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         import gc
         gc.collect()
 
-    
     def set_tools(self,tools):
             self.tools = tools
 
