@@ -18,8 +18,7 @@ def _get_search_internet_function():
     """Obtiene la función search_internet de SearchTools de manera segura"""
     try:
         from .search_tools import SearchTools
-        instance = SearchTools()
-        return instance.search_internet
+        return SearchTools.search_internet
     except Exception:
         # Fallback: función dummy si no se puede importar
         return lambda query: "Error: No se pudo cargar la función de búsqueda en internet"
@@ -122,10 +121,8 @@ class AdvancedSearchTools(BaseTool):
             summary = summarizer(parser.document, 3)
             return " ".join(str(sentence) for sentence in summary)
         except Exception as e:
-            return f"No se pudo resumir el contenido: {str(e)}"
-    
+            return f"No se pudo resumir el contenido: {str(e)}"   
     @staticmethod
-    @tool("Búsqueda en DuckDuckGo")
     def search_duckduckgo(query):
         """Realiza una búsqueda en DuckDuckGo y devuelve los resultados más relevantes."""
         top_results = 5
@@ -185,7 +182,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en DuckDuckGo: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Google")
     def search_google(query):
         """Realiza una búsqueda en Google y devuelve los resultados más relevantes."""
         top_results = 5
@@ -262,7 +258,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en Google: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Bing")
     def search_bing(query):
         """Realiza una búsqueda en Bing y devuelve los resultados más relevantes."""
         top_results = 5
@@ -398,7 +393,6 @@ class AdvancedSearchTools(BaseTool):
         return [div for div in divs if div.find('a') and (div.find('h2') or div.find('h3') or div.find('p'))]
     
     @staticmethod
-    @tool("Búsqueda en Startpage")
     def search_startpage(query):
         """Realiza una búsqueda en Startpage y devuelve los resultados más relevantes."""
         top_results = 5
@@ -451,7 +445,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en Startpage: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Baidu")
     def search_baidu(query):
         """Realiza una búsqueda en Baidu y devuelve los resultados más relevantes."""
         top_results = 5
@@ -504,7 +497,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en Baidu: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Ecosia")
     def search_ecosia(query):
         """Realiza una búsqueda en Ecosia y devuelve los resultados más relevantes."""
         top_results = 5
@@ -557,7 +549,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en Ecosia: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Archive.org")
     def search_archive(query):
         """Realiza una búsqueda en Archive.org (Wayback Machine) y devuelve los resultados más relevantes."""
         top_results = 5
@@ -610,7 +601,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en Archive.org: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Scholar")
     def search_scholar(query):
         """Realiza una búsqueda en Google Scholar y devuelve los resultados académicos más relevantes."""
         top_results = 5
@@ -667,7 +657,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en Google Scholar: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda en Noticias")
     def search_news(query):
         """Realiza una búsqueda en fuentes de noticias y devuelve los resultados más relevantes."""
         top_results = 5
@@ -728,7 +717,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda en noticias: {str(e)}"
     
     @staticmethod
-    @tool("Obtener Información de Dominio")
     def get_domain_info(domain):
         """Obtiene información básica sobre un dominio web."""
         try:
@@ -784,7 +772,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error al obtener información del dominio: {str(e)}"
     
     @staticmethod
-    @tool("Búsqueda Reversa de Imagen")
     def reverse_image_search(image_url):
         """Realiza una búsqueda inversa de imagen utilizando TinEye."""
         try:
@@ -842,7 +829,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda inversa de imagen: {str(e)}"
     
     @staticmethod
-    @tool("Buscar Información de Usuario")
     def search_username(username):
         """Busca información sobre un nombre de usuario en múltiples plataformas sociales."""
         username= username.replace(" ", "")
@@ -887,7 +873,6 @@ class AdvancedSearchTools(BaseTool):
         return "Resultados de la búsqueda para usuario '" + username + "':\n\n" + "\n".join(results)
     
     @staticmethod
-    @tool("Búsqueda de Correo Electrónico")
     def search_email(email):
         """Busca información asociada a una dirección de correo electrónico."""
         # Validar formato de email
@@ -979,7 +964,6 @@ class AdvancedSearchTools(BaseTool):
             return f"Error durante la búsqueda de correo electrónico: {str(e)}"
         
     @staticmethod
-    @tool("Búsqueda Avanzada Combinada")
     def advanced_search(query, engines=None):
         """
         Realiza una búsqueda combinada en múltiples motores de búsqueda y devuelve resultados agregados.
@@ -990,7 +974,7 @@ class AdvancedSearchTools(BaseTool):
                 Opciones disponibles: "duckduckgo", "google", "bing", "yandex", "startpage", "baidu", "ecosia"
         """
         if not engines:
-            engines = ["google", "google 2","startpage", "scholar", "yandex", "bing", "news", "baidu", "ecosia","github"]
+            engines = ["google","startpage", "scholar", "yandex", "bing", "news", "baidu", "ecosia","github"]
         
             all_engines = {
             "duckduckgo": AdvancedSearchTools.search_duckduckgo,
@@ -1022,7 +1006,6 @@ class AdvancedSearchTools(BaseTool):
         return "\n\n".join(results)
     
     @staticmethod
-    @tool("Búsqueda en Github")
     def search_github(query):
         """Busca en GitHub repos, código o usuarios relacionados con la consulta."""
         top_results = 5
@@ -1084,7 +1067,6 @@ class AdvancedSearchTools(BaseTool):
     
 
     @staticmethod
-    @tool("Análisis rápido de sitio web")
     def analyze_website(url):
         """Realiza un análisis rápido de un sitio web, extrayendo metadatos e información básica."""
         try:

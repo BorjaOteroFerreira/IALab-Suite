@@ -1,6 +1,5 @@
 from typing import List
 from pydantic import BaseModel, Field
-from langchain.tools import tool
 import requests
 from datetime import datetime, timezone, timedelta
 import os
@@ -110,7 +109,6 @@ class YoutubeVideoSearchTool(BaseTool):
 
     # Mantener el método estático original para compatibilidad con LangChain si es necesario
     @staticmethod
-    @tool("Search YouTube Videos")
     def run(keyword: str, max_results: int = 4) -> List[VideoSearchResult]:
         """
         Método estático legacy para compatibilidad con LangChain.

@@ -2,7 +2,6 @@ import os
 import shutil
 from typing import List
 from pydantic import BaseModel, Field
-from langchain.tools import tool
 from gradio_client import Client
 from huggingface_hub import login
 
@@ -47,10 +46,9 @@ class ImageGenerationTool(BaseTool):
         num_inference_steps = kwargs.get('num_inference_steps', 28)
         randomize_seed = kwargs.get('randomize_seed', True)
         seed = kwargs.get('seed', 0)
-        
         return self.run(query, width, height, guidance_scale, num_inference_steps, randomize_seed, seed)
+    
     @staticmethod
-    @tool("Generate Image with Flux")
     def run(
         prompt: str,
         width: int = 1024,
