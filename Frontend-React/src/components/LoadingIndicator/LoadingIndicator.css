@@ -1,9 +1,7 @@
 /* 
- * Loading Indicator - Modern Professional UI
- * Optimized for production with smooth animations and accessibility
+ * Loading Indicator
  */
 
-/* Base styles for all loading indicators */
 .loading-text {
   margin-top: var(--spacing-xs);
   font-size: var(--font-size-sm);
@@ -14,7 +12,7 @@
   letter-spacing: 0.02em;
 }
 
-/* Enhanced typing indicator with glassmorphism */
+
 .typing-indicator {
   display: flex;
   align-items: center;
@@ -56,7 +54,7 @@
   }
 }
 
-/* Modern model loading indicator */
+/* Model loading  */
 .model-loading-indicator {
   display: flex;
   flex-direction: column;
@@ -95,7 +93,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Sophisticated thinking indicator */
+/* thinking indicator */
 .thinking-indicator {
   display: flex;
   flex-direction: column;
@@ -140,7 +138,7 @@
   }
 }
 
-/* saving indicator with progress */
+/* Indicador de guardado con progreso */
 .saving-indicator {
   display: flex;
   flex-direction: column;
@@ -190,7 +188,7 @@
   100% { transform: translateX(100%); }
 }
 
-/* Loading message */
+/* Loading  */
 .loading-message {
   margin-left: var(--spacing-sm);
   font-style: normal;

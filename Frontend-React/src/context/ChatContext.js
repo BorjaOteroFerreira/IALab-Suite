@@ -13,7 +13,7 @@ export const ChatProvider = ({ children }) => {
     modelPath: '',
     format: 'chatml',
     temperature: 0.8,
-    context: 2048,
+    context: 8192,
     systemMessage: 'Eres un asistente en español. Debes responder siempre en español',
     gpuLayers: -1
   });
