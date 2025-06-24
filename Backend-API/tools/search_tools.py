@@ -1,16 +1,17 @@
 import json
 import os
 import requests
+from requests_html import HTMLSession
 from send_to_console import SendToConsole
 from langchain_community.document_loaders.chromium import AsyncChromiumLoader  
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from requests_html import HTMLSession
 from sumy.parsers.html import HtmlParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer
 
 from .base_tool import BaseTool, ToolMetadata, ToolCategory
+from urllib.parse import urlparse
 
 class SearchTools(BaseTool):
     @property
@@ -22,6 +23,7 @@ class SearchTools(BaseTool):
             requires_api_key=True,
             api_key_env_var="SERPER_API_KEY"
         )
+
     @classmethod
     def get_tool_name(cls) -> str:
         return "buscar_en_internet"
@@ -44,30 +46,29 @@ class SearchTools(BaseTool):
         try:
             session = HTMLSession()
             response = session.post(url, headers=headers, json=payload)
-            response.raise_for_status()  # Raise an exception for non-2xx status codes
+            response.raise_for_status()
 
-            if 'organic' not in response.json():
-                return "Sorry, I couldn't find anything relevant."
+            data = response.json()
+            if 'organic' not in data or not data['organic']:
+                return "Sorry, no se encontraron resultados relevantes."
 
-            results = response.json()['organic']
             string = []
-            for result in results[:top_result_to_return]:
-                title = result['title'].replace('|', '-').replace('||', '--')
-                snippet = result['snippet'].replace('|', '-').replace('||', '--')
+            for result in data['organic'][:top_result_to_return]:
+                title = result.get('title', '').replace('|', '-').replace('||', '--')
+                snippet = result.get('snippet', '').replace('|', '-').replace('||', '--')
+                link = result.get('link')
+                if not link:
+                    continue
 
-                try:
-                    link = result['link']
-                    # Extract content using requests-html
-                    content = SearchTools.extract_relevant_content(link)
-
-                    string.append('\n'.join([
-                        f"Title: {title}", f"Link: {link}",
-                        f"Snippet: {snippet}", f"Content: {content}",
-                        f"traduce todo a español.",
-                        "\n-----------------"
-                    ]))
-                except KeyError:
-                    pass  # Skip links with missing information
+                content = SearchTools.extract_content(link)
+                string.append('\n'.join([
+                    f"Title: {title}",
+                    f"Link: {link}",
+                    f"Snippet: {snippet}",
+                    f"Content: {content}",
+                    "Instrucciones: incrusta las imágenes con ![]().",
+                    "\n-----------------"
+                ]))
 
             return '\n'.join(string)
 
@@ -76,29 +77,95 @@ class SearchTools(BaseTool):
             return "An error occurred while searching the internet."
 
     @staticmethod
+    def extract_relevant_content_from_text(text):
+        try:
+            parser = HtmlParser.from_string(text, Tokenizer('spanish'))
+            summarizer = LsaSummarizer()
+            summary = summarizer(parser.document, 1)  # Una sola frase
+            return str(summary[0]) if summary else ""
+        except Exception as e:
+            print(f"Error extracting content: {e}")
+            return ""
+
+    @staticmethod
     def extract_content(url):
         session = HTMLSession()
         try:
-            response = session.get(url)
-            response.raise_for_status()
-            # Extract all text elements from the page
-            text_elements = response.html.find('body')[0].xpath('//p|//h1|//h2|//h3')
-            content = '\n'.join([element.text for element in text_elements])
-            return content if content else "Content extraction failed."
+            resp = session.get(url)
+            resp.raise_for_status()
+
+            # 1. Extraer texto dentro de <article>, fallback a <p> y <h1-3>
+            elems = resp.html.xpath('//article//p | //article//h1 | //article//h2 | //article//h3')
+            if not elems:
+                elems = resp.html.xpath('//p | //h1 | //h2 | //h3')
+            content = '\n'.join([e.text.strip() for e in elems if e.text and e.text.strip()])
+
+            # 2. Imágenes relevantes dentro de <article>
+            imgs = resp.html.xpath('//article//img')
+            srcs = set()
+            for img in imgs:
+                src = img.attrs.get('data-src') or img.attrs.get('src')
+                if not src or src.startswith('data:'):
+                    continue
+                if any(x in src for x in ['ads.', 'tracker.', 'pixel.']):
+                    continue
+                # Formato: ![imagen dominio_url](url_imagen)
+                domain = urlparse(url).netloc
+                src = requests.compat.urljoin(url, src)
+                srcs.add(f"![imagen - {domain} -]({src})")
+                # Extraer dominio para el alt
+                domain = urlparse(url).netloc
+                src = requests.compat.urljoin(url, src)
+                srcs.add((domain, src))
+                src = requests.compat.urljoin(url, src)
+                srcs.add(src)
+
+            # 3. Fallback a og:image si no hay imgs
+            if not srcs:
+                metas = resp.html.xpath('//meta[@property="og:image"]')
+                for m in metas:
+                    c = m.attrs.get('content')
+                    if c:
+                        srcs.add(c)
+
+            # 4. Imágenes de perfil de LinkedIn, Facebook e Instagram
+            perfil = []
+            if 'linkedin.com/in/' in url:
+                nodes = resp.html.xpath('//img[contains(@class,"profile-photo") or contains(@class,"pv-top-card__photo")]')
+                perfil = [requests.compat.urljoin(url, n.attrs.get('src')) for n in nodes if n.attrs.get('src')]
+            elif 'facebook.com/' in url and ('/profile.php' in url or url.rstrip('/').count('/') == 3):
+                metas = resp.html.xpath('//meta[@property="og:image"]')
+                perfil = [m.attrs.get('content') for m in metas if m.attrs.get('content')]
+            elif 'instagram.com/' in url:
+                scripts = resp.html.xpath('//script[@type="application/ld+json"]')
+                for s in scripts:
+                    try:
+                        ld = json.loads(s.text)
+                        if 'image' in ld:
+                            perfil.append(ld['image'])
+                    except:
+                        continue
+
+            # 5. Priorizar perfil si existe, si no hasta 5 imgs de artículo
+            final = perfil[:1] if perfil else list(srcs)[:5]
+
+            # Formatear Markdown
+            md_imgs = ' '.join(f'![{url}]({i})' for i in final)
+            resumen = SearchTools.extract_relevant_content_from_text(content)
+
+            return f"Imágenes: {md_imgs}\nResumen: {resumen}" if content or md_imgs else "Content extraction failed."
+
         except requests.exceptions.RequestException as e:
             print(f"Error extracting content: {e}")
             return "Content extraction failed."
-    
+
     @staticmethod
     def extract_relevant_content(url):
         try:
             parser = HtmlParser.from_url(url, Tokenizer('spanish'))
             summarizer = LsaSummarizer()
             summary = summarizer(parser.document, 1)  # Extract a single sentence as summary
-            return str(summary[0]) if summary else "Content extraction failed."
+            return str(summary[0]) if summary else ""
         except Exception as e:
             print(f"Error extracting content: {e}")
             return "Content extraction failed."
-
-
-

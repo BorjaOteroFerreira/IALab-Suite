@@ -8,6 +8,20 @@ const isYoutubeLink = href => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/
 const isImageLink = href => /\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(href);
 const isImageLabel = text => /^\s*\[(imagen|image)\b.*\]/i.test(text.trim());
 
+// Detecta URLs de imágenes más ampliamente, incluso con parámetros complejos
+const isImageUrl = url => {
+  // Extensiones de imagen comunes
+  if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(url)) return true;
+  
+  // URLs específicas de servicios de imágenes
+  if (/cdninstagram\.com.*\.(jpg|jpeg|png|gif|webp)/i.test(url)) return true;
+  if (/staticflickr\.com.*\.(jpg|jpeg|png|gif|webp)/i.test(url)) return true;
+  if (/images\.unsplash\.com/i.test(url)) return true;
+  if (/imgur\.com\/.*\.(jpg|jpeg|png|gif|webp)/i.test(url)) return true;
+  
+  return false;
+};
+
 // Limpia enlaces markdown redundantes de YouTube
 const cleanYoutubeMarkdown = md => md.replace(
   /\[([^\]]+)\]\((https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)\)/gi,
@@ -40,7 +54,9 @@ const splitMarkdownWithLinks = markdownInput => {
     imageLink: /\[([^\]]*(?:imagen|image)[^\]]*)\]\((https?:\/\/[^\)]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\)/gi,
     imageLinkColon: /\[imagen[^\]]*:\s*(https?:\/\/[^\]]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\]/gi,
     youtubeMarkdown: /\[([^\]]*)\]\((https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)\)/gi,
-    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi
+    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi,
+    // Patrón mejorado para URLs de imágenes directas
+    directImageUrl: /(https?:\/\/[^\s\)]+(?:\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:[?#][^\s\)]*)?|cdninstagram\.com[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)|staticflickr\.com[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)|images\.unsplash\.com[^\s\)]*|imgur\.com\/[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)))/gi
   };
 
   const lines = markdown.split(/\r?\n/);
@@ -80,16 +96,48 @@ const splitMarkdownWithLinks = markdownInput => {
 
   const processTextWithYoutubeAndImages = (text, resultArray) => {
     if (!text.trim()) return;
+    
+    // Mejorar la detección de imágenes - priorizar patrones específicos
     const imageMatches = [...text.matchAll(patterns.imageLink)];
     const imageColonMatches = [...text.matchAll(patterns.imageLinkColon)];
     const youtubeMarkdownMatches = [...text.matchAll(patterns.youtubeMarkdown)];
     const youtubeMatches = [...text.matchAll(patterns.youtube)];
+    const directImageMatches = [...text.matchAll(patterns.directImageUrl)];
+    
+    // Crear un conjunto de rangos ocupados por patrones específicos
+    const occupiedRanges = new Set();
+    const specificMatches = [
+      ...imageMatches,
+      ...imageColonMatches,
+      ...youtubeMarkdownMatches,
+      ...youtubeMatches.filter(m => !isImageUrl(m[1]))
+    ];
+    
+    // Marcar rangos ocupados por patrones específicos
+    specificMatches.forEach(match => {
+      for (let i = match.index; i < match.index + match[0].length; i++) {
+        occupiedRanges.add(i);
+      }
+    });
+    
+    // Filtrar URLs directas de imágenes que no conflicten con patrones específicos
+    const filteredDirectImageMatches = directImageMatches.filter(match => {
+      if (!isImageUrl(match[1])) return false;
+      
+      // Verificar si esta URL directa está dentro de un patrón específico
+      for (let i = match.index; i < match.index + match[0].length; i++) {
+        if (occupiedRanges.has(i)) return false;
+      }
+      return true;
+    });
     
     const allMatches = [
       ...youtubeMarkdownMatches.map(m => ({ ...m, type: 'youtube', url: m[2], text: m[1] })),
-      ...youtubeMatches.map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
+      ...youtubeMatches.filter(m => !isImageUrl(m[1])) // Excluir URLs que son imágenes
+        .map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
       ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] })),
-      ...imageColonMatches.map(m => ({ ...m, type: 'image', url: m[1], altText: 'Imagen' }))
+      ...imageColonMatches.map(m => ({ ...m, type: 'image', url: m[1], altText: 'Imagen' })),
+      ...filteredDirectImageMatches.map(m => ({ ...m, type: 'image', url: m[1], altText: 'Imagen' }))
     ].sort((a, b) => a.index - b.index);
 
     if (!allMatches.length) {
@@ -99,32 +147,33 @@ const splitMarkdownWithLinks = markdownInput => {
 
     let lastIndex = 0;
     allMatches.forEach((match, idx) => {
+      // Agregar texto antes del match
       if (match.index > lastIndex) {
         const before = text.slice(lastIndex, match.index);
         if (before.trim()) resultArray.push({ type: 'text', value: before });
       }
+      
       if (match.type === 'image') {
+        // Verificar si hay una ! justo antes del match (para imágenes markdown)
+        const hasExclamationBefore = match.index > 0 && text[match.index - 1] === '!';
+        if (hasExclamationBefore) {
+          // Ajustar el lastIndex para incluir la exclamación
+          lastIndex = match.index - 1;
+        }
+        
+        // Agregar la imagen sin saltos de línea automáticos
         resultArray.push({ type: 'image', value: match.url, text: match.altText });
       } else {
         // Agregar el enlace de YouTube
         const youtubeUrl = match.url || match[0];
         const youtubeText = match.text || youtubeUrl;
         resultArray.push({ type: 'youtube', value: youtubeUrl, text: youtubeText });
-
-        // Agregar salto de línea después de YouTube si hay texto siguiente
-        const nextMatch = allMatches[idx + 1];
-        const textAfterYoutube = nextMatch ?
-          text.slice(match.index + match[0].length, nextMatch.index) :
-          text.slice(match.index + match[0].length);
-
-        if (textAfterYoutube.trim() && !textAfterYoutube.startsWith('\n')) {
-          // Insertar un salto de línea virtual para evitar problemas de renderizado
-          resultArray.push({ type: 'text', value: '\n\n' });
-        }
       }
+      
       lastIndex = match.index + match[0].length;
     });
 
+    // Agregar texto restante después del último match
     if (lastIndex < text.length) {
       const after = text.slice(lastIndex);
       if (after.trim()) resultArray.push({ type: 'text', value: after });
@@ -155,17 +204,26 @@ const splitMarkdownWithLinks = markdownInput => {
     return false;
   };
 
-  for (let i = 0; i < lines.length; i++) {
+for (let i = 0; i < lines.length; i++) {
     const raw = cleanYoutubeMarkdown(lines[i]);
-    if (patterns.customImage.test(raw) || patterns.markdownImage.test(raw) || patterns.imageWithColon.test(raw)) {
+    if (patterns.customImage.test(raw) || 
+        patterns.markdownImage.test(raw) || 
+        patterns.imageWithColon.test(raw)) {
       flushBuffer();
       imageBlock.push(raw);
       const nxt = lines[i+1] || '';
-      if (!patterns.customImage.test(nxt) && !patterns.markdownImage.test(nxt) && !patterns.imageWithColon.test(nxt)) flushImageBlock();
+      if (!patterns.customImage.test(nxt) && 
+          !patterns.markdownImage.test(nxt) && 
+          !patterns.imageWithColon.test(nxt)) {
+        flushImageBlock();
+      }
     } else {
       flushImageBlock();
-      if (!processLine(raw)) buffer.push(raw);
-      else flushBuffer();
+      if (!processLine(raw)) {
+        buffer.push(raw);
+      } else {
+        flushBuffer();
+      }
     }
   }
 
@@ -215,7 +273,13 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
     return (
       <div className="assistant-message" ref={el => htmlRefs.current[idx] = el}>
         {parts.map((part, i) => {
-          if (part.type === 'image') return <ImageRenderer key={i} src={part.value} alt={part.text} href={part.value}/>;
+          if (part.type === 'image') {
+            return (
+              <div key={i} className="image-container">
+                <ImageRenderer src={part.value} alt={part.text} href={part.value}/>
+              </div>
+            );
+          }
           if (part.type === 'youtube') return <LinkRenderer key={i} href={part.value}>{part.text}</LinkRenderer>;
           if (part.type === 'link') return <a key={i} href={part.value} target="_blank" rel="noopener noreferrer">{part.text}</a>;
           if (part.type === 'text') {
