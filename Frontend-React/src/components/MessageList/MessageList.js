@@ -53,7 +53,7 @@ const splitMarkdownWithLinks = markdownInput => {
     singleImageWithColon: /^\s*(\[imagen[^\]]*:\s*([^\]]+)\])(?:\s*([^\n]*))?$/i,
     imageLink: /\[([^\]]*(?:imagen|image)[^\]]*)\]\((https?:\/\/[^\)]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\)/gi,
     imageLinkColon: /\[imagen[^\]]*:\s*(https?:\/\/[^\]]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\]/gi,
-    youtubeMarkdown: /\[([^\]]*)\]\((https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)\)/gi,
+    //youtubeMarkdown: /\[([^\]]*)\]\((https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)\)/gi,
     youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi,
     // Patrón mejorado para URLs de imágenes directas
     directImageUrl: /(https?:\/\/[^\s\)]+(?:\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:[?#][^\s\)]*)?|cdninstagram\.com[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)|staticflickr\.com[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)|images\.unsplash\.com[^\s\)]*|imgur\.com\/[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)))/gi
@@ -100,7 +100,7 @@ const splitMarkdownWithLinks = markdownInput => {
     // Mejorar la detección de imágenes - priorizar patrones específicos
     const imageMatches = [...text.matchAll(patterns.imageLink)];
     const imageColonMatches = [...text.matchAll(patterns.imageLinkColon)];
-    const youtubeMarkdownMatches = [...text.matchAll(patterns.youtubeMarkdown)];
+    //const youtubeMarkdownMatches = [...text.matchAll(patterns.youtubeMarkdown)];
     const youtubeMatches = [...text.matchAll(patterns.youtube)];
     const directImageMatches = [...text.matchAll(patterns.directImageUrl)];
     
@@ -109,7 +109,7 @@ const splitMarkdownWithLinks = markdownInput => {
     const specificMatches = [
       ...imageMatches,
       ...imageColonMatches,
-      ...youtubeMarkdownMatches,
+      //...youtubeMarkdownMatches,
       ...youtubeMatches.filter(m => !isImageUrl(m[1]))
     ];
     
@@ -132,7 +132,7 @@ const splitMarkdownWithLinks = markdownInput => {
     });
     
     const allMatches = [
-      ...youtubeMarkdownMatches.map(m => ({ ...m, type: 'youtube', url: m[2], text: m[1] })),
+      //...youtubeMarkdownMatches.map(m => ({ ...m, type: 'youtube', url: m[2], text: m[1] })),
       ...youtubeMatches.filter(m => !isImageUrl(m[1])) // Excluir URLs que son imágenes
         .map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
       ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] })),
@@ -147,27 +147,61 @@ const splitMarkdownWithLinks = markdownInput => {
 
     let lastIndex = 0;
     allMatches.forEach((match, idx) => {
+      // Verificar si es una imagen con formato markdown que apunta a una URL de imagen plana
+      let effectiveStartIndex = match.index;
+      let shouldRemoveMarkdown = false;
+      
+      if (match.type === 'image') {
+        // Verificar si es un patrón markdown que apunta directamente a una imagen
+        const isDirectImageUrl = isImageUrl(match.url);
+        const hasMarkdownFormat = match[0].includes('[') && match[0].includes(']') && match[0].includes('(') && match[0].includes(')');
+        const hasExclamation = match.index > 0 && text[match.index - 1] === '!';
+        
+        // Solo eliminar markdown si es una URL directa de imagen con formato markdown
+        if (isDirectImageUrl && (hasMarkdownFormat || hasExclamation)) {
+          shouldRemoveMarkdown = true;
+          if (hasExclamation) {
+            effectiveStartIndex = match.index - 1;
+          }
+        }
+      }
+      
       // Agregar texto antes del match
-      if (match.index > lastIndex) {
-        const before = text.slice(lastIndex, match.index);
+      if (effectiveStartIndex > lastIndex) {
+        const before = text.slice(lastIndex, effectiveStartIndex);
         if (before.trim()) resultArray.push({ type: 'text', value: before });
       }
       
       if (match.type === 'image') {
-        // Verificar si hay una ! justo antes del match (para imágenes markdown)
-        const hasExclamationBefore = match.index > 0 && text[match.index - 1] === '!';
-        if (hasExclamationBefore) {
-          // Ajustar el lastIndex para incluir la exclamación
-          lastIndex = match.index - 1;
-        }
+        // Verificar si hay texto inmediatamente antes de la imagen (sin salto de línea)
+        const textBefore = text.slice(0, effectiveStartIndex);
+        const lastChar = textBefore.slice(-1);
+        const needsLineBreak = textBefore.trim() && lastChar !== '\n' && !textBefore.endsWith('\n\n');
         
-        // Agregar la imagen sin saltos de línea automáticos
+        // Agregar salto de línea si es necesario
+        if (needsLineBreak) {
+          resultArray.push({ type: 'text', value: '\n\n' });
+        }
+        // Agregar la imagen
         resultArray.push({ type: 'image', value: match.url, text: match.altText });
       } else {
         // Agregar el enlace de YouTube
         const youtubeUrl = match.url || match[0];
         const youtubeText = match.text || youtubeUrl;
         resultArray.push({ type: 'youtube', value: youtubeUrl, text: youtubeText });
+
+        // Agregar salto de línea después de YouTube si hay texto siguiente
+        const nextMatch = allMatches[idx + 1];
+        const textAfterYoutube = nextMatch ?
+          text.slice(match.index + match[0].length, nextMatch.index) :
+          text.slice(match.index + match[0].length);
+        const textBerforeYoutube = text.slice(0, match.index);
+        if(textAfterYoutube.endsWith('(\n') ) { textAfterYoutube.replace('(\n', '\n'); }
+        if(textBerforeYoutube.endsWith('\n)') ) { textAfterYoutube.replace('\n)', '\n\n'); }
+        if (textAfterYoutube.trim() && !textAfterYoutube.startsWith('\n')) {
+          // Insertar un salto de línea virtual para evitar problemas de renderizado
+          resultArray.push({ type: 'text', value: '\n\n' });
+        }
       }
       
       lastIndex = match.index + match[0].length;

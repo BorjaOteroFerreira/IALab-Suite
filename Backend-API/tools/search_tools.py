@@ -112,7 +112,7 @@ class SearchTools(BaseTool):
                 # Formato: ![imagen dominio_url](url_imagen)
                 domain = urlparse(url).netloc
                 src = requests.compat.urljoin(url, src)
-                srcs.add(f"![imagen - {domain} -]({src})")
+                srcs.add(f"![{domain}]({src})")
                 # Extraer dominio para el alt
                 domain = urlparse(url).netloc
                 src = requests.compat.urljoin(url, src)

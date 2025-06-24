@@ -23,7 +23,8 @@
 }
 
 .image-renderer-link {
-  display: inline-block;
+  display: flex;
+  flex-direction:row;
   width: 128px;
   height: 128px;
   margin: 4px 8px 4px 0;
