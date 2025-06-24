@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useChatContext } from '../../hooks/useChatContext';
+import { Trash } from 'lucide-react';
 import './ChatSidebar.css';
 
 function ChatSidebar({ visible, onLoadChat, onDeleteChat, onClose }) {
@@ -35,7 +36,7 @@ function ChatSidebar({ visible, onLoadChat, onDeleteChat, onClose }) {
                 className="delete-chat-btn"
                 title="Eliminar chat"
               >
-                🗑️
+                <Trash size={18} />
               </button>
               <button
                 onClick={() => onLoadChat(chatName)}

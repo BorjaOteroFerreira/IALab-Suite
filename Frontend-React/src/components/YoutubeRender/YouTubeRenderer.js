@@ -51,19 +51,12 @@ export const YouTubeEmbed = ({ videoId }) => {
   );
 };
 
-// Componente personalizado para enlaces que detecta YouTube
+// Componente personalizado para enlaces que detecta YouTube - SOLO EMBED
 export const LinkRenderer = ({ href, children }) => {
   const videoId = extractYouTubeVideoId(href);
   
   if (videoId) {
-    return (
-      <div>
-        <a href={href} target="_blank" rel="noopener noreferrer" className="youtube-link">
-          {children || href}
-        </a>
-        <YouTubeEmbed videoId={videoId} />
-      </div>
-    );
+    return <YouTubeEmbed videoId={videoId} />;
   }
   
   return (

@@ -1,5 +1,6 @@
 import React from 'react';
 import './Header.css';
+import { Download, Folder, Settings, Plus } from 'lucide-react';
 
 function Header({ 
   tools, 
@@ -10,7 +11,8 @@ function Header({
   onToggleRag, 
   onToggleChatSidebar, 
   onToggleConfigSidebar, 
-  onClearChat 
+  onClearChat,
+  onOpenDownloader
 }) {
   return (
     <header className="app-header">
@@ -40,13 +42,19 @@ function Header({
             RAG
           </label>
         </div>
-
+        <button
+          onClick={onClearChat}
+          className="header-button"
+          title="Nuevo chat"
+        >
+          <Plus size={22} />
+        </button>
         <button
           onClick={onToggleChatSidebar}
           className={`header-button ${chatSidebarVisible ? 'active' : ''}`}
           title="Historial"
         >
-          📁
+          <Folder size={22} />
         </button>
         
         <button
@@ -54,15 +62,17 @@ function Header({
           className={`header-button ${configSidebarVisible ? 'active' : ''}`}
           title="Configuración"
         >
-          ⚙️
+          <Settings size={22} />
         </button>
         
+
+        
         <button
-          onClick={onClearChat}
+          onClick={onOpenDownloader}
           className="header-button"
-          title="Nuevo chat"
+          title="Descargar modelos GGUF"
         >
-          ➕
+          <Download size={22} />
         </button>
       </div>
     </header>

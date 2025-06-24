@@ -744,7 +744,26 @@
   color: var(--accent-hover);
   text-decoration-color: var(--accent-hover);
 }
-
+/* Botón flotante para abrir chat */
+.gguf-fab{
+  position: fixed;
+  bottom: 6.5rem; 
+  right: 2.2rem;
+  z-index: 1000;
+  background: var(--primary, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.7rem;
+  box-shadow: 0 4px 24px 0 rgba(99,102,241,0.18);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 /* Responsive design mejorado para dispositivos móviles */
 @media (max-width: 768px) {
   /* Layout principal móvil */

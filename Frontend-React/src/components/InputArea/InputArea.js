@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import './InputArea.css';
+import { Square } from 'lucide-react';
 
 function InputArea({ 
   input, 
@@ -67,7 +68,7 @@ function InputArea({
               className="send-button stop"
               title="Detener respuesta"
             >
-              ⏹️
+              <Square size={20} />
             </button>
           ) : (
             <button

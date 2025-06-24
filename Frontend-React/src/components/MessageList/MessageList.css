@@ -158,11 +158,26 @@
 
 .welcome-message h2 {
   font-size: 1.5rem;
-  color: var(--primary);
+  background: linear-gradient(90deg, var(--primary), var(--secondary, #a855f7), var(--primary-light, #60a5fa));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 0.5rem;
 }
 
-.welcome-message p {
-  color: var(--text-secondary);
+.welcome-message-p {
+  color: #fff !important;
   font-size: 1.1rem;
+  user-select: text;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.25);
+  margin: 0;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #fff !important;
+  background-clip: initial !important;
+}
+
+.welcome-message-p::selection {
+  background: var(--primary, #6366f1);
+  color: #fff !important;
 }

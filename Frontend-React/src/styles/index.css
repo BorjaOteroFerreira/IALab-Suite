@@ -2,7 +2,7 @@
  * Modern Design System - Immediate Visual Impact
  * Production-ready CSS with glassmorphism and modern aesthetics
  */
-
+@import './github-dark.css';
 :root {
   /* Primary Brand Colors */
   --primary: #6366f1;

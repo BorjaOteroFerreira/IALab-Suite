@@ -1,0 +1,83 @@
+/* highlight.js GitHub Dark theme (copiado desde node_modules/highlight.js/styles/github-dark.css) */
+
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  background: #0d1117;
+  color: #c9d1d9;
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #ff7b72;
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #d2a8ff;
+}
+.hljs-literal {
+  color: #79c0ff;
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #a5d6ff;
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #ffa657;
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #d2a8ff;
+}
+.hljs-built_in,
+.hljs-title.class_ {
+  color: #ffa657;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
+}
+.hljs-link {
+  text-decoration: underline;
+}
+
+/* Ajuste para el contenedor padre de los mensajes (por si no está en el CSS global) */
+.assistant-message, .message-content {
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+.assistant-md-fragment {
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
