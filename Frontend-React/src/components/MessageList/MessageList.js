@@ -14,6 +14,11 @@ const cleanYoutubeMarkdown = md => md.replace(
   (match, text, url) => (text.trim() === url.trim() ? url : match)
 );
 
+// Limpia indicadores de lista markdown
+const cleanListIndicators = text => {
+  return text.replace(/^\s*[\-*+•‣◦●▪‧·]\s+/, '');
+};
+
 // Procesa markdown con enlaces especiales
 const splitMarkdownWithLinks = markdownInput => {
   let markdown = cleanYoutubeMarkdown(markdownInput || '');
@@ -23,7 +28,16 @@ const splitMarkdownWithLinks = markdownInput => {
     singleMarkdownImage: /^\s*(\[imagen[^\]]*\])\(([^)]+)\)(?:\s*([^\n]*))?$/i,
     singleCustomImage: /^\s*(\[imagen[^\]]*\])\s*\[([^\]]+)\](?:\s*([^\n]*))?$/i,
     standardImage: /^\s*([\-*+]\s*)?!\[([^\]]*)\]\(([^)]+)\)\s*(.*)$/i,
-    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/\.]+)/gi
+    // NUEVO: Patrón para detectar [Imagen: URL] dentro de listas
+    imageWithColon: /^[\s\t]*([\-*+•‣◦●▪‧·])[\s\t]+(\[imagen[^\]]*:\s*([^\]]+)\])(?:\s*([^\n]*))?$/i,
+    // NUEVO: Patrón para detectar [Imagen: URL] sin lista
+    singleImageWithColon: /^\s*(\[imagen[^\]]*:\s*([^\]]+)\])(?:\s*([^\n]*))?$/i,
+    imageLink: /\[([^\]]*(?:imagen|image)[^\]]*)\]\((https?:\/\/[^\)]+\.(jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\)/gi,
+    // NUEVO: Patrón para detectar enlaces de imagen con formato [Imagen: URL] en texto
+    imageLinkColon: /\[imagen[^\]]*:\s*(https?:\/\/[^\]]+\.(jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\]]*)?)\]/gi,
+    // Patrón mejorado para YouTube que incluye formato markdown
+    youtubeMarkdown: /\[([^\]]*)\]\((https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/\.]+)\)/gi,
+    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/\.]+)(\s*\(\s*\))?/gi
   };
 
   const lines = markdown.split(/\r?\n/);
@@ -35,8 +49,8 @@ const splitMarkdownWithLinks = markdownInput => {
     if (buffer.length) {
       const text = buffer.join('\n');
       if (text.trim()) {
-        // Procesar YouTube links en el texto acumulado
-        processTextWithYoutube(text, result);
+        // Procesar YouTube links e imágenes en el texto acumulado
+        processTextWithYoutubeAndImages(text, result);
       }
       buffer = [];
     }
@@ -44,35 +58,61 @@ const splitMarkdownWithLinks = markdownInput => {
 
   const flushImageBlock = () => {
     if (!imageBlock.length) return;
-    const allImgs = imageBlock.every(l => patterns.customImage.test(l) || patterns.markdownImage.test(l));
+    const allImgs = imageBlock.every(l => 
+      patterns.customImage.test(l) || 
+      patterns.markdownImage.test(l) || 
+      patterns.imageWithColon.test(l)
+    );
     if (allImgs) {
       imageBlock.forEach(l => {
-        const m = patterns.customImage.exec(l) || patterns.markdownImage.exec(l);
+        const m = patterns.customImage.exec(l) || 
+                  patterns.markdownImage.exec(l) || 
+                  patterns.imageWithColon.exec(l);
         if (m) {
-          result.push({ type: 'image', value: m[3], text: m[2] });
+          // Para imageWithColon, la URL está en el índice 3
+          const url = patterns.imageWithColon.test(l) ? m[3] : m[3];
+          const text = patterns.imageWithColon.test(l) ? m[2] : m[2];
+          result.push({ type: 'image', value: url, text: text });
           if (m[4]?.trim()) {
-            processTextWithYoutube(m[4].trim(), result);
+            // Limpiar indicadores de lista del texto adicional
+            const cleanText = cleanListIndicators(m[4].trim());
+            if (cleanText) {
+              processTextWithYoutubeAndImages(cleanText, result);
+            }
           }
         }
       });
     } else {
-      processTextWithYoutube(imageBlock.join('\n'), result);
+      processTextWithYoutubeAndImages(imageBlock.join('\n'), result);
     }
     imageBlock = [];
   };
 
-  const processTextWithYoutube = (text, resultArray) => {
+  const processTextWithYoutubeAndImages = (text, resultArray) => {
     if (!text.trim()) return;
     
-    const matches = [...text.matchAll(patterns.youtube)];
-    if (!matches.length) {
+    // Procesar enlaces de imágenes (tanto formato estándar como con dos puntos)
+    const imageMatches = [...text.matchAll(patterns.imageLink)];
+    const imageColonMatches = [...text.matchAll(patterns.imageLinkColon)];
+    const youtubeMarkdownMatches = [...text.matchAll(patterns.youtubeMarkdown)];
+    const youtubeMatches = [...text.matchAll(patterns.youtube)];
+    
+    // Combinar y ordenar todas las coincidencias por posición
+    const allMatches = [
+      ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] })),
+      ...imageColonMatches.map(m => ({ ...m, type: 'image', url: m[1], altText: 'Imagen' })),
+      ...youtubeMarkdownMatches.map(m => ({ ...m, type: 'youtube', url: m[2], text: m[1] })),
+      ...youtubeMatches.map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] }))
+    ].sort((a, b) => a.index - b.index);
+
+    if (!allMatches.length) {
       resultArray.push({ type: 'text', value: text });
       return;
     }
 
     let lastIndex = 0;
-    matches.forEach(match => {
-      // Agregar texto antes del enlace de YouTube
+    allMatches.forEach((match, index) => {
+      // Agregar texto antes del enlace
       if (match.index > lastIndex) {
         const beforeText = text.slice(lastIndex, match.index);
         if (beforeText.trim()) {
@@ -80,12 +120,33 @@ const splitMarkdownWithLinks = markdownInput => {
         }
       }
       
-      // Agregar el enlace de YouTube
-      resultArray.push({ type: 'youtube', value: match[0], text: match[0] });
+      if (match.type === 'image') {
+        // Agregar la imagen
+        resultArray.push({ type: 'image', value: match.url, text: match.altText });
+     
+        
+      } else {
+        // Agregar el enlace de YouTube
+        const youtubeUrl = match.url || match[0];
+        const youtubeText = match.text || youtubeUrl;
+        resultArray.push({ type: 'youtube', value: youtubeUrl, text: youtubeText });
+        
+        // Agregar salto de línea después de YouTube si hay texto siguiente
+        const nextMatch = allMatches[index + 1];
+        const textAfterYoutube = nextMatch ? 
+          text.slice(match.index + match[0].length, nextMatch.index) : 
+          text.slice(match.index + match[0].length);
+        
+        if (textAfterYoutube.trim() && !textAfterYoutube.startsWith('\n')) {
+          // Insertar un salto de línea virtual para evitar problemas de renderizado
+          resultArray.push({ type: 'text', value: '\n\n' });
+        }
+      }
+      
       lastIndex = match.index + match[0].length;
     });
 
-    // Agregar texto después del último enlace de YouTube
+    // Agregar texto después del último enlace
     if (lastIndex < text.length) {
       const afterText = text.slice(lastIndex);
       if (afterText.trim()) {
@@ -99,38 +160,67 @@ const splitMarkdownWithLinks = markdownInput => {
     if (m && isImageLink(m[3])) {
       result.push({ type: 'image', value: m[3], text: m[2] });
       if (m[4]?.trim()) {
-        processTextWithYoutube(m[4].trim(), result);
-      }
-      return true;
-    }
-    m = patterns.singleMarkdownImage.exec(line);
-    if (m && isImageLabel(m[1]) && isImageLink(m[2])) {
-      result.push({ type: 'image', value: m[2], text: m[1] });
-      if (m[3]?.trim()) {
-        processTextWithYoutube(m[3].trim(), result);
-      }
-      return true;
-    }
-    m = patterns.singleCustomImage.exec(line);
-    if (m && isImageLabel(m[1])) {
-      result.push({ type: 'image', value: m[2], text: m[1] });
-      if (m[3]?.trim()) {
-        processTextWithYoutube(m[3].trim(), result);
+        const cleanText = cleanListIndicators(m[4].trim());
+        if (cleanText) {
+          processTextWithYoutubeAndImages(cleanText, result);
+        }
       }
       return true;
     }
     
-    // Ya no procesamos YouTube aquí línea por línea
+    m = patterns.singleMarkdownImage.exec(line);
+    if (m && isImageLabel(m[1]) && isImageLink(m[2])) {
+      result.push({ type: 'image', value: m[2], text: m[1] });
+      if (m[3]?.trim()) {
+        const cleanText = cleanListIndicators(m[3].trim());
+        if (cleanText) {
+          processTextWithYoutubeAndImages(cleanText, result);
+        }
+      }
+      return true;
+    }
+    
+    m = patterns.singleCustomImage.exec(line);
+    if (m && isImageLabel(m[1])) {
+      result.push({ type: 'image', value: m[2], text: m[1] });
+      if (m[3]?.trim()) {
+        const cleanText = cleanListIndicators(m[3].trim());
+        if (cleanText) {
+          processTextWithYoutubeAndImages(cleanText, result);
+        }
+      }
+      return true;
+    }
+    
+    // NUEVO: Procesar líneas con formato [Imagen: URL]
+    m = patterns.singleImageWithColon.exec(line);
+    if (m) {
+      result.push({ type: 'image', value: m[2], text: 'Imagen' });
+      if (m[3]?.trim()) {
+        const cleanText = cleanListIndicators(m[3].trim());
+        if (cleanText) {
+          processTextWithYoutubeAndImages(cleanText, result);
+        }
+      }
+      return true;
+    }
+    
     return false;
   };
 
   for (let i = 0; i < lines.length; i++) {
     const raw = cleanYoutubeMarkdown(lines[i]);
-    if (patterns.customImage.test(raw) || patterns.markdownImage.test(raw)) {
+    if (patterns.customImage.test(raw) || 
+        patterns.markdownImage.test(raw) || 
+        patterns.imageWithColon.test(raw)) {
       flushBuffer();
       imageBlock.push(raw);
       const nxt = lines[i+1] || '';
-      if (!patterns.customImage.test(nxt) && !patterns.markdownImage.test(nxt)) flushImageBlock();
+      if (!patterns.customImage.test(nxt) && 
+          !patterns.markdownImage.test(nxt) && 
+          !patterns.imageWithColon.test(nxt)) {
+        flushImageBlock();
+      }
     } else {
       flushImageBlock();
       if (!processLine(raw)) {
@@ -182,7 +272,7 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
   const renderMarkdown = (text, idx) => {
     if (!showdown) return <div className="assistant-message">Cargando...</div>;
     const parts = splitMarkdownWithLinks(text || '');
-    const blockRe = /<(h[1-6]|p|ul|ol|li|blockquote|table|pre)/i;
+    const blockRe = /<(h[1-6]|p|ul|ol|li|blockquote|table|pre|code)/i;
 
     return (
       <div className="assistant-message" ref={el => htmlRefs.current[idx] = el}>
@@ -193,9 +283,16 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
           if (part.type === 'text') {
             const v = part.value;
             if (!v.trim() && v !== '\n') return null;
+            
+            // Detectar si es una línea que originalmente tenía indicadores de lista pero ahora es texto limpio
+            const wasListItem = /^\s*[\*\-\+]\s+/.test(v);
             const html = showdown.makeHtml(v);
-            const isList = /^\s*[\*\-\+]\s+/.test(v);
-            const Tag = isList || blockRe.test(html.trim()) ? 'div' : 'span';
+            
+            // Mejorar la detección de bloques para evitar <pre> no deseados
+            const isBlockContent = blockRe.test(html.trim()) && !wasListItem;
+            const shouldBeBlock = isBlockContent || /^\s*[\*\-\+]\s+/.test(v);
+            
+            const Tag = shouldBeBlock ? 'div' : 'span';
             return <Tag key={i} className="assistant-md-fragment" dangerouslySetInnerHTML={{ __html: html }} />;
           }
           return null;
