@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import './InputArea.css';
-import { Square } from 'lucide-react';
+import { Square, Wrench, Database } from 'lucide-react';
 
 function InputArea({ 
   input, 
@@ -9,7 +9,8 @@ function InputArea({
   isLoading, 
   tokensCount, 
   currentResponse, 
-  onStopResponse 
+  onStopResponse, 
+  tools, rag, onToggleTools, onToggleRag 
 }) {
   const textareaRef = useRef(null);
 
@@ -41,11 +42,29 @@ function InputArea({
   return (
     <div className="input-area">
       <form onSubmit={handleSubmit} className="message-form">
-        {/* Contador de tokens encima del input */}
         <span className="tokens-counter">
           Contexto usado: {tokensCount} Tokens
         </span>
         <div className="input-container">
+           <button
+              type="button"
+              onClick={() => onToggleRag(!rag)}
+              className={`input-icon-button${!!rag ? ' active' : ''}`}
+              title="RAG"
+            >
+              <Database size={23} />
+            </button>
+          
+          <div className="input-side-buttons">
+            <button
+              type="button"
+              onClick={() => onToggleTools(!tools)}
+              className={`input-icon-button${!!tools ? ' active' : ''}`}
+              title="Herramientas"
+            >
+              <Wrench size={23} />
+            </button>
+           </div>
           <textarea
             ref={textareaRef}
             value={input}

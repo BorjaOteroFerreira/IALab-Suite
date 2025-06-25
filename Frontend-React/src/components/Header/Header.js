@@ -1,6 +1,6 @@
 import React from 'react';
 import './Header.css';
-import { Download, Folder, Settings, Plus } from 'lucide-react';
+import { Download, Folder, Settings, Plus, MessagesSquare, Wrench, Database } from 'lucide-react';
 
 function Header({ 
   tools, 
@@ -21,27 +21,6 @@ function Header({
       </div>
       
       <div className="header-controls">
-        <div className="toggle-group">
-          <label className="toggle-label">
-            <input
-              type="checkbox"
-              checked={tools}
-              onChange={(e) => onToggleTools(e.target.checked)}
-            />
-            <span className="toggle-slider"></span>
-            Tools
-          </label>
-          
-          <label className="toggle-label">
-            <input
-              type="checkbox"
-              checked={rag}
-              onChange={(e) => onToggleRag(e.target.checked)}
-            />
-            <span className="toggle-slider"></span>
-            RAG
-          </label>
-        </div>
         <button
           onClick={onClearChat}
           className="header-button"
@@ -54,7 +33,7 @@ function Header({
           className={`header-button ${chatSidebarVisible ? 'active' : ''}`}
           title="Historial"
         >
-          <Folder size={22} />
+          <MessagesSquare size={22} />
         </button>
         
         <button

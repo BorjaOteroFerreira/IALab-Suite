@@ -87,6 +87,10 @@ function ChatComponent({ onOpenDownloader }) {
           currentResponse={currentResponse}
           onStopResponse={stopResponse}
           tokensCount={tokensCount}
+          tools={tools}
+          rag={rag}
+          onToggleTools={setTools}
+          onToggleRag={setRag}
         />
       </div>
 

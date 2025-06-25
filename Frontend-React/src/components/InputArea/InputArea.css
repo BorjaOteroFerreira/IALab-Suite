@@ -23,7 +23,54 @@
   margin-bottom: 6px;
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+}
+
+.input-side-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-right: 0.7rem;
+  align-items: center;
+  justify-content: flex-end;
+  background: transparent;
+  border-radius: 8px;
+  box-shadow: none;
+  padding: 2px 0 2px 0;
+}
+
+.input-icon-button {
+  background: transparent;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 1.7rem;
+  box-shadow: none;
+  transition: color 0.18s, text-shadow 0.18s;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-icon-button.active {
+  color: #b983ff; /* lila neon */
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+}
+
+.input-icon-button:hover {
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.input-icon-button:focus {
+  outline: none;
 }
 
 .message-textarea {
