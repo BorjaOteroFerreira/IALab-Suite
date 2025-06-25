@@ -6,21 +6,6 @@ import './MessageList.css';
 // Utilidades de detección de enlaces e imágenes
 const isYoutubeLink = href => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(href);
 const isImageLink = href => /\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(href);
-const isImageLabel = text => /^\s*\[(imagen|image)\b.*\]/i.test(text.trim());
-
-// Detecta URLs de imágenes más ampliamente, incluso con parámetros complejos
-const isImageUrl = url => {
-  // Extensiones de imagen comunes
-  if (/\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(url)) return true;
-  
-  // URLs específicas de servicios de imágenes
-  if (/cdninstagram\.com.*\.(jpg|jpeg|png|gif|webp)/i.test(url)) return true;
-  if (/staticflickr\.com.*\.(jpg|jpeg|png|gif|webp)/i.test(url)) return true;
-  if (/images\.unsplash\.com/i.test(url)) return true;
-  if (/imgur\.com\/.*\.(jpg|jpeg|png|gif|webp)/i.test(url)) return true;
-  
-  return false;
-};
 
 // Limpia enlaces markdown redundantes de YouTube
 const cleanYoutubeMarkdown = md => md.replace(
@@ -28,116 +13,26 @@ const cleanYoutubeMarkdown = md => md.replace(
   (match, text, url) => (text.trim() === url.trim() ? url : match)
 );
 
-// Limpia enlaces markdown redundantes de imágenes
-const cleanImageMarkdown = md => md.replace(
-  /\[([^\]]+)\]\((https?:\/\/(?:[\w\-./]+)\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:[?#][^)]+)?)\)/gi,
-  (match, text, url) => (text.trim() === url.trim() ? url : match)
-);
-
-// Limpia indicadores de lista markdown
-const cleanListIndicators = text => text.replace(/^\s*[\-*+•‣◦●▪‧·]\s+/, '');
-
 // Procesa markdown con enlaces especiales
 const splitMarkdownWithLinks = markdownInput => {
-  // Aplicar limpieza primero a YouTube, luego a imágenes
+  // Aplicar limpieza a YouTube
   let markdown = cleanYoutubeMarkdown(markdownInput || '');
-  markdown = cleanImageMarkdown(markdown);
 
   const patterns = {
-    customImage: /^[\s\t]*([\-*+•‣◦●▪‧·])[\s\t]+(\[imagen[^\]]*\])\s*\[([^\]]+)\](?:\s*([^\n]*))?$/i,
-    markdownImage: /^[\s\t]*([\-*+•‣◦●▪‧·])[\s\t]+(\[imagen[^\]]*\])\(([^)]+)\)(?:\s*([^\n]*))?$/i,
-    singleMarkdownImage: /^\s*(\[imagen[^\]]*\])\(([^)]+)\)(?:\s*([^\n]*))?$/i,
-    singleCustomImage: /^\s*(\[imagen[^\]]*\])\s*\[([^\]]+)\](?:\s*([^\n]*))?$/i,
-    standardImage: /^\s*([\-*+]\s*)?!\[([^\]]*)\]\(([^)]+)\)\s*(.*)$/i,
-    imageWithColon: /^[\s\t]*([\-*+•‣◦●▪‧·])[\s\t]+(\[imagen[^\]]*:\s*([^\]]+)\])(?:\s*([^\n]*))?$/i,
-    singleImageWithColon: /^\s*(\[imagen[^\]]*:\s*([^\]]+)\])(?:\s*([^\n]*))?$/i,
-    imageLink: /\[([^\]]*(?:imagen|image)[^\]]*)\]\((https?:\/\/[^\)]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\)/gi,
-    imageLinkColon: /\[imagen[^\]]*:\s*(https?:\/\/[^\]]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:\?[^\)]*)?)\]/gi,
-    //youtubeMarkdown: /\[([^\]]*)\]\((https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)\)/gi,
-    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi,
-    // Patrón mejorado para URLs de imágenes directas
-    directImageUrl: /(https?:\/\/[^\s\)]+(?:\.(?:jpg|jpeg|png|gif|webp|bmp|svg)(?:[?#][^\s\)]*)?|cdninstagram\.com[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)|staticflickr\.com[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)|images\.unsplash\.com[^\s\)]*|imgur\.com\/[^\s\)]*\.(?:jpg|jpeg|png|gif|webp)))/gi
-  };
-
-  const lines = markdown.split(/\r?\n/);
-  const result = [];
-  let buffer = [];
-  let imageBlock = [];
-
-  const flushBuffer = () => {
-    if (!buffer.length) return;
-    const text = buffer.join('\n');
-    if (text.trim()) processTextWithYoutubeAndImages(text, result);
-    buffer = [];
-  };
-
-  const flushImageBlock = () => {
-    if (!imageBlock.length) return;
-    const allImgs = imageBlock.every(l => patterns.customImage.test(l) || patterns.markdownImage.test(l) || patterns.imageWithColon.test(l));
-    if (allImgs) {
-      imageBlock.forEach(l => {
-        const m = patterns.customImage.exec(l) || patterns.markdownImage.exec(l) || patterns.imageWithColon.exec(l);
-        if (m) {
-          // Agregar texto previo primero para respetar orden
-          if (m[4]?.trim()) {
-            const cleanText = cleanListIndicators(m[4].trim());
-            if (cleanText) processTextWithYoutubeAndImages(cleanText, result);
-          }
-          const url = patterns.imageWithColon.test(l) ? m[3] : (m[2] || m[2]);
-          const text = patterns.imageWithColon.test(l) ? m[2] : m[2];
-          result.push({ type: 'image', value: url, text });
-        }
-      });
-    } else {
-      processTextWithYoutubeAndImages(imageBlock.join('\n'), result);
-    }
-    imageBlock = [];
+    // Solo mantenemos el patrón markdown estándar para imágenes
+    standardImage: /!\[([^\]]*)\]\(([^)]+)\)/gi,
+    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi
   };
 
   const processTextWithYoutubeAndImages = (text, resultArray) => {
     if (!text.trim()) return;
     
-    // Mejorar la detección de imágenes - priorizar patrones específicos
-    const imageMatches = [...text.matchAll(patterns.imageLink)];
-    const imageColonMatches = [...text.matchAll(patterns.imageLinkColon)];
-    //const youtubeMarkdownMatches = [...text.matchAll(patterns.youtubeMarkdown)];
+    const imageMatches = [...text.matchAll(patterns.standardImage)];
     const youtubeMatches = [...text.matchAll(patterns.youtube)];
-    const directImageMatches = [...text.matchAll(patterns.directImageUrl)];
-    
-    // Crear un conjunto de rangos ocupados por patrones específicos
-    const occupiedRanges = new Set();
-    const specificMatches = [
-      ...imageMatches,
-      ...imageColonMatches,
-      //...youtubeMarkdownMatches,
-      ...youtubeMatches.filter(m => !isImageUrl(m[1]))
-    ];
-    
-    // Marcar rangos ocupados por patrones específicos
-    specificMatches.forEach(match => {
-      for (let i = match.index; i < match.index + match[0].length; i++) {
-        occupiedRanges.add(i);
-      }
-    });
-    
-    // Filtrar URLs directas de imágenes que no conflicten con patrones específicos
-    const filteredDirectImageMatches = directImageMatches.filter(match => {
-      if (!isImageUrl(match[1])) return false;
-      
-      // Verificar si esta URL directa está dentro de un patrón específico
-      for (let i = match.index; i < match.index + match[0].length; i++) {
-        if (occupiedRanges.has(i)) return false;
-      }
-      return true;
-    });
     
     const allMatches = [
-      //...youtubeMarkdownMatches.map(m => ({ ...m, type: 'youtube', url: m[2], text: m[1] })),
-      ...youtubeMatches.filter(m => !isImageUrl(m[1])) // Excluir URLs que son imágenes
-        .map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
-      ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] })),
-      ...imageColonMatches.map(m => ({ ...m, type: 'image', url: m[1], altText: 'Imagen' })),
-      ...filteredDirectImageMatches.map(m => ({ ...m, type: 'image', url: m[1], altText: 'Imagen' }))
+      ...youtubeMatches.map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
+      ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] }))
     ].sort((a, b) => a.index - b.index);
 
     if (!allMatches.length) {
@@ -147,34 +42,22 @@ const splitMarkdownWithLinks = markdownInput => {
 
     let lastIndex = 0;
     allMatches.forEach((match, idx) => {
-      // Verificar si es una imagen con formato markdown que apunta a una URL de imagen plana
-      let effectiveStartIndex = match.index;
-      let shouldRemoveMarkdown = false;
-      
-      if (match.type === 'image') {
-        // Verificar si es un patrón markdown que apunta directamente a una imagen
-        const isDirectImageUrl = isImageUrl(match.url);
-        const hasMarkdownFormat = match[0].includes('[') && match[0].includes(']') && match[0].includes('(') && match[0].includes(')');
-        const hasExclamation = match.index > 0 && text[match.index - 1] === '!';
-        
-        // Solo eliminar markdown si es una URL directa de imagen con formato markdown
-        if (isDirectImageUrl && (hasMarkdownFormat || hasExclamation)) {
-          shouldRemoveMarkdown = true;
-          if (hasExclamation) {
-            effectiveStartIndex = match.index - 1;
-          }
-        }
-      }
-      
       // Agregar texto antes del match
-      if (effectiveStartIndex > lastIndex) {
-        const before = text.slice(lastIndex, effectiveStartIndex);
+      if (match.index > lastIndex) {
+        let before = text.slice(lastIndex, match.index);
+        
+        // Si el siguiente match es una imagen, limpiar asteriscos del texto anterior
+        if (match.type === 'image') {
+          // Eliminar asteriscos sueltos que preceden a imágenes
+          before = before.replace(/\s*[\*\-\+]\s*$/, '');
+        }
+        
         if (before.trim()) resultArray.push({ type: 'text', value: before });
       }
       
       if (match.type === 'image') {
         // Verificar si hay texto inmediatamente antes de la imagen (sin salto de línea)
-        const textBefore = text.slice(0, effectiveStartIndex);
+        const textBefore = text.slice(0, match.index);
         const lastChar = textBefore.slice(-1);
         const needsLineBreak = textBefore.trim() && lastChar !== '\n' && !textBefore.endsWith('\n\n');
         
@@ -184,7 +67,7 @@ const splitMarkdownWithLinks = markdownInput => {
         }
         // Agregar la imagen
         resultArray.push({ type: 'image', value: match.url, text: match.altText });
-      } else {
+      } else if (match.type === 'youtube') {
         // Agregar el enlace de YouTube
         const youtubeUrl = match.url || match[0];
         const youtubeText = match.text || youtubeUrl;
@@ -195,9 +78,7 @@ const splitMarkdownWithLinks = markdownInput => {
         const textAfterYoutube = nextMatch ?
           text.slice(match.index + match[0].length, nextMatch.index) :
           text.slice(match.index + match[0].length);
-        const textBerforeYoutube = text.slice(0, match.index);
-        if(textAfterYoutube.endsWith('(\n') ) { textAfterYoutube.replace('(\n', '\n'); }
-        if(textBerforeYoutube.endsWith('\n)') ) { textAfterYoutube.replace('\n)', '\n\n'); }
+        
         if (textAfterYoutube.trim() && !textAfterYoutube.startsWith('\n')) {
           // Insertar un salto de línea virtual para evitar problemas de renderizado
           resultArray.push({ type: 'text', value: '\n\n' });
@@ -214,55 +95,10 @@ const splitMarkdownWithLinks = markdownInput => {
     }
   };
 
-  const processLine = line => {
-    let m = patterns.standardImage.exec(line);
-    if (m && isImageLink(m[3])) {
-      if (m[4]?.trim()) buffer.push(cleanListIndicators(m[4].trim()));
-      return result.push({ type: 'image', value: m[3], text: m[2] });
-    }
-    m = patterns.singleMarkdownImage.exec(line);
-    if (m && isImageLabel(m[1]) && isImageLink(m[2])) {
-      if (m[3]?.trim()) buffer.push(cleanListIndicators(m[3].trim()));
-      return result.push({ type: 'image', value: m[2], text: m[1] });
-    }
-    m = patterns.singleCustomImage.exec(line);
-    if (m && isImageLabel(m[1])) {
-      if (m[3]?.trim()) buffer.push(cleanListIndicators(m[3].trim()));
-      return result.push({ type: 'image', value: m[2], text: m[1] });
-    }
-    m = patterns.singleImageWithColon.exec(line);
-    if (m) {
-      if (m[3]?.trim()) buffer.push(cleanListIndicators(m[3].trim()));
-      return result.push({ type: 'image', value: m[2], text: 'Imagen' });
-    }
-    return false;
-  };
-
-for (let i = 0; i < lines.length; i++) {
-    const raw = cleanYoutubeMarkdown(lines[i]);
-    if (patterns.customImage.test(raw) || 
-        patterns.markdownImage.test(raw) || 
-        patterns.imageWithColon.test(raw)) {
-      flushBuffer();
-      imageBlock.push(raw);
-      const nxt = lines[i+1] || '';
-      if (!patterns.customImage.test(nxt) && 
-          !patterns.markdownImage.test(nxt) && 
-          !patterns.imageWithColon.test(nxt)) {
-        flushImageBlock();
-      }
-    } else {
-      flushImageBlock();
-      if (!processLine(raw)) {
-        buffer.push(raw);
-      } else {
-        flushBuffer();
-      }
-    }
-  }
-
-  flushBuffer();
-  flushImageBlock();
+  // Procesar el texto completo
+  const result = [];
+  processTextWithYoutubeAndImages(markdown, result);
+  
   return result.filter(x => x.value != null);
 };
 
@@ -319,8 +155,23 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
           if (part.type === 'text') {
             const v = part.value;
             if (!v.trim() && v !== '\n') return null;
+            
+            // Filtrar asteriscos sueltos que pueden generar elementos de lista vacíos
+            let cleanedValue = v.replace(/^\s*[\*\-\+]\s*$/, '').trim();
+            
+            // Eliminar dos puntos (:) al inicio de línea, preservando el texto que sigue
+            cleanedValue = cleanedValue.replace(/^:\s*/gm, '');
+            
+            if (!cleanedValue) return null;
+            
             const wasListItem = /^\s*[\*\-\+]\s+/.test(v);
-            const html = showdown.makeHtml(v);
+            const html = showdown.makeHtml(cleanedValue);
+            
+            // Evitar renderizar elementos vacíos o solo con asteriscos
+            if (html.trim() === '<p></p>' || html.trim() === '' || /^<[^>]*>\s*<\/[^>]*>$/.test(html.trim())) {
+              return null;
+            }
+            
             const isBlockContent = blockRe.test(html.trim()) && !wasListItem;
             const shouldBeBlock = isBlockContent || /^\s*[\*\-\+]\s+/.test(v);
             const Tag = shouldBeBlock ? 'div' : 'span';
