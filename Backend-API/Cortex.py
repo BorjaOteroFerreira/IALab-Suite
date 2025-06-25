@@ -176,8 +176,8 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         for chunk in model.create_chat_completion(messages=prompt_decision, max_tokens=1024, stream=True):
             # Verificar si se debe detener
             if self.assistant and self.assistant.stop_emit:
-                print(f"{Fore.RED}🛑 Stop signal detected during decision consultation{Style.RESET_ALL}")
-                return "🛑 Process stopped by user"
+                print(f"{Fore.RED}Stop signal detected during decision consultation{Style.RESET_ALL}")
+                return "Process stopped by user"
                 
             if 'content' in chunk['choices'][0]['delta']:
                 fragmento = chunk['choices'][0]['delta']['content']
@@ -224,7 +224,6 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         
         # Añadir un mensaje de asistente para mantener la alternancia de roles
         decision_prompt.append({"role": "assistant", "content": "He ejecutado las herramientas solicitadas y tengo los resultados."})
-        
         # Añadir la información al prompt        
         decision_prompt.append({"role": "user", "content": herramientas_info + resultados_info + instruccion})
         
@@ -246,8 +245,8 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
     def _ejecutar_herramienta_individual(self, funcion_texto, query_texto):
         # Verificar si se debe detener antes de ejecutar la herramienta
         if self.assistant and self.assistant.stop_emit:
-            print(f"{Fore.RED}🛑 Stop signal detected before tool execution{Style.RESET_ALL}")
-            return "🛑 Process stopped by user"
+            print(f"{Fore.RED}Stop signal detected before tool execution{Style.RESET_ALL}")
+            return "Process stopped by user"
             
         print("")
         funcion_texto = funcion_texto.replace("'", "")
@@ -295,7 +294,14 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         # Preparar el prompt final con todos los resultados de herramientas
         prompt_final = copy.deepcopy(self.original_prompt)
         
-        info_consolidada = "Utiliza esta información proporcionada por las herramientas para responder al usuario:\n\n"
+        info_consolidada = """
+        Responde en Markdown.
+        Tus respuestas deben estar bien maketadas, deben ser agradables a la vista y fáciles de leer.
+        Incrusta las imágenes con este formato ![dominio](url_imagen) siempre sin olvidar la exclamación al inicio.
+        No es obligatorio que todas las respuestas tengan imágenes, solo si tiene sentido usarlas en ese contexto, pero si las usas, asegurate de que acompañen al texto que las acompaña de forma coherente.
+        IMPORTANTE: Los videos de youtube debes insertarlos sin formato markdown, solo el enlace aplanado.
+        Despues del caracter ':' debes añadir un salto de linea y un espacio antes de continuar con el texto  a no ser que sea el primer caracter de la línea, en ese caso elimina el caracter ':' y comienza directamente con el texto.
+        Utiliza esta información proporcionada por las herramientas para responder al usuario\n\n"""
         for funcion, query, resultado in resultados_herramientas:
             info_consolidada += f"Resultados de {funcion} para '{query}':\n{resultado}\n\n"
         
@@ -308,7 +314,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
           # Generar la respuesta final con todos los resultados
         response_final = self.transmitir_response(model, prompt_final)
         
-        salida_final = f'\n{Fore.GREEN}✍️FINAL {response_final}{Style.RESET_ALL}\n\n{Fore.BLUE}{Style.RESET_ALL}\n'
+        salida_final = f'\n{Fore.GREEN}FINAL {response_final}{Style.RESET_ALL}\n\n{Fore.BLUE}{Style.RESET_ALL}\n'
         print(salida_final)
         
         return response_final
@@ -332,7 +338,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             model=model,
             messages=prompt,
             socket=self.socket,
-            max_tokens=1024,
+            max_tokens=8192,
             user_tokens=total_user_tokens,
             process_line_breaks=True,
             response_queue=self.response_queue,
