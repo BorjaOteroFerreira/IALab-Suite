@@ -33,7 +33,7 @@ class ImageSearchTool(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="image_search_tool",
+            name="Búsqueda de Imágenes",
             description="Busca imágenes usando DuckDuckGo (sin API key)",
             category=ToolCategory.MEDIA,
             requires_api_key=False,
@@ -42,7 +42,7 @@ class ImageSearchTool(BaseTool):
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "image_search_tool"
+        return "Búsqueda de Imágenes"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta búsqueda de imágenes"""

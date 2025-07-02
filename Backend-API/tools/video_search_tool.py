@@ -26,7 +26,7 @@ class YoutubeVideoSearchTool(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="video_search_tool",
+            name="Búsqueda de vídeos en YouTube",
             description="Busca videos en YouTube basado en palabras clave",
             category=ToolCategory.MEDIA,
             requires_api_key=True,
@@ -35,7 +35,7 @@ class YoutubeVideoSearchTool(BaseTool):
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "video_search_tool"
+        return "Búsqueda de vídeos en YouTube"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta búsqueda de videos en YouTube"""

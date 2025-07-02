@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image, BarChart2, Key, Ban, AlertCircle } from 'lucide-react';
+import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image as ImageIcon, BarChart2, Key, Ban, AlertCircle } from 'lucide-react';
 import './ToolsSelector.css';
+
+const CATEGORY_ICONS = {
+  search: <Search size={16} className="icon" />, // Búsqueda
+  media: <Film size={16} className="icon" />, // Media
+  finance: <DollarSign size={16} className="icon" />, // Finanzas
+  image: <ImageIcon size={16} className="icon" />, // Imagen
+  analysis: <BarChart2 size={16} className="icon" />, // Análisis
+  utility: <Wrench size={16} className="icon" /> // Utilidad
+};
 
 const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +19,8 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
-  const popupRef = useRef(null); // Referencia al popup
+  const [activeCategory, setActiveCategory] = useState(null);
+  const popupRef = useRef(null);
 
   // Cargar herramientas disponibles al montar el componente
   useEffect(() => {
@@ -292,18 +302,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }
   };
 
-  const getCategoryIcon = (category) => {
-    const icons = {
-      search: <Search size={16} className="category-icon" />, // Búsqueda
-      media: <Film size={16} className="category-icon" />, // Media
-      finance: <DollarSign size={16} className="category-icon" />, // Finanzas
-      image: <Image size={16} className="category-icon" />, // Imagen
-      analysis: <BarChart2 size={16} className="category-icon" />, // Análisis
-      utility: <Wrench size={16} className="category-icon" /> // Utilidad
-    };
-    return icons[category] || <Settings size={16} className="category-icon" />;
-  };
-
+  // Agrupar herramientas por categoría
   const groupToolsByCategory = (tools) => {
     return tools.reduce((groups, tool) => {
       const category = tool.category || 'utility';
@@ -313,6 +312,19 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
       groups[category].push(tool);
       return groups;
     }, {});
+  };
+
+  // Determinar categorías y la activa
+  const categories = Object.entries(groupToolsByCategory(availableTools));
+  const defaultCategory = categories.length > 0 ? categories[0][0] : null;
+  const currentCategory = activeCategory || defaultCategory;
+  const currentTools = currentCategory ? groupToolsByCategory(availableTools)[currentCategory] || [] : [];
+
+  // Selección visual y lógica
+  const handleCategoryClick = (cat) => setActiveCategory(cat);
+  const handleCardClick = (tool) => {
+    if (!tool.available) return;
+    handleToolToggle(tool.name);
   };
 
   // Auto-ocultar errores después de 5 segundos
@@ -350,91 +362,106 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
       {isOpen && ReactDOM.createPortal(
         <div className="tools-overlay">
           <div className="tools-popup" ref={popupRef}>
-            <div className="tools-header">
-              <div className="tools-header-main">
-                <h3><Wrench size={18} style={{marginRight: 6}} /> Herramientas Disponibles</h3>
-                <div className="tools-header-subtitle">
-                  <List size={14} style={{marginRight: 4}} />
-                  <span>{selectedTools.length} de {availableTools.length} herramientas seleccionadas</span>
-                </div>
+            {/* Sidebar de categorías */}
+            <div className="tools-sidebar">
+              <div className="tools-sidebar-header">
+                <h3 className="tools-sidebar-title">
+                  <Wrench size={18} style={{marginRight: 6}} /> Herramientas
+                </h3>
+                <p className="tools-sidebar-subtitle">{selectedTools.length} de {availableTools.length} seleccionadas</p>
               </div>
-              <div className="tools-header-actions">
-                <button
-                  onClick={handleRefreshTools}
-                  className="refresh-button"
-                  disabled={isLoading}
-                  title="Refrescar herramientas"
-                >
-                  <RefreshCw size={16} className={isLoading ? 'spinning' : ''} />
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="close-button"
-                  title="Cerrar"
-                >
-                  <X size={16} />
-                </button>
-              </div>
+              <nav className="category-nav">
+                {categories.map(([cat, toolsArr]) => {
+                  // Calcular seleccionadas en esta categoría
+                  const selectedInCategory = toolsArr.filter(tool => selectedTools.includes(tool.name)).length;
+                  const totalInCategory = toolsArr.length;
+                  return (
+                    <button
+                      key={cat}
+                      className={`category-nav-item${cat === currentCategory ? ' active' : ''}`}
+                      onClick={() => handleCategoryClick(cat)}
+                    >
+                      <span className="icon">{CATEGORY_ICONS[cat] || <Settings size={16} className="icon" />}</span>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      <span className="category-count">{selectedInCategory}/{totalInCategory}</span>
+                    </button>
+                  );
+                })}
+              </nav>
             </div>
-
-            {error && (
-              <div className="tools-error">
-                <AlertCircle size={14} style={{marginRight: 4, color: '#e74c3c'}} /> {error}
-              </div>
-            )}
-
-            <div className="tools-content modern-scroll">
-              {isLoading || isInitializing ? (
-                <div className="tools-loading">
-                  <div className="loading-spinner" />
-                  <span>{isInitializing ? 'Inicializando herramientas...' : 'Cargando herramientas...'}</span>
+            {/* Contenido principal */}
+            <div className="tools-main">
+              <div className="tools-main-header">
+                <h2 className="tools-main-title">{currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) : ''}</h2>
+                <div className="tools-actions">
+                  <button
+                    className="action-button"
+                    onClick={handleRefreshTools}
+                    title="Refrescar"
+                    disabled={isLoading}
+                  >
+                    <RefreshCw size={16} />
+                  </button>
+                  <button
+                    className="action-button"
+                    onClick={() => setIsOpen(false)}
+                    title="Cerrar"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-              ) : (
-                <>
-                  <div className="tools-list modern-list">
-                    {Object.entries(groupToolsByCategory(availableTools))
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .map(([category, tools]) => (
-                        <div key={category} className="tools-category modern-category">
-                          <h4 className="category-title modern-category-title">
-                            {getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)}
-                          </h4>
-                          <div className="category-tools modern-category-tools">
-                            {tools.map((tool) => (
-                              <div
-                                key={tool.name}
-                                className={`tool-item modern-tool-item ${!tool.available ? 'disabled' : ''}`}
-                                data-tool={tool.name}
-                              >
-                                <label className="tool-checkbox modern-tool-checkbox">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedTools.includes(tool.name)}
-                                    onChange={() => handleToolToggle(tool.name)}
-                                    disabled={!tool.available}
-                                  />
-                                  <span className="checkmark modern-checkmark">
-                                    {selectedTools.includes(tool.name) && <Check size={12} />}
-                                  </span>
-                                  <div className="tool-info modern-tool-info">
-                                    <span className="tool-name modern-tool-name">{tool.name}</span>
-                                    <span className="tool-description modern-tool-description">{tool.description}</span>
-                                    {tool.requires_api_key && (
-                                      <span className="api-key-indicator modern-api-key-indicator"><Key size={12} style={{marginRight: 2}} /> API Key</span>
-                                    )}
-                                    {!tool.available && (
-                                      <span className="unavailable-indicator modern-unavailable-indicator"><Ban size={12} style={{marginRight: 2}} /> No disponible</span>
-                                    )}
-                                  </div>
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+              </div>
+              <div className="tools-content">
+                {error && (
+                  <div className="tools-error">
+                    <AlertCircle size={14} style={{marginRight: 4, color: '#e74c3c'}} /> {error}
                   </div>
-                </>
-              )}
+                )}
+                {isLoading || isInitializing ? (
+                  <div className="tools-loading">
+                    <div className="loading-spinner" />
+                    <span>{isInitializing ? 'Inicializando herramientas...' : 'Cargando herramientas...'}</span>
+                  </div>
+                ) : (
+                  <>
+                    {currentTools.length === 0 ? (
+                      <div className="empty-state">
+                        <div className="empty-state-icon">🔍</div>
+                        <div className="empty-state-title">No hay herramientas en esta categoría</div>
+                        <div className="empty-state-description">Selecciona otra categoría o refresca.</div>
+                      </div>
+                    ) : (
+                      <div className="tools-grid">
+                        {currentTools.map((tool) => (
+                          <div
+                            key={tool.name}
+                            className={`tool-card${selectedTools.includes(tool.name) ? ' selected' : ''}${!tool.available ? ' disabled' : ''}`}
+                            onClick={() => handleCardClick(tool)}
+                          >
+                            <div className="tool-card-header">
+                              <div className="tool-checkbox-custom">
+                                {selectedTools.includes(tool.name) ? <Check size={14} /> : ''}
+                              </div>
+                              <div className="tool-info">
+                                <h4 className="tool-name">{tool.name}</h4>
+                                <p className="tool-description">{tool.description}</p>
+                                <div className="tool-badges">
+                                  {tool.requires_api_key && (
+                                    <span className="tool-badge badge-api-key"> <Key size={12} style={{marginRight: 2}} /> API Key</span>
+                                  )}
+                                  {!tool.available && (
+                                    <span className="tool-badge badge-unavailable"> <Ban size={12} style={{marginRight: 2}} /> No disponible</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="tools-overlay-bg" onClick={() => setIsOpen(false)} />

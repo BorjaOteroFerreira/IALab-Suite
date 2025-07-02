@@ -10,7 +10,7 @@ class CriptoPrice(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="cripto_price",
+            name="Precios Criptomonedas",
             description="Obtiene el precio actual de criptomonedas en USD",
             category=ToolCategory.FINANCE,
             requires_api_key=False
@@ -18,7 +18,7 @@ class CriptoPrice(BaseTool):
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "cripto_price"
+        return "Precios Criptomonedas"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta consulta de precios de criptomonedas"""

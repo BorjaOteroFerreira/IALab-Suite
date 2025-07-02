@@ -27,7 +27,7 @@ class ImageGenerationTool(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="generate_image",
+            name="Generar Imagen",
             description="Genera imágenes basadas en prompts de texto usando IA",
             category=ToolCategory.IMAGE,
             requires_api_key=True,
@@ -36,7 +36,7 @@ class ImageGenerationTool(BaseTool):
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "generate_image"
+        return "Generar Imagen"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta generación de imagen"""

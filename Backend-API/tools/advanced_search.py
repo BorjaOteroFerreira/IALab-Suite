@@ -30,15 +30,15 @@ class AdvancedSearchTools(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="advanced_search",
-            description="Realiza búsquedas avanzadas OSINT con técnicas especializadas",
+            name="Busqueda Multiples Motores",
+            description="Realiza búsquedas avanzadas  con técnicas especializadas y varios motores de búsqueda",
             category=ToolCategory.SEARCH,
             requires_api_key=False
         )
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "advanced_search"
+        return "Busqueda Multiples Motores"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta búsqueda avanzada"""

@@ -17,7 +17,7 @@ class SearchTools(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="buscar_en_internet",
+            name="Buscar en Internet",
             description="Busca información en internet sobre un tema específico",
             category=ToolCategory.SEARCH,
             requires_api_key=True,
@@ -26,7 +26,7 @@ class SearchTools(BaseTool):
 
     @classmethod
     def get_tool_name(cls) -> str:
-        return "buscar_en_internet"
+        return "Buscar en Internet"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta búsqueda en internet"""

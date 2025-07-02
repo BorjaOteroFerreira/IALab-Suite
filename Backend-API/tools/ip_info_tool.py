@@ -6,7 +6,7 @@ class IpInfoTool(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="get_ip_info",
+            name="Ip Lookup",
             description="Obtiene información geográfica y detalles sobre una dirección IP",
             category=ToolCategory.UTILITY,
             requires_api_key=False
@@ -52,4 +52,4 @@ class IpInfoTool(BaseTool):
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "get_ip_info"
+        return "Ip Lookup"
