@@ -13,7 +13,10 @@ from app.api.chat_controller import chat_controller
 from app.api.model_controller import model_controller
 from app.api.assistant_controller import assistant_controller
 from app.api.static_controller import static_controller
+from app.api.tools_controller import tools_controller
 from app.services.assistant_service import assistant_service
+# Importar el proveedor de instancias socketio
+from app.utils import socket_instance
 
 def create_app(config_name=None):
     """Application factory pattern"""
@@ -58,6 +61,9 @@ def create_app(config_name=None):
         max_size=config.SOCKETIO_MAX_SIZE
     )
     
+    # Almacenar la instancia socketio en el proveedor global
+    socket_instance.set_socketio(socketio)
+    
     # Set SocketIO reference in assistant controller
     assistant_controller.set_socketio(socketio)
     
@@ -96,6 +102,12 @@ def _register_routes(app):
     # API routes - Assistant
     app.route('/user_input', methods=['POST'])(assistant_controller.handle_user_input)
     app.route('/stop_response', methods=['POST'])(assistant_controller.stop_response)
+    
+    # API routes - Tools
+    app.route('/api/tools/available', methods=['GET'])(tools_controller.get_available_tools)
+    app.route('/api/tools/selected', methods=['GET'])(tools_controller.get_selected_tools)
+    app.route('/api/tools/selected', methods=['POST'])(tools_controller.set_selected_tools)
+    app.route('/api/tools/refresh', methods=['POST'])(tools_controller.refresh_tools)
 
 
 def _register_socket_events(socketio):
@@ -116,11 +128,43 @@ def _register_socket_events(socketio):
     def handle_connect():
         """Handle client connection"""
         logger.info("Client connected to WebSocket")
+        # Enviar el registro de herramientas al cliente recién conectado
+        try:
+            # Almacenar o actualizar la referencia en el proveedor global (por si acaso)
+            socket_instance.set_socketio(socketio)
+            # Enviar registro de herramientas usando el objeto socketio
+            assistant_service.send_tools_registry_to_client(socketio)
+        except Exception as e:
+            logger.error(f"Error sending tools registry on connection: {e}")
+            try:
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+            except ImportError:
+                logger.error("No se pudo importar traceback para el registro de errores")
     
     @socketio.on('disconnect', namespace='/test')
     def handle_disconnect():
         """Handle client disconnection"""
         logger.info("Client disconnected from WebSocket")
+    
+    @socketio.on('request_tools_registry', namespace='/test')
+    def handle_request_tools_registry(data=None):
+        """Handle request for tools registry from client"""
+        try:
+            logger.info("Client requested tools registry")
+            # Asegurar que la referencia global esté actualizada
+            socket_instance.set_socketio(socketio)
+            # Enviar registro de herramientas al cliente actual
+            assistant_service.send_tools_registry_to_client(socketio)
+            return {'success': True, 'message': 'Tools registry sent'}
+        except Exception as e:
+            try:
+                import traceback
+                logger.error(f"Error sending tools registry on request: {e}")
+                logger.debug(f"Traceback: {traceback.format_exc()}")
+            except ImportError:
+                logger.error(f"Error sending tools registry on request: {e}")
+            return {'success': False, 'error': str(e)}
 
 def _register_hooks(app):
     """Register application hooks"""

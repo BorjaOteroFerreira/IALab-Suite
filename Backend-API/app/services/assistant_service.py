@@ -11,6 +11,8 @@ from app.core.socket_handler import SocketResponseHandler
 from app.models.data_models import ModelConfig, UserInput, ApiResponse
 from app.utils.logger import logger
 from app.config.settings import Config
+# Importar el proveedor de instancias socketio
+from app.utils import socket_instance
 
 class AssistantService:
     """Service layer for Assistant operations"""
@@ -24,6 +26,28 @@ class AssistantService:
         try:
             if not self._is_initialized:
                 self._assistant = Assistant()
+                
+                # Inicializar también el tools_manager
+                try:
+                    from app.core.tools_manager import tools_manager
+                    from tools.tool_registry import ToolRegistry
+                    from app.core.socket_handler import SocketResponseHandler
+                    
+                    # Asegurar que el registry esté inicializado
+                    tool_registry = ToolRegistry()
+                    tool_registry.discover_tools()
+                    
+                    # Inicializar el tools_manager con el registry
+                    tools_manager.initialize_registry(tool_registry)
+                    logger.info("🔧 Tools manager initialized with assistant service")
+                    
+                    # Importante: Guardar referencia al socket para poder enviar actualizaciones más adelante
+                    self._tools_registry = tool_registry
+                    self._tools_manager = tools_manager
+                    
+                except ImportError as e:
+                    logger.warning(f"Could not initialize tools manager: {e}")
+                
                 self._is_initialized = True
                 logger.info("🤖 Assistant service initialized")
             return True
@@ -196,6 +220,37 @@ class AssistantService:
                 message="Failed to stop response",
                 error=str(e)
             )
+    
+    def send_tools_registry_to_client(self, socketio_instance=None) -> None:
+        """Envía el registro de herramientas disponibles a un cliente recién conectado"""
+        try:
+            if hasattr(self, '_tools_manager') and self._tools_manager:
+                from app.api.tools_controller import make_json_serializable
+                
+                # Obtener el resumen de herramientas desde el tools_manager
+                tools_summary = self._tools_manager.get_tools_summary()
+                
+                # Convertir a formato serializable
+                serializable_summary = make_json_serializable(tools_summary)
+                
+                # Usar la instancia proporcionada o la global si no se proporciona
+                socketio = socketio_instance if socketio_instance else socket_instance.get_socketio()
+                
+                if socketio:
+                    # Emitir el registro de herramientas al cliente
+                    logger.info(f"🔧 Enviando registro de herramientas: {len(serializable_summary.get('available_tools', {}))} herramientas")
+                    socketio.emit('tools_registry', serializable_summary, namespace='/test')
+                    
+                    # También enviar las herramientas actualmente seleccionadas
+                    selected_tools = self._tools_manager.get_selected_tools()
+                    logger.info(f"🔧 Enviando herramientas seleccionadas: {len(selected_tools)} herramientas")
+                    socketio.emit('tools_selection_update', selected_tools, namespace='/test')
+                else:
+                    logger.warning("No se pudo enviar el registro de herramientas: instancia socketio no disponible")
+        except Exception as e:
+            logger.error(f"Error sending tools registry to client: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
 
 # Global assistant service instance
 assistant_service = AssistantService()

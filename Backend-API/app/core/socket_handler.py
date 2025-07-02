@@ -2,6 +2,10 @@
 @Author: Borja Otero Ferreira
 Socket Response Handler - Clase centralizada para el envío de respuestas al frontend
 """
+import traceback
+from app.utils.logger import logger
+# Importar el proveedor de instancias socketio
+from app.utils import socket_instance
 
 class SocketResponseHandler:
     """
@@ -206,3 +210,119 @@ class SocketResponseHandler:
         """
         # Usar el método más completo que ya existe
         SocketResponseHandler.emit_console_output(socket, message, role='info')
+
+    @staticmethod
+    def emit_tools_registry(socket, tools_data):
+        """
+        Emite la información del registry de herramientas al frontend
+        
+        Args:
+            socket: Instancia del socket para enviar la respuesta
+            tools_data (dict): Información de todas las herramientas disponibles
+        """
+        # Asegurarse de que los datos sean serializables
+        try:
+            from app.api.tools_controller import make_json_serializable
+            serializable_data = make_json_serializable(tools_data)
+            socket.emit('tools_registry', serializable_data, namespace='/test')
+        except Exception as e:
+            logger.error(f"Error al emitir registry de herramientas: {e}")
+            # Intentar enviar una versión simplificada si falla la serialización
+            try:
+                simplified_data = {
+                    'tools_enabled': tools_data.get('tools_enabled', False),
+                    'total_available': tools_data.get('total_available', 0),
+                    'total_selected': tools_data.get('total_selected', 0),
+                    'active_tools': list(tools_data.get('active_tools', [])),
+                    'available_tools': {}  # Versión vacía para evitar errores
+                }
+                socket.emit('tools_registry', simplified_data, namespace='/test')
+            except Exception as inner_e:
+                logger.error(f"Error al emitir versión simplificada: {inner_e}")
+    
+    @staticmethod
+    def emit_tools_selection_update(socket, selected_tools):
+        """
+        Emite una actualización de herramientas seleccionadas al frontend
+        
+        Args:
+            socket: Instancia del socket para enviar la respuesta (puede ser socketio completo o un namespace)
+            selected_tools (list): Lista de nombres de herramientas seleccionadas
+        """
+        try:
+            # Asegurar que los datos sean serializables
+            from app.api.tools_controller import make_json_serializable
+            serializable_data = make_json_serializable(selected_tools)
+            
+            # Detectar si es el objeto socketio completo o un namespace específico
+            if hasattr(socket, 'emit'):
+                # Es un objeto con método emit (puede ser socketio o namespace)
+                if 'namespace' in socket.emit.__code__.co_varnames:
+                    # Es socketio, necesita namespace
+                    socket.emit('tools_selection_update', serializable_data, namespace='/test')
+                else:
+                    # Es un namespace específico, no necesita namespace
+                    socket.emit('tools_selection_update', serializable_data)
+            else:
+                # Fallback, intentar usar la instancia global de socketio
+                logger.warning("Socket object doesn't have emit method, using fallback")
+                socketio = socket_instance.get_socketio()
+                if socketio:
+                    socketio.emit('tools_selection_update', serializable_data, namespace='/test')
+                else:
+                    logger.error("No hay instancia de socketio disponible para emisión fallback")
+                
+        except Exception as e:
+            logger.error(f"Error al emitir actualización de herramientas: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            # Intentar enviar una versión simplificada si falla
+            try:
+                if hasattr(socket, 'emit'):
+                    socket.emit('tools_selection_update', [], namespace='/test')
+            except Exception as inner_e:
+                logger.error(f"Error al emitir actualización simplificada: {inner_e}")
+
+    @staticmethod
+    def emit_tools_update(selected_tools=None, registry_data=None):
+        """
+        Método auxiliar para emitir actualizaciones de herramientas usando el proveedor global de socketio
+        
+        Args:
+            selected_tools (list, optional): Lista de herramientas seleccionadas
+            registry_data (dict, optional): Datos del registro de herramientas
+        
+        Returns:
+            bool: True si se emitió correctamente al menos una actualización
+        """
+        socketio = socket_instance.get_socketio()
+        if not socketio:
+            logger.warning("No se puede emitir actualizaciones de herramientas: socketio no disponible")
+            return False
+            
+        success = False
+        
+        # Emitir actualización de herramientas seleccionadas si se proporcionan
+        if selected_tools is not None:
+            try:
+                from app.api.tools_controller import make_json_serializable
+                serializable_data = make_json_serializable(selected_tools)
+                socketio.emit('tools_selection_update', serializable_data, namespace='/test')
+                logger.info(f"Emitida actualización de herramientas seleccionadas: {len(selected_tools)} herramientas")
+                success = True
+            except Exception as e:
+                logger.error(f"Error al emitir actualización de herramientas seleccionadas: {e}")
+                logger.debug(f"Traceback: {traceback.format_exc()}")
+        
+        # Emitir actualización del registro de herramientas si se proporcionan
+        if registry_data is not None:
+            try:
+                from app.api.tools_controller import make_json_serializable
+                serializable_data = make_json_serializable(registry_data)
+                socketio.emit('tools_registry', serializable_data, namespace='/test')
+                logger.info(f"Emitida actualización del registro de herramientas")
+                success = True
+            except Exception as e:
+                logger.error(f"Error al emitir actualización del registro de herramientas: {e}")
+                logger.debug(f"Traceback: {traceback.format_exc()}")
+                
+        return success

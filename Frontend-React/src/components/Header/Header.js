@@ -1,6 +1,8 @@
 import React from 'react';
 import './Header.css';
-import { Download, Folder, Settings, Plus, MessagesSquare, Wrench, Database } from 'lucide-react';
+import { Download, Folder, Settings, Plus, MessagesSquare, Database } from 'lucide-react';
+import ToolsSelector from '../ToolsSelector/ToolsSelector';
+import { useChatContext } from '../../hooks/useChatContext';
 
 function Header({ 
   tools, 
@@ -14,6 +16,8 @@ function Header({
   onClearChat,
   onOpenDownloader
 }) {
+  // Obtener el socket del contexto de chat
+  const { socket } = useChatContext();
   return (
     <header className="app-header">
       <div className="header-left">

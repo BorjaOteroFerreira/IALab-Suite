@@ -87,6 +87,14 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
     def set_tools(self, tools: bool):
         """Configurar el uso de herramientas (idéntico al legacy)"""
         self.tools = tools
+        
+        # Actualizar el tools_manager
+        try:
+            from app.core.tools_manager import tools_manager
+            tools_manager.set_tools_enabled(tools)
+        except ImportError:
+            pass
+            
         logger.info(f"🔧 Tools configured: {tools}")
         print(f"🔧 DEBUG: Tools set to {tools}")
 

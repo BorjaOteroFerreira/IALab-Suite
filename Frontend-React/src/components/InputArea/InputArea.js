@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import './InputArea.css';
-import { Square, Wrench, Database } from 'lucide-react';
+import { Square, Database } from 'lucide-react';
+import ToolsSelector from '../ToolsSelector/ToolsSelector';
+import { useChatContext } from '../../hooks/useChatContext';
 
 function InputArea({ 
   input, 
@@ -13,6 +15,9 @@ function InputArea({
   tools, rag, onToggleTools, onToggleRag 
 }) {
   const textareaRef = useRef(null);
+  
+  // Obtener el socket del contexto de chat
+  const { socket } = useChatContext();
 
   // Auto-resize del textarea
   const adjustTextareaHeight = () => {
@@ -56,14 +61,11 @@ function InputArea({
             </button>
           
           <div className="input-side-buttons">
-            <button
-              type="button"
-              onClick={() => onToggleTools(!tools)}
-              className={`input-icon-button${!!tools ? ' active' : ''}`}
-              title="Herramientas"
-            >
-              <Wrench size={23} />
-            </button>
+            <ToolsSelector 
+              tools={tools} 
+              onToggleTools={onToggleTools}
+              socket={socket}
+            />
            </div>
           <textarea
             ref={textareaRef}

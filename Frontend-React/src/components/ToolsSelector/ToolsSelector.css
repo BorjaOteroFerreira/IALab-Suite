@@ -1,0 +1,524 @@
+/* Tools Selector Component */
+.tools-selector {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Botón principal de herramientas */
+.tools-button {
+  position: relative;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.18s, text-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  /* Mismas propiedades que input-icon-button */
+  outline: none;
+}
+
+.tools-button:hover {
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+/* Mantener el color lila y los efectos cuando el botón activo tiene hover */
+.tools-button.active:hover {
+  color: #b983ff; /* mantener el lila neon */
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+}
+
+.tools-button.active {
+  color: #b983ff; /* lila neon - mismo color que input-icon-button.active */
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+  /* Mantener el estado activo sin transiciones que puedan causar reposicionamientos */
+  transition: none;
+}
+
+/* Indicador de carga en botón de herramientas */
+.tools-button.loading,
+.tools-button.initializing {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.tools-loading-indicator {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--accent-primary);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.tools-button.initializing .tools-loading-indicator {
+  border: 2px solid var(--warning-border);
+  border-top: 2px solid transparent;
+}
+
+/* Contador de herramientas */
+.tools-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--background);
+}
+
+.tools-button.active .tools-count {
+  background: white;
+  color: #b983ff; /* Usar el mismo color lila para consistencia */
+}
+
+/* Botón de configuración */
+.tools-config-button {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.4rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+.tools-config-button:hover {
+  background: var(--surface-hover);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+/* Overlay */
+.tools-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Popup de herramientas */
+.tools-popup {
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -60%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  width: min(90vw, 700px);
+  height: min(80vh, 600px);
+  max-width: 700px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  animation: toolsPopupShow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  /* Forzar posicionamiento respecto al viewport */
+  margin: 0 !important;
+  inset: auto !important;
+  /* Prevenir recolocaciones inesperadas */
+  will-change: transform, opacity;
+}
+
+@keyframes toolsPopupShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1);
+  }
+}
+
+/* Header del popup */
+.tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tools-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tools-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refresh-button, .close-button {
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.refresh-button:hover, .close-button:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Contenido del popup */
+.tools-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 1.5rem 1.5rem;
+  min-height: 0;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-primary) var(--surface-secondary);
+}
+
+/* Scrollbar personalizado para webkit */
+.tools-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tools-content::-webkit-scrollbar-track {
+  background: var(--surface-secondary);
+  border-radius: 4px;
+}
+
+.tools-content::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
+.tools-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary-hover);
+}
+
+/* Error */
+.tools-error {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-md);
+  color: var(--error-text);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Loading */
+.tools-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--surface-variant);
+  border-top: 3px solid var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* Resumen */
+.tools-summary {
+  background: var(--surface-secondary);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Lista de herramientas */
+.tools-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  align-items: start;
+}
+
+/* Categoría */
+.tools-category {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-secondary);
+  width: 100%;
+  height: fit-content;
+}
+
+.category-title {
+  background: var(--surface-variant);
+  padding: 0.75rem 1rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.category-tools {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Item de herramienta */
+.tool-item {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.tool-item:last-child {
+  margin-bottom: 0;
+}
+
+.tool-item.disabled {
+  opacity: 0.5;
+}
+
+.tool-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.tool-checkbox:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-light);
+}
+
+.tool-item.disabled .tool-checkbox {
+  cursor: not-allowed;
+}
+
+/* Checkbox personalizado */
+.tool-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-secondary);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tool-checkbox input[type="checkbox"]:checked + .checkmark {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+/* Información de la herramienta */
+.tool-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tool-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.tool-description {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.api-key-indicator, .unavailable-indicator {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.api-key-indicator {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.unavailable-indicator {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-border);
+}
+
+/* Estados de actualización de herramientas */
+.tool-updating {
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.tool-update-success {
+  animation: toolUpdateSuccess 0.8s ease;
+}
+
+.tool-update-error {
+  animation: toolUpdateError 0.8s ease;
+}
+
+@keyframes toolUpdateSuccess {
+  0%, 100% { background: transparent; }
+  50% { background: var(--success-bg); }
+}
+
+@keyframes toolUpdateError {
+  0%, 100% { background: transparent; }
+  50% { background: var(--error-bg); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .tools-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .tools-popup {
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -60%);
+    width: min(95vw, 500px);
+    height: min(85vh, 500px);
+    max-width: 500px;
+    max-height: 500px;
+  }
+  
+  .tools-list {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .tools-header {
+    padding: 1rem;
+  }
+  
+  .tools-content {
+    padding: 0.75rem 1rem 1rem;
+  }
+  
+  .tool-checkbox {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tools-popup {
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -60%);
+    width: min(98vw, 350px);
+    height: min(90vh, 450px);
+    max-width: 350px;
+    max-height: 450px;
+  }
+  
+  .tools-content {
+    padding: 0.5rem 0.75rem 0.75rem;
+  }
+  
+  .tools-header {
+    padding: 0.75rem;
+  }
+  
+  .tools-header h3 {
+    font-size: 1.1rem;
+  }
+}

@@ -69,6 +69,14 @@
   text-shadow: none;
 }
 
+/* Mantener el color lila y los efectos cuando el botón activo tiene hover */
+.input-icon-button.active:hover {
+  color: #b983ff; /* mantener el lila neon */
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+}
+
 .input-icon-button:focus {
   outline: none;
 }

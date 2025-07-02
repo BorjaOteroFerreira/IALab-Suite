@@ -211,6 +211,9 @@ const ConfigSidebar = ({ visible, onClose }) => {
     });
   }, [modelsList, allModelsList]);
 
+  // Obtener el modelo seleccionado
+  const selected = modelsWithInfo.find(m => m.path === modelConfig.modelPath) || {info:{}};
+
   return (
     <div className={`config-sidebar ${visible ? 'visible' : 'hidden'}`}>
       <div className="sidebar-header">
@@ -221,7 +224,6 @@ const ConfigSidebar = ({ visible, onClose }) => {
           </button>
         )}
       </div>
-      
       <form onSubmit={handleSubmit}>        <div className="form-group">
           <label htmlFor="modelPath" className="model-label">
             🤖 Modelo de IA:
@@ -245,15 +247,11 @@ const ConfigSidebar = ({ visible, onClose }) => {
                 </option>
               );
             })}</select>
-          
-          {/* Ocultar el select tradicional */}
           <style>{`
             .form-control.model-select {
               display: none !important;
             }
           `}</style>
-          
-          {/* Selector moderno de modelos */}
           <button
             type="button"
             className={`model-selector-trigger ${isModelSelectorOpen ? 'open' : ''}`}
@@ -262,18 +260,24 @@ const ConfigSidebar = ({ visible, onClose }) => {
           >            {modelConfig.modelPath ? (
               <div className="selected-model-display">
                 <span className="model-icon">{
-                  modelsWithInfo.find(m => m.path === modelConfig.modelPath)?.info.icon || '🤖'
+                  selected.info.icon || '🤖'
                 }</span>
                 <div className="model-details">
                   <span className="model-name">{
-                    modelsWithInfo.find(m => m.path === modelConfig.modelPath)?.displayName || formatModelName(modelConfig.modelPath)
+                    selected.displayName || formatModelName(modelConfig.modelPath)
                   }</span>
                   <div className="model-badges">
-                    {modelsWithInfo.find(m => m.path === modelConfig.modelPath)?.info.size && (
-                      <span className="model-size">{modelsWithInfo.find(m => m.path === modelConfig.modelPath).info.size}</span>
+                    {selected.info.size && (
+                      <span className="model-size">{selected.info.size}</span>
                     )}
-                    {modelsWithInfo.find(m => m.path === modelConfig.modelPath)?.info.quantization && (
-                      <span className="model-quantization">{modelsWithInfo.find(m => m.path === modelConfig.modelPath).info.quantization}</span>
+                    {selected.info.quantization && (
+                      <span className="model-quantization">{selected.info.quantization}</span>
+                    )}
+                    {selected.info.type && (
+                      <span className="model-meta-type">{selected.info.type}</span>
+                    )}
+                    {selected.info.hasVision && (
+                      <span className="model-meta-vision">visión</span>
                     )}
                   </div>
                 </div>
@@ -399,8 +403,11 @@ const ConfigSidebar = ({ visible, onClose }) => {
             type="submit" 
             className={`btn btn-primary ${isApplying ? 'loading' : ''}`}
             disabled={isApplying}
+   
           >
-            {isApplying ? 'Aplicando...' : 'Aplicar configuración'}
+            <span style={{opacity: isApplying ? 0 : 1}}>
+              {isApplying ? 'Aplicando...' : 'Aplicar configuración'}
+            </span>
           </button>
           <button 
             type="button" 

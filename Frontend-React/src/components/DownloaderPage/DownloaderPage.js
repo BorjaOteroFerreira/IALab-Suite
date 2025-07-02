@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 
 import './DownloaderPage.css';
-import './../ConfigSidebar/ConfigSidebar.css';
 
 const FunctionalLMStudioDownloader = ({ open, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -400,16 +400,21 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   flex-wrap: wrap;
 }
 
-/*  Botones con glassmorphism */
+/*  Botones con glassmorphism - versión mejorada */
 .btn {
+  --btn-height: 44px;
+  --btn-width: auto;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: var(--font-size-sm);
   font-weight: 600;
   border: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 44px;
+  transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: var(--btn-height);
+  height: var(--btn-height); /* Altura fija usando variable */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -418,6 +423,8 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   position: relative;
   overflow: hidden;
   letter-spacing: 0.02em;
+  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+  max-height: var(--btn-height); /* Evita que crezca */
 }
 
 .btn::before {
@@ -453,28 +460,39 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+  /* Eliminar transform para evitar cambios de tamaño */
 }
 
 .btn-secondary:hover {
   background: var(--surface-variant);
   border-color: var(--border-focus);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  /* Eliminar transform para evitar cambios de tamaño */
 }
 
 .btn:active {
-  transform: translateY(0);
+  /* No usar transform para evitar cambios de tamaño */
+  box-shadow: var(--shadow-sm);
 }
 
-.btn:disabled {
+.btn:disabled:not(.loading) {
+  cursor: not-allowed;
+  opacity: 0.6;
+  /* Mantener el mismo tamaño pero cambiar color */
+  box-shadow: var(--shadow-sm) !important;
+  transform: none !important;
+}
+
+/* Estilos específicos para cada tipo de botón deshabilitado */
+.btn-primary:disabled:not(.loading) {
+  background: var(--primary-dark);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-secondary:disabled:not(.loading) {
   background: var(--surface-variant);
   color: var(--text-secondary);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  opacity: 0.6;
 }
 
 .btn:focus-visible {
@@ -482,26 +500,57 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   outline-offset: 2px;
 }
 
-/* Cargar estado */
+/* Estado de carga - solución fixed */
 .btn.loading {
   position: relative;
-  color: transparent;
+  color: transparent !important;
   pointer-events: none;
+  transform: none !important; /* Forzar sin transformación */
+  opacity: 1;
+  box-shadow: inherit !important; /* Mantener la misma sombra */
+  /* Asegurar que las dimensiones sean exactamente iguales */
+  width: var(--btn-width, auto);
+  height: var(--btn-height, 44px) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+}
+
+/* Mantener los estilos específicos para cada tipo de botón exactamente iguales */
+.btn-primary.loading {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: none !important;
+}
+
+.btn-secondary.loading {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 .btn.loading::after {
   content: '';
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   top: 50%;
   left: 50%;
-  margin-left: -8px;
-  margin-top: -8px;
-  border: 2px solid transparent;
-  border-top-color: currentColor;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  z-index: 2; /* Asegurar que esté por encima de otros elementos */
+  box-sizing: border-box; /* Asegurar que el borde no afecte el tamaño */
+  pointer-events: none; /* No interferir con los eventos del botón */
+}
+
+.btn-primary.loading::after {
+  border-top-color: white;
+}
+
+.btn-secondary.loading::after {
+  border-top-color: var(--text-primary);
 }
 
 @keyframes spin {
@@ -606,7 +655,9 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   }
   
   .btn {
-    min-height: 48px;
+    --btn-height: 48px; /* Actualizar la variable CSS */
+    min-height: var(--btn-height);
+    height: var(--btn-height);
     flex: none;
   }
 }
@@ -636,9 +687,11 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   }
   
   .btn {
+    --btn-height: 52px; /* Actualizar la variable CSS para móviles */
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-base);
-    min-height: 52px;
+    min-height: var(--btn-height);
+    height: var(--btn-height);
   }
   
   .config-buttons {
@@ -745,6 +798,12 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   flex: 1;
 }
 
+/* Indicador de visión para el modelo seleccionado */
+.selected-model-display.has-vision .model-icon {
+  color: #b9b610;
+  text-shadow: 0 0 8px rgba(185, 182, 16, 0.3);
+}
+
 .model-icon {
   font-size: 1.2em;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
@@ -760,6 +819,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
+  flex-wrap: wrap; /* Para permitir que las etiquetas fluyan si hay muchas */
 }
 
 .model-name {
@@ -785,6 +845,18 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   border-radius: var(--radius-sm);
   font-weight: 600;
   border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Etiqueta de visión para el modelo seleccionado - usando el mismo estilo que model-meta-vision */
+.model-vision {
+  font-size: var(--font-size-xs);
+  color: #b9b610;
+  background: rgba(185, 182, 16, 0.2);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+  border: 1px solid rgba(185, 182, 16, 0.3);
 }
 
 /* Placeholder display */
@@ -972,6 +1044,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   border-radius: var(--radius-sm);
   font-weight: 600;
   text-transform: capitalize;
+  border: 1px solid rgba(185, 182, 16, 0.3);
 }
 
 /* Indicador seleccionado */

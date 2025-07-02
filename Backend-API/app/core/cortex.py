@@ -68,6 +68,13 @@ class Cortex:
         # Inicializar el registry de herramientas
         self._initialize_tools()
         
+        # Verificar si las herramientas están habilitadas globalmente
+        if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
+            logger.warning("🔧 Las herramientas están deshabilitadas globalmente. Cortex no ejecutará herramientas.")
+            print(f"{Fore.YELLOW}🔧 Las herramientas están deshabilitadas globalmente. Cortex no ejecutará herramientas.{Style.RESET_ALL}")
+            self.final_response = self._generate_normal_response(model)
+            return
+        
         # Patrones regex para detectar herramientas (idénticos al legacy)
         self.patrones_regex = [
             r'herramienta\s*\'([^\']+)\'.*consulta\s*\'([^\']+)\'',
@@ -130,24 +137,56 @@ class Cortex:
         """Inicializar el registry de herramientas"""
         try:
             from tools.tool_registry import ToolRegistry
-            self.tool_registry = ToolRegistry()
-            # Registrar automáticamente todas las herramientas disponibles
-            self.tool_registry.discover_tools()
+            from app.core.tools_manager import tools_manager
+            
+            # Primero verificar si ya tenemos un registro global disponible
+            if hasattr(tools_manager, '_registry') and tools_manager._registry:
+                logger.info("🔧 Using existing tool registry from ToolsManager")
+                self.tool_registry = tools_manager._registry
+            else:
+                # Si no hay registro global, crear uno nuevo
+                logger.info("🔧 Creating new ToolRegistry in Cortex")
+                self.tool_registry = ToolRegistry()
+                try:
+                    # Registrar automáticamente todas las herramientas disponibles
+                    # con manejo de errores para herramientas individuales
+                    self.tool_registry.discover_tools()
+                except Exception as e:
+                    logger.error(f"Error during tool discovery: {e}")
+                    import traceback
+                    logger.error(f"Traceback: {traceback.format_exc()}")
+                    # Continuamos incluso si fallan algunas herramientas
+                
+                # Inicializar el gestor de herramientas con el nuevo registry
+                tools_manager.initialize_registry(self.tool_registry)
+            
+            self.tools_manager = tools_manager
             
             # Obtener las herramientas disponibles del registry
-            self.tools = self._get_available_tools_dict()
+            try:
+                self.tools = self._get_available_tools_dict()
+                logger.info(f"🔧 Tools initialized: {len(self.tools)} tools available")
+            except Exception as e:
+                logger.error(f"Error getting available tools dictionary: {e}")
+                self.tools = {}
             
             # Importar solo cuando sea necesario para evitar dependencias circulares
             from app.core.socket_handler import SocketResponseHandler
             # Usar la clase directamente para métodos estáticos
             self.socket_handler = SocketResponseHandler
             
-            logger.info(f"🔧 Tools initialized: {len(self.tools)} tools available")
         except ImportError as e:
             logger.warning(f"Tool registry not available: {e}")
             self.tools = {}
             from app.core.socket_handler import SocketResponseHandler
             # Usar la clase directamente para métodos estáticos
+            self.socket_handler = SocketResponseHandler
+        except Exception as e:
+            logger.error(f"Unexpected error initializing tools: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            self.tools = {}
+            from app.core.socket_handler import SocketResponseHandler
             self.socket_handler = SocketResponseHandler
 
     def _enviar_a_consola(self, mensaje: str, rol: str):
@@ -161,12 +200,21 @@ class Cortex:
         try:
             logger.info("🧠 Determinando herramientas necesarias")
             
+            # Verificar si hay herramientas activas disponibles
+            active_tools = []
+            if hasattr(self, 'tools_manager'):
+                active_tools = self.tools_manager.get_active_tools()
+                
+            if not active_tools:
+                logger.warning("No hay herramientas activas disponibles para usar")
+                return "No hay herramientas activas disponibles"
+            
             # Crear prompt para determinar herramientas usando el registry
             base_instructions = """
 TU PRINCIPAL OBJETIVO ES DETERMINAR QUE HERRAMIENTA NECESITAS
 """
             
-            # Obtener las instrucciones dinámicas de herramientas
+            # Obtener las instrucciones dinámicas de herramientas SOLO para herramientas activas
             tool_instructions = self._get_tool_instructions()
             
             additional_instructions = """
@@ -176,6 +224,7 @@ supongamos que necesitas buscar el tiempo en internet , contestas:
 Asegurate de que utilizas la sintaxis correcta al colocar un corchete al inicio y otro al final.
 Puedes usar mas de una herramienta si lo necesitas.
 Debes contestar solo con las funciones que usarias sin texto antes ni despues
+IMPORTANTE: Sólo puedes usar las herramientas listadas arriba. No uses ninguna otra herramienta.
 SIEMPRE DEBES RESPONDER EN ESPAÑOL.
 """
             
@@ -229,6 +278,26 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             
             logger.info("🧠 Cortex processing started")
             
+            # Verificar si las herramientas están habilitadas globalmente
+            if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
+                logger.info("🔧 Las herramientas están deshabilitadas globalmente. Cortex generará respuesta sin herramientas.")
+                print(f"{Fore.YELLOW}🔧 Las herramientas están deshabilitadas globalmente. Cortex generará respuesta sin herramientas.{Style.RESET_ALL}")
+                self._enviar_a_consola("Las herramientas están deshabilitadas. Generando respuesta directa.", 'info')
+                
+                # Generar respuesta normal sin herramientas
+                self.final_response = self._generate_normal_response(model)
+                return
+            
+            # Verificar si hay herramientas seleccionadas
+            if hasattr(self, 'tools_manager') and not self.tools_manager.get_active_tools():
+                logger.info("🔧 No hay herramientas activas seleccionadas. Cortex generará respuesta sin herramientas.")
+                print(f"{Fore.YELLOW}🔧 No hay herramientas activas seleccionadas. Cortex generará respuesta sin herramientas.{Style.RESET_ALL}")
+                self._enviar_a_consola("No hay herramientas seleccionadas. Generando respuesta directa.", 'info')
+                
+                # Generar respuesta normal sin herramientas
+                self.final_response = self._generate_normal_response(model)
+                return
+            
             # Determinar herramientas necesarias
             herramientas_necesarias = self._determinar_herramientas_necesarias(model)
             self.output_console = f'💭 {herramientas_necesarias}'
@@ -248,6 +317,8 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             
         except Exception as e:
             logger.error(f"Error in Cortex processing: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             from app.core.socket_handler import SocketResponseHandler
             SocketResponseHandler.emit_error_response(socket, f"Error en Cortex: {str(e)}")
     
@@ -260,10 +331,25 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         logger.info('Iniciando proceso iterativo de detección y uso de herramientas')
         self._enviar_a_consola(self.output_console, 'pensamiento')
         
+        # Obtener solo herramientas ACTIVAS (habilitadas Y seleccionadas)
+        active_tools = []
+        if hasattr(self, 'tools_manager'):
+            active_tools = self.tools_manager.get_active_tools()
+            
+        # Si no hay herramientas activas, salir inmediatamente
+        if not active_tools:
+            mensaje = "No hay herramientas activas seleccionadas disponibles para usar."
+            print(f"{Fore.YELLOW}{mensaje}{Style.RESET_ALL}")
+            logger.warning(mensaje)
+            self._enviar_a_consola(mensaje, 'info')
+            # Generar respuesta final sin herramientas
+            return self._generate_normal_response(model)
+        
         herramientas_usadas = []
         resultados_herramientas = []
         iterations = 0
         current_response = response
+        herramientas_no_disponibles = False
         
         while iterations < self.max_iterations:
             # Verificar si se debe detener la respuesta
@@ -295,6 +381,11 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
                     print(f"{Fore.RED}🛑 Stop signal detected during tool execution{Style.RESET_ALL}")
                     logger.warning("🛑 Stop signal detected during tool execution")
                     return "🛑 Process stopped by user"
+                
+                # Verificar si la herramienta está disponible y seleccionada
+                herramienta_disponible = funcion_texto.lower().strip("'\" ") in [t.lower() for t in active_tools]
+                if not herramienta_disponible:
+                    herramientas_no_disponibles = True
                     
                 if (funcion_texto, query_texto) not in herramientas_usadas:  # Evitar repetir exactamente la misma consulta
                     resultado = self._ejecutar_herramienta_individual(funcion_texto, query_texto)
@@ -304,6 +395,26 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             # Consultar al modelo para decidir si necesita más herramientas
             if herramientas_usadas:
                 current_response = self._consultar_modelo_para_decision(model, resultados_herramientas)
+        
+        # Si se alcanzó el máximo de iteraciones, informar
+        if iterations >= self.max_iterations:
+            mensaje = f"Se alcanzó el máximo de iteraciones ({self.max_iterations}). Generando respuesta final."
+            print(f"{Fore.YELLOW}{mensaje}{Style.RESET_ALL}")
+            logger.warning(mensaje)
+            self._enviar_a_consola(mensaje, 'info')
+        
+        # Si se intentó usar herramientas no disponibles, añadir un mensaje final
+        if herramientas_no_disponibles:
+            mensaje = "Se intentó usar herramientas que no están seleccionadas o disponibles."
+            print(f"{Fore.YELLOW}{mensaje}{Style.RESET_ALL}")
+            logger.warning(mensaje)
+            self._enviar_a_consola(mensaje, 'info')
+            
+            # Añadir un mensaje explícito a los resultados
+            resultados_herramientas.append(
+                ("sistema", "aviso", 
+                 "Algunas herramientas solicitadas no están seleccionadas. Por favor, utiliza solo las herramientas disponibles.")
+            )
         
         # Generar respuesta final
         final_response = self.generar_respuesta_final(model, resultados_herramientas)
@@ -317,6 +428,13 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         logger.info("[*] Consultando al modelo para decisión de herramientas adicionales")
         self._enviar_a_consola("[*] Consultando al modelo para decisión de herramientas adicionales", 'info')
         
+        # Verificar si hay herramientas no disponibles en los resultados
+        hay_herramientas_no_disponibles = False
+        for _, _, resultado in resultados_herramientas:
+            if isinstance(resultado, str) and ('no está seleccionada' in resultado or 'no está disponible' in resultado):
+                hay_herramientas_no_disponibles = True
+                break
+                
         response_decision = ""
         for chunk in model.create_chat_completion(messages=prompt_decision, max_tokens=1024, stream=True):
             # Verificar si se debe detener
@@ -341,35 +459,61 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         # Copia del prompt original para no modificarlo
         decision_prompt = copy.deepcopy(self.original_prompt)
         
-        # Información sobre las herramientas disponibles usando el registry
-        herramientas_info = "Tienes disponibles las siguientes herramientas:\n"
-        for tool_name in self.tool_registry.list_tools():
-            tool_info = self.tool_registry.get_tool_info(tool_name)
-            if tool_info:
-                herramientas_info += f"- {tool_name}: {tool_info.get('description', 'Sin descripción')}\n"
+        # Obtener solo herramientas ACTIVAS (habilitadas Y seleccionadas)
+        active_tools = []
+        if hasattr(self, 'tools_manager'):
+            active_tools = self.tools_manager.get_active_tools()
+        
+        # Información sobre SOLO las herramientas actualmente disponibles y seleccionadas
+        herramientas_info = "Tienes disponibles ÚNICAMENTE las siguientes herramientas:\n"
+        if active_tools:
+            for tool_name in active_tools:
+                tool_info = self.tool_registry.get_tool_info(tool_name)
+                if tool_info:
+                    herramientas_info += f"- {tool_name}: {tool_info.get('description', 'Sin descripción')}\n"
+        else:
+            herramientas_info += "No hay herramientas seleccionadas disponibles.\n"
         
         # Información sobre los resultados de las herramientas ya utilizadas
         resultados_info = "He utilizado las siguientes herramientas con estos resultados:\n\n"
+        
+        # Verificar si hay herramientas no disponibles en los resultados
+        hay_herramientas_no_disponibles = False
         for funcion, query, resultado in resultados_herramientas:
             resultados_info += f"Herramienta: '{funcion}' con consulta: '{query}'\n"
             if resultado is not None:
                 resultado_str = str(resultado)
-                if len(resultado_str) > 500:
+                if 'no está seleccionada' in resultado_str or 'no está disponible' in resultado_str:
+                    hay_herramientas_no_disponibles = True
+                    resultados_info += f"Resultado: {resultado_str} (IMPORTANTE: Esta herramienta NO está disponible)\n\n"
+                elif len(resultado_str) > 500:
                     resultados_info += f"Resultado: {resultado_str[:500]}...\n\n"
                 else:
                     resultados_info += f"Resultado: {resultado_str}\n\n"
             else:
                 resultados_info += f"Resultado: Sin resultado (herramienta devolvió None)\n\n"
         
-        # Instrucción para el modelo
+        # Instrucción para el modelo, ajustada para enfatizar restricciones
         instruccion = (
             "Basándote en los resultados anteriores, determina si necesitas usar herramientas adicionales "
             "para investigar más información (como enlaces encontrados) o si ya tienes suficiente información "
-            "para responder al usuario. Si necesitas usar otra herramienta, indica cuál y con qué consulta, "
+            "para responder al usuario. "
+        )
+        
+        # Añadir aviso específico si se intentaron usar herramientas no disponibles
+        if hay_herramientas_no_disponibles:
+            instruccion += (
+                "IMPORTANTE: Algunas herramientas que intentaste usar NO están disponibles o seleccionadas. "
+                "SÓLO puedes usar las herramientas listadas al principio de este mensaje. "
+            )
+        
+        instruccion += (
+            "Si necesitas usar otra herramienta, indica cuál y con qué consulta, "
             "usando el formato [Funcion: 'nombre_funcion', query: 'consulta']. "
             "Si no necesitas más herramientas, responde con 'No necesito usar más herramientas' y proporciona "
-            "un resumen de la información que usarás para responder al usuario."
-            "si los resultados no muestran informacion relevante o no estan completos, puedes buscar mas informacion con dorks de google."
+            "un resumen de la información que usarás para responder al usuario. "
+            "Si los resultados no muestran información relevante, puedes intentar con otra herramienta disponible "
+            "o responder directamente con la información que tengas."
         )
         
         # Añadir un mensaje de asistente para mantener la alternancia de roles
@@ -417,6 +561,27 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
     def ejecutar_herramienta(self, nombre_herramienta: str, consulta: Any) -> str:
         """Ejecuta una herramienta usando el registry (igual que legacy)"""
         try:
+            # Verificar si las herramientas están habilitadas globalmente
+            if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
+                error_msg = f'Las herramientas están deshabilitadas globalmente'
+                print(f"{Fore.YELLOW}{error_msg}{Style.RESET_ALL}")
+                logger.warning(error_msg)
+                return error_msg
+                
+            # Verificar si la herramienta está activa (habilitada y seleccionada)
+            if hasattr(self, 'tools_manager') and not self.tools_manager.is_tool_active(nombre_herramienta):
+                # Comprobar si está en las herramientas seleccionadas
+                selected_tools = self.tools_manager.get_selected_tools()
+                if nombre_herramienta not in selected_tools:
+                    error_msg = f'La herramienta {nombre_herramienta} no está seleccionada por el usuario'
+                else:
+                    error_msg = f'La herramienta {nombre_herramienta} no está disponible actualmente'
+                
+                print(f"{Fore.YELLOW}{error_msg}{Style.RESET_ALL}")
+                logger.warning(error_msg)
+                self._enviar_a_consola(error_msg, 'info')
+                return error_msg
+                
             # Usar el registry para ejecutar la herramienta
             resultado_ejecucion = self.tool_registry.execute_tool(nombre_herramienta, consulta)
             
@@ -425,6 +590,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
                 error_msg = f'Error usando la herramienta {nombre_herramienta}: {resultado_ejecucion.error}'
                 print(f"{Fore.RED}{error_msg}{Style.RESET_ALL}")
                 logger.error(error_msg)
+                self._enviar_a_consola(error_msg, 'error')
                 return error_msg
             
             # Extraer los datos del resultado
@@ -444,6 +610,9 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             error_msg = f'Error usando la herramienta {nombre_herramienta}: {e}'
             print(f"{Fore.RED}{error_msg}{Style.RESET_ALL}")
             logger.error(error_msg)
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            self._enviar_a_consola(error_msg, 'error')
             return error_msg
 
     def generar_respuesta_final(self, model: Any, resultados_herramientas: List[tuple]) -> str:
@@ -559,21 +728,64 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
     def _get_available_tools_dict(self) -> Dict[str, Any]:
         """Obtiene un diccionario de herramientas disponibles desde el registry"""
         available_tools = {}
-        for tool_name in self.tool_registry.list_tools():
-            # Crear una función wrapper que use el registry para ejecutar la herramienta
-            def tool_wrapper(query, name=tool_name):
-                result = self.tool_registry.execute_tool(name, query)
-                return result.data if result.success else f"Error: {result.error}"
-            available_tools[tool_name] = tool_wrapper
-        return available_tools
+        
+        if not hasattr(self, 'tool_registry') or not self.tool_registry:
+            logger.warning("No hay registro de herramientas disponible")
+            return available_tools
+            
+        try:
+            tool_names = self.tool_registry.list_tools()
+            logger.info(f"Obteniendo diccionario de herramientas: {len(tool_names)} encontradas")
+            
+            for tool_name in tool_names:
+                try:
+                    # Crear una función wrapper que use el registry para ejecutar la herramienta
+                    def tool_wrapper(query, name=tool_name):
+                        try:
+                            result = self.tool_registry.execute_tool(name, query)
+                            return result.data if result.success else f"Error: {result.error}"
+                        except Exception as e:
+                            logger.error(f"Error ejecutando herramienta {name}: {e}")
+                            return f"Error al ejecutar {name}: {str(e)}"
+                    
+                    available_tools[tool_name] = tool_wrapper
+                except Exception as e:
+                    logger.error(f"Error al crear wrapper para herramienta {tool_name}: {e}")
+            
+            return available_tools
+        except Exception as e:
+            logger.error(f"Error al obtener lista de herramientas: {e}")
+            return available_tools
 
     def _get_tool_instructions(self) -> str:
         """Genera las instrucciones de herramientas disponibles para el modelo"""
-        instructions = "Funciones disponibles:\n"
-        for tool_name in self.tool_registry.list_tools():
-            tool_info = self.tool_registry.get_tool_info(tool_name)
-            if tool_info:
-                instructions += f"[Funcion: '{tool_name}' , query: '{tool_info.get('description', 'consulta')}']\n"
+        # Verificar si las herramientas están habilitadas globalmente
+        if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
+            return "No hay herramientas disponibles (las herramientas están deshabilitadas)."
+        
+        # Obtener solo herramientas que están ACTIVAS: habilitadas Y seleccionadas Y disponibles
+        active_tools = []
+        if hasattr(self, 'tools_manager'):
+            active_tools = self.tools_manager.get_active_tools()
+        
+        # Si no hay herramientas activas, informar claramente
+        if not active_tools:
+            return "No hay herramientas seleccionadas disponibles para usar."
+        
+        # Generar instrucciones SOLO para herramientas activas
+        instructions = "Funciones disponibles (SÓLO puedes usar estas herramientas):\n"
+        try:
+            for tool_name in active_tools:
+                # Solo incluir herramientas que están realmente seleccionadas
+                if tool_name in active_tools:
+                    tool_info = self.tool_registry.get_tool_info(tool_name)
+                    if tool_info:
+                        instructions += f"[Funcion: '{tool_name}' , query: '{tool_info.get('description', 'consulta')}']\n"
+            
+        except Exception as e:
+            logger.error(f"Error generando instrucciones de herramientas: {e}")
+            instructions += "Error obteniendo lista de herramientas.\n"
+        
         return instructions
 
     # Métodos de compatibilidad que ya no se usan pero mantengo para referencia
