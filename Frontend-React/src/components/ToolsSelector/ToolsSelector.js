@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter } from 'lucide-react';
+import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image, BarChart2, Key, Ban, AlertCircle } from 'lucide-react';
 import './ToolsSelector.css';
 
 const ToolsSelector = ({ tools, onToggleTools, socket }) => {
@@ -318,14 +318,14 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
 
   const getCategoryIcon = (category) => {
     const icons = {
-      search: '🔍',
-      media: '🎥',
-      finance: '💰',
-      image: '🖼️',
-      analysis: '📊',
-      utility: '🔧'
+      search: <Search size={16} className="category-icon" />, // Búsqueda
+      media: <Film size={16} className="category-icon" />, // Media
+      finance: <DollarSign size={16} className="category-icon" />, // Finanzas
+      image: <Image size={16} className="category-icon" />, // Imagen
+      analysis: <BarChart2 size={16} className="category-icon" />, // Análisis
+      utility: <Wrench size={16} className="category-icon" /> // Utilidad
     };
-    return icons[category] || '⚙️';
+    return icons[category] || <Settings size={16} className="category-icon" />;
   };
 
   const groupToolsByCategory = (tools) => {
@@ -376,7 +376,13 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
           <div className="tools-overlay" onClick={() => setIsOpen(false)} />
           <div className="tools-popup" ref={popupRef}>
             <div className="tools-header">
-              <h3>🔧 Herramientas Disponibles</h3>
+              <div className="tools-header-main">
+                <h3><Wrench size={18} style={{marginRight: 6}} /> Herramientas Disponibles</h3>
+                <div className="tools-header-subtitle">
+                  <List size={14} style={{marginRight: 4}} />
+                  <span>{selectedTools.length} de {availableTools.length} herramientas seleccionadas</span>
+                </div>
+              </div>
               <div className="tools-header-actions">
                 <button
                   onClick={handleRefreshTools}
@@ -398,11 +404,11 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
 
             {error && (
               <div className="tools-error">
-                ❌ {error}
+                <AlertCircle size={14} style={{marginRight: 4, color: '#e74c3c'}} /> {error}
               </div>
             )}
 
-            <div className="tools-content">
+            <div className="tools-content modern-scroll">
               {isLoading || isInitializing ? (
                 <div className="tools-loading">
                   <div className="loading-spinner" />
@@ -410,41 +416,37 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                 </div>
               ) : (
                 <>
-                  <div className="tools-summary">
-                    <span>{selectedTools.length} de {availableTools.length} herramientas seleccionadas</span>
-                  </div>
-
-                  <div className="tools-list">
+                  <div className="tools-list modern-list">
                     {Object.entries(groupToolsByCategory(availableTools)).map(([category, tools]) => (
-                      <div key={category} className="tools-category">
-                        <h4 className="category-title">
+                      <div key={category} className="tools-category modern-category">
+                        <h4 className="category-title modern-category-title">
                           {getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)}
                         </h4>
-                        <div className="category-tools">
+                        <div className="category-tools modern-category-tools">
                           {tools.map((tool) => (
                             <div
                               key={tool.name}
-                              className={`tool-item ${!tool.available ? 'disabled' : ''}`}
+                              className={`tool-item modern-tool-item ${!tool.available ? 'disabled' : ''}`}
                               data-tool={tool.name}
                             >
-                              <label className="tool-checkbox">
+                              <label className="tool-checkbox modern-tool-checkbox">
                                 <input
                                   type="checkbox"
                                   checked={selectedTools.includes(tool.name)}
                                   onChange={() => handleToolToggle(tool.name)}
                                   disabled={!tool.available}
                                 />
-                                <span className="checkmark">
+                                <span className="checkmark modern-checkmark">
                                   {selectedTools.includes(tool.name) && <Check size={12} />}
                                 </span>
-                                <div className="tool-info">
-                                  <span className="tool-name">{tool.name}</span>
-                                  <span className="tool-description">{tool.description}</span>
+                                <div className="tool-info modern-tool-info">
+                                  <span className="tool-name modern-tool-name">{tool.name}</span>
+                                  <span className="tool-description modern-tool-description">{tool.description}</span>
                                   {tool.requires_api_key && (
-                                    <span className="api-key-indicator">🔑 API Key</span>
+                                    <span className="api-key-indicator modern-api-key-indicator"><Key size={12} style={{marginRight: 2}} /> API Key</span>
                                   )}
                                   {!tool.available && (
-                                    <span className="unavailable-indicator">❌ No disponible</span>
+                                    <span className="unavailable-indicator modern-unavailable-indicator"><Ban size={12} style={{marginRight: 2}} /> No disponible</span>
                                   )}
                                 </div>
                               </label>

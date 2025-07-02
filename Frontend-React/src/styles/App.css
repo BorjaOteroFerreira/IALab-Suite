@@ -459,22 +459,6 @@
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
-.delete-chat-btn {
-  background: var(--error-bg);
-  border: none;
-  border-right: 2px solid var(--error-border); /* Separador visible */
-  color: var(--error-text);
-  padding: 1rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-  font-weight: 600;
-}
-
-.delete-chat-btn:hover {
-  background: var(--error-hover);
-}
 
 .chat-name-btn {
   flex: 1;

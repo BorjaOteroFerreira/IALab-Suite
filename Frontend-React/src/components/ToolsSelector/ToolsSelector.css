@@ -44,8 +44,6 @@
   background: transparent;
   box-shadow: none;
   text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
-  /* Mantener el estado activo sin transiciones que puedan causar reposicionamientos */
-  transition: none;
 }
 
 /* Indicador de carga en botón de herramientas */
@@ -175,63 +173,125 @@
   }
 }
 
-/* Header del popup */
+/* --- MODERNIZACIÓN DEL POPUP DE HERRAMIENTAS --- */
+.tools-popup.modern-popup, .tools-popup {
+  background: #181828; /* Fondo sólido dark */
+  /* Quitar glassmorphism */
+  /* backdrop-filter: blur(24px) saturate(1.2); */
+  border-radius: 22px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25), 0 1.5px 8px 0 #b983ff44;
+  border: 1.5px solid rgba(185, 131, 255, 0.18);
+  animation: modernPopupShow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modernPopupShow {
+  from { opacity: 0; transform: translate(-50%, -60%) scale(0.93); }
+  to { opacity: 1; transform: translate(-50%, -60%) scale(1); }
+}
+
+/* --- Ajustes para header moderno y subtítulo --- */
 .tools-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-light);
+  gap: 1.5rem;
 }
-
-.tools-header h3 {
+.tools-header-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+.tools-header-main h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
+  line-height: 1.2;
 }
-
+.tools-header-subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.98rem;
+  color: #b983ff;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  opacity: 0.95;
+}
 .tools-header-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-left: auto;
+}
+@media (max-width: 768px) {
+  .tools-header {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .tools-header-main h3 {
+    font-size: 1.1rem;
+  }
+  .tools-header-subtitle {
+    font-size: 0.92rem;
+  }
 }
 
-.refresh-button, .close-button {
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.5rem;
-  width: 32px;
-  height: 32px;
+/* --- Botones de cabecera redondos y modernos --- */
+.tools-header-actions button,
+.refresh-button,
+.close-button {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: rgba(185, 131, 255, 0.13);
+  border: 2px solid #b983ff33;
+  color: #b983ff;
+  box-shadow: 0 2px 8px 0 #b983ff22, 0 1.5px 8px 0 #fff1;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s, border 0.18s, transform 0.13s;
+  font-size: 1.1rem;
+  outline: none;
+  margin: 0;
+  padding: 0;
 }
-
-.refresh-button:hover, .close-button:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
+.tools-header-actions button:hover,
+.refresh-button:hover,
+.close-button:hover {
+  background: #b983ff;
+  color: #fff;
+  border: 2px solid #b983ff;
+  box-shadow: 0 0 0 3px #b983ff44;
+  transform: scale(1.08);
 }
-
-.refresh-button:disabled {
+.tools-header-actions button:active,
+.refresh-button:active,
+.close-button:active {
+  background: #a16ae8;
+  color: #fff;
+  border: 2px solid #a16ae8;
+  box-shadow: 0 0 0 2px #a16ae844;
+  transform: scale(0.97);
+}
+.tools-header-actions .refresh-button[disabled],
+.tools-header-actions .close-button[disabled],
+.refresh-button[disabled],
+.close-button[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
+  background: #b983ff22;
+  color: #b983ff99;
+  border: 2px solid #b983ff22;
+  box-shadow: none;
 }
 
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Contenido del popup */
 .tools-content {
   flex: 1;
   overflow-y: auto;
@@ -260,6 +320,23 @@
 
 .tools-content::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary-hover);
+}
+
+.tools-content.modern-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #b983ff #23233a;
+  background: transparent;
+}
+.tools-content.modern-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.tools-content.modern-scroll::-webkit-scrollbar-thumb {
+  background: #b983ffcc;
+  border-radius: 8px;
+}
+.tools-content.modern-scroll::-webkit-scrollbar-track {
+  background: #23233a;
+  border-radius: 8px;
 }
 
 /* Error */
@@ -304,13 +381,24 @@
   text-align: center;
 }
 
+.tools-summary.modern-summary {
+  background: rgba(185, 131, 255, 0.10);
+  color: #b983ff;
+  border: 1px solid #b983ff33;
+  box-shadow: 0 1px 4px 0 #b983ff11;
+}
+
 /* Lista de herramientas */
 .tools-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
   width: 100%;
-  align-items: start;
+  grid-auto-flow: dense;
+}
+
+.tools-list.modern-list {
+  gap: 2rem;
 }
 
 /* Categoría */
@@ -323,6 +411,13 @@
   height: fit-content;
 }
 
+.tools-category.modern-category {
+  background: rgba(185, 131, 255, 0.07);
+  border: 1.5px solid #b983ff22;
+  border-radius: 16px;
+  box-shadow: 0 1px 8px 0 #b983ff11;
+}
+
 .category-title {
   background: var(--surface-variant);
   padding: 0.75rem 1rem;
@@ -333,6 +428,12 @@
   border-bottom: 1px solid var(--border-light);
 }
 
+.category-title.modern-category-title {
+  background: rgba(185, 131, 255, 0.13);
+  color: #b983ff;
+  border-bottom: 1.5px solid #b983ff22;
+}
+
 .category-tools {
   padding: 0.75rem;
   display: flex;
@@ -340,10 +441,15 @@
   gap: 0.5rem;
 }
 
+.category-tools.modern-category-tools {
+  gap: 0.7rem;
+}
+
 /* Item de herramienta */
 .tool-item {
   margin-bottom: 0;
   width: 100%;
+  break-inside: avoid;
 }
 
 .tool-item:last-child {
@@ -352,6 +458,14 @@
 
 .tool-item.disabled {
   opacity: 0.5;
+}
+
+.tool-item.modern-tool-item {
+  transition: box-shadow 0.18s, background 0.18s;
+}
+.tool-item.modern-tool-item:not(.disabled):hover {
+  box-shadow: 0 0 0 2px #b983ff55;
+  background: #b983ff11;
 }
 
 .tool-checkbox {
@@ -365,9 +479,18 @@
   border: 1px solid transparent;
 }
 
+.tool-checkbox.modern-tool-checkbox {
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  transition: border 0.18s, background 0.18s;
+}
 .tool-checkbox:hover {
   background: var(--surface-hover);
   border-color: var(--border-light);
+}
+.tool-checkbox.modern-tool-checkbox:hover {
+  border: 1.5px solid #b983ff55;
+  background: #b983ff11;
 }
 
 .tool-item.disabled .tool-checkbox {
@@ -393,10 +516,22 @@
   margin-top: 2px;
 }
 
+.checkmark.modern-checkmark {
+  border-radius: 6px;
+  border: 2px solid #b983ff88;
+  background: #23233a;
+  transition: background 0.18s, border 0.18s;
+}
+
 .tool-checkbox input[type="checkbox"]:checked + .checkmark {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
   color: white;
+}
+.tool-checkbox input[type="checkbox"]:checked + .checkmark.modern-checkmark {
+  background: #b983ff;
+  border-color: #b983ff;
+  color: #fff;
 }
 
 /* Información de la herramienta */
@@ -407,16 +542,31 @@
   gap: 0.25rem;
 }
 
+.tool-info.modern-tool-info {
+  gap: 0.18rem;
+}
+
 .tool-name {
   font-weight: 600;
   color: var(--text-primary);
   font-size: 0.95rem;
 }
 
+.tool-name.modern-tool-name {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
 .tool-description {
   color: var(--text-secondary);
   font-size: 0.85rem;
   line-height: 1.4;
+}
+
+.tool-description.modern-tool-description {
+  color: #b983ff;
+  font-size: 0.92rem;
 }
 
 .api-key-indicator, .unavailable-indicator {
@@ -433,10 +583,22 @@
   border: 1px solid var(--warning-border);
 }
 
+.api-key-indicator.modern-api-key-indicator {
+  background: #fffbe6;
+  color: #b983ff;
+  border: 1px solid #b983ff88;
+}
+
 .unavailable-indicator {
   background: var(--error-bg);
   color: var(--error-text);
   border: 1px solid var(--error-border);
+}
+
+.unavailable-indicator.modern-unavailable-indicator {
+  background: #ffeaea;
+  color: #e74c3c;
+  border: 1px solid #e74c3c88;
 }
 
 /* Estados de actualización de herramientas */
