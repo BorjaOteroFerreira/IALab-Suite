@@ -150,7 +150,7 @@ export const ChatProvider = ({ children }) => {
 
     // Listener para respuesta detenida
     newSocket.on('response_stopped', (response) => {
-      console.log('🛑 Respuesta detenida por el usuario:', response);
+      console.log('Respuesta detenida por el usuario:', response);
       setCurrentResponse('');
       currentResponseRef.current = '';
       setIsLoading(false);

@@ -21,7 +21,7 @@ class Assistant:
     """
     
     def __init__(self):
-        # Estado del modelo (idéntico al legacy)
+        # Estado del modelo 
         self.model = None
         self.temperature = 0.3
         self.max_context_tokens = 8192
@@ -32,7 +32,7 @@ class Assistant:
         self.tools = False
         self.rag = False
         
-        # Sistema de mensaje por defecto (idéntico al legacy)
+        # Sistema de mensaje por defecto 
         self.default_system_message = '''
 Eres un asistente con una personalidad amable y honesta.
 Como programador experto y pentester,
@@ -40,7 +40,7 @@ debes examinar los detalles proporcionados para asegurarte de que sean utilizabl
 Si no sabes la respuesta a una pregunta, no compartas información falsa y no te desvíes de la pregunta.
 '''
         
-        # Configuración de dispositivo según el sistema operativo (idéntico al legacy)
+        # Configuración de dispositivo según el sistema operativo 
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             self.device_options = {"device": "cuda", "cuda_device_id": 0}
             self.use_nmap = True
@@ -54,7 +54,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
     
     def load_model(self, model_path: str, new_temperature: float, n_gpu_layer: int, 
                    new_system_message: str, context: int, max_response_tokens: int):
-        """Carga un modelo específico con configuración personalizada (idéntico al legacy)"""
+        """Carga un modelo específico con configuración personalizada"""
         # Validar y establecer parámetros
         self.model_path = model_path
         self.temperature = new_temperature if isinstance(new_temperature, float) else self.temperature
@@ -85,7 +85,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         gc.collect()
 
     def set_tools(self, tools: bool):
-        """Configurar el uso de herramientas (idéntico al legacy)"""
+        """Configurar el uso de herramientas """
         self.tools = tools
         
         # Actualizar el tools_manager
@@ -99,13 +99,13 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         print(f"🔧 DEBUG: Tools set to {tools}")
 
     def set_rag(self, rag: bool):
-        """Configurar el uso de RAG (idéntico al legacy)"""
+        """Configurar el uso de RAG """
         self.rag = rag
         logger.info(f"🔧 RAG configured: {rag}")
         print(f"🔧 DEBUG: RAG set to {rag}")
 
     def add_user_input(self, user_input, socket):
-        """Procesar entrada del usuario (idéntico al legacy) - acepta string o lista"""
+        """Procesar entrada del usuario - acepta string o lista"""
         if not self.is_processing:
             if self.model is None:
                 # Importar aquí para evitar dependencia circular
@@ -134,7 +134,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
       
     def emit_assistant_response_stream(self, user_input: List[Dict], socket):
         """
-        Obtiene la respuesta del asistente (flujo idéntico al legacy)
+        Obtiene la respuesta del asistente
 
         Parámetros:
         - user_input: Lista de mensajes del chat

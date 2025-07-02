@@ -518,14 +518,14 @@ class Retriever:
         del docs
 
     def get_page_content(self, file_name: str, page_num: int) -> str:
-        """Obtiene el contenido de una página específica de un documento (identical to legacy)."""
+        """Obtiene el contenido de una página específica de un documento """
         if file_name in self.doc_store.document_index:
             if page_num in self.doc_store.document_index[file_name]:
                 return self.doc_store.document_index[file_name][page_num]["content"]
         return "Página no encontrada"
 
     def search_in_page(self, file_name: str, page_num: int, query: str) -> str:
-        """Busca un término específico en una página particular (identical to legacy)."""
+        """Busca un término específico en una página particular """
         content = self.get_page_content(file_name, page_num)
         if content != "Página no encontrada":
             # Realizar búsqueda de similitud en el contenido de la página
@@ -533,7 +533,7 @@ class Retriever:
         return "Página no encontrada"
 
     def perform_similarity_search(self, content: str, query: str) -> str:
-        """Realiza una búsqueda de similitud en un contenido específico (identical to legacy)."""
+        """Realiza una búsqueda de similitud en un contenido específico"""
         # Crear un documento temporal para la búsqueda
         from langchain.docstore.document import Document
         temp_doc = Document(page_content=content)
@@ -558,7 +558,7 @@ class Retriever:
         return results[0].page_content if results else "No se encontraron resultados relevantes"
 
     def search_in_document(self, file_name: str, query: str) -> Dict[int, str]:
-        """Busca un término específico en todas las páginas de un documento (identical to legacy)."""
+        """Busca un término específico en todas las páginas de un documento """
         if file_name in self.doc_store.document_index:
             results = {}
             for page_num, page_data in self.doc_store.document_index[file_name].items():
@@ -569,12 +569,12 @@ class Retriever:
         return {"error": "Documento no encontrado"}
 
     def fits_in_context(self, docs: List[Document]) -> bool:
-        """Check if the documents fit into the context size (identical to legacy)."""
+        """Check if the documents fit into the context size"""
         total_tokens = sum(len(doc.page_content.split()) for doc in docs)
         return total_tokens <= self.max_tokens
 
     def truncate_docs(self, docs: List[Document], max_tokens: int) -> List[Document]:
-        """Truncate documents to fit in context (identical to legacy)."""
+        """Truncate documents to fit in context """
         truncated_docs = []
         total_tokens = 0
         for doc in docs:
@@ -596,14 +596,14 @@ class Retriever:
         return truncated_docs
 
     def format_docs(self, docs: List[Document]) -> str:
-        """Format documents for display (identical to legacy)."""
+        """Format documents for display """
         return "\n\n".join(
             f"{doc.metadata['file_name']} - página {doc.metadata.get('page_num', 'N/A')}\n{doc.page_content.lower()}" 
             for doc in docs
         )
 
     def emitir_respuesta(self):
-        """Generate and emit RAG response (EXACTO como legacy - socket directo)."""
+        """Generate and emit RAG response."""
         response_completa = ''
         total_tokens = 0
         
@@ -679,7 +679,7 @@ class Retriever:
             }, namespace='/test')
 
     def search_in_document(self, file_name: str, query: str) -> Dict[int, str]:
-        """Busca en todo un documento (identical to legacy)."""
+        """Busca en todo un documento """
         if file_name in self.doc_store.document_index:
             results = {}
             for page_num, page_data in self.doc_store.document_index[file_name].items():
@@ -690,7 +690,7 @@ class Retriever:
         return {}
 
     def fits_in_context(self, docs: List[Document]) -> bool:
-        """Check if documents fit in context (simplified version)."""
+        """Check if documents fit in context """
         total_length = sum(len(doc.page_content) for doc in docs)
         return total_length <= self.max_tokens * 4  # Rough estimate
 
@@ -709,7 +709,7 @@ class Retriever:
         return "\n\n".join(formatted_docs)
 
     def truncate_docs(self, docs: List[Document], max_tokens: int) -> List[Document]:
-        """Truncate documents to fit in context (identical to legacy)."""
+        """Truncate documents to fit in context"""
         truncated = []
         total_length = 0
         for doc in docs:

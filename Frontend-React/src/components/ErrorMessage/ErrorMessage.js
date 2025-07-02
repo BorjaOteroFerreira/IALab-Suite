@@ -35,7 +35,7 @@ const ErrorMessage = ({
   
   const errorType = getErrorType();
   
-  // Ocultar automáticamente después del tiempo especificado
+  // Ocultar automáticamente 
   useEffect(() => {
     let timer;
     if (timeout > 0) {

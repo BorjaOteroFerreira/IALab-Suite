@@ -1,4 +1,4 @@
-/* Chat Container - Diseño Moderno de Producción */
+/* Chat Container  */
 .chat-container {
   display: flex;
   flex-direction: column;
@@ -58,7 +58,7 @@
   contain: layout style;
 }
 
-/* Mensajes Modernos */
+/* Mensajes  */
 .message {
   display: flex;
   align-items: flex-start;
@@ -84,7 +84,7 @@
   opacity: 0.8;
 }
 
-/* Avatares Modernos */
+/* Avatares  */
 .avatar {
   width: 40px;
   height: 40px;
@@ -222,7 +222,7 @@
   opacity: 0.8;
 }
 
-/* Footer y Controles - Diseño Moderno */
+/* Footer y Controles  */
 .footer {
   background: var(--surface-bg);
   backdrop-filter: blur(20px);
@@ -254,7 +254,7 @@
   font-size: 14px;
 }
 
-/* Switch Moderno */
+/* Switch  */
 .ios8-switch {
   position: relative;
   width: 52px;
@@ -365,7 +365,7 @@ input[type="checkbox"] {
   }
 }
 
-/* Responsive mejorado */
+/* Responsive  */
 @media (max-width: 768px) {  .chat-container {
     height: calc(100dvh - 60px); /* Dynamic viewport height para Safari */
     /* Safari móvil específico */

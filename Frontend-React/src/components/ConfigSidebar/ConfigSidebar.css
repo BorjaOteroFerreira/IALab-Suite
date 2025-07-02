@@ -400,7 +400,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   flex-wrap: wrap;
 }
 
-/*  Botones con glassmorphism - versión mejorada */
+/*  Botones con glassmorphism */
 .btn {
   --btn-height: 44px;
   --btn-width: auto;
@@ -847,7 +847,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* Etiqueta de visión para el modelo seleccionado - usando el mismo estilo que model-meta-vision */
+/* Etiqueta de visión para el modelo seleccionado  */
 .model-vision {
   font-size: var(--font-size-xs);
   color: #b9b610;

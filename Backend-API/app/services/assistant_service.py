@@ -135,7 +135,7 @@ class AssistantService:
                     error="Assistant is not initialized"
                 )
             
-            # Set tools and RAG based on user input (always set, exactly like legacy)
+            # Set tools and RAG based on user input 
             # Asegurar que los valores sean siempre booleanos
             tools_value = bool(user_input.tools) if user_input.tools is not None else False
             rag_value = bool(user_input.rag) if user_input.rag is not None else False
@@ -148,7 +148,6 @@ class AssistantService:
             print(f"🔧 RAG configurado como: {rag_value}")
             
             # Process the input using the legacy assistant method
-            # El content ya debe ser el chat_history (lista de mensajes) como en legacy
             logger.info(f"Processing user input: {user_input.content}")
             self._assistant.add_user_input(user_input.content, socketio)
             
@@ -167,39 +166,7 @@ class AssistantService:
                 error=str(e)
             )
     
-    def process_ollama_request(self, content: Any, socketio) -> ApiResponse:
-        """Process Ollama-compatible request"""
-        try:
-            if not self.is_ready():
-                return ApiResponse(
-                    success=False,
-                    message="Assistant not ready",
-                    error="Assistant is not initialized"
-                )
-            
-            logger.info(f"Processing Ollama request with content: {content}")
-            
-            # Remove system message (first element) as in original code
-            if content and isinstance(content, list) and len(content) > 0:
-                content.pop(0)  # Elimina el mensaje del sistema
-            
-            # Use the legacy assistant method for Ollama compatibility
-            self._assistant.emit_ollama_response_stream(content, socketio)
-            
-            logger.info("Ollama request processed successfully")
-            
-            return ApiResponse(
-                success=True,
-                message="Ollama request processed successfully"
-            )
-            
-        except Exception as e:
-            logger.error(f"Error processing Ollama request: {e}")
-            return ApiResponse(
-                success=False,
-                message="Failed to process Ollama request",
-                error=str(e)
-            )
+
     
     def stop_response(self) -> ApiResponse:
         """Stop the current response generation"""

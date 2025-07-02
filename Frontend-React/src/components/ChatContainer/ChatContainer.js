@@ -98,7 +98,7 @@ const ChatContainer = ({ toggleChatSidebar, toggleConfigSidebar }) => {
   }, [messages, currentResponse]);
 
   useEffect(() => {
-    // Si se agregó un mensaje nuevo del asistente, forzar el foco con JS puro
+    // Si se agregó un mensaje nuevo del asistente, forzar el foco con JS
     if (
       messages.length > prevMessagesLength.current &&
       messages[messages.length - 1]?.role === 'assistant'

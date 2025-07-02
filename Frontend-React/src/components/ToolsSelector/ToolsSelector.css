@@ -172,7 +172,7 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-/* --- Ajustes para header moderno y subtítulo --- */
+/* --- Ajustes para header  --- */
 .tools-header {
   display: flex;
   align-items: flex-start;
@@ -224,7 +224,7 @@
   }
 }
 
-/* --- Botones de cabecera redondos y modernos --- */
+/* --- Botones de cabecera --- */
 .tools-header-actions button,
 .refresh-button,
 .close-button {

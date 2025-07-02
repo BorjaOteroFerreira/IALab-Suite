@@ -40,13 +40,12 @@ if ANTHROPIC_API_KEY:
 
 class Cortex:
     """
-    Sistema de procesamiento de herramientas integrado en la nueva arquitectura
-    Migración completa desde Cortex.py legacy manteniendo el flujo original
+    Sistema de procesamiento de herramientas integrado 
     """
     
     def __init__(self, prompt_o: Any, prompt: Any, response: str, model: Any, socket: Any, assistant: Any = None):
         """
-        Inicializar Cortex con los mismos parámetros que el legacy
+        Inicializar Cortex 
         
         Args:
             prompt_o: Prompt original
@@ -112,7 +111,7 @@ class Cortex:
         
         self.max_iterations = 3  # Límite de iteraciones para evitar bucles infinitos
         
-        # Ahora el flujo principal: determinar herramientas y procesarlas (igual que legacy)
+        # Ahora el flujo principal: determinar herramientas y procesarlas 
         print("🧠 Cortex iniciando determinación de herramientas...")
         logger.info("🧠 Cortex iniciando determinación de herramientas...")
         
@@ -236,7 +235,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             if prompt_herramientas and prompt_herramientas[0]['role'] == 'system':
                 prompt_herramientas[0]['content'] = instrucciones_herramientas
             
-            # Solicitar al modelo que determine las herramientas (streaming como legacy)
+            # Solicitar al modelo que determine las herramientas 
             response = ""
             for chunk in model.create_chat_completion(messages=prompt_herramientas, max_tokens=200, stream=True):
                 if 'content' in chunk['choices'][0]['delta']:
@@ -559,7 +558,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         return resultado_herramienta
     
     def ejecutar_herramienta(self, nombre_herramienta: str, consulta: Any) -> str:
-        """Ejecuta una herramienta usando el registry (igual que legacy)"""
+        """Ejecuta una herramienta usando el registry"""
         try:
             # Verificar si las herramientas están habilitadas globalmente
             if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
@@ -791,19 +790,19 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
 
     # Métodos de compatibilidad que ya no se usan pero mantengo para referencia
     def _extract_tools_from_text(self, text: str) -> List[tuple]:
-        """Extraer herramientas del texto usando patrones regex (método legacy simplificado)"""
+        """Extraer herramientas del texto usando patrones regex"""
         return self._extraer_coincidencias(text, self.patrones_regex)
 
     def _execute_tool(self, tool_name: str, query: str) -> str:
-        """Ejecutar una herramienta específica (método legacy simplificado)"""
+        """Ejecutar una herramienta específica """
         return self.ejecutar_herramienta(tool_name, query)
 
     def _generate_normal_response(self, model: Any) -> str:
-        """Generar respuesta normal sin herramientas (método legacy)"""
+        """Generar respuesta normal sin herramientas"""
         return self.generar_respuesta_final(model, [])
 
     def _generate_final_response(self, model: Any, tool_results: List[str]) -> str:
-        """Generar respuesta final con resultados de herramientas (método legacy)"""
+        """Generar respuesta final con resultados de herramientas """
         # Convertir tool_results a formato esperado
         formatted_results = [("tool", "query", result) for result in tool_results]
         return self.generar_respuesta_final(model, formatted_results)

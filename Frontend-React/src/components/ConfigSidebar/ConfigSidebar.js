@@ -44,7 +44,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
     };
     
     fetchData();
-  }, [fetchModelsAndFormats]);  // Función para formatear el nombre del modelo de forma más legible
+  }, [fetchModelsAndFormats]);  // Función para formatear el nombre del modelo 
   const formatModelName = (modelPath) => {
     if (!modelPath) return '';
     
@@ -105,7 +105,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
       });
     }
     
-    // Seleccionar icono basado en el tipo (NO cambiar por visión)
+    // Seleccionar icono basado en el tipo 
     let icon = '🤖';
     if (type) {
       const typeStr = type[0].toLowerCase();
@@ -138,7 +138,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isModelSelectorOpen]);
 
-  // Función para seleccionar un modelo
+  // seleccionar un modelo
   const handleModelSelect = (modelPath) => {
     setModelConfig({
       ...modelConfig,

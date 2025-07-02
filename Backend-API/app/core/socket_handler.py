@@ -208,7 +208,7 @@ class SocketResponseHandler:
             message (str): Mensaje a mostrar en la consola
             socket: Instancia del socket para enviar el mensaje
         """
-        # Usar el método más completo que ya existe
+       
         SocketResponseHandler.emit_console_output(socket, message, role='info')
 
     @staticmethod
