@@ -2,7 +2,7 @@ import json
 import os
 import requests
 from requests_html import HTMLSession
-from send_to_console import SendToConsole
+from app.core.socket_handler import SocketResponseHandler
 from langchain_community.document_loaders.chromium import AsyncChromiumLoader  
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter

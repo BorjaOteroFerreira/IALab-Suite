@@ -147,7 +147,8 @@ class SocketResponseHandler:
                 socket,
                 '',  # Sin contenido aún
                 user_tokens=user_tokens,
-                finished=False            )
+                finished=False
+            )
         
         try:
             for chunk in model.create_chat_completion(messages=messages, max_tokens=max_tokens, stream=True):
@@ -192,3 +193,16 @@ class SocketResponseHandler:
         except Exception as e:
             print(f"Error en stream_chat_completion: {e}")
             return response_completa, total_assistant_tokens
+    
+    @staticmethod
+    def send_to_console(message, socket):
+        """
+        Envía un mensaje a la consola del frontend (migrado desde send_to_console.py)
+        Compatible con el método legacy - usa emit_console_output internamente
+        
+        Args:
+            message (str): Mensaje a mostrar en la consola
+            socket: Instancia del socket para enviar el mensaje
+        """
+        # Usar el método más completo que ya existe
+        SocketResponseHandler.emit_console_output(socket, message, role='info')
