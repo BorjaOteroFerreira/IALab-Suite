@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { LinkRenderer } from '../YoutubeRender/YouTubeRenderer';
 import ImageRenderer from '../ImageRenderer/ImageRenderer';
+import GoogleMapsRenderer from '../GoogleMapsRenderer/GoogleMapsRenderer';
 import './MessageList.css';
 
 // Utilidades de detección de enlaces e imágenes
 const isYoutubeLink = href => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(href);
 const isImageLink = href => /\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(href);
+const isGoogleMapsLink = href => /https?:\/\/(www\.)?maps\.google\.com\/maps\?q=[^\s)]+/i.test(href);
 
 // Limpia enlaces markdown redundantes de YouTube
 const cleanYoutubeMarkdown = md => md.replace(
@@ -21,7 +23,8 @@ const splitMarkdownWithLinks = markdownInput => {
   const patterns = {
     // Solo mantenemos el patrón markdown estándar para imágenes
     standardImage: /!\[([^\]]*)\]\(([^)]+)\)/gi,
-    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi
+    youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi,
+    googlemaps: /(https?:\/\/(?:www\.)?maps\.google\.com\/maps\?q=[^\s)]+)/gi
   };
 
   const processTextWithYoutubeAndImages = (text, resultArray) => {
@@ -29,9 +32,11 @@ const splitMarkdownWithLinks = markdownInput => {
     
     const imageMatches = [...text.matchAll(patterns.standardImage)];
     const youtubeMatches = [...text.matchAll(patterns.youtube)];
+    const googleMapsMatches = [...text.matchAll(patterns.googlemaps)];
     
     const allMatches = [
       ...youtubeMatches.map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
+      ...googleMapsMatches.map(m => ({ ...m, type: 'googlemaps', url: m[1], fullMatch: m[0] })),
       ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] }))
     ].sort((a, b) => a.index - b.index);
 
@@ -83,6 +88,11 @@ const splitMarkdownWithLinks = markdownInput => {
           // Insertar un salto de línea virtual para evitar problemas de renderizado
           resultArray.push({ type: 'text', value: '\n\n' });
         }
+      } else if (match.type === 'googlemaps') {
+        // Agregar el enlace de Google Maps
+        const googleMapsUrl = match.url || match[0];
+        const googleMapsText = match.text || googleMapsUrl;
+        resultArray.push({ type: 'googlemaps', value: googleMapsUrl, text: googleMapsText });
       }
       
       lastIndex = match.index + match[0].length;
@@ -149,6 +159,9 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
                 <ImageRenderer src={part.value} alt={part.text} href={part.value}/>
               </div>
             );
+          }
+          if (part.type === 'googlemaps') {
+            return <GoogleMapsRenderer key={i} url={part.url} alt={part.text || 'Mapa de Google Maps'} />;
           }
           if (part.type === 'youtube') return <LinkRenderer key={i} href={part.value}>{part.text}</LinkRenderer>;
           if (part.type === 'link') return <a key={i} href={part.value} target="_blank" rel="noopener noreferrer">{part.text}</a>;

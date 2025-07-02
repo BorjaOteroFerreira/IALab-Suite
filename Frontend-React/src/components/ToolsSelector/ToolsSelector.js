@@ -417,44 +417,46 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
               ) : (
                 <>
                   <div className="tools-list modern-list">
-                    {Object.entries(groupToolsByCategory(availableTools)).map(([category, tools]) => (
-                      <div key={category} className="tools-category modern-category">
-                        <h4 className="category-title modern-category-title">
-                          {getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </h4>
-                        <div className="category-tools modern-category-tools">
-                          {tools.map((tool) => (
-                            <div
-                              key={tool.name}
-                              className={`tool-item modern-tool-item ${!tool.available ? 'disabled' : ''}`}
-                              data-tool={tool.name}
-                            >
-                              <label className="tool-checkbox modern-tool-checkbox">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedTools.includes(tool.name)}
-                                  onChange={() => handleToolToggle(tool.name)}
-                                  disabled={!tool.available}
-                                />
-                                <span className="checkmark modern-checkmark">
-                                  {selectedTools.includes(tool.name) && <Check size={12} />}
-                                </span>
-                                <div className="tool-info modern-tool-info">
-                                  <span className="tool-name modern-tool-name">{tool.name}</span>
-                                  <span className="tool-description modern-tool-description">{tool.description}</span>
-                                  {tool.requires_api_key && (
-                                    <span className="api-key-indicator modern-api-key-indicator"><Key size={12} style={{marginRight: 2}} /> API Key</span>
-                                  )}
-                                  {!tool.available && (
-                                    <span className="unavailable-indicator modern-unavailable-indicator"><Ban size={12} style={{marginRight: 2}} /> No disponible</span>
-                                  )}
-                                </div>
-                              </label>
-                            </div>
-                          ))}
+                    {Object.entries(groupToolsByCategory(availableTools))
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([category, tools]) => (
+                        <div key={category} className="tools-category modern-category">
+                          <h4 className="category-title modern-category-title">
+                            {getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)}
+                          </h4>
+                          <div className="category-tools modern-category-tools">
+                            {tools.map((tool) => (
+                              <div
+                                key={tool.name}
+                                className={`tool-item modern-tool-item ${!tool.available ? 'disabled' : ''}`}
+                                data-tool={tool.name}
+                              >
+                                <label className="tool-checkbox modern-tool-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedTools.includes(tool.name)}
+                                    onChange={() => handleToolToggle(tool.name)}
+                                    disabled={!tool.available}
+                                  />
+                                  <span className="checkmark modern-checkmark">
+                                    {selectedTools.includes(tool.name) && <Check size={12} />}
+                                  </span>
+                                  <div className="tool-info modern-tool-info">
+                                    <span className="tool-name modern-tool-name">{tool.name}</span>
+                                    <span className="tool-description modern-tool-description">{tool.description}</span>
+                                    {tool.requires_api_key && (
+                                      <span className="api-key-indicator modern-api-key-indicator"><Key size={12} style={{marginRight: 2}} /> API Key</span>
+                                    )}
+                                    {!tool.available && (
+                                      <span className="unavailable-indicator modern-unavailable-indicator"><Ban size={12} style={{marginRight: 2}} /> No disponible</span>
+                                    )}
+                                  </div>
+                                </label>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </>
               )}

@@ -628,9 +628,10 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         info_consolidada = """
         Responde en Markdown.
         Tus respuestas deben estar bien maquetadas, deben ser agradables a la vista y fáciles de leer.
-        Incrusta las imágenes con este formato ![dominio](url_imagen) siempre sin olvidar la exclamación al inicio.
-        No es obligatorio que todas las respuestas tengan imágenes, solo si tiene sentido usarlas en ese contexto, pero si las usas, asegurate de que acompañen al texto que las acompaña de forma coherente.
+        Incrusta las imágenes con este formato ![dominio](url_imagen) sin olvidar la exclamación al inicio.
+        No incluyas imagenes o mapas si no te las han facilitado las herramientas.
         IMPORTANTE: Los videos de youtube debes insertarlos sin formato markdown, solo el enlace aplanado.
+        
         Despues del caracter ':' debes añadir un salto de linea y un espacio antes de continuar con el texto  a no ser que sea el primer caracter de la línea, en ese caso elimina el caracter ':' y comienza directamente con el texto.
         Utiliza esta información proporcionada por las herramientas para responder al usuario\n\n"""
         

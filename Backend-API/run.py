@@ -20,7 +20,7 @@ def main():
     # Get host and port from environment or use defaults
     host = os.environ.get('HOST', '0.0.0.0')
     port = int(os.environ.get('PORT', 8081))
-    debug = os.environ.get('DEBUG', 'True').lower() == 'true'
+    debug = os.environ.get('DEBUG', 'False')
     
     print(f"🚀 Starting IALab Suite API on {host}:{port}")
     print(f"🔧 Environment: {config_name}")
