@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image, BarChart2, Key, Ban, AlertCircle } from 'lucide-react';
 import './ToolsSelector.css';
 
@@ -10,23 +11,6 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   const [error, setError] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const popupRef = useRef(null); // Referencia al popup
-
-  // Efecto para manejar la apertura del popup sin recolocación
-  useEffect(() => {
-    if (isOpen && popupRef.current) {
-      // Forzar reflow/repaint antes de que comience la animación
-      const popup = popupRef.current;
-      popup.style.opacity = '0';
-      popup.style.transform = 'translate(-50%, -60%) scale(0.95)';
-      
-      // Pequeño truco para forzar un recálculo inmediato antes de la animación
-      void popup.offsetWidth;
-      
-      // Restaurar estilos para permitir que la animación CSS se encargue
-      popup.style.opacity = '';
-      popup.style.transform = '';
-    }
-  }, [isOpen]);
 
   // Cargar herramientas disponibles al montar el componente
   useEffect(() => {
@@ -159,7 +143,6 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         const toolsData = result.data;
         if (!toolsData || !toolsData.available_tools) {
           console.warn('🔧 No se recibieron herramientas disponibles en la respuesta');
-          // En lugar de borrar herramientas, mantener las existentes si las hay
           if (availableTools.length === 0) {
             setAvailableTools([]);
           }
@@ -193,10 +176,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
       }
     } catch (error) {
       console.error('🔧 Error cargando herramientas:', error);
-      // Mostrar un error más descriptivo
       setError(`Error al cargar herramientas: ${error.message}`);
-      // No lanzamos el error, simplemente mostramos el mensaje y continuamos
-      // con las herramientas que pudimos cargar anteriormente
       return false;
     }
     return true;
@@ -235,10 +215,8 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
       : [...selectedTools, toolName];
 
     try {
-      // Actualización optimista de la UI
       setSelectedTools(newSelectedTools);
       
-      // Elemento visual para feedback temporal
       const toolElement = document.querySelector(`.tool-item[data-tool="${toolName}"]`);
       if (toolElement) {
         toolElement.classList.add('tool-updating');
@@ -264,7 +242,6 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         throw new Error(result.error || 'Error al actualizar herramientas');
       }
       
-      // Muestra un indicador visual de éxito
       if (toolElement) {
         toolElement.classList.add('tool-update-success');
         setTimeout(() => toolElement.classList.remove('tool-update-success'), 800);
@@ -275,7 +252,6 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
       setSelectedTools(selectedTools);
       setError(error.message);
       
-      // Muestra un indicador visual de error
       const toolElement = document.querySelector(`.tool-item[data-tool="${toolName}"]`);
       if (toolElement) {
         toolElement.classList.add('tool-update-error');
@@ -371,9 +347,8 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         </button>
       )}
 
-      {isOpen && (
-        <>
-          <div className="tools-overlay" onClick={() => setIsOpen(false)} />
+      {isOpen && ReactDOM.createPortal(
+        <div className="tools-overlay">
           <div className="tools-popup" ref={popupRef}>
             <div className="tools-header">
               <div className="tools-header-main">
@@ -462,7 +437,9 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
               )}
             </div>
           </div>
-        </>
+          <div className="tools-overlay-bg" onClick={() => setIsOpen(false)} />
+        </div>,
+        document.body
       )}
     </div>
   );

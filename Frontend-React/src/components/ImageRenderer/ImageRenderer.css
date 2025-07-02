@@ -46,3 +46,25 @@
   background: #222;
   display: block;
 }
+
+.image-renderer-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.image-container-row, .image-container-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Si hay dos .image-container seguidos, forzar flex-row */
+.image-container + .image-container {
+  display: inline-flex;
+  vertical-align: top;
+}

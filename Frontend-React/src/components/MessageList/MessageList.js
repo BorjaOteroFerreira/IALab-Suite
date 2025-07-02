@@ -150,10 +150,59 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
     const parts = splitMarkdownWithLinks(text || '');
     const blockRe = /<(h[1-6]|p|ul|ol|li|blockquote|table|pre|code)/i;
 
+    // Agrupar imágenes consecutivas ignorando saltos de línea y espacios
+    const grouped = [];
+    let imageBuffer = [];
+    let skipIndexes = new Set();
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      // Si es imagen, agregar al buffer
+      if (part.type === 'image') {
+        imageBuffer.push(part);
+        // Buscar imágenes siguientes separadas solo por saltos de línea o espacios
+        let j = i + 1;
+        while (j < parts.length && (
+          (parts[j].type === 'text' && (!parts[j].value.trim() || /^\s*\n+\s*$/.test(parts[j].value))) || parts[j].type === 'image')
+        ) {
+          if (parts[j].type === 'image') {
+            imageBuffer.push(parts[j]);
+            skipIndexes.add(j);
+          }
+          j++;
+        }
+        i = j - 1;
+        if (imageBuffer.length === 1) {
+          grouped.push(imageBuffer[0]);
+        } else if (imageBuffer.length > 1) {
+          grouped.push({ type: 'image-row', images: imageBuffer });
+        }
+        imageBuffer = [];
+      } else if (!skipIndexes.has(i)) {
+        grouped.push(part);
+      }
+    }
+    if (imageBuffer.length === 1) {
+      grouped.push(imageBuffer[0]);
+    } else if (imageBuffer.length > 1) {
+      grouped.push({ type: 'image-row', images: imageBuffer });
+    }
+
     return (
       <div className="assistant-message" ref={el => htmlRefs.current[idx] = el}>
-        {parts.map((part, i) => {
+        {grouped.map((part, i) => {
+          if (part.type === 'image-row') {
+            return (
+              <div key={i} className="image-container-row">
+                {part.images.map((img, j) => (
+                  <div key={j} className="image-container">
+                    <ImageRenderer src={img.value} alt={img.text} href={img.value}/>
+                  </div>
+                ))}
+              </div>
+            );
+          }
           if (part.type === 'image') {
+            // Esto solo ocurrirá si hay una imagen aislada
             return (
               <div key={i} className="image-container">
                 <ImageRenderer src={part.value} alt={part.text} href={part.value}/>

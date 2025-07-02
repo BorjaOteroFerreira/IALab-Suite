@@ -117,17 +117,49 @@
   transform: translateY(-1px);
 }
 
-/* Overlay */
+/* Fondo oscuro detrás del popup, clickeable para cerrar */
+.tools-overlay-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 20, 30, 0.75);
+  z-index: 2000;
+  animation: fadeIn 0.2s;
+}
+
 .tools-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Popup de herramientas */
+.tools-popup {
+  background: var(--surface-elevated, #23233a);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 48px 0 rgba(60,60,90,0.18), 0 2px 12px 0 rgba(99,102,241,0.12);
+  max-width: 700px;
+  width: 98vw;
+  max-height: 85vh;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  animation: modalPop 0.22s cubic-bezier(.4,1.6,.6,1);
+  margin: auto;
+  z-index: 2200;
+  pointer-events: auto;
 }
 
 @keyframes fadeIn {
@@ -135,57 +167,9 @@
   to { opacity: 1; }
 }
 
-/* Popup de herramientas */
-.tools-popup {
-  position: fixed;
-  top: 50vh;
-  left: 50vw;
-  transform: translate(-50%, -60%);
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  z-index: 1001;
-  width: min(90vw, 700px);
-  height: min(80vh, 600px);
-  max-width: 700px;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
-  animation: toolsPopupShow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-  /* Forzar posicionamiento respecto al viewport */
-  margin: 0 !important;
-  inset: auto !important;
-  /* Prevenir recolocaciones inesperadas */
-  will-change: transform, opacity;
-}
-
-@keyframes toolsPopupShow {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -60%) scale(1);
-  }
-}
-
-/* --- MODERNIZACIÓN DEL POPUP DE HERRAMIENTAS --- */
-.tools-popup.modern-popup, .tools-popup {
-  background: #181828; /* Fondo sólido dark */
-  /* Quitar glassmorphism */
-  /* backdrop-filter: blur(24px) saturate(1.2); */
-  border-radius: 22px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25), 0 1.5px 8px 0 #b983ff44;
-  border: 1.5px solid rgba(185, 131, 255, 0.18);
-  animation: modernPopupShow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes modernPopupShow {
-  from { opacity: 0; transform: translate(-50%, -60%) scale(0.93); }
-  to { opacity: 1; transform: translate(-50%, -60%) scale(1); }
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* --- Ajustes para header moderno y subtítulo --- */
@@ -634,13 +618,13 @@
 
 @media (max-width: 768px) {
   .tools-popup {
-    top: 50vh;
-    left: 50vw;
-    transform: translate(-50%, -60%);
-    width: min(95vw, 500px);
-    height: min(85vh, 500px);
-    max-width: 500px;
-    max-height: 500px;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(95vw, 500px) !important;
+    max-width: 500px !important;
+    height: auto !important;
+    max-height: 85vh !important;
   }
   
   .tools-list {
@@ -663,13 +647,13 @@
 
 @media (max-width: 480px) {
   .tools-popup {
-    top: 50vh;
-    left: 50vw;
-    transform: translate(-50%, -60%);
-    width: min(98vw, 350px);
-    height: min(90vh, 450px);
-    max-width: 350px;
-    max-height: 450px;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(98vw, 350px) !important;
+    max-width: 350px !important;
+    height: auto !important;
+    max-height: 90vh !important;
   }
   
   .tools-content {
