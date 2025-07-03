@@ -71,27 +71,33 @@
   border-top: 2px solid transparent;
 }
 
-/* Contador de herramientas */
+/* Contador de herramientas pequeño */
 .tools-count {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: var(--accent-primary);
-  color: white;
+  top: -6px;
+  right: -6px;
+  background: #b983ff;
+  color: #fff;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--background);
+  border: 2px solid #23233a;
+  padding: 0 5px;
+  box-sizing: border-box;
+  z-index: 2;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .tools-button.active .tools-count {
-  background: white;
-  color: #b983ff; /* Usar el mismo color lila para consistencia */
+  background: #fff;
+  color: #b983ff;
+  border: 2px solid #b983ff;
 }
 
 /* Botón de configuración */
@@ -460,12 +466,6 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
-}
-
-.tool-checkbox.modern-tool-checkbox {
-  border-radius: 10px;
-  border: 1.5px solid transparent;
-  transition: border 0.18s, background 0.18s;
 }
 .tool-checkbox:hover {
   background: var(--surface-hover);

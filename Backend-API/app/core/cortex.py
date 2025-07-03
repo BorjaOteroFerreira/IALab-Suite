@@ -26,16 +26,12 @@ load_dotenv()
 # Configurar API keys desde variables de entorno
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY', '')  # fallback por compatibilidad
 SERPER_API_KEY = os.getenv('SERPER_API_KEY', '')  # fallback por compatibilidad
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
+
 
 # Configurar variables de entorno para que las herramientas las puedan usar
 os.environ["YOUTUBE_API_KEY"] = YOUTUBE_API_KEY
 os.environ["SERPER_API_KEY"] = SERPER_API_KEY
-if OPENAI_API_KEY:
-    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-if ANTHROPIC_API_KEY:
-    os.environ["ANTHROPIC_API_KEY"] = ANTHROPIC_API_KEY
+
 
 
 class Cortex:
@@ -109,29 +105,14 @@ class Cortex:
             r"\[\s*Funcion:\s*'([^']+)',\s*query:\s*'([^']+)'\s*\]"
         ]
         
+
         self.max_iterations = 3  # Límite de iteraciones para evitar bucles infinitos
-        
-        # Ahora el flujo principal: determinar herramientas y procesarlas 
-        print("🧠 Cortex iniciando determinación de herramientas...")
-        logger.info("🧠 Cortex iniciando determinación de herramientas...")
-        
         herramientas_necesarias = self._determinar_herramientas_necesarias(model)
         self.output_console = f'💭 {herramientas_necesarias}'
-        
-        print(f"🧠 Herramientas determinadas: {herramientas_necesarias}")
-        logger.info(f"🧠 Herramientas determinadas: {herramientas_necesarias}")
-        
-        # Procesar las herramientas necesarias
-        print("🧠 Cortex iniciando procesamiento de herramientas...")
-        logger.info("🧠 Cortex iniciando procesamiento de herramientas...")
-        
         self.final_response = self.process_tool_needs(herramientas_necesarias, model)
         
-        print(f"🧠 Cortex completado. Respuesta final generada: {len(self.final_response) if self.final_response else 0} caracteres")
-        logger.info(f"🧠 Cortex completado. Respuesta final: {len(self.final_response) if self.final_response else 0} caracteres")
-        
-        logger.info("🧠 Cortex processing completed")
-    
+   
+   
     def _initialize_tools(self):
         """Inicializar el registry de herramientas"""
         try:
@@ -787,22 +768,3 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
             instructions += "Error obteniendo lista de herramientas.\n"
         
         return instructions
-
-    # Métodos de compatibilidad que ya no se usan pero mantengo para referencia
-    def _extract_tools_from_text(self, text: str) -> List[tuple]:
-        """Extraer herramientas del texto usando patrones regex"""
-        return self._extraer_coincidencias(text, self.patrones_regex)
-
-    def _execute_tool(self, tool_name: str, query: str) -> str:
-        """Ejecutar una herramienta específica """
-        return self.ejecutar_herramienta(tool_name, query)
-
-    def _generate_normal_response(self, model: Any) -> str:
-        """Generar respuesta normal sin herramientas"""
-        return self.generar_respuesta_final(model, [])
-
-    def _generate_final_response(self, model: Any, tool_results: List[str]) -> str:
-        """Generar respuesta final con resultados de herramientas """
-        # Convertir tool_results a formato esperado
-        formatted_results = [("tool", "query", result) for result in tool_results]
-        return self.generar_respuesta_final(model, formatted_results)
