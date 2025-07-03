@@ -143,6 +143,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         # Importar aquí para evitar dependencia circular
         from app.core.socket_handler import SocketResponseHandler
         from app.core.cortex import Cortex
+        from app.core.agent import Agent
         from app.core.rag import Retriever
         
         logger.info(f"🔥 DEBUG: emit_assistant_response_stream INICIADO (tools={self.tools}, rag={self.rag})")

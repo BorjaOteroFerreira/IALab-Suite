@@ -13,6 +13,7 @@ import Header from './components/Header/Header';
 import MessageList from './components/MessageList/MessageList';
 import InputArea from './components/InputArea/InputArea';
 import DownloaderPage from './components/DownloaderPage/DownloaderPage';
+import DevConsole from './components/DevConsole/DevConsole';
 import { Download, MessageCircle } from 'lucide-react';
 
 // Componente principal de Chat
@@ -134,6 +135,7 @@ function App() {
     <ChatProvider>
       <ChatComponent onOpenDownloader={() => setShowDownloader(true)} />
       <DownloaderPage open={showDownloader} onClose={() => setShowDownloader(false)} />
+      <DevConsole />
     </ChatProvider>
   );
 }

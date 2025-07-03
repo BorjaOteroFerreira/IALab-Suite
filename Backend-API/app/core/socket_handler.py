@@ -201,9 +201,7 @@ class SocketResponseHandler:
     @staticmethod
     def send_to_console(message, socket):
         """
-        Envía un mensaje a la consola del frontend (migrado desde send_to_console.py)
-        Compatible con el método legacy - usa emit_console_output internamente
-        
+        Envía un mensaje a la consola del frontend 
         Args:
             message (str): Mensaje a mostrar en la consola
             socket: Instancia del socket para enviar el mensaje
