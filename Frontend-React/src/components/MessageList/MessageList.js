@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LinkRenderer } from '../YoutubeRender/YouTubeRenderer';
+import { LinkRenderer as YouTubeLinkRenderer } from '../YoutubeRender/YouTubeRenderer';
+import { LinkRenderer as TikTokLinkRenderer, cleanTikTokMarkdown } from '../TikTokRender/TikTokRenderer';
 import ImageRenderer from '../ImageRenderer/ImageRenderer';
 import GoogleMapsRenderer from '../GoogleMapsRenderer/GoogleMapsRenderer';
 import './MessageList.css';
 
 // Utilidades de detección de enlaces e imágenes
 const isYoutubeLink = href => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(href);
+const isTikTokLink = href => /^(https?:\/\/)?(www\.)?tiktok\.com\//.test(href);
 const isImageLink = href => /\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(href);
 const isGoogleMapsLink = href => /https?:\/\/(www\.)?maps\.google\.com\/maps\?q=[^\s)]+/i.test(href);
 
@@ -17,13 +19,15 @@ const cleanYoutubeMarkdown = md => md.replace(
 
 // Procesa markdown con enlaces especiales
 const splitMarkdownWithLinks = markdownInput => {
-  // Aplicar limpieza a YouTube
+  // Aplicar limpieza a YouTube y TikTok
   let markdown = cleanYoutubeMarkdown(markdownInput || '');
+  markdown = cleanTikTokMarkdown(markdown);
 
   const patterns = {
     // Solo mantenemos el patrón markdown estándar para imágenes
     standardImage: /!\[([^\]]*)\]\(([^)]+)\)/gi,
     youtube: /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi,
+    tiktok: /(https?:\/\/(?:www\.)?tiktok\.com\/[\w\-?&=;%#@/.]+)(\s*\(\s*\))?/gi,
     googlemaps: /(https?:\/\/(?:www\.)?maps\.google\.com\/maps\?q=[^\s)]+)/gi
   };
 
@@ -32,10 +36,12 @@ const splitMarkdownWithLinks = markdownInput => {
     
     const imageMatches = [...text.matchAll(patterns.standardImage)];
     const youtubeMatches = [...text.matchAll(patterns.youtube)];
+    const tiktokMatches = [...text.matchAll(patterns.tiktok)];
     const googleMapsMatches = [...text.matchAll(patterns.googlemaps)];
     
     const allMatches = [
       ...youtubeMatches.map(m => ({ ...m, type: 'youtube', url: m[1], fullMatch: m[0] })),
+      ...tiktokMatches.map(m => ({ ...m, type: 'tiktok', url: m[1], fullMatch: m[0] })),
       ...googleMapsMatches.map(m => ({ ...m, type: 'googlemaps', url: m[1], fullMatch: m[0] })),
       ...imageMatches.map(m => ({ ...m, type: 'image', url: m[2], altText: m[1] }))
     ].sort((a, b) => a.index - b.index);
@@ -88,6 +94,11 @@ const splitMarkdownWithLinks = markdownInput => {
           // Insertar un salto de línea virtual para evitar problemas de renderizado
           resultArray.push({ type: 'text', value: '\n\n' });
         }
+      } else if (match.type === 'tiktok') {
+        // Agregar el enlace de TikTok
+        const tiktokUrl = match.url || match[0];
+        const tiktokText = match.text || tiktokUrl;
+        resultArray.push({ type: 'tiktok', value: tiktokUrl, text: tiktokText });
       } else if (match.type === 'googlemaps') {
         // Agregar el enlace de Google Maps
         const googleMapsUrl = match.url || match[0];
@@ -212,8 +223,13 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
           if (part.type === 'googlemaps') {
             return <GoogleMapsRenderer key={i} url={part.url} alt={part.text || 'Mapa de Google Maps'} />;
           }
-          if (part.type === 'youtube') return <LinkRenderer key={i} href={part.value}>{part.text}</LinkRenderer>;
-          if (part.type === 'link') return <a key={i} href={part.value} target="_blank" rel="noopener noreferrer">{part.text}</a>;
+          if (part.type === 'youtube') return <YouTubeLinkRenderer key={i} href={part.value}>{part.text}</YouTubeLinkRenderer>;
+          if (part.type === 'tiktok') return <TikTokLinkRenderer key={i} href={part.value}>{part.text}</TikTokLinkRenderer>;
+          if (part.type === 'link') {
+            if (isYoutubeLink(part.value)) return <YouTubeLinkRenderer key={i} href={part.value}>{part.text}</YouTubeLinkRenderer>;
+            if (isTikTokLink(part.value)) return <TikTokLinkRenderer key={i} href={part.value}>{part.text}</TikTokLinkRenderer>;
+            return <a key={i} href={part.value} target="_blank" rel="noopener noreferrer">{part.text}</a>;
+          }
           if (part.type === 'text') {
             const v = part.value;
             if (!v.trim() && v !== '\n') return null;

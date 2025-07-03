@@ -1,0 +1,41 @@
+.tiktok-embed-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: #000;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  overflow: hidden;
+  width: 100%;
+  max-width: 323px;
+  height: 739px;
+  aspect-ratio: 9/16;
+  margin: 10px auto 18px auto;
+  overflow-y: visible !important;
+  overflow-x: hidden;
+}
+
+.tiktok-embed-container iframe {
+  width: 100%;
+  aspect-ratio: 9/16;
+  height: 100%;
+  min-height: 650px;
+  border: none;
+  border-radius: 8px;
+  background: #000;
+  display: block;
+  overflow-y: visible !important;
+}
+
+@media (max-width: 400px) {
+  .tiktok-embed-container {
+    max-width: 100vw;
+    height: 90vw;
+    min-height: 400px;
+  }
+  .tiktok-embed-iframe {
+    min-height: 400px;
+  }
+}

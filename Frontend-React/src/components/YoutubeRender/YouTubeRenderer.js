@@ -5,7 +5,8 @@ import './YoutubeRender.css';
 const extractYouTubeVideoId = (url) => {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([^&\n?#]+)/,
-    /youtube\.com\/watch\?.*v=([^&\n?#]+)$/
+    /youtube\.com\/watch\?.*v=([^&\n?#]+)$/,
+    /youtube\.com\/shorts\/([\w-]+)/ // Soporte para shorts
   ];
   
   for (const pattern of patterns) {
