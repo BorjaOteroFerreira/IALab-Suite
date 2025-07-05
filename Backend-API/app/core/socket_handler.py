@@ -99,12 +99,29 @@ class SocketResponseHandler:
             message (str): Mensaje a mostrar en consola
             role (str): Tipo de mensaje ('info', 'pensamiento', 'tool', etc.)
         """
-        console_data = {
-            'content': message,
-            'role': role
-        }
-        
-        socket.emit('output_console', console_data, namespace='/test')
+        try:
+            # Asegurar que el message sea serializable en JSON
+            if not isinstance(message, (str, int, float, bool, type(None))):
+                message = str(message)
+            
+            console_data = {
+                'content': message,
+                'role': role
+            }
+            
+            socket.emit('output_console', console_data, namespace='/test')
+        except Exception as e:
+            logger.error(f"Error in emit_console_output: {e}")
+            logger.error(f"Message type: {type(message)}, Role: {role}")
+            # Intentar enviar un mensaje de error simple
+            try:
+                error_data = {
+                    'content': f"Error mostrando mensaje de tipo {type(message).__name__}",
+                    'role': 'error'
+                }
+                socket.emit('output_console', error_data, namespace='/test')
+            except:
+                pass
     
     @staticmethod
     def emit_utilities_data(socket, data):

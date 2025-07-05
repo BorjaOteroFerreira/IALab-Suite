@@ -338,6 +338,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   return (
     <div className="tools-selector">
       <button
+        type="button"
         onClick={() => onToggleTools(!tools)}
         className={`tools-button ${tools ? 'active' : ''} ${isLoading ? 'loading' : ''} ${isInitializing ? 'initializing' : ''}`}
         title={`Herramientas ${isLoading ? '(Cargando...)' : isInitializing ? '(Inicializando...)' : tools ? '(Activadas)' : '(Desactivadas)'}`}
@@ -351,6 +352,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
 
       {tools && (
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="tools-config-button"
           title="Seleccionar herramientas"

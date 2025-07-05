@@ -122,6 +122,7 @@ class AdvancedSearchTools(BaseTool):
             return " ".join(str(sentence) for sentence in summary)
         except Exception as e:
             return f"No se pudo resumir el contenido: {str(e)}"   
+        
     @staticmethod
     def search_duckduckgo(query):
         """Realiza una búsqueda en DuckDuckGo y devuelve los resultados más relevantes."""
@@ -388,7 +389,7 @@ class AdvancedSearchTools(BaseTool):
         if containers:
             return containers
         
-        # Último recurso: buscar estructuras que parecen resultados
+        # buscar estructuras que parecen resultados
         divs = soup.find_all('div')
         return [div for div in divs if div.find('a') and (div.find('h2') or div.find('h3') or div.find('p'))]
     

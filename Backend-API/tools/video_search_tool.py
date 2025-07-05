@@ -103,7 +103,7 @@ class YoutubeVideoSearchTool(BaseTool):
         results_str = '\n'.join(str(result) for result in reversed(results))
         if results_str != '':
             print(ids)
-            return f'{results_str}', ids  # Devolver resultado y IDs
+            return f'{results_str}', ids  # Devolver resultado e IDs
         else: 
             return f'', []  # Devolver cadena vacía y lista vacía de IDs
 

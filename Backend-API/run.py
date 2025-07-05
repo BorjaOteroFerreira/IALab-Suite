@@ -20,11 +20,13 @@ def main():
     # Get host and port from environment or use defaults
     host = os.environ.get('HOST', '0.0.0.0')
     port = int(os.environ.get('PORT', 8081))
-    debug = os.environ.get('DEBUG', 'False')
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    use_reloader = os.environ.get('USE_RELOADER', 'False').lower() == 'true'
     
     print(f"🚀 Starting IALab Suite API on {host}:{port}")
     print(f"🔧 Environment: {config_name}")
     print(f"🐛 Debug mode: {debug}")
+    print(f"🔄 Auto-reload: {use_reloader}")
     
     # Run the application
     socketio.run(
@@ -32,6 +34,7 @@ def main():
         host=host,
         port=port,
         debug=debug,
+        use_reloader=use_reloader,
         allow_unsafe_werkzeug=True
     )
 

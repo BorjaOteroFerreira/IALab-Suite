@@ -8,7 +8,6 @@ import platform
 import time
 import gc
 from typing import Optional, Any, List, Dict
-
 from colorama import Fore, Style
 from llama_cpp import Llama as Model
 from app.utils.logger import logger
@@ -142,8 +141,9 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         """
         # Importar aquí para evitar dependencia circular
         from app.core.socket_handler import SocketResponseHandler
-        from app.core.cortex import Cortex
-        from app.core.agent import Agent
+        from app.core.agents.default_agent.default_agent import DefaultAgent
+        from app.core.agents.adaptive_agent.adaptive_agent import AdaptiveAgent
+        from app.core.agents.lineal_agent.lineal_agent import  LinealAgent
         from app.core.rag import Retriever
         
         logger.info(f"🔥 DEBUG: emit_assistant_response_stream INICIADO (tools={self.tools}, rag={self.rag})")
@@ -173,7 +173,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 # Si hay herramientas, ir directamente a Cortex sin procesar aquí
                 if self.tools:
                     logger.info("Using tools with Cortex")
-                    Cortex(user_input_o, prompt=user_input, response="", model=self.model, socket=socket, assistant=self)
+                    DefaultAgent(user_input_o, prompt=user_input, response="", model=self.model, socket=socket, assistant=self)
                     return  # Salir temprano, Cortex se encarga de todo
                 
                 # Si RAG está habilitado, ir directamente al retriever sin respuesta normal
