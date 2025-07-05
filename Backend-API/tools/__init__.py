@@ -13,7 +13,7 @@ from .video_search_tool import YoutubeVideoSearchTool
 from .ip_info_tool import IpInfoTool
 from .cripto_price import CriptoPrice
 from .generate_image import ImageGenerationTool
-from .buscar_internet import BuscarInternet
+from .buscar_internet import GoogleSearchTool, buscar_internet
 
 __all__ = [
     'BaseTool',
@@ -27,5 +27,6 @@ __all__ = [
     'IpInfoTool',
     'CriptoPrice',
     'ImageGenerationTool',
-    'BuscarInternet'
+    'GoogleSearchTool',
+    'buscar_internet'
 ]
