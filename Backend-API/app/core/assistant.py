@@ -224,7 +224,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 gc.collect()
     
     def stop_response(self):
-        """Detener la respuesta actual (idéntico al legacy)"""
+        """Detener la respuesta actual """
         self.stop_emit = True
         logger.info("Stop signal activada")
         # Emitir señal de finalización inmediata

@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 from .config import DefaultAgentConfig
 from .default_need_analyzer import DefaultNeedAnalyzer
 from .default_tool_executor import DefaultToolExecutor
-from ..response_generator import ResponseGenerator  # Usar el ResponseGenerator estándar
+from .default_response_generator import DefaultResponseGenerator  # Usar el ResponseGenerator estándar
 from ..utils import get_available_tools_dict, safe_emit_status
 
 load_dotenv()
@@ -74,8 +74,8 @@ class DefaultAgent:
         self.tool_executor = DefaultToolExecutor(
             self.tools_manager, self.tool_registry, self.socket, self.assistant, self.config
         )
-        self.response_generator = ResponseGenerator(
-            self.model, self.socket, self.response_queue, self.original_prompt, self.assistant
+        self.response_generator = DefaultResponseGenerator(
+            self.model, self.socket, self.response_queue, self.original_prompt, self.assistant, self.config
         )
         
         # Iniciar el procesamiento del agente default
@@ -135,7 +135,7 @@ class DefaultAgent:
             # Paso 1: Determinar herramientas necesarias
             safe_emit_status(self.socket, "🧠 Analizando necesidades de herramientas...")
             herramientas_necesarias = self.need_analyzer.determinar_herramientas_necesarias(self.original_prompt)
-            self.output_console = f'💭 {herramientas_necesarias}'
+            self.output_console = f' {herramientas_necesarias}'
             
             # Enviar pensamiento al frontend
             safe_emit_status(self.socket, self.output_console, 'pensamiento')
@@ -153,7 +153,7 @@ class DefaultAgent:
             execution_results = self._convert_results_to_execution_format(resultados_herramientas)
             
             # Generar respuesta final usando el ResponseGenerator estándar
-            final_response = self.response_generator.generate_final_response(execution_results, self._safe_emit_status)
+            final_response = self.response_generator.generar_respuesta_final(resultados_herramientas, self._safe_emit_status)
             
             # Paso 4: Mostrar estadísticas del proceso
             self._display_processing_stats(resultados_herramientas)
@@ -169,6 +169,20 @@ class DefaultAgent:
             return self._generate_normal_response()
 
     def _convert_results_to_execution_format(self, resultados_herramientas: List[Tuple[str, str, str]]) -> Dict[str, Any]:
+        """
+        The function `_convert_results_to_execution_format` converts results from a default agent into a
+        format expected by `ResponseGenerator`, including representing execution steps and calculating
+        success rate.
+        
+        :param resultados_herramientas: The `resultados_herramientas` parameter is expected to be a list of
+        tuples, where each tuple contains three elements:
+        :type resultados_herramientas: List[Tuple[str, str, str]]
+        :return: The function `_convert_results_to_execution_format` returns a dictionary containing
+        information about the execution results of a set of tools. The dictionary includes keys such as
+        'completed_steps', 'failed_steps', 'total_steps', 'execution_time', and 'success_rate'. The
+        'completed_steps' and 'failed_steps' keys contain lists of `ExecutionStep` objects representing the
+        steps that were successfully completed and the steps
+        """
         """Convierte los resultados del default_agent al formato esperado por ResponseGenerator"""
         from dataclasses import dataclass
         from typing import Optional
@@ -217,7 +231,7 @@ class DefaultAgent:
 
     def _generate_normal_response(self) -> str:
         """Generar respuesta normal sin herramientas"""
-        return self.response_generator.generate_normal_response()
+        return self.response_generator._generate_normal_response(self.model)
     
     def _display_processing_stats(self, resultados_herramientas: List[Tuple[str, str, str]]):
         """Mostrar estadísticas del procesamiento"""

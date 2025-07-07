@@ -139,7 +139,7 @@ Utiliza toda la información obtenida para proporcionar una respuesta completa y
 
 IMPORTANTE - Reglas de formato:
 - Evita saltos de línea excesivos - máximo 1 línea en blanco entre secciones
-- Usa formato compacto y profesional
+- Usa formato profesional
 - Incrusta imágenes con ![descripción](url) 
 - Enlaces de YouTube sin formato markdown, solo el URL
 - Organiza la información de manera clara y estructurada sin espaciado excesivo

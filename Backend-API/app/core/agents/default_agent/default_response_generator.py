@@ -40,28 +40,42 @@ class DefaultResponseGenerator:
             emit_status_callback(salida)
         else:
             self._enviar_a_consola(salida, 'info')
-        
+
         try:
             # Crear el prompt para generar la respuesta final
             final_prompt = self._crear_prompt_respuesta_final(resultados_herramientas)
-            
-            # Generar la respuesta final usando create_chat_completion como en Cortex
-            response_content = ""
-            for chunk in self.model.create_chat_completion(messages=final_prompt, max_tokens=1024, stream=True):
-                if 'choices' in chunk and len(chunk['choices']) > 0:
-                    delta = chunk['choices'][0].get('delta', {})
-                    if 'content' in delta:
-                        response_content += delta['content']
-            
-            final_response = response_content.strip()
-            
-            # Verificar que la respuesta no esté vacía
+
+            # Emitir la respuesta final al frontend usando el socket (stream)
+            from app.core.socket_handler import SocketResponseHandler
+            user_question = ""
+            for message in reversed(self.original_prompt):
+                if message['role'] == 'user':
+                    user_question = message['content']
+                    break
+            tokensInput = user_question.encode()
+            tokens = self.model.tokenize(tokensInput)
+            total_user_tokens = len(tokens)
+            def safe_stop_condition():
+                try:
+                    return self.assistant and getattr(self.assistant, 'stop_emit', False)
+                except Exception:
+                    return False
+            response_completa, total_assistant_tokens = SocketResponseHandler.stream_chat_completion(
+                model=self.model,
+                messages=final_prompt,
+                socket=self.socket,
+                max_tokens=8192,
+                user_tokens=total_user_tokens,
+                process_line_breaks=True,
+                response_queue=self.response_queue,
+                stop_condition=safe_stop_condition
+            )
+            SocketResponseHandler.emit_finalization_signal(self.socket, total_user_tokens, total_assistant_tokens)
+            final_response = response_completa.strip()
             if not final_response or final_response.strip() == "":
                 final_response = self._generar_respuesta_fallback(resultados_herramientas)
-            
             logger.info("Respuesta final generada exitosamente")
             return final_response
-            
         except Exception as e:
             logger.error(f"Error generando respuesta final: {e}")
             import traceback
@@ -70,39 +84,31 @@ class DefaultResponseGenerator:
     
     def _crear_prompt_respuesta_final(self, resultados_herramientas: List[Tuple[str, str, str]]) -> List[dict]:
         """
-        Crear el prompt para generar la respuesta final
+        Crear el prompt para generar la respuesta final (idéntico a Cortex, reforzado para que el modelo use TODOS los bloques)
         """
-        # Construir información de resultados
-        resultados_info = ""
+        instrucciones = (
+            "Responde en Markdown.\n"
+            "Tus respuestas deben estar bien maquetadas, agradables a la vista y fáciles de leer.\n"
+            "Incrusta las imágenes con este formato ![dominio](url_imagen).\n"
+            "No incluyas imágenes o mapas si no te las han facilitado las herramientas.\n"
+            "IMPORTANTE: Los videos de youtube debes insertarlos solo como enlace plano.\n"
+            "Después de ':' añade un salto de línea y un espacio antes de continuar, salvo que sea el primer carácter de la línea.\n"
+            "Utiliza toda la información proporcionada por las herramientas para responder al usuario.\n"
+            "A continuación tienes toda la informacion recopilada por las herramentas\n\n"
+        )
+        info_consolidada = ""
         if resultados_herramientas:
-            resultados_info = "\n## INFORMACIÓN RECOPILADA:\n\n"
-            for i, (funcion, query, resultado) in enumerate(resultados_herramientas, 1):
-                resultados_info += f"**Fuente {i} ({funcion}):**\n"
-                resultados_info += f"Consulta: {query}\n"
-                resultados_info += f"Resultado: {resultado}\n\n"
-        
-        # Instrucciones para la respuesta final
-        instrucciones = """
-## INSTRUCCIONES PARA LA RESPUESTA:
-    Responde en Markdown.
-    1.Tus respuestas deben estar bien maquetadas, deben ser agradables a la vista y fáciles de leer.
-    2.Incrusta las imágenes con este formato ![dominio](url_imagen) sin olvidar la exclamación al inicio.
-    3.No incluyas imagenes o mapas si no te las han facilitado las herramientas.
-    4.IMPORTANTE: Los videos de youtube debes insertarlos sin formato markdown, solo el enlace aplanado.
-    5.Despues del caracter ':' debes añadir un salto de linea y un espacio antes de continuar con el texto  a no ser que sea el primer caracter de la línea, en ese caso elimina el caracter ':' y comienza directamente con el texto.
-    6.Utiliza esta información proporcionada por las herramientas para responder al usuario
-
-## CONSULTA ORIGINAL:
-"""
-        
-        # Construir el prompt completo
-        prompt_content = instrucciones + f"{self.original_prompt}\n" + resultados_info
-        
+            for funcion, query, resultado in resultados_herramientas:
+                info_consolidada += f"Resultados de {funcion} para '{query}':\n{resultado}\n\n"
+        info_consolidada += (
+            "Inserta los enlaces e imágenes relevantes en tu respuesta y responde en completo español. "
+            "Organiza la información de manera coherente y clara para el usuario."
+        )
+        # Añadir mensaje assistant como en Cortex
         messages = [
-            {"role": "system", "content": "Eres un asistente experto que integra información de múltiples fuentes para dar respuestas completas y útiles. Tu objetivo es crear una respuesta cohesiva y bien estructurada."},
-            {"role": "user", "content": prompt_content}
+            {"role": "system", "content": "Eres un asistente experto que integra información de múltiples fuentes para dar respuestas completas y útiles. Tu objetivo es crear una respuesta bien estructurada."},
+            {"role": "user", "content": instrucciones + info_consolidada}
         ]
-        
         return messages
     
     def _generar_respuesta_fallback(self, resultados_herramientas: List[Tuple[str, str, str]]) -> str:
@@ -138,7 +144,7 @@ class DefaultResponseGenerator:
             
             # Generar respuesta usando create_chat_completion
             response_content = ""
-            for chunk in model.create_chat_completion(messages=messages, max_tokens=1024, stream=True):
+            for chunk in model.create_chat_completion(messages=messages, max_tokens=8192, stream=True):
                 if 'choices' in chunk and len(chunk['choices']) > 0:
                     delta = chunk['choices'][0].get('delta', {})
                     if 'content' in delta:
@@ -159,48 +165,4 @@ class DefaultResponseGenerator:
                 SocketResponseHandler.emit_console_output(self.socket, mensaje, rol)
             except Exception as e:
                 logger.error(f"Error emitting to socket: {e}")
-    
-    def hablar_response(self, response: str):
-        """
-        Función para hablar la respuesta usando TTS
-        Migrado desde Cortex.hablar_response
-        """
-        if not self.config.VOICE_RESPONSE_ENABLED:
-            return
-            
-        try:
-            # Importar pyttsx3 solo cuando sea necesario
-            import pyttsx3
-            
-            # Limitar la longitud del texto a hablar
-            max_length = 500  # caracteres
-            if len(response) > max_length:
-                response = response[:max_length] + "..."
-            
-            with self.engine_lock:
-                try:
-                    engine = pyttsx3.init()
-                    
-                    # Configurar velocidad y volumen
-                    engine.setProperty('rate', 150)  # velocidad de habla
-                    engine.setProperty('volume', 0.8)  # volumen (0.0 a 1.0)
-                    
-                    # Configurar voz en español si está disponible
-                    voices = engine.getProperty('voices')
-                    for voice in voices:
-                        if 'spanish' in voice.name.lower() or 'es' in voice.id.lower():
-                            engine.setProperty('voice', voice.id)
-                            break
-                    
-                    # Hablar el texto
-                    engine.say(response)
-                    engine.runAndWait()
-                    engine.stop()
-                    
-                except Exception as e:
-                    logger.error(f"Error en TTS engine: {e}")
-                    
-        except ImportError:
-            logger.warning("pyttsx3 no está disponible para TTS")
-        except Exception as e:
-            logger.error(f"Error en hablar_response: {e}")
+

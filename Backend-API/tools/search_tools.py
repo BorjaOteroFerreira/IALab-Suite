@@ -53,7 +53,7 @@ class SearchTools(BaseTool):
                 return "Sorry, no se encontraron resultados relevantes."
 
             string = []
-            for idx, result in enumerate(data['organic'][:top_result_to_return], 1):
+            for result in data['organic'][:top_result_to_return]:
                 title = result.get('title', '').replace('|', '-').replace('||', '--')
                 snippet = result.get('snippet', '').replace('|', '-').replace('||', '--')
                 link = result.get('link')
@@ -61,13 +61,12 @@ class SearchTools(BaseTool):
                     continue
 
                 content = SearchTools.extract_content(link)
-                # Encabezado numerado y formato robusto
                 string.append('\n'.join([
-                    f"### Noticia {idx}",
-                    f"**Título:** {title}",
-                    f"**Enlace:** {link}",
-                    f"**Snippet:** {snippet}",
-                    "-----------------"
+                    f"Title: {title}",
+                    f"Link: {link}",
+                    f"Snippet: {snippet}",
+                    f"Content: {content}",
+                    "\n-----------------"
                 ]))
 
             return '\n'.join(string)
@@ -79,9 +78,7 @@ class SearchTools(BaseTool):
     @staticmethod
     def extract_relevant_content_from_text(text):
         try:
-            tokenizer = Tokenizer('spanish')
-
-            parser = HtmlParser.from_string(text, tokenizer=tokenizer,url=None)
+            parser = HtmlParser.from_string(text, Tokenizer('spanish'))
             summarizer = LsaSummarizer()
             summary = summarizer(parser.document, 1)  # Una sola frase
             return str(summary[0]) if summary else ""
@@ -178,7 +175,8 @@ class SearchTools(BaseTool):
     @staticmethod
     def extract_relevant_content(url):
         try:
-            parser = HtmlParser.from_url(url, Tokenizer('spanish'))
+            tokenizer = Tokenizer('spanish')
+            parser = HtmlParser.from_url(url, tokenizer=tokenizer, url=None)
             summarizer = LsaSummarizer()
             summary = summarizer(parser.document, 1)  # Extract a single sentence as summary
             return str(summary[0]) if summary else ""

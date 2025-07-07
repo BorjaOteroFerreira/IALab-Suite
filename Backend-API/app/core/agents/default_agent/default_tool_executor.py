@@ -341,7 +341,7 @@ class DefaultToolExecutor:
             
             # Generar respuesta del modelo usando create_chat_completion
             response_content = ""
-            for chunk in model.create_chat_completion(messages=decision_prompt, max_tokens=1024, stream=True):
+            for chunk in model.create_chat_completion(messages=decision_prompt, max_tokens=8192, stream=True):
                 if 'choices' in chunk and len(chunk['choices']) > 0:
                     delta = chunk['choices'][0].get('delta', {})
                     if 'content' in delta:

@@ -28,7 +28,7 @@ class DefaultAgentConfig:
     MODEL_RESPONSE_TIMEOUT = 60  # Timeout en segundos para respuesta del modelo
     
     # Configuración de prompts
-    MAX_PROMPT_LENGTH = 8192  # Longitud máxima de prompt
+    MAX_PROMPT_LENGTH = 128000  # Longitud máxima de prompt
     MAX_RESPONSE_LENGTH = 8192  # Longitud máxima de respuesta
     
     # Configuración de patrones JSON
