@@ -339,7 +339,7 @@ class DefaultToolExecutor:
             # Crear prompt para consultar al modelo
             decision_prompt = self._crear_prompt_decision(resultados_herramientas)
             
-            # Generar respuesta del modelo usando create_chat_completion
+            # Generar respuesta del modelo 
             response_content = ""
             for chunk in model.create_chat_completion(messages=decision_prompt, max_tokens=8192, stream=True):
                 if 'choices' in chunk and len(chunk['choices']) > 0:

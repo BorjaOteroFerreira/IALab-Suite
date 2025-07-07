@@ -178,12 +178,7 @@ class AdaptiveAgent:
             # Tiempo total
             execution_time = execution_results.get('execution_time', 0)
             summary_text += f"⏱️ **Tiempo de procesamiento:** {execution_time:.1f} segundos\n"
-            
-            summary_text += "\n💭 **Ventajas del modo adaptativo:**\n"
-            summary_text += "• Pensamiento flexible y contextual\n"
-            summary_text += "• Adaptación en tiempo real\n"
-            summary_text += "• Optimización de recursos\n"
-            summary_text += "• Aprendizaje incremental\n"
+
             
             self._safe_emit_status(summary_text)
             
@@ -281,5 +276,4 @@ class AdaptiveAgent:
                 self.config = None
             
         except Exception:
-            # Evitar que errores en el destructor causen problemas
             pass

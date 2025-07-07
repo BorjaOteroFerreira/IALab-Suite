@@ -89,7 +89,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
                     {"role": "user", "content": prompt_text}
                 ]
             
-            # Generar respuesta usando create_chat_completion como en Cortex
+            # Generar respuesta 
             response_content = ""
             for chunk in self.model.create_chat_completion(messages=prompt_herramientas, max_tokens=200, stream=True):
                 if 'choices' in chunk and len(chunk['choices']) > 0:

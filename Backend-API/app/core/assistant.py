@@ -1,7 +1,7 @@
 """
 @Author: Borja Otero Ferreira
 Assistant - Core component for LLM interaction and orchestration
-Migración completa desde Assistant.py legacy manteniendo el flujo original
+Migración completa desde Assistant.py manteniendo el flujo original
 """
 import copy
 import platform
@@ -23,7 +23,7 @@ class Assistant:
         # Estado del modelo 
         self.model = None
         self.temperature = 0.3
-        self.max_context_tokens = 8192
+        self.max_context_tokens = 20000
         self.max_assistant_tokens = 8192
         self.gpu_layers = -1
         self.is_processing = False

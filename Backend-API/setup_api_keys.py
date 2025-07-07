@@ -82,14 +82,14 @@ def main():
         f.write("# Logging Configuration\n")
         f.write(f"LOG_LEVEL={env_content.get('LOG_LEVEL', 'INFO')}\n")
     
-    print("\n✅ Configuration saved to .env")
-    print("\n📋 API Key Resources:")
+    print("\nConfiguration saved to .env")
+    print("\nAPI Key Resources:")
     print("• YouTube API: https://console.cloud.google.com/")
     print("• Serper API: https://serper.dev/")
     print("• OpenAI API: https://platform.openai.com/")
     print("• Anthropic API: https://console.anthropic.com/")
-    print("\n🔒 Security: Never commit .env files to version control!")
-    print("✅ Setup complete!")
+    print("\nSecurity: Never commit .env files to version control!")
+    print("Setup complete!")
 
 if __name__ == "__main__":
     main()

@@ -78,7 +78,8 @@ class SearchTools(BaseTool):
     @staticmethod
     def extract_relevant_content_from_text(text):
         try:
-            parser = HtmlParser.from_string(text, Tokenizer('spanish'))
+            
+            parser = HtmlParser.from_string(text, tokenizer=Tokenizer('spanish'), url=None)
             summarizer = LsaSummarizer()
             summary = summarizer(parser.document, 1)  # Una sola frase
             return str(summary[0]) if summary else ""

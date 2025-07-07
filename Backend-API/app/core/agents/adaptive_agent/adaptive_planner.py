@@ -57,7 +57,7 @@ class AdaptiveTaskPlanner:
         }
         
         try:
-            emit_status_func("🧠 Iniciando planificación adaptativa...")
+            emit_status_func("Iniciando planificación adaptativa...")
             
             # Bucle principal de planificación y ejecución paso a paso
             for iteration in range(self.max_iterations):
@@ -67,8 +67,8 @@ class AdaptiveTaskPlanner:
                     break
                 
                 # Paso 1: Reflexionar sobre el estado actual
-                emit_status_func(f"🧠 **REFLEXIÓN ESTRATÉGICA** (Iteración {iteration + 1})")
-                emit_status_func("   🤔 Analizando situación actual...")
+                emit_status_func(f"**REFLEXIÓN ESTRATÉGICA** (Iteración {iteration + 1})")
+                emit_status_func("Analizando situación actual...")
                 
                 reflection = self._reflect_on_current_state(current_plan, user_message, iteration)
                 execution_results['reflections'].append(reflection)
@@ -77,7 +77,7 @@ class AdaptiveTaskPlanner:
                 self._display_reflection_insights(reflection, emit_status_func)
                 
                 if reflection.get('task_completion_assessment', False):
-                    emit_status_func("✅ **TAREA COMPLETADA** - El agente considera que se ha cumplido el objetivo")
+                    emit_status_func("**TAREA COMPLETADA** - El agente considera que se ha cumplido el objetivo")
                     # Generar respuesta final limpia
                     self._generate_clean_final_response(user_message, execution_results, emit_status_func)
                     break
@@ -86,7 +86,7 @@ class AdaptiveTaskPlanner:
                 next_step = self._decide_next_step(current_plan, reflection, user_message)
                 
                 if not next_step:
-                    emit_status_func("❌ No se pudo determinar el siguiente paso. Finalizando.")
+                    emit_status_func("No se pudo determinar el siguiente paso. Finalizando.")
                     break
                 
                 # Paso 3: Agregar el paso al plan y mostrarlo
@@ -198,7 +198,7 @@ CRITERIOS PARA COMPLETAR LA TAREA (INTELIGENTES):
 - Si detectas que hay más información disponible en el mismo resultado, procesa TODO antes de finalizar
 
 RESPONDE COMO UN EXPERTO REFLEXIVO Y EFICIENTE:
-- Si detectas patrones improductivos, recoméndalo abiertamente
+- Si detectas patrones improductivos, recomiéndalo abiertamente
 - Propón cambios de estrategia cuando sea necesario
 - Considera si la información actual es suficiente para responder
 - Prioriza eficiencia sobre completitud perfecta
@@ -241,16 +241,16 @@ Como un experto reflexivo, analiza profundamente la situación, considera el con
                 }
             ]
             
-            # Obtener reflexión del modelo con mayor capacidad
+            # Obtener reflexión del modelo 
             reflection_response = ""
             for chunk in self.model.create_chat_completion(messages=reflection_prompt, max_tokens=1200, stream=True, temperature=0.7):
                 if 'content' in chunk['choices'][0]['delta']:
                     reflection_response += chunk['choices'][0]['delta']['content']
             
-            # Parsear la reflexión mejorada
+            # Parsear la reflexión 
             reflection = self._parse_enhanced_reflection(reflection_response)
             
-            # Log mejorado para debugging
+            # Log para debugging
             logger.info(f"Reflexión iteración {iteration + 1}")
             logger.info(f"   Proceso mental: {reflection.get('mental_process', 'N/A')[:100]}...")
             logger.info(f"   Comprensión: {reflection.get('current_understanding', 'N/A')[:100]}...")
@@ -358,7 +358,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
                 }
             ]
             
-            # Obtener respuesta del modelo con mayor capacidad
+            # Obtener respuesta del modelo 
             step_response = ""
             for chunk in self.model.create_chat_completion(messages=step_prompt, max_tokens=700, stream=True, temperature=0.3):
                 if 'content' in chunk['choices'][0]['delta']:
@@ -414,7 +414,6 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
                 json_str = json_match.group(0)
                 parsed = json.loads(json_str)
                 
-                # Mapear campos nuevos a campos legacy para compatibilidad
                 legacy_mapping = {
                     'current_understanding': parsed.get('current_understanding', ''),
                     'available_data': parsed.get('valuable_findings', ''),
@@ -423,14 +422,12 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
                     'task_completed': parsed.get('task_completion_assessment', False),
                     'confidence_level': parsed.get('confidence_level', 'medio'),
                     'reasoning': parsed.get('expert_reasoning', ''),
-                    # Campos nuevos mejorados
                     'mental_process': parsed.get('mental_process', ''),
                     'valuable_findings': parsed.get('valuable_findings', ''),
                     'knowledge_gaps': parsed.get('knowledge_gaps', ''),
                     'strategic_next_action': parsed.get('strategic_next_action', ''),
                     'task_completion_assessment': parsed.get('task_completion_assessment', False),
                     'expert_reasoning': parsed.get('expert_reasoning', ''),
-                    # Nuevos campos de eficiencia
                     'efficiency_assessment': parsed.get('efficiency_assessment', 'Análisis de eficiencia no disponible'),
                     'pattern_detection': parsed.get('pattern_detection', 'Sin patrones detectados')
                 }
@@ -440,7 +437,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
         except Exception as e:
             logger.warning(f"Error parseando reflexión mejorada: {e}")
         
-        # Reflexión por defecto mejorada si falla el parsing
+        # Reflexión por defecto si falla el parsing
         return {
             'mental_process': 'Procesando información disponible...',
             'current_understanding': 'Análisis en progreso',
@@ -452,10 +449,6 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
             'expert_reasoning': 'Continuando con planificación sistemática',
             'efficiency_assessment': 'Evaluando productividad',
             'pattern_detection': 'Analizando patrones de ejecución',
-            # Campos legacy
-            'available_data': 'Recopilando datos',
-            'missing_information': 'Identificando necesidades',
-            'next_action_needed': 'Continuar investigación',
             'task_completed': False,
             'reasoning': 'Continuando con el plan adaptativo'
         }
@@ -528,12 +521,12 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
         # Mostrar comprensión actual
         understanding = reflection.get('current_understanding', reflection.get('mental_process', ''))
         if understanding:
-            insights_text += f"   🎯 **Comprensión:** {understanding[:200]}{'...' if len(understanding) > 200 else ''}\n"
+            insights_text += f"**Comprensión:** {understanding[:200]}{'...' if len(understanding) > 200 else ''}\n"
         
         # Mostrar hallazgos valiosos
         findings = reflection.get('valuable_findings', reflection.get('available_data', ''))
         if findings:
-            insights_text += f"   📊 **Hallazgos:** {findings[:150]}{'...' if len(findings) > 150 else ''}\n"
+            insights_text += f"**Hallazgos:** {findings[:150]}{'...' if len(findings) > 150 else ''}\n"
         
         # Mostrar análisis de eficiencia
         efficiency = reflection.get('efficiency_assessment', '')
@@ -543,17 +536,17 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
         # Mostrar detección de patrones
         patterns = reflection.get('pattern_detection', '')
         if patterns and "sin patrones" not in patterns.lower():
-            insights_text += f"   🔁 **Patrones:** {patterns[:150]}{'...' if len(patterns) > 150 else ''}\n"
+            insights_text += f"**Patrones:** {patterns[:150]}{'...' if len(patterns) > 150 else ''}\n"
         
         # Mostrar brechas identificadas
         gaps = reflection.get('knowledge_gaps', reflection.get('missing_information', ''))
         if gaps:
-            insights_text += f"   ❓ **Necesito:** {gaps[:150]}{'...' if len(gaps) > 150 else ''}\n"
+            insights_text += f"**Necesito:** {gaps[:150]}{'...' if len(gaps) > 150 else ''}\n"
         
         # Mostrar próxima acción estratégica
         next_action = reflection.get('strategic_next_action', reflection.get('next_action_needed', ''))
         if next_action:
-            insights_text += f"   ⚡ **Siguiente acción:** {next_action[:150]}{'...' if len(next_action) > 150 else ''}\n"
+            insights_text += f"**Siguiente acción:** {next_action[:150]}{'...' if len(next_action) > 150 else ''}\n"
         
         # Mostrar nivel de confianza
         confidence = reflection.get('confidence_level', 'medio')
@@ -588,11 +581,11 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
     
     def _display_current_step(self, step: TaskStep, step_number: int, emit_status_func):
         """Muestra el paso actual que se va a ejecutar con información más rica"""
-        step_text = f"🎯 **PASO {step_number} - PLANIFICACIÓN ADAPTATIVA**\n"
-        step_text += f"📋 **Objetivo:** {step.description}\n"
-        step_text += f"🔧 **Herramienta:** `{step.tool_name}`\n"
-        step_text += f"📝 **Consulta estratégica:** `{step.query}`\n"
-        step_text += f"⚡ **Estado:** Ejecutando...\n"
+        step_text = f"**PASO {step_number} - PLANIFICACIÓN ADAPTATIVA**\n"
+        step_text += f"**Objetivo:** {step.description}\n"
+        step_text += f"**Herramienta:** `{step.tool_name}`\n"
+        step_text += f"**Consulta estratégica:** `{step.query}`\n"
+        step_text += f"**Estado:** Ejecutando...\n"
         
         emit_status_func(step_text)
     
@@ -644,8 +637,8 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
     
     def display_execution_stats(self, execution_results: Dict[str, Any], emit_status_func):
         """Muestra las estadísticas de ejecución mejoradas"""
-        stats_text = "📊 **=== ESTADÍSTICAS DE EJECUCIÓN ADAPTATIVA ===**\n\n"
-        stats_text += f"🎯 **Rendimiento General:**\n"
+        stats_text = "**=== ESTADÍSTICAS DE EJECUCIÓN ADAPTATIVA ===**\n\n"
+        stats_text += f"**Rendimiento General:**\n"
         stats_text += f"   • Pasos ejecutados: {execution_results['total_steps']}\n"
         stats_text += f"   • Pasos completados: {len(execution_results['completed_steps'])}\n"
         stats_text += f"   • Pasos fallidos: {len(execution_results['failed_steps'])}\n"
@@ -657,7 +650,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
             avg_time = execution_results['execution_time'] / execution_results['total_steps']
             stats_text += f"   • Tiempo promedio por paso: {avg_time:.1f}s\n\n"
         
-        stats_text += f"🧠 **Proceso Adaptativo:**\n"
+        stats_text += f"**Proceso Adaptativo:**\n"
         stats_text += f"   • Reflexiones realizadas: {execution_results['adaptations_made']}\n"
         stats_text += f"   • Herramientas únicas utilizadas: {len(set(data.get('tool_used', '') for data in self.execution_context.values() if isinstance(data, dict)))}\n"
         stats_text += f"   • Datos recopilados: {len(self.execution_context)} elementos\n\n"

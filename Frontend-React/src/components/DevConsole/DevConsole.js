@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback, useContext } from 'rea
 import { ChatContext } from '../../context/ChatContext';
 import './DevConsole.css';
 
+// Importar showdown dinámicamente como en MessageList
+
 const DevConsole = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [messages, setMessages] = useState([]);
@@ -19,6 +21,7 @@ const DevConsole = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [resizeDirection, setResizeDirection] = useState(null);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+    const [showdown, setShowdown] = useState(null);
     const messagesEndRef = useRef(null);
     const consoleRef = useRef(null);
     const { socket } = useContext(ChatContext);
@@ -66,14 +69,40 @@ const DevConsole = () => {
         };
     }, [isVisible]);
 
-    // Scroll automático al final
-    const scrollToBottom = useCallback(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, []);
+    // Scroll automático al final SOLO si la consola está visible y el usuario no está haciendo scroll manual
+    const [autoScroll, setAutoScroll] = useState(true);
+
+    // Detectar si el usuario hace scroll manual en la consola
+    useEffect(() => {
+        if (!isVisible) return;
+        const el = consoleRef.current?.querySelector('.console-messages');
+        if (!el) return;
+        const handleScroll = () => {
+            // Si el usuario está cerca del fondo, activar autoscroll
+            const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+            setAutoScroll(atBottom);
+        };
+        el.addEventListener('scroll', handleScroll);
+        return () => el.removeEventListener('scroll', handleScroll);
+    }, [isVisible]);
+
+    // --- Cambios para que SOLO DevConsole haga scroll cuando recibe mensajes nuevos ---
+    // El autoscroll de la consola solo se activa cuando se recibe un mensaje NUEVO para la consola
+    // y no depende de cambios en otros componentes (como MessageList)
+    //
+    // Guardar el número de mensajes previos para detectar si hay mensajes nuevos
+    const prevMessagesCount = useRef(messages.length);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages, scrollToBottom]);
+        // Solo hacer scroll si hay mensajes nuevos en la consola
+        if (isVisible && autoScroll && messages.length > prevMessagesCount.current) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+        prevMessagesCount.current = messages.length;
+    }, [messages, isVisible, autoScroll]);
+
+    // Elimina el scroll automático global que dependía de otros cambios
+    // (ya está controlado solo por los mensajes de la consola)
 
     // Escuchar mensajes del socket
     useEffect(() => {
@@ -339,6 +368,30 @@ const DevConsole = () => {
         centerConsole();
     };
 
+    // Inicializar showdown (igual que en MessageList)
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            const sd = await import('showdown');
+            if (mounted) {
+                setShowdown(new sd.Converter({
+                    tables: true,
+                    simplifiedAutoLink: true,
+                    openLinksInNewWindow: true,
+                    strikethrough: true,
+                    emoji: true,
+                    tasklists: true,
+                    ghCodeBlocks: true,
+                    noHeaderId: true,
+                    excludeTrailingPunctuationFromURLs: true,
+                    parseImgDimensions: true,
+                    headerLevelStart: 1
+                }));
+            }
+        })();
+        return () => { mounted = false; };
+    }, []);
+
     // Guardar dimensiones en localStorage
     useEffect(() => {
         localStorage.setItem('devConsole_dimensions', JSON.stringify(dimensions));
@@ -464,6 +517,17 @@ const DevConsole = () => {
             top: `${position.y}px`,
             transform: 'translateX(-50%)'
         })
+    };
+
+    // Renderizar el contenido del mensaje como Markdown interpretado
+    const renderMarkdown = (text) => {
+        if (!showdown) return <span>Cargando...</span>;
+        // Si el texto es JSON.stringify, no lo proceses como markdown
+        if (typeof text === 'string' && text.trim().startsWith('{') && text.trim().endsWith('}')) {
+            return <span>{text}</span>;
+        }
+        const html = showdown.makeHtml(text || '');
+        return <span className="console-md-fragment" dangerouslySetInnerHTML={{ __html: html }} />;
     };
 
     return (
@@ -606,7 +670,7 @@ const DevConsole = () => {
                                 [{message.role.toUpperCase()}]
                             </span>
                             <span className="message-content">
-                                {message.content}
+                                {renderMarkdown(message.content)}
                             </span>
                         </div>
                     ))}

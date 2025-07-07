@@ -100,19 +100,24 @@ class SocketResponseHandler:
             role (str): Tipo de mensaje ('info', 'pensamiento', 'tool', etc.)
         """
         try:
+            # DEBUG: Log para ver cómo llega el mensaje antes de enviar
+            try:
+                print(f"[DEBUG SOCKET] Mensaje a consola: {repr(message)} (type: {type(message)})")
+            except Exception as log_exc:
+                pass
             # Asegurar que el message sea serializable en JSON
             if not isinstance(message, (str, int, float, bool, type(None))):
                 message = str(message)
-            
+            # Forzar a string UTF-8 si es posible
+            if isinstance(message, bytes):
+                message = message.decode('utf-8', errors='replace')
             # Asegurar que role sea una cadena
             if not isinstance(role, str):
                 role = str(role) if role is not None else 'info'
-            
             console_data = {
                 'content': message,
                 'role': role
             }
-            
             socket.emit('output_console', console_data, namespace='/test')
         except Exception as e:
             logger.error(f"Error in emit_console_output: {e}")

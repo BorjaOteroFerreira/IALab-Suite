@@ -43,31 +43,6 @@ class StaticController(BaseController):
             logger.error(f"Error serving font {filename}: {e}")
             return "Font error", 500
     
-    def serve_playground(self):
-        """Serve the playground page with initial data"""
-        try:
-            models_data = model_service.get_models_and_formats()
-            chat_result = chat_service.list_chats()
-            
-            # Return JSON data instead of rendering template for now
-            from flask import jsonify
-            return jsonify({
-                'models_list': models_data.get('models', []),
-                'format_list': models_data.get('formats', []),
-                'chat_list': chat_result.data if chat_result.success else []
-            })
-            
-        except Exception as e:
-            logger.error(f"Error serving playground: {e}")
-            return jsonify({'error': 'Error loading playground data'}), 500
-    
-    def serve_letsencrypt_challenge(self, challenge):
-        """Serve Let's Encrypt challenge files"""
-        try:
-            return send_from_directory('.well-known/acme-challenge', challenge)
-        except Exception as e:
-            logger.error(f"Error serving Let's Encrypt challenge {challenge}: {e}")
-            return "Challenge not found", 404
 
 # Global static controller instance
 static_controller = StaticController()

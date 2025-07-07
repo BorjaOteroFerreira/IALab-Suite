@@ -60,18 +60,18 @@ class LinealAgent:
             self.final_response = self._generate_normal_response()
             return
         
-        # Variables para el procesamiento tradicional
+        # Variables para el procesamiento 
         self.current_plan: Optional[TaskPlan] = None
         self.max_planning_iterations = 5
         self.max_execution_iterations = 10
         
-        # Inicializar componentes modulares del agente tradicional
+        # Inicializar componentes modulares del agente
         self.task_analyzer = TaskAnalyzer(self.model, self.tools_manager, self.tool_registry)
         self.task_planner = TaskPlanner(self.model, self.tools_manager, self.tool_registry)
         self.task_executor = TaskExecutor(self.tools_manager, self.tool_registry, self.socket, self.assistant, self.max_execution_iterations)
         self.response_generator = ResponseGenerator(self.model, self.socket, self.response_queue, self.original_prompt, self.assistant)
         
-        # Iniciar el procesamiento tradicional
+        # Iniciar el procesamiento
         logger.info("Inicializando Agente Tradicional")
         self.final_response = self._traditional_processing()
     
