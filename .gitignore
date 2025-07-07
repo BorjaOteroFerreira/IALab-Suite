@@ -98,6 +98,7 @@ logs/
 *.pem
 *.p12
 *.pfx
+*.bk
 
 # Local configuration
 config.local.*
