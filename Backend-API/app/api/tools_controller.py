@@ -53,7 +53,7 @@ class ToolsController:
                     registry = ToolRegistry()
                     registry.discover_tools()
                     tools_manager.initialize_registry(registry)
-                    logger.info("🔧 Tools registry initialized on-demand")
+                    logger.info("Tools registry initialized on-demand")
                 except Exception as e:
                     logger.error(f"Failed to initialize tools registry: {e}")
                     return jsonify({
@@ -65,7 +65,7 @@ class ToolsController:
             tools_summary = tools_manager.get_tools_summary()
             # Convertir a formato JSON serializable
             serializable_summary = make_json_serializable(tools_summary)
-            logger.info(f"🔧 Returning tools summary: {len(serializable_summary.get('available_tools', {}))} tools available")
+            logger.info(f"Returning tools summary: {len(serializable_summary.get('available_tools', {}))} tools available")
             
             return jsonify({
                 'success': True,
@@ -160,11 +160,11 @@ class ToolsController:
                 registry = ToolRegistry()
                 registry.discover_tools()
                 tools_manager.initialize_registry(registry)
-                logger.info("🔧 Tools registry completely reinitialized")
+                logger.info("Tools registry completely reinitialized")
             except Exception as e:
                 logger.error(f"Error reinitializing tools registry: {e}")
                 tools_manager.refresh_tools()
-                logger.info("🔧 Using existing registry for refresh")
+                logger.info("Using existing registry for refresh")
             
             # Obtener el resumen actualizado y convertirlo a formato serializable
             tools_summary = tools_manager.get_tools_summary()
@@ -175,7 +175,7 @@ class ToolsController:
             socketio = socket_instance.get_socketio()
             if socketio:
                 SocketResponseHandler.emit_tools_registry(socketio, serializable_summary)
-                logger.info("🔧 Tools registry update broadcast to all clients")
+                logger.info("Tools registry update broadcast to all clients")
             else:
                 logger.warning("No se pudo emitir actualización de registry: instancia socketio no disponible")
             

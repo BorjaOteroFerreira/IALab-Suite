@@ -3,9 +3,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1.5rem;
-  background: var(--surface-elevated);
-  border-bottom: 2px solid var(--border-primary);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05));
+  border-bottom: 2px solid #87CEEB;
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.15);
+  backdrop-filter: blur(20px);
 }
 
 .header-left {
@@ -17,8 +18,9 @@
 .app-title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--primary);
+  color: #87CEEB;
   letter-spacing: 0.02em;
+  text-shadow: 0 0 8px rgba(135, 206, 235, 0.3);
 }
 
 .header-controls {
@@ -29,7 +31,7 @@
 
 
 .header-button {
-  background: none;
+  background: transparent;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
@@ -37,14 +39,34 @@
   min-width: 36px;
   height: 36px;
   border-radius: 50%;
-  transition: background 0.2s;
+  color: #87CEEB;
+  transition: all 0.3s ease;
+}
+
+.header-button:hover {
+  background: rgba(135, 206, 235, 0.15);
+  color: #87CEEB;
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.25);
+  transform: translateY(-1px);
 }
 
 .header-button.active {
-  background: var(--primary-light);
+  background: linear-gradient(135deg, #87CEEB, #b983ff);
   color: #fff;
+  box-shadow: 0 0 16px rgba(185, 131, 255, 0.4);
+}
+
+.header-button.active:hover {
+  background: linear-gradient(135deg, #b983ff, #87CEEB);
+  box-shadow: 0 0 20px rgba(185, 131, 255, 0.5);
 }
 
 .header-button.danger {
-  color: var(--error);
+  color: #FFB6C1;
+}
+
+.header-button.danger:hover {
+  background: rgba(255, 182, 193, 0.15);
+  color: #FFB6C1;
+  box-shadow: 0 4px 12px rgba(255, 182, 193, 0.25);
 }

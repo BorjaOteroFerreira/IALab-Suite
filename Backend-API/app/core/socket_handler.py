@@ -104,6 +104,10 @@ class SocketResponseHandler:
             if not isinstance(message, (str, int, float, bool, type(None))):
                 message = str(message)
             
+            # Asegurar que role sea una cadena
+            if not isinstance(role, str):
+                role = str(role) if role is not None else 'info'
+            
             console_data = {
                 'content': message,
                 'role': role
@@ -112,7 +116,7 @@ class SocketResponseHandler:
             socket.emit('output_console', console_data, namespace='/test')
         except Exception as e:
             logger.error(f"Error in emit_console_output: {e}")
-            logger.error(f"Message type: {type(message)}, Role: {role}")
+            logger.error(f"Message type: {type(message)}, Role type: {type(role)}")
             # Intentar enviar un mensaje de error simple
             try:
                 error_data = {
@@ -135,7 +139,7 @@ class SocketResponseHandler:
         socket.emit('utilidades', data, namespace='/test')
     
     @staticmethod
-    def stream_chat_completion(model, messages, socket, max_tokens=1024, 
+    def stream_chat_completion(model, messages, socket, max_tokens=8192, 
                               user_tokens=None, process_line_breaks=False, 
                               response_queue=None, link_remover_func=None, 
                               stop_condition=None):

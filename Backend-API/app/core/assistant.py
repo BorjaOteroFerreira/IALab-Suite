@@ -34,8 +34,6 @@ class Assistant:
         # Sistema de mensaje por defecto 
         self.default_system_message = '''
 Eres un asistente con una personalidad amable y honesta.
-Como programador experto y pentester,
-debes examinar los detalles proporcionados para asegurarte de que sean utilizables.
 Si no sabes la respuesta a una pregunta, no compartas información falsa y no te desvíes de la pregunta.
 '''
         
@@ -49,7 +47,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         else:
             raise RuntimeError("Sistema operativo no compatible")
         
-        logger.info("🤖 Assistant initialized")
+        logger.info("Assistant initialized")
     
     def load_model(self, model_path: str, new_temperature: float, n_gpu_layer: int, 
                    new_system_message: str, context: int, max_response_tokens: int):
@@ -75,7 +73,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
             use_mmap=True,
         )
         self.stop_emit = False
-        logger.info(f"✅ Modelo {model_path} cargado con éxito")
+        logger.info(f"Modelo {model_path} cargado con éxito")
 
     def unload_model(self):
         """Descargar modelo y liberar memoria"""
@@ -94,13 +92,13 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         except ImportError:
             pass
             
-        logger.info(f"🔧 Tools configured: {tools}")
+        logger.info(f"Tools configured: {tools}")
         print(f"🔧 DEBUG: Tools set to {tools}")
 
     def set_rag(self, rag: bool):
         """Configurar el uso de RAG """
         self.rag = rag
-        logger.info(f"🔧 RAG configured: {rag}")
+        logger.info(f"RAG configured: {rag}")
         print(f"🔧 DEBUG: RAG set to {rag}")
 
     def add_user_input(self, user_input, socket):
@@ -126,7 +124,7 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 logger.error(f"Tipo de user_input no soportado: {type(user_input)}")
                 return
                 
-            logger.info(f"🔥 DEBUG: Procesando user_input de tipo {type(user_input)}")
+            logger.info(f"DEBUG: Procesando user_input de tipo {type(user_input)}")
             print(f"🔥 DEBUG: Procesando user_input de tipo {type(user_input)}")
             
             self.emit_assistant_response_stream(processed_input, socket)
@@ -141,12 +139,10 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
         """
         # Importar aquí para evitar dependencia circular
         from app.core.socket_handler import SocketResponseHandler
-        from app.core.agents.default_agent.default_agent import DefaultAgent
-        from app.core.agents.adaptive_agent.adaptive_agent import AdaptiveAgent
-        from app.core.agents.lineal_agent.lineal_agent import  LinealAgent
+        from app.core.agents.agent_registry import agent_registry
         from app.core.rag import Retriever
         
-        logger.info(f"🔥 DEBUG: emit_assistant_response_stream INICIADO (tools={self.tools}, rag={self.rag})")
+        logger.info(f"DEBUG: emit_assistant_response_stream INICIADO (tools={self.tools}, rag={self.rag})")
 
         if not self.is_processing:
             self.stop_emit = False
@@ -170,11 +166,26 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
                 )
                 
             try:
-                # Si hay herramientas, ir directamente a Cortex sin procesar aquí
+                # Si hay herramientas, usar el sistema de agentes
                 if self.tools:
-                    logger.info("Using tools with Cortex")
-                    DefaultAgent(user_input_o, prompt=user_input, response="", model=self.model, socket=socket, assistant=self)
-                    return  # Salir temprano, Cortex se encarga de todo
+                    logger.info("Using tools with agent system")
+                    
+                    # Usar el agente actual del registro (seleccionado por el usuario)
+                    selected_agent = agent_registry.get_current_agent()
+                    logger.info(f"Usando agente seleccionado: {selected_agent}")
+                    
+                    # Crear y ejecutar el agente
+                    agent_instance = agent_registry.create_agent(
+                        selected_agent,
+                        user_input_o, 
+                        prompt=user_input, 
+                        response="", 
+                        model=self.model, 
+                        socket=socket, 
+                        assistant=self
+                    )
+                    
+                    return 
                 
                 # Si RAG está habilitado, ir directamente al retriever sin respuesta normal
                 if self.rag: 
@@ -215,10 +226,10 @@ Si no sabes la respuesta a una pregunta, no compartas información falsa y no te
     def stop_response(self):
         """Detener la respuesta actual (idéntico al legacy)"""
         self.stop_emit = True
-        logger.info("🛑 Stop signal activada")
+        logger.info("Stop signal activada")
         # Emitir señal de finalización inmediata
         try:
             # Si tenemos un socket activo, emitir señal de parada
-            logger.info("🛑 Response stopping...")
+            logger.info("Response stopping...")
         except Exception as e:
             logger.error(f"Error emitiendo señal de parada: {e}")

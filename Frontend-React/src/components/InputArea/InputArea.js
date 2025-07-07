@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import './InputArea.css';
-import { Square, Database } from 'lucide-react';
+import { Send, Square, Database } from 'lucide-react';
 import ToolsSelector from '../ToolsSelector/ToolsSelector';
 import { useChatContext } from '../../hooks/useChatContext';
 
@@ -61,6 +61,7 @@ function InputArea({
             </button>
           
           <div className="input-side-buttons">
+            
             <ToolsSelector 
               tools={tools} 
               onToggleTools={onToggleTools}
@@ -101,9 +102,11 @@ function InputArea({
               ➤
             </button>
           )}
-        </div>
+        </div
+        >
       </form>
     </div>
+    
   );
 }
 

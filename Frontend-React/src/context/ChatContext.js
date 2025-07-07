@@ -19,6 +19,7 @@ export const ChatProvider = ({ children }) => {
   });
   const [tools, setTools] = useState(false);
   const [rag, setRag] = useState(false);
+  const [currentAgent, setCurrentAgent] = useState(null); // Estado para el agente actual
   const [tokensCount, setTokensCount] = useState(0);
   const [modelList, setModelList] = useState([]);
   const [formatList, setFormatList] = useState([]);  const [chatId, setChatId] = useState('');
@@ -160,6 +161,17 @@ export const ChatProvider = ({ children }) => {
       finalizationProcessedRef.current = false;
     });
 
+    // Listeners para agentes
+    newSocket.on('agent_changed', (data) => {
+      console.log('🤖 Agent changed:', data);
+      setCurrentAgent(data.agent_name);
+    });
+
+    newSocket.on('agents_registry', (data) => {
+      console.log('🤖 Agents registry received:', data);
+      setCurrentAgent(data.current_agent);
+    });
+
     setSocket(newSocket);
     socketRef.current = newSocket;
 
@@ -268,6 +280,7 @@ export const ChatProvider = ({ children }) => {
       console.log('📤 Enviando historial al backend:', JSON.stringify(conversationHistory.current, null, 2));
       
       // Enviar mensaje al servidor con el historial actual
+      // El backend ya sabe qué agente está activo a través del registro de agentes
       await axios.post('/user_input', {
         content: conversationHistory.current,
         tools,
@@ -464,6 +477,7 @@ export const ChatProvider = ({ children }) => {
     isLoading,
     tools,
     rag,
+    currentAgent, // Agregar el agente actual para que los componentes puedan mostrarlo
     tokensCount,
     modelConfig,
     chatId,
@@ -496,6 +510,7 @@ export const ChatProvider = ({ children }) => {
     isLoading, 
     tools, 
     rag, 
+    currentAgent, // Agregar dependencia del agente actual
     tokensCount, 
     modelConfig, 
     chatId, 

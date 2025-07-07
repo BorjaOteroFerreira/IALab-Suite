@@ -39,7 +39,7 @@ class AssistantService:
                     
                     # Inicializar el tools_manager con el registry
                     tools_manager.initialize_registry(tool_registry)
-                    logger.info("🔧 Tools manager initialized with assistant service")
+                    logger.info("Tools manager initialized with assistant service")
                     
                     # Importante: Guardar referencia al socket para poder enviar actualizaciones más adelante
                     self._tools_registry = tool_registry
@@ -49,7 +49,7 @@ class AssistantService:
                     logger.warning(f"Could not initialize tools manager: {e}")
                 
                 self._is_initialized = True
-                logger.info("🤖 Assistant service initialized")
+                logger.info("Assistant service initialized")
             return True
         except Exception as e:
             logger.error(f"Error initializing assistant: {e}")
@@ -142,9 +142,9 @@ class AssistantService:
             
             self._assistant.set_tools(tools_value)
             self._assistant.set_rag(rag_value)
-            logger.info(f"🔧 Tools configurado como: {tools_value}")
+            logger.info(f"Tools configurado como: {tools_value}")
             print(f"🔧 Tools configurado como: {tools_value}")
-            logger.info(f"🔧 RAG configurado como: {rag_value}")
+            logger.info(f"RAG configurado como: {rag_value}")
             print(f"🔧 RAG configurado como: {rag_value}")
             
             # Process the input using the legacy assistant method
@@ -205,17 +205,44 @@ class AssistantService:
                 
                 if socketio:
                     # Emitir el registro de herramientas al cliente
-                    logger.info(f"🔧 Enviando registro de herramientas: {len(serializable_summary.get('available_tools', {}))} herramientas")
+                    logger.info(f"Enviando registro de herramientas: {len(serializable_summary.get('available_tools', {}))} herramientas")
                     socketio.emit('tools_registry', serializable_summary, namespace='/test')
                     
                     # También enviar las herramientas actualmente seleccionadas
                     selected_tools = self._tools_manager.get_selected_tools()
-                    logger.info(f"🔧 Enviando herramientas seleccionadas: {len(selected_tools)} herramientas")
+                    logger.info(f"Enviando herramientas seleccionadas: {len(selected_tools)} herramientas")
                     socketio.emit('tools_selection_update', selected_tools, namespace='/test')
                 else:
                     logger.warning("No se pudo enviar el registro de herramientas: instancia socketio no disponible")
         except Exception as e:
             logger.error(f"Error sending tools registry to client: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+    
+    def send_agents_registry_to_client(self, socketio_instance=None) -> None:
+        """Envía el registro de agentes disponibles a un cliente recién conectado"""
+        try:
+            from app.core.agents.agent_registry import agent_registry
+            
+            # Obtener el resumen de agentes
+            agents_summary = agent_registry.get_agent_for_frontend()
+            current_agent = agent_registry.get_current_agent()
+            
+            # Usar la instancia proporcionada o la global si no se proporciona
+            socketio = socketio_instance if socketio_instance else socket_instance.get_socketio()
+            
+            if socketio:
+                # Emitir el registro de agentes al cliente
+                logger.info(f"Enviando registro de agentes: {len(agents_summary)} agentes")
+                socketio.emit('agents_registry', {
+                    'agents': agents_summary,
+                    'current_agent': current_agent
+                }, namespace='/test')
+            else:
+                logger.warning("No se pudo enviar el registro de agentes: instancia socketio no disponible")
+                
+        except Exception as e:
+            logger.error(f"Error sending agents registry to client: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
 

@@ -251,7 +251,7 @@ Como un experto reflexivo, analiza profundamente la situación, considera el con
             reflection = self._parse_enhanced_reflection(reflection_response)
             
             # Log mejorado para debugging
-            logger.info(f"🧠 Reflexión iteración {iteration + 1}")
+            logger.info(f"Reflexión iteración {iteration + 1}")
             logger.info(f"   Proceso mental: {reflection.get('mental_process', 'N/A')[:100]}...")
             logger.info(f"   Comprensión: {reflection.get('current_understanding', 'N/A')[:100]}...")
             logger.info(f"   Próxima acción: {reflection.get('strategic_next_action', 'N/A')[:100]}...")

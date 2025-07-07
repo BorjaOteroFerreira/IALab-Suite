@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image as ImageIcon, BarChart2, Key, Ban, AlertCircle } from 'lucide-react';
+import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image as ImageIcon, BarChart2, Key, Ban, AlertCircle, Bot, Brain, MessageSquare, Zap, ChevronDown } from 'lucide-react';
 import './ToolsSelector.css';
 
 const CATEGORY_ICONS = {
@@ -12,6 +12,13 @@ const CATEGORY_ICONS = {
   utility: <Wrench size={16} className="icon" /> // Utilidad
 };
 
+const AGENT_ICONS = {
+  default: <MessageSquare size={16} className="icon" />,
+  adaptive: <Brain size={16} className="icon" />,
+  lineal: <List size={16} className="icon" />,
+  auto: <Zap size={16} className="icon" />
+};
+
 const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [availableTools, setAvailableTools] = useState([]);
@@ -20,6 +27,13 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   const [error, setError] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [activeCategory, setActiveCategory] = useState(null);
+  const [currentSection, setCurrentSection] = useState('tools'); // 'tools' o 'agents'
+  
+  // Estados para agentes
+  const [availableAgents, setAvailableAgents] = useState([]);
+  const [currentAgent, setCurrentAgent] = useState(null);
+  const [agentsLoading, setAgentsLoading] = useState(false);
+  
   const popupRef = useRef(null);
 
   // Cargar herramientas disponibles al montar el componente
@@ -30,7 +44,8 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         // Cargar herramientas disponibles y seleccionadas en paralelo
         await Promise.all([
           loadAvailableTools(),
-          loadSelectedTools()
+          loadSelectedTools(),
+          loadAvailableAgents()
         ]);
         
         // Si no se han cargado herramientas, solicitarlas explícitamente por socket
@@ -102,15 +117,39 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
       console.log('🔧 Socket conectado, recuperando estado de herramientas...');
       // Recargar herramientas seleccionadas cuando se reconecte el socket
       loadSelectedTools();
+      loadAvailableAgents();
+    };
+
+    const handleAgentsRegistry = (data) => {
+      console.log('🤖 Agents registry received:', data);
+      setAvailableAgents(data.agents || []);
+      setCurrentAgent(data.current_agent);
+    };
+
+    const handleAgentChanged = (data) => {
+      console.log('🤖 Agent changed:', data);
+      setCurrentAgent(data.agent_name);
+      
+      // Actualizar el estado del agente en la lista
+      setAvailableAgents(prev => 
+        prev.map(agent => ({
+          ...agent,
+          is_current: agent.id === data.agent_name
+        }))
+      );
     };
 
     socket.on('tools_selection_update', handleToolsUpdate);
     socket.on('tools_registry', handleToolsRegistry);
+    socket.on('agents_registry', handleAgentsRegistry);
+    socket.on('agent_changed', handleAgentChanged);
     socket.on('connect', handleSocketConnect);
 
     return () => {
       socket.off('tools_selection_update', handleToolsUpdate);
       socket.off('tools_registry', handleToolsRegistry);
+      socket.off('agents_registry', handleAgentsRegistry);
+      socket.off('agent_changed', handleAgentChanged);
       socket.off('connect', handleSocketConnect);
     };
   }, [socket, selectedTools]);
@@ -302,6 +341,120 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }
   };
 
+  // Funciones para manejo de agentes
+  const loadAvailableAgents = async () => {
+    setAgentsLoading(true);
+    setError(null);
+    
+    try {
+      console.log('🤖 Cargando agentes disponibles...');
+      const response = await fetch('/api/agents');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('🤖 Datos de agentes recibidos:', data);
+      
+      if (data.success) {
+        console.log('🤖 Agentes disponibles:', data.agents);
+        console.log('🤖 Agente actual:', data.current_agent);
+        setAvailableAgents(data.agents || []);
+        setCurrentAgent(data.current_agent);
+        
+        // Debug: mostrar estructura de cada agente
+        if (data.agents && data.agents.length > 0) {
+          console.log('🤖 Estructura del primer agente:', data.agents[0]);
+          data.agents.forEach((agent, index) => {
+            console.log(`🤖 Agente ${index}:`, { id: agent.id, name: agent.name, type: agent.type, is_current: agent.is_current });
+          });
+        }
+      } else {
+        throw new Error(data.error || 'Error desconocido al cargar agentes');
+      }
+    } catch (error) {
+      console.error('🤖 Error loading agents:', error);
+      setError(error.message);
+    } finally {
+      setAgentsLoading(false);
+    }
+  };
+
+  const selectAgent = async (agentId) => {
+    console.log('🤖 Intentando seleccionar agente:', agentId);
+    console.log('🤖 Agente actual:', currentAgent);
+    
+    if (agentId === currentAgent) {
+      console.log('🤖 El agente ya está seleccionado, no haciendo nada');
+      return; // No hacer nada si ya está seleccionado
+    }
+
+    setAgentsLoading(true);
+    setError(null);
+    
+    try {
+      const requestBody = { agent_name: agentId };
+      console.log('🤖 Enviando datos al servidor:', requestBody);
+      
+      const response = await fetch('/api/agents/select', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('🤖 Respuesta del servidor:', response.status, response.statusText);
+
+      if (!response.ok) {
+        // Intentar obtener más detalles del error
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+          console.log('🤖 Detalles del error:', errorData);
+        } catch (e) {
+          try {
+            const errorText = await response.text();
+            console.log('🤖 Error text:', errorText);
+            if (errorText) {
+              errorMessage = errorText;
+            }
+          } catch (e2) {
+            console.log('🤖 No se pudo obtener detalles del error');
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log('🤖 Datos de respuesta:', data);
+      
+      if (data.success) {
+        setCurrentAgent(agentId);
+        
+        // Actualizar el estado del agente en la lista
+        setAvailableAgents(prev => 
+          prev.map(agent => ({
+            ...agent,
+            is_current: agent.id === agentId
+          }))
+        );
+        
+        console.log(`🤖 Agente cambiado a: ${agentId}`);
+      } else {
+        throw new Error(data.error || 'Error al cambiar agente');
+      }
+    } catch (error) {
+      console.error('🤖 Error selecting agent:', error);
+      setError(`Error al seleccionar agente: ${error.message}`);
+    } finally {
+      setAgentsLoading(false);
+    }
+  };
+
   // Agrupar herramientas por categoría
   const groupToolsByCategory = (tools) => {
     return tools.reduce((groups, tool) => {
@@ -366,41 +519,74 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
           <div className="tools-popup" ref={popupRef}>
             {/* Sidebar de categorías */}
             <div className="tools-sidebar">
-              <div className="tools-sidebar-header">
-                <h3 className="tools-sidebar-title">
-                  <Wrench size={18} style={{marginRight: 6}} /> Herramientas
-                </h3>
-                <p className="tools-sidebar-subtitle">{selectedTools.length} de {availableTools.length} seleccionadas</p>
+              {/* Sección de Herramientas */}
+              <div className="tools-sidebar-section">
+                <div className="tools-sidebar-header">
+                  <h3 className="tools-sidebar-title">
+                    <Wrench size={18} style={{marginRight: 6}} /> Herramientas
+                  </h3>
+                  <p className="tools-sidebar-subtitle">{selectedTools.length} de {availableTools.length} seleccionadas</p>
+                </div>
+                <nav className="category-nav">
+                  {categories.map(([cat, toolsArr]) => {
+                    // Calcular seleccionadas en esta categoría
+                    const selectedInCategory = toolsArr.filter(tool => selectedTools.includes(tool.name)).length;
+                    const totalInCategory = toolsArr.length;
+                    return (
+                      <button
+                        key={cat}
+                        className={`category-nav-item${cat === currentCategory && currentSection === 'tools' ? ' active' : ''}`}
+                        onClick={() => {
+                          setCurrentSection('tools');
+                          handleCategoryClick(cat);
+                        }}
+                      >
+                        <span className="icon">{CATEGORY_ICONS[cat] || <Settings size={16} className="icon" />}</span>
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        <span className="category-count">{selectedInCategory}/{totalInCategory}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
               </div>
-              <nav className="category-nav">
-                {categories.map(([cat, toolsArr]) => {
-                  // Calcular seleccionadas en esta categoría
-                  const selectedInCategory = toolsArr.filter(tool => selectedTools.includes(tool.name)).length;
-                  const totalInCategory = toolsArr.length;
-                  return (
-                    <button
-                      key={cat}
-                      className={`category-nav-item${cat === currentCategory ? ' active' : ''}`}
-                      onClick={() => handleCategoryClick(cat)}
-                    >
-                      <span className="icon">{CATEGORY_ICONS[cat] || <Settings size={16} className="icon" />}</span>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                      <span className="category-count">{selectedInCategory}/{totalInCategory}</span>
-                    </button>
-                  );
-                })}
-              </nav>
+
+              {/* Sección de Agentes */}
+              <div className="tools-sidebar-section">
+                <div className="tools-sidebar-header">
+                  <h3 className="tools-sidebar-title">
+                    <Bot size={18} style={{marginRight: 6}} /> Agentes
+                  </h3>
+                  <p className="tools-sidebar-subtitle">
+                    {currentAgent ? `Activo: ${availableAgents.find(a => a.id === currentAgent)?.name || currentAgent}` : 'Ninguno seleccionado'}
+                  </p>
+                </div>
+                <nav className="category-nav">
+                  <button
+                    className={`category-nav-item${currentSection === 'agents' ? ' active' : ''}`}
+                    onClick={() => setCurrentSection('agents')}
+                  >
+                    <span className="icon"><Bot size={16} className="icon" /></span>
+                    Seleccionar Agente
+                    <span className="category-count">{availableAgents.length}</span>
+                  </button>
+                </nav>
+              </div>
             </div>
             {/* Contenido principal */}
             <div className="tools-main">
               <div className="tools-main-header">
-                <h2 className="tools-main-title">{currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) : ''}</h2>
+                <h2 className="tools-main-title">
+                  {currentSection === 'agents' 
+                    ? 'Agentes' 
+                    : (currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) : '')
+                  }
+                </h2>
                 <div className="tools-actions">
                   <button
                     className="action-button"
-                    onClick={handleRefreshTools}
+                    onClick={currentSection === 'agents' ? loadAvailableAgents : handleRefreshTools}
                     title="Refrescar"
-                    disabled={isLoading}
+                    disabled={isLoading || agentsLoading}
                   >
                     <RefreshCw size={16} />
                   </button>
@@ -419,49 +605,100 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                     <AlertCircle size={14} style={{marginRight: 4, color: '#e74c3c'}} /> {error}
                   </div>
                 )}
-                {isLoading || isInitializing ? (
-                  <div className="tools-loading">
-                    <div className="loading-spinner" />
-                    <span>{isInitializing ? 'Inicializando herramientas...' : 'Cargando herramientas...'}</span>
-                  </div>
-                ) : (
-                  <>
-                    {currentTools.length === 0 ? (
-                      <div className="empty-state">
-                        <div className="empty-state-icon">🔍</div>
-                        <div className="empty-state-title">No hay herramientas en esta categoría</div>
-                        <div className="empty-state-description">Selecciona otra categoría o refresca.</div>
-                      </div>
-                    ) : (
-                      <div className="tools-grid">
-                        {currentTools.map((tool) => (
-                          <div
-                            key={tool.name}
-                            className={`tool-card${selectedTools.includes(tool.name) ? ' selected' : ''}${!tool.available ? ' disabled' : ''}`}
-                            onClick={() => handleCardClick(tool)}
-                          >
-                            <div className="tool-card-header">
-                              <div className="tool-checkbox-custom">
-                                {selectedTools.includes(tool.name) ? <Check size={14} /> : ''}
-                              </div>
-                              <div className="tool-info">
-                                <h4 className="tool-name">{tool.name}</h4>
-                                <p className="tool-description">{tool.description}</p>
-                                <div className="tool-badges">
-                                  {tool.requires_api_key && (
-                                    <span className="tool-badge badge-api-key"> <Key size={12} style={{marginRight: 2}} /> API Key</span>
-                                  )}
-                                  {!tool.available && (
-                                    <span className="tool-badge badge-unavailable"> <Ban size={12} style={{marginRight: 2}} /> No disponible</span>
-                                  )}
+                
+                {currentSection === 'agents' ? (
+                  // Contenido de Agentes
+                  agentsLoading ? (
+                    <div className="tools-loading">
+                      <div className="loading-spinner" />
+                      <span>Cargando agentes...</span>
+                    </div>
+                  ) : (
+                    <>
+                      {availableAgents.length === 0 ? (
+                        <div className="empty-state">
+                          <div className="empty-state-icon">🤖</div>
+                          <div className="empty-state-title">No hay agentes disponibles</div>
+                          <div className="empty-state-description">Intenta refrescar para cargar los agentes.</div>
+                        </div>
+                      ) : (
+                        <div className="tools-grid">
+                          {availableAgents.map((agent) => (
+                            <div
+                              key={agent.id}
+                              className={`tool-card agent-card${agent.is_current || agent.id === currentAgent ? ' selected' : ''}`}
+                              onClick={() => selectAgent(agent.id)}
+                            >
+                              <div className="tool-card-header">
+                                <div className="tool-checkbox-custom">
+                                  {(agent.is_current || agent.id === currentAgent) ? <Check size={14} /> : ''}
+                                </div>
+                                <div className="tool-info">
+                                  <div className="agent-icon-container">
+                                    {AGENT_ICONS[agent.type] || AGENT_ICONS.default}
+                                  </div>
+                                  <h4 className="tool-name">{agent.name}</h4>
+                                  <p className="tool-description">{agent.description}</p>
+                                  <div className="tool-badges">
+                                    <span className="tool-badge badge-agent-type">{agent.type}</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )
+                ) : (
+                  // Contenido de Herramientas (existente)
+                  isLoading || isInitializing ? (
+                    <div className="tools-loading">
+                      <div className="loading-spinner" />
+                      <span>{isInitializing ? 'Inicializando herramientas...' : 'Cargando herramientas...'}</span>
+                    </div>
+                  ) : (
+                    <>
+                      {currentTools.length === 0 ? (
+                        <div className="empty-state">
+                          <div className="empty-state-icon">🔍</div>
+                          <div className="empty-state-title">No hay herramientas en esta categoría</div>
+                          <div className="empty-state-description">Selecciona otra categoría o refresca.</div>
+                        </div>
+                      ) : (
+                        <div className="tools-grid">
+                          {currentTools.map((tool) => (
+                            <div
+                              key={tool.name}
+                              className={`tool-card agent-card${selectedTools.includes(tool.name) ? ' selected' : ''}${!tool.available ? ' disabled' : ''}`}
+                              onClick={() => handleCardClick(tool)}
+                            >
+                              <div className="tool-card-header">
+                                <div className="tool-checkbox-custom">
+                                  {selectedTools.includes(tool.name) ? <Check size={14} /> : ''}
+                                </div>
+                                <div className="tool-info">
+                                  <div className="agent-icon-container">
+                                    {CATEGORY_ICONS[tool.category || 'utility'] || CATEGORY_ICONS.utility}
+                                  </div>
+                                  <h4 className="tool-name">{tool.name}</h4>
+                                  <p className="tool-description">{tool.description}</p>
+                                  <div className="tool-badges">
+                                    {tool.requires_api_key && (
+                                      <span className="tool-badge badge-api-key"> <Key size={12} style={{marginRight: 2}} /> API Key</span>
+                                    )}
+                                    {!tool.available && (
+                                      <span className="tool-badge badge-unavailable"> <Ban size={12} style={{marginRight: 2}} /> No disponible</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )
                 )}
               </div>
             </div>

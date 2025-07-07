@@ -31,13 +31,13 @@ class ToolsManager:
             self._tools_enabled: bool = False
             self._registry = None
             self._initialized = True
-            logger.info("🔧 ToolsManager inicializado")
+            logger.info("Tools manager initialized with assistant service")
     
     def initialize_registry(self, tool_registry):
         """Inicializar con el registry de herramientas"""
         self._registry = tool_registry
         self._update_available_tools()
-        logger.info(f"🔧 ToolsManager: Registry inicializado con {len(self._available_tools)} herramientas")
+        logger.info(f"ToolsManager: Registry inicializado con {len(self._available_tools)} herramientas")
     
     def _update_available_tools(self):
         """Actualizar la lista de herramientas disponibles desde el registry"""
@@ -69,7 +69,7 @@ class ToolsManager:
     def set_tools_enabled(self, enabled: bool):
         """Habilitar o deshabilitar el uso de herramientas"""
         self._tools_enabled = enabled
-        logger.info(f"🔧 ToolsManager: Tools {'habilitado' if enabled else 'deshabilitado'}")
+        logger.info(f"ToolsManager: Tools {'habilitado' if enabled else 'deshabilitado'}")
     
     def is_tools_enabled(self) -> bool:
         """Verificar si las herramientas están habilitadas"""
@@ -83,8 +83,14 @@ class ToolsManager:
             if name in self._available_tools and self._available_tools[name]["available"]
         ]
         
+        # Verificar si ha cambiado la selección
+        tools_changed = set(self._selected_tools) != set(valid_tools)
+        
         self._selected_tools = valid_tools
-        logger.info(f"🔧 ToolsManager: Herramientas seleccionadas: {self._selected_tools}")
+        logger.info(f"ToolsManager: Herramientas seleccionadas: {self._selected_tools}")
+        
+    
+    
     
     def get_selected_tools(self) -> List[str]:
         """Obtener las herramientas seleccionadas"""
@@ -136,7 +142,7 @@ class ToolsManager:
         if self._registry:
             self._registry.reload_tools()
             self._update_available_tools()
-            logger.info("🔧 ToolsManager: Herramientas refrescadas")
+            logger.info("ToolsManager: Herramientas refrescadas")
     
     def get_tools_summary(self) -> Dict[str, Any]:
         """Obtener resumen del estado actual de herramientas"""

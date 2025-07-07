@@ -611,7 +611,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
         Incrusta las imágenes con este formato ![dominio](url_imagen) sin olvidar la exclamación al inicio.
         No incluyas imagenes o mapas si no te las han facilitado las herramientas.
         IMPORTANTE: Los videos de youtube debes insertarlos sin formato markdown, solo el enlace aplanado.
-        Despues del caracter ':' debes añadir un salto de linea y un espacio antes de continuar con el texto  a no ser que sea el primer caracter de la línea, en ese caso elimina el caracter ':' y comienza directamente con el texto.
+        Despues del caracter ':' debes añadir un salto de linea y un espacio antes de continuar con el texto a no ser que sea el primer caracter de la línea, en ese caso elimina el caracter ':' y comienza directamente con el texto.
         Utiliza esta información proporcionada por las herramientas para responder al usuario\n\n"""
         
         for funcion, query, resultado in resultados_herramientas:

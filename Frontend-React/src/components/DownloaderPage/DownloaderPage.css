@@ -1,35 +1,44 @@
-/* === SIMPLIFICACIÓN: Menos recargado, más limpio === */
+/* === PALETA DE COLORES UNIFICADA: Azul/Púrpura Pastel === */
 :root {
-  --accent-primary: #b983ff;
-  --accent-primary-hover: #a16ae8;
-  --surface-elevated: #23233a;
-  --surface-secondary: #23233a;
-  --surface: #181828;
-  --border-light: #b983ff22;
-  --border-strong: #b983ff;
+  --accent-primary: #87CEEB; /* Azul pastel principal */
+  --accent-primary-hover: #b983ff; /* Púrpura pastel para hover */
+  --accent-secondary: #FFB6C1; /* Rosa pastel para acentos */
+  --surface-elevated: #3A455B;
+  --surface-secondary: #2F3A50;
+  --surface: linear-gradient(135deg, #2F3A50, #3A455B);
+  --border-light: rgba(135, 206, 235, 0.3);
+  --border-strong: #87CEEB;
   --text-primary: #fff;
-  --text-secondary: #b983ff;
+  --text-secondary: #87CEEB;
   --radius-lg: 1.2rem;
   --radius-md: 0.7rem;
   --radius-sm: 0.4rem;
 }
 
 .lm-studio-app {
-  background: var(--surface);
+  background: linear-gradient(135deg, 
+    #2A3F5F 0%, 
+    #4A3B6B 50%, 
+    #5F3A4A 100%);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  min-height: 100vh;
+  min-height: 80vh;
+  max-height: 90vh;
+  height: 85vh;
   display: flex;
 }
 
 .sidebar {
   width: 420px;
-  background: var(--surface-secondary);
-  border-right: 1px solid var(--border-light);
+  background: linear-gradient(135deg, 
+    #3A4F6F 0%, 
+    #5A4B7B 100%);
+  border-right: 2px solid var(--border-light);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
+  backdrop-filter: blur(20px);
 }
 
 .search-header {
@@ -45,26 +54,28 @@
 
 .search-input {
   width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: 7px;
-  padding: 8px 12px 8px 34px;
+  background: linear-gradient(135deg, #3A455B, #4A3B6B);
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  padding: 10px 12px 10px 38px;
   color: var(--text-primary);
   font-size: 14px;
-  transition: border 0.18s;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--accent-primary);
+  border-color: var(--accent-primary-hover);
+  box-shadow: 0 0 20px rgba(135, 206, 235, 0.3);
 }
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #b983ff99;
+  color: var(--accent-primary);
 }
 
 .filters {
@@ -74,38 +85,40 @@
 }
 
 .filter-select {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: 5px;
-  padding: 4px 8px;
+  background: linear-gradient(135deg, #3A455B, #4A3B6B);
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  padding: 6px 10px;
   color: var(--text-primary);
   font-size: 12px;
-  transition: border 0.18s;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .filter-select:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--accent-primary-hover);
+  box-shadow: 0 0 15px rgba(135, 206, 235, 0.3);
 }
 
 .gguf-badge {
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
   color: white;
-  padding: 2px 7px;
-  border-radius: 5px;
+  padding: 4px 8px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
 }
 
 .staff-picks {
-  background: #a855f7;
+  background: linear-gradient(135deg, var(--accent-secondary), #FF8FA3);
   color: white;
-  padding: 2px 7px;
-  border-radius: 5px;
+  padding: 4px 8px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
   margin-left: 8px;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
 }
 
 .models-list {
@@ -130,7 +143,7 @@
 .model-card.selected,
 .model-card:hover {
   border: 1px solid var(--accent-primary);
-  background: #23233a;
+  background: #404A60;
 }
 .model-card-icon {
   font-size: 1.3rem;
@@ -258,7 +271,7 @@
 }
 
 .section-scrollable {
-  max-height: 372px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
@@ -268,7 +281,7 @@
   align-items: center;
   padding: 10px 12px;
   border-bottom: 1px solid #b983ff11;
-  background: #23233a;
+  background: #404A60;
   border-radius: 6px;
   margin-bottom: 6px;
   transition: background 0.18s;
@@ -369,8 +382,8 @@
   box-shadow: 0 8px 32px 0 rgba(60,60,90,0.13);
   max-width: 1100px;
   width: 98vw;
-  max-height: 92vh;
-  min-height: 600px;
+  max-height: 80vh;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -422,7 +435,7 @@
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
-  max-height: 60vh;
+  max-height: 40vh;
   overflow-y: auto;
   overflow-x: auto;
   background: var(--surface);
@@ -497,7 +510,7 @@
 .models-list::-webkit-scrollbar-track,
 .section-scrollable::-webkit-scrollbar-track,
 .readme-content::-webkit-scrollbar-track {
-  background: #23233a;
+  background: #404A60;
   border-radius: 7px;
 }
 
@@ -520,12 +533,14 @@
 @media (max-width: 768px) {
   .lm-studio-app {
     flex-direction: column;
+    height: 70vh;
+    min-height: 70vh;
   }
   .sidebar {
     width: 100%;
-    height: 50vh;
+    height: 35vh;
   }
   .main-content {
-    height: 50vh;
+    height: 35vh;
   }
 }

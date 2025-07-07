@@ -12,7 +12,7 @@
   background: transparent;
   border: none;
   border-radius: var(--radius-lg);
-  color: var(--text-primary);
+  color: #87CEEB; /* Azul pastel - mismo color que input-icon-button */
   cursor: pointer;
   font-size: 1.1rem;
   transition: color 0.18s, text-shadow 0.18s;
@@ -25,25 +25,25 @@
 }
 
 .tools-button:hover {
-  color: inherit;
+  color: #87CEEB; /* Mantener azul pastel en hover */
   background: transparent;
   box-shadow: none;
-  text-shadow: none;
+  text-shadow: 0 0 8px rgba(135, 206, 235, 0.3);
 }
 
-/* Mantener el color lila y los efectos cuando el botón activo tiene hover */
+/* Mantener el color púrpura y los efectos cuando el botón activo tiene hover */
 .tools-button.active:hover {
-  color: #b983ff; /* mantener el lila neon */
+  color: #b983ff; /* Púrpura pastel para estado activo - mismo que RAG */
   background: transparent;
   box-shadow: none;
-  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px rgba(185, 131, 255, 0.8), 0 0 48px rgba(255, 255, 255, 0.1);
 }
 
 .tools-button.active {
-  color: #b983ff; /* lila neon - mismo color que input-icon-button.active */
+  color: #b983ff; /* Púrpura pastel para estado activo - mismo que RAG */
   background: transparent;
   box-shadow: none;
-  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px rgba(185, 131, 255, 0.8), 0 0 48px rgba(255, 255, 255, 0.1);
 }
 
 /* Indicador de carga en botón de herramientas */
@@ -60,14 +60,14 @@
   right: -4px;
   width: 12px;
   height: 12px;
-  border: 2px solid var(--accent-primary);
+  border: 2px solid #87CEEB; /* Azul pastel */
   border-top: 2px solid transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .tools-button.initializing .tools-loading-indicator {
-  border: 2px solid var(--warning-border);
+  border: 2px solid #FFB6C1; /* Rosa pastel para inicialización */
   border-top: 2px solid transparent;
 }
 
@@ -76,7 +76,7 @@
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #b983ff;
+  background: #87CEEB; /* Azul pastel para estado normal */
   color: #fff;
   border-radius: 50%;
   min-width: 18px;
@@ -86,7 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #23233a;
+  border: 2px solid rgba(135, 206, 235, 0.3);
   padding: 0 5px;
   box-sizing: border-box;
   z-index: 2;
@@ -95,9 +95,9 @@
 }
 
 .tools-button.active .tools-count {
-  background: #fff;
-  color: #b983ff;
-  border: 2px solid #b983ff;
+  background: #b983ff; /* Púrpura pastel para estado activo */
+  color: #fff;
+  border: 2px solid rgba(185, 131, 255, 0.5);
 }
 
 /* Botón de configuración */
@@ -778,23 +778,28 @@
 
 /* Tarjeta de herramienta */
 .tool-card {
-  background: var(--surface-secondary, #2a2a3e);
-  border: 1px solid var(--border-subtle, #2a2a3e);
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1)) !important;
+  border: 2px solid var(--border-light, #333) !important;
   border-radius: var(--radius-lg, 16px);
   padding: 20px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease !important;
   cursor: pointer;
   position: relative;
 }
 .tool-card:hover {
-  border-color: rgba(185, 131, 255, 0.3);
-  background: rgba(185, 131, 255, 0.05);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border-color: #87CEEB !important;
+  background: rgba(135, 206, 235, 0.05) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3) !important;
 }
 .tool-card.selected {
-  border-color: var(--accent-primary, #b983ff);
-  background: rgba(185, 131, 255, 0.1);
+  border-color: #b983ff !important;
+  background: linear-gradient(135deg, rgba(185, 131, 255, 0.2), rgba(52, 152, 219, 0.2)) !important;
+  box-shadow: 0 0 20px rgba(185, 131, 255, 0.4) !important;
+}
+.tool-card.selected:hover {
+  border-color: #b983ff !important;
+  box-shadow: 0 0 25px rgba(185, 131, 255, 0.5), 0 8px 25px rgba(0, 123, 255, 0.2) !important;
 }
 .tool-card.disabled {
   opacity: 0.5;
@@ -812,9 +817,6 @@
 .tool-checkbox-custom {
   width: 20px;
   height: 20px;
-  border: 2px solid var(--border-light, #3a3a52);
-  border-radius: 6px;
-  background: var(--surface-elevated, #23233a);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -822,11 +824,10 @@
   transition: all 0.2s ease;
   margin-top: 2px;
   font-size: 15px;
+  color: #87CEEB;
 }
 .tool-card.selected .tool-checkbox-custom {
-  background: var(--accent-primary, #b983ff);
-  border-color: var(--accent-primary, #b983ff);
-  color: white;
+  color: var(--accent-primary, #b983ff);
 }
 
 /* Info de la herramienta */
@@ -862,14 +863,14 @@
   gap: 4px;
 }
 .badge-api-key {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  background: rgba(173, 216, 230, 0.3) !important;
+  color: #87CEEB !important;
+  border: 1px solid rgba(173, 216, 230, 0.5) !important;
 }
 .badge-unavailable {
-  background: rgba(220, 53, 69, 0.2);
-  color: #dc3545;
-  border: 1px solid rgba(220, 53, 69, 0.3);
+  background: rgba(255, 182, 193, 0.3) !important;
+  color: #FFB6C1 !important;
+  border: 1px solid rgba(255, 182, 193, 0.5) !important;
 }
 
 /* Estado vacío */
@@ -951,4 +952,54 @@
   width: 16px;
   height: 16px;
   display: inline-block;
+}
+
+/* Estilos específicos para agentes */
+.agent-card {
+  border: 2px solid var(--border-light, #333) !important;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1)) !important;
+  transition: all 0.3s ease !important;
+}
+
+.agent-card:hover {
+  border-color: #87CEEB !important;
+  box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+.agent-card.selected {
+  border-color: #b983ff !important;
+  background: linear-gradient(135deg, rgba(185, 131, 255, 0.2), rgba(52, 152, 219, 0.2)) !important;
+  box-shadow: 0 0 20px rgba(185, 131, 255, 0.4) !important;
+}
+
+.agent-card.selected:hover {
+  border-color: #b983ff !important;
+  box-shadow: 0 0 25px rgba(185, 131, 255, 0.5), 0 8px 25px rgba(0, 123, 255, 0.2) !important;
+}
+
+.agent-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+  color: #87CEEB;
+}
+
+.agent-card.selected .agent-icon-container {
+  color: #b983ff;
+}
+
+.badge-agent-type {
+  background: rgba(173, 216, 230, 0.3) !important;
+  color: #87CEEB !important;
+  border: 1px solid rgba(173, 216, 230, 0.5) !important;
+}
+
+.agent-card.selected .badge-agent-type {
+  background: rgba(185, 131, 255, 0.3) !important;
+  color: #b983ff !important;
+  border: 1px solid rgba(185, 131, 255, 0.4) !important;
 }

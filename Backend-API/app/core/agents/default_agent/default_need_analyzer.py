@@ -29,7 +29,7 @@ class DefaultNeedAnalyzer:
         Migrado desde Cortex._determinar_herramientas_necesarias
         """
         try:
-            logger.info("🧠 Determinando herramientas necesarias usando formato JSON")
+            logger.info("Determinando herramientas necesarias usando formato JSON")
             
             # Verificar si hay herramientas activas disponibles
             active_tools = []
@@ -98,7 +98,7 @@ SIEMPRE DEBES RESPONDER EN ESPAÑOL.
                         response_content += delta['content']
             
             print(f'\n{Fore.BLUE}🧠 Determinando herramientas necesarias\n💭 {response_content}{Style.RESET_ALL}')
-            logger.info(f"🧠 Herramientas determinadas (JSON): {response_content[:200]}...")
+            logger.info(f"Herramientas determinadas (JSON): {response_content[:200]}...")
             return response_content.strip()
             
         except Exception as e:

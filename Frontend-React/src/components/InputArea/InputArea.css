@@ -1,7 +1,7 @@
 .input-area {
   padding: 0.25rem 0.5rem !important;
-  border-top: 2px solid var(--border-primary);
-  background: var(--surface-elevated);
+  border-top: 2px solid #87CEEB;
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05));
   backdrop-filter: blur(20px);
   display: flex;
   justify-content: center;
@@ -17,6 +17,8 @@
   width: 100%;
   font-size: 0.85em;
   margin-bottom: 4px;
+  color: #87CEEB;
+  opacity: 0.8;
 }
 
 .input-container {
@@ -24,13 +26,14 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0; /* Eliminar cualquier separación entre hijos */
+  gap: 8px; /* Pequeño espacio entre elementos */
+  width: 100%;
 }
 
 .input-side-buttons {
   display: flex;
   flex-direction: row;
-  gap: 0.5rem;
+  gap: 8px;
   margin-right: 0.7rem;
   align-items: center;
   justify-content: flex-end;
@@ -38,6 +41,13 @@
   border-radius: 8px;
   box-shadow: none;
   padding: 2px 0 2px 0;
+  flex-wrap: nowrap; /* Mantener en una línea */
+  min-width: fit-content;
+  flex-shrink: 0; /* No permitir que se reduzca */
+}
+
+.input-side-buttons > * {
+  height: 40px; /* Altura consistente */
 }
 
 .input-icon-button {
@@ -45,7 +55,7 @@
   border: none;
   padding: 7px 10px;
   border-radius: 7px;
-  color: #fff;
+  color: #87CEEB; /* Azul pastel */
   font-size: 1.7rem;
   box-shadow: none;
   transition: color 0.18s, text-shadow 0.18s;
@@ -54,28 +64,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px; /* Ancho mínimo fijo */
+  height: 44px; /* Altura fija */
+  flex-shrink: 0; /* No permitir que se reduzca */
 }
 
 .input-icon-button.active {
-  color: #b983ff; /* lila neon */
+  color: #b983ff; /* Púrpura pastel para estado activo */
   background: transparent;
   box-shadow: none;
-  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px rgba(185, 131, 255, 0.8), 0 0 48px rgba(255, 255, 255, 0.1);
 }
 
 .input-icon-button:hover {
-  color: inherit;
+  color: #87CEEB; /* Mantener azul pastel en hover */
   background: transparent;
   box-shadow: none;
-  text-shadow: none;
+  text-shadow: 0 0 8px rgba(135, 206, 235, 0.3);
 }
 
-/* Mantener el color lila y los efectos cuando el botón activo tiene hover */
+/* Mantener el color púrpura y los efectos cuando el botón activo tiene hover */
 .input-icon-button.active:hover {
-  color: #b983ff; /* mantener el lila neon */
+  color: #b983ff; /* mantener el púrpura pastel */
   background: transparent;
   box-shadow: none;
-  text-shadow: 0 0 16px #b983ff, 0 0 32px #b983ffcc, 0 0 48px #fff2;
+  text-shadow: 0 0 16px #b983ff, 0 0 32px rgba(185, 131, 255, 0.8), 0 0 48px rgba(255, 255, 255, 0.1);
 }
 
 .input-icon-button:focus {
@@ -83,21 +96,27 @@
 }
 
 .message-textarea {
-  width: 100%;
+  flex: 1; /* Tomar todo el espacio disponible */
   min-height: 44px;
   padding: 0.75rem 2.3rem 0.75rem 1rem;
   font-size: 0.9rem;
   border-radius: var(--radius-lg);
   resize: none;
-  border: 1px solid var(--border-light);
-  background: var(--surface);
+  border: 2px solid #87CEEB;
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05));
   color: var(--text-primary);
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.1);
   outline: none;
-  transition: border 0.2s;
+  transition: border 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   /* Ocultar barra de scroll en todos los navegadores */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
+}
+
+.message-textarea:focus {
+  border-color: #b983ff;
+  background: linear-gradient(135deg, rgba(185, 131, 255, 0.1), rgba(135, 206, 235, 0.1));
+  box-shadow: 0 0 20px rgba(185, 131, 255, 0.2), 0 4px 12px rgba(135, 206, 235, 0.15);
 }
 
 .message-textarea::-webkit-scrollbar {
@@ -111,23 +130,31 @@
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: linear-gradient(135deg, #87CEEB, #b983ff);
   color: #fff;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  box-shadow: var(--shadow-xs);
-  transition: background 0.2s;
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+  transition: all 0.3s ease;
   z-index: 2;
   padding: 0;
+}
+
+.send-button:hover {
+  background: linear-gradient(135deg, #b983ff, #87CEEB);
+  box-shadow: 0 6px 16px rgba(185, 131, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 .send-button:disabled {
   background: var(--surface-variant);
   color: var(--text-secondary);
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .new-chat-button {
@@ -136,22 +163,102 @@
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 50%;
-  background: var(--surface-secondary, #23234a);
-  color: var(--primary, #6366f1);
-  border: 2px solid var(--primary, #6366f1);
+  background: rgba(135, 206, 235, 0.1);
+  color: #87CEEB;
+  border: 2px solid #87CEEB;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  box-shadow: var(--shadow-xs);
-  transition: background 0.2s, color 0.2s, border 0.2s;
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.2);
+  transition: all 0.3s ease;
   z-index: 2;
   padding: 0;
   cursor: pointer;
 }
 
 .new-chat-button:hover {
-  background: var(--primary, #6366f1);
+  background: #87CEEB;
   color: #fff;
-  border-color: var(--primary, #6366f1);
+  border-color: #87CEEB;
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Estilos específicos para el AgentSelector en InputArea */
+.input-container .agent-selector {
+  margin: 0; /* Eliminar cualquier margen */
+  flex-shrink: 0; /* No permitir que se reduzca */
+}
+
+.input-container .agent-selector-toggle {
+  height: 44px; /* Altura consistente con otros botones */
+  width: auto; /* Ancho automático para ajustarse al contenido */
+  min-width: 120px; /* Ancho mínimo para mostrar nombres de agentes */
+  max-width: 200px; /* Ancho máximo para no ocupar demasiado espacio */
+  border-radius: 8px; /* Bordes redondeados pero no circular */
+  padding: 8px 12px; /* Padding para el contenido */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.input-container .agent-selector-toggle:hover {
+  border-radius: 8px; /* Mantener bordes redondeados en hover */
+}
+
+.input-container .agent-selector-toggle .agent-text {
+  display: block !important; /* Mostrar el texto del agente incluso en pantallas pequeñas */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.input-container .agent-selector-toggle .agent-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.input-container .agent-selector-toggle .agent-type {
+  display: none; /* Ocultar el tipo para ahorrar espacio */
+}
+
+/* Posicionamiento del popup del AgentSelector cuando está en el InputArea */
+.input-container .agent-selector .agent-selector-popup {
+  position: fixed !important;
+  z-index: 10000 !important; /* Z-index muy alto para estar por encima de todo */
+  width: 320px;
+  max-height: 400px;
+  transform: none !important;
+}
+
+/* Ajustar la flecha del popup para que apunte hacia abajo */
+.input-container .agent-selector .agent-selector-popup::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 15px; /* Alinear con el botón del selector */
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--popup-bg, #1e1e1e);
+  z-index: 10001;
+}
+
+/* Asegurar que el input-area no oculte el popup */
+.input-area {
+  position: relative;
+  z-index: 1;
+}
+
+/* Asegurar que el popup sea visible por encima del contenido */
+body .agent-selector-popup {
+  position: fixed !important;
+  z-index: 10000 !important;
+}
+
+/* Asegurar que el popup se posicione correctamente */
+.input-side-buttons .agent-selector-popup {
+  bottom: 45px; /* Ajustar para que aparezca justo encima del botón circular */
 }

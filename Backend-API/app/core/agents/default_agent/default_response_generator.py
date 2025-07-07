@@ -32,7 +32,7 @@ class DefaultResponseGenerator:
         Genera la respuesta final incorporando los resultados de todas las herramientas
         Migrado desde Cortex.generar_respuesta_final
         """
-        salida = '[>] Generando respuesta final incorporando todos los resultados...✍️'
+        salida = '[>] Generando respuesta final incorporando todos los resultados...'
         print(f"{Fore.GREEN}{salida}{Style.RESET_ALL}")
         logger.info(salida)
         
@@ -59,7 +59,7 @@ class DefaultResponseGenerator:
             if not final_response or final_response.strip() == "":
                 final_response = self._generar_respuesta_fallback(resultados_herramientas)
             
-            logger.info("✅ Respuesta final generada exitosamente")
+            logger.info("Respuesta final generada exitosamente")
             return final_response
             
         except Exception as e:
@@ -84,14 +84,13 @@ class DefaultResponseGenerator:
         # Instrucciones para la respuesta final
         instrucciones = """
 ## INSTRUCCIONES PARA LA RESPUESTA:
-1. Integra TODA la información recopilada de manera coherente y útil
-2. Organiza la información de forma clara y estructurada
-3. Responde directamente a la consulta original del usuario
-4. Si hay múltiples fuentes, compara y sintetiza la información
-5. Usa formato Markdown para mejorar la legibilidad
-6. NO menciones las herramientas utilizadas internamente
-7. Presenta la información como si fuera tu conocimiento directo
-8. Si la información es contradictoria, menciona las diferentes perspectivas
+    Responde en Markdown.
+    1.Tus respuestas deben estar bien maquetadas, deben ser agradables a la vista y fáciles de leer.
+    2.Incrusta las imágenes con este formato ![dominio](url_imagen) sin olvidar la exclamación al inicio.
+    3.No incluyas imagenes o mapas si no te las han facilitado las herramientas.
+    4.IMPORTANTE: Los videos de youtube debes insertarlos sin formato markdown, solo el enlace aplanado.
+    5.Despues del caracter ':' debes añadir un salto de linea y un espacio antes de continuar con el texto  a no ser que sea el primer caracter de la línea, en ese caso elimina el caracter ':' y comienza directamente con el texto.
+    6.Utiliza esta información proporcionada por las herramientas para responder al usuario
 
 ## CONSULTA ORIGINAL:
 """
@@ -129,7 +128,7 @@ class DefaultResponseGenerator:
         Migrado desde Cortex._generate_normal_response
         """
         try:
-            logger.info("📝 Generando respuesta normal sin herramientas")
+            logger.info("Generando respuesta normal sin herramientas")
             
             # Crear prompt simple para respuesta directa
             messages = [
@@ -145,7 +144,7 @@ class DefaultResponseGenerator:
                     if 'content' in delta:
                         response_content += delta['content']
             
-            logger.info("✅ Respuesta normal generada exitosamente")
+            logger.info("Respuesta normal generada exitosamente")
             return response_content.strip()
             
         except Exception as e:

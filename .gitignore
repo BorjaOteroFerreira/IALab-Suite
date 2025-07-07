@@ -88,7 +88,7 @@ env/
 
 # Models and data
 *.gguf
-models/
+
 documents/
 chats/
 logs/

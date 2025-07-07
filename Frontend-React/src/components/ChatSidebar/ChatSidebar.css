@@ -2,15 +2,18 @@
 .chat-sidebar {
   width: 320px;
   height: 100vh;
-  background: var(--surface-bg);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 0.15) 0%, 
+    rgba(147, 112, 219, 0.15) 50%, 
+    rgba(255, 182, 193, 0.15) 100%);
   backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 2px solid rgba(135, 206, 235, 0.3);
   position: fixed;
   left: 0;
   top: 0;
   z-index: 50;
   transition: transform var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 8px 32px rgba(135, 206, 235, 0.2);
   display: flex;
   flex-direction: column;
 }
@@ -22,22 +25,27 @@
 /* Header del Sidebar */
 .header-chat-menu {
   padding: var(--space-6) var(--space-4) var(--space-4);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: var(--card-bg);
+  border-bottom: 2px solid rgba(135, 206, 235, 0.3);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 0.2) 0%, 
+    rgba(147, 112, 219, 0.2) 100%);
+  backdrop-filter: blur(15px);
 }
 
 .header-chat-menu button {
   width: 100%;
-  background: var(--primary-bg);
-  color: var(--text-primary);
-  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 0.9) 0%, 
+    rgba(147, 112, 219, 0.9) 100%);
+  color: #ffffff;
+  border-radius: 16px;
   padding: var(--space-4);
   font-size: 16px;
   font-weight: 600;
-  border: none;
+  border: 2px solid rgba(135, 206, 235, 0.5);
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 6px 20px rgba(135, 206, 235, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,9 +53,16 @@
 }
 
 .header-chat-menu button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(135, 206, 235, 0.4);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 1) 0%, 
+    rgba(147, 112, 219, 1) 100%);
+  border-color: rgba(135, 206, 235, 0.7);
+}
+
+.header-chat-menu button:active {
+  transform: translateY(-1px);
 }
 
 .header-chat-menu button::before {
@@ -68,7 +83,7 @@
 .conversations-list:empty::after {
   content: 'No hay conversaciones guardadas';
   text-align: center;
-  color: var(--text-muted);
+  color: rgba(135, 206, 235, 0.8);
   font-style: italic;
   padding: var(--space-8);
   display: block;
@@ -76,20 +91,28 @@
 
 /* Item de Conversación */
 .load-history {
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 0.1) 0%, 
+    rgba(147, 112, 219, 0.1) 50%, 
+    rgba(255, 182, 193, 0.1) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(135, 206, 235, 0.3);
   overflow: hidden;
   transition: all var(--transition-fast);
   display: flex;
   align-items: stretch;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 15px rgba(135, 206, 235, 0.15);
+  backdrop-filter: blur(10px);
 }
 
 .load-history:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(135, 206, 235, 0.25);
+  border-color: rgba(135, 206, 235, 0.6);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 0.2) 0%, 
+    rgba(147, 112, 219, 0.2) 50%, 
+    rgba(255, 182, 193, 0.2) 100%);
 }
 
 /* Botón de Cargar */
@@ -97,7 +120,7 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: var(--text-primary);
+  color: #ffffff;
   padding: var(--space-3) var(--space-4);
   text-align: left;
   cursor: pointer;
@@ -110,15 +133,17 @@
 }
 
 .load-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
-  color: var(--accent-primary);
+  background: linear-gradient(135deg, 
+    rgba(135, 206, 235, 0.3) 0%, 
+    rgba(147, 112, 219, 0.3) 100%);
+  color: #ffffff;
 }
 
 /* Botón de Eliminar */
 .delete-btn {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: rgba(255, 182, 193, 0.8);
   padding: var(--space-3);
   cursor: pointer;
   font-size: 16px;
@@ -127,12 +152,14 @@
   align-items: center;
   justify-content: center;
   width: 44px;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 2px solid rgba(135, 206, 235, 0.3);
 }
 
 .delete-btn:hover {
-  background: var(--accent-error);
-  color: var(--text-primary);
+  background: linear-gradient(135deg, 
+    rgba(255, 182, 193, 0.8) 0%, 
+    rgba(255, 105, 135, 0.8) 100%);
+  color: #ffffff;
 }
 
 /* Overlay para cerrar sidebar en móvil */
@@ -142,8 +169,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(135, 206, 235, 0.3);
+  backdrop-filter: blur(8px);
   z-index: 40;
   opacity: 0;
   visibility: hidden;
@@ -165,8 +192,8 @@
 .delete-chat-btn {
   background: transparent;
   border: none;
-  border-right: 2px solid grey; /* Separador visible */
-  color: var(--error-text);
+  border-right: 2px solid rgba(135, 206, 235, 0.3);
+  color: rgba(255, 182, 193, 0.9);
   padding: 1rem;
   cursor: pointer;
   font-size: 0.9rem;
@@ -176,15 +203,18 @@
 }
 
 .delete-chat-btn:hover {
-  background: var(--error-hover);
+  background: linear-gradient(135deg, 
+    rgba(255, 182, 193, 0.3) 0%, 
+    rgba(255, 105, 135, 0.3) 100%);
+  color: #ffffff;
 }
 
 
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid var(--accent-primary);
+  border: 3px solid rgba(135, 206, 235, 0.3);
+  border-top: 3px solid rgba(135, 206, 235, 0.9);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

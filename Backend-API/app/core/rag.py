@@ -45,7 +45,7 @@ class DocumentStore:
         legacy_index_path = "document_index.pkl"
         if os.path.exists(legacy_index_path) and not os.path.exists(self.index_path):
             print(f"⚠️ Encontrado índice legacy en raíz, migrando a {self.index_path}")
-            logger.info(f"⚠️ Encontrado índice legacy en raíz, migrando a {self.index_path}")
+            logger.info(f"Encontrado índice legacy en raíz, migrando a {self.index_path}")
             # Crear directorio si no existe
             parent_dir = os.path.dirname(self.index_path)
             if parent_dir and not os.path.exists(parent_dir):
@@ -54,10 +54,10 @@ class DocumentStore:
             try:
                 shutil.copy2(legacy_index_path, self.index_path)
                 print("✅ Migración del índice completada con éxito")
-                logger.info("✅ Migración del índice completada con éxito")
+                logger.info("Migración del índice completada con éxito")
             except Exception as e:
                 print(f"❌ Error al migrar el índice: {e}")
-                logger.error(f"❌ Error al migrar el índice: {e}")
+                logger.error(f"Error al migrar el índice: {e}")
         
         self.document_index = self.load_index()
         self.document_hashes: Set[str] = {
@@ -66,33 +66,33 @@ class DocumentStore:
             for page in pages.values()
         }
         print(f"🔍 Document store inicializado con {len(self.document_hashes)} fragmentos de documentos")
-        logger.info(f"🔍 Document store inicializado con {len(self.document_hashes)} fragmentos de documentos")
+        logger.info(f"Document store inicializado con {len(self.document_hashes)} fragmentos de documentos")
         self.document_summaries = {}
 
     def load_index(self) -> Dict:
         if os.path.exists(self.index_path):
             try:
                 print(f"📂 Cargando índice de documentos desde: {self.index_path}")
-                logger.info(f"📂 Cargando índice de documentos desde: {self.index_path}")
+                logger.info(f"Cargando índice de documentos desde: {self.index_path}")
                 with open(self.index_path, 'rb') as f:
                     index_data = pickle.load(f)
                 print(f"✅ Índice cargado con éxito: {len(index_data)} documentos")
-                logger.info(f"✅ Índice cargado con éxito: {len(index_data)} documentos")
+                logger.info(f"Índice cargado con éxito: {len(index_data)} documentos")
                 return index_data
             except (pickle.PickleError, EOFError) as e:
                 print(f"❌ Error al cargar el índice de documentos: {e}")
                 print(f"❌ Creando un nuevo índice vacío")
-                logger.error(f"❌ Error al cargar el índice de documentos: {e}")
+                logger.error(f"Error al cargar el índice de documentos: {e}")
                 return {}
         else:
             parent_dir = os.path.dirname(self.index_path)
             if parent_dir and not os.path.exists(parent_dir):
                 os.makedirs(parent_dir, exist_ok=True)
                 print(f"📁 Directorio creado para el índice de documentos: {parent_dir}")
-                logger.info(f"📁 Directorio creado para el índice de documentos: {parent_dir}")
+                logger.info(f"Directorio creado para el índice de documentos: {parent_dir}")
             print(f"⚠️ No se encontró el archivo de índice en: {self.index_path}")
             print(f"⚠️ Creando un nuevo índice vacío")
-            logger.warning(f"⚠️ No se encontró el archivo de índice en: {self.index_path}")
+            logger.warning(f"No se encontró el archivo de índice en: {self.index_path}")
             return {}
 
     def save_index(self):
@@ -102,7 +102,7 @@ class DocumentStore:
             parent_dir = os.path.dirname(self.index_path)
             if parent_dir and not os.path.exists(parent_dir):
                 os.makedirs(parent_dir, exist_ok=True)
-                logger.info(f"📁 Directorio creado para guardar índice: {parent_dir}")
+                logger.info(f"Directorio creado para guardar índice: {parent_dir}")
             
             # Guardar primero a un archivo temporal
             temp_path = f"{self.index_path}.tmp"
@@ -117,11 +117,11 @@ class DocumentStore:
             
             num_docs = len(self.document_index)
             print(f"💾 Índice guardado con éxito en {self.index_path} ({num_docs} documentos)")
-            logger.info(f"💾 Índice guardado con éxito en {self.index_path} ({num_docs} documentos)")
+            logger.info(f"Índice guardado con éxito en {self.index_path} ({num_docs} documentos)")
             
             # Verificar tamaño del archivo para debugging
             file_size = os.path.getsize(self.index_path)
-            logger.info(f"📊 Tamaño del archivo de índice: {file_size} bytes")
+            logger.info(f"Tamaño del archivo de índice: {file_size} bytes")
             
             return True
         except Exception as e:

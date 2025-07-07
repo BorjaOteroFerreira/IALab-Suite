@@ -14,6 +14,7 @@ from app.api.model_controller import model_controller
 from app.api.assistant_controller import assistant_controller
 from app.api.static_controller import static_controller
 from app.api.tools_controller import tools_controller
+from app.api.agent_controller import agent_controller
 from app.services.assistant_service import assistant_service
 # Importar el proveedor de instancias socketio
 from app.utils import socket_instance
@@ -108,6 +109,9 @@ def _register_routes(app):
     app.route('/api/tools/selected', methods=['GET'])(tools_controller.get_selected_tools)
     app.route('/api/tools/selected', methods=['POST'])(tools_controller.set_selected_tools)
     app.route('/api/tools/refresh', methods=['POST'])(tools_controller.refresh_tools)
+    
+    # Register Blueprints - Agents
+    app.register_blueprint(agent_controller)
 
 
 def _register_socket_events(socketio):
@@ -134,8 +138,10 @@ def _register_socket_events(socketio):
             socket_instance.set_socketio(socketio)
             # Enviar registro de herramientas usando el objeto socketio
             assistant_service.send_tools_registry_to_client(socketio)
+            # Enviar registro de agentes al cliente
+            assistant_service.send_agents_registry_to_client(socketio)
         except Exception as e:
-            logger.error(f"Error sending tools registry on connection: {e}")
+            logger.error(f"Error sending registry on connection: {e}")
             try:
                 import traceback
                 logger.error(f"Traceback: {traceback.format_exc()}")
@@ -165,6 +171,29 @@ def _register_socket_events(socketio):
             except ImportError:
                 logger.error(f"Error sending tools registry on request: {e}")
             return {'success': False, 'error': str(e)}
+    
+    @socketio.on('agent_selected', namespace='/test')
+    def handle_agent_selected(data):
+        """Handle agent selection from WebSocket"""
+        try:
+            logger.info(f"Agent selected via WebSocket: {data}")
+            # Notificar a otros clientes conectados sobre el cambio
+            socketio.emit('agent_changed', data, namespace='/test')
+            return {'success': True}
+        except Exception as e:
+            logger.error(f"Error handling agent selection: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @socketio.on('request_agents_registry', namespace='/test')
+    def handle_request_agents_registry(data):
+        """Handle request for agents registry"""
+        try:
+            logger.info("Agents registry requested via WebSocket")
+            assistant_service.send_agents_registry_to_client(socketio)
+            return {'success': True}
+        except Exception as e:
+            logger.error(f"Error sending agents registry: {e}")
+            return {'success': False, 'error': str(e)}
 
 def _register_hooks(app):
     """Register application hooks"""
@@ -179,10 +208,10 @@ def _register_hooks(app):
         try:
             success = assistant_service.initialize()
             if success:
-                logger.info("🤖 Assistant service initialized successfully")
+                logger.info("Assistant service initialized successfully")
                 app._assistant_initialized = True
             else:
-                logger.error("❌ Failed to initialize assistant service")
+                logger.error("Failed to initialize assistant service")
         except Exception as e:
             logger.error(f"Error initializing assistant: {e}")
             app._assistant_initialized = True  # Prevent infinite retry

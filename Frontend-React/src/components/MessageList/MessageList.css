@@ -31,7 +31,7 @@
   margin-top: 1.2rem;
   margin-left: 3.5rem;
   margin-right: 3.5rem;
-  border: 1.5px solid rgba(99,102,241,0.10);
+  border: 1.5px solid rgba(135, 206, 235, 0.3);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: box-shadow 0.25s, background 0.25s, border 0.25s;
@@ -45,16 +45,16 @@
   flex-direction: row-reverse;
   margin-left: 0;
   margin-right: 3.5rem;
-  border: 2.5px solid var(--primary);
-  box-shadow: 0 0 8px 1.5px var(--primary), 0 4px 16px 0 rgba(99,102,241,0.08), 0 1.5px 8px 0 rgba(99,102,241,0.08);
+  border: 2.5px solid #87CEEB;
+  box-shadow: 0 0 8px 1.5px rgba(135, 206, 235, 0.4), 0 4px 16px 0 rgba(135, 206, 235, 0.08), 0 1.5px 8px 0 rgba(135, 206, 235, 0.08);
 }
 
 .message.assistant {
   background: linear-gradient(135deg, var(--assistant-bubble) 60%, rgba(40,44,52,0.10) 100%);
   color: var(--text-primary);
   align-self: flex-start;
-  border: 2.5px solid rgba(139,92,246,0.45);
-  box-shadow: 0 0 16px 2px rgba(139,92,246,0.25), 0 4px 32px 0 rgba(60,60,90,0.10), 0 1.5px 8px 0 rgba(99,102,241,0.08);
+  border: 2.5px solid rgba(185, 131, 255, 0.45);
+  box-shadow: 0 0 16px 2px rgba(185, 131, 255, 0.25), 0 4px 32px 0 rgba(60,60,90,0.10), 0 1.5px 8px 0 rgba(185, 131, 255, 0.08);
 }
 
 .message-avatar {
@@ -65,8 +65,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(99,102,241,0.12);
-  box-shadow: 0 2px 8px 0 rgba(99,102,241,0.10);
+  background: rgba(135, 206, 235, 0.12);
+  box-shadow: 0 2px 8px 0 rgba(135, 206, 235, 0.10);
   flex-shrink: 0;
   margin-right: 0;
   margin-left: -2.5rem;
@@ -74,7 +74,7 @@
   margin-bottom: 0;
   z-index: 3;
   position: static;
-  border: 1.5px solid rgba(99,102,241,0.18);
+  border: 1.5px solid rgba(135, 206, 235, 0.3);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
@@ -91,7 +91,7 @@
 }
 
 .message.user .message-avatar {
-  background: var(--primary);
+  background: #87CEEB;
   color: #fff;
   margin-left: 0;
   margin-right: -2.5rem;
@@ -124,7 +124,7 @@
   display: block;
   width: 7px;
   height: 7px;
-  background: var(--primary);
+  background: #87CEEB;
   border-radius: 50%;
   animation: typingBlink 1.2s infinite both;
 }
@@ -158,7 +158,7 @@
 
 .welcome-message h2 {
   font-size: 1.5rem;
-  background: linear-gradient(90deg, var(--primary), var(--secondary, #a855f7), var(--primary-light, #60a5fa));
+  background: linear-gradient(90deg, #87CEEB, #b983ff, #87CEEB);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -178,7 +178,7 @@
 }
 
 .welcome-message-p::selection {
-  background: var(--primary, #6366f1);
+  background: #87CEEB;
   color: #fff !important;
 }
 

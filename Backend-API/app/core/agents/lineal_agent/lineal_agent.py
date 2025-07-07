@@ -56,7 +56,7 @@ class LinealAgent:
         
         # Verificar si las herramientas están habilitadas
         if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
-            logger.warning("🔧 Las herramientas están deshabilitadas globalmente.")
+            logger.warning("Las herramientas están deshabilitadas globalmente.")
             self.final_response = self._generate_normal_response()
             return
         
@@ -72,7 +72,7 @@ class LinealAgent:
         self.response_generator = ResponseGenerator(self.model, self.socket, self.response_queue, self.original_prompt, self.assistant)
         
         # Iniciar el procesamiento tradicional
-        logger.info("📋 Inicializando Agente Tradicional")
+        logger.info("Inicializando Agente Tradicional")
         self.final_response = self._traditional_processing()
     
     def _initialize_tools(self):
@@ -82,10 +82,10 @@ class LinealAgent:
             from app.core.tools_manager import tools_manager
             
             if hasattr(tools_manager, '_registry') and tools_manager._registry:
-                logger.info("🔧 Using existing tool registry from ToolsManager")
+                logger.info("Using existing tool registry from ToolsManager")
                 self.tool_registry = tools_manager._registry
             else:
-                logger.info("🔧 Creating new ToolRegistry in agent")
+                logger.info("Creating new ToolRegistry in agent")
                 self.tool_registry = ToolRegistry()
                 try:
                     self.tool_registry.discover_tools()
@@ -95,7 +95,7 @@ class LinealAgent:
             
             self.tools_manager = tools_manager
             self.tools = get_available_tools_dict(self.tool_registry)
-            logger.info(f"🔧 Traditional Agent: {len(self.tools)} tools available")
+            logger.info(f"Traditional Agent: {len(self.tools)} tools available")
             
             from app.core.socket_handler import SocketResponseHandler
             self.socket_handler = SocketResponseHandler
@@ -143,7 +143,7 @@ class LinealAgent:
             return final_response
             
         except Exception as e:
-            from .utils import clean_error_message
+            from ..utils import clean_error_message
             error_clean = clean_error_message(str(e))
             logger.error(f"Error en procesamiento tradicional: {error_clean}")
             self._safe_emit_status(f"❌ Error en Agente Tradicional: {error_clean}")
@@ -162,7 +162,7 @@ class LinealAgent:
 
     def _safe_emit_status(self, message: str):
         """Emite mensaje de estado de forma segura, manejando errores de encoding"""
-        safe_emit_status(self.socket, message, self._emit_status)
+        safe_emit_status(self.socket, message, 'info')
 
     def get_response(self) -> str:
         """Obtiene la respuesta final"""

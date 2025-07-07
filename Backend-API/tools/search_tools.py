@@ -13,15 +13,11 @@ from sumy.summarizers.lsa import LsaSummarizer
 from .base_tool import BaseTool, ToolMetadata, ToolCategory
 from urllib.parse import urlparse
 
-# Cargar variables de entorno
-from dotenv import load_dotenv
-load_dotenv()
-
 class SearchTools(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="Google SerperAPI",
+            name="Serper.dev",
             description="Busca información en internet sobre un tema específico",
             category=ToolCategory.SEARCH,
             requires_api_key=True,
@@ -30,7 +26,7 @@ class SearchTools(BaseTool):
 
     @classmethod
     def get_tool_name(cls) -> str:
-        return "Google SerperAPI"
+        return "Serper.dev"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta búsqueda en internet"""
@@ -39,37 +35,17 @@ class SearchTools(BaseTool):
     @staticmethod
     def search_internet(query):
         """Searches the internet for a given topic and returns relevant results."""
-        
-        # Verificar que la API key esté disponible
-        api_key = os.environ.get('SERPER_API_KEY')
-        if not api_key:
-            error_msg = "Error: SERPER_API_KEY no está configurada en las variables de entorno."
-            print(error_msg)
-            return error_msg
 
         top_result_to_return = 5
         url = "https://google.serper.dev/search"
         payload = {"q": query, 'order': 'date'}
         headers = {
-            'X-API-KEY': api_key,
+            'X-API-KEY': os.environ.get('SERPER_API_KEY'),
             'content-type': 'application/json'
         }
-        
         try:
-            print(f"[DEBUG] Enviando búsqueda a Serper API con query: {query}")
-            print(f"[DEBUG] API Key presente: {'Sí' if api_key else 'No'}")
-            print(f"[DEBUG] API Key (primeros 10 chars): {api_key[:10] if api_key else 'None'}...")
-            
             session = HTMLSession()
             response = session.post(url, headers=headers, json=payload)
-            
-            print(f"[DEBUG] Status code: {response.status_code}")
-            print(f"[DEBUG] Response headers: {dict(response.headers)}")
-            
-            if response.status_code != 200:
-                print(f"[ERROR] Response content: {response.text}")
-                return f"Error en la búsqueda: {response.status_code} - {response.text}"
-            
             response.raise_for_status()
 
             data = response.json()
@@ -77,7 +53,7 @@ class SearchTools(BaseTool):
                 return "Sorry, no se encontraron resultados relevantes."
 
             string = []
-            for result in data['organic'][:top_result_to_return]:
+            for idx, result in enumerate(data['organic'][:top_result_to_return], 1):
                 title = result.get('title', '').replace('|', '-').replace('||', '--')
                 snippet = result.get('snippet', '').replace('|', '-').replace('||', '--')
                 link = result.get('link')
@@ -85,25 +61,27 @@ class SearchTools(BaseTool):
                     continue
 
                 content = SearchTools.extract_content(link)
+                # Encabezado numerado y formato robusto
                 string.append('\n'.join([
-                    f"Title: {title}",
-                    f"Link: {link}",
-                    f"Snippet: {snippet}",
-                    f"Content: {content}",
-                    "\n-----------------"
+                    f"### Noticia {idx}",
+                    f"**Título:** {title}",
+                    f"**Enlace:** {link}",
+                    f"**Snippet:** {snippet}",
+                    "-----------------"
                 ]))
 
             return '\n'.join(string)
 
         except requests.exceptions.RequestException as e:
-            error_msg = f"Error fetching search results: {e}"
-            print(error_msg)
-            return f"An error occurred while searching the internet: {str(e)}"
+            print(f"Error fetching search results: {e}")
+            return "An error occurred while searching the internet."
 
     @staticmethod
     def extract_relevant_content_from_text(text):
         try:
-            parser = HtmlParser.from_string(text, Tokenizer('spanish'))
+            tokenizer = Tokenizer('spanish')
+
+            parser = HtmlParser.from_string(text, tokenizer=tokenizer,url=None)
             summarizer = LsaSummarizer()
             summary = summarizer(parser.document, 1)  # Una sola frase
             return str(summary[0]) if summary else ""

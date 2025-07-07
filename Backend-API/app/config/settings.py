@@ -30,7 +30,7 @@ class Config:
     DOCUMENTS_DIR = 'documents'
     
     # Logging Configuration
-    LOG_LEVEL = 'ERROR'
+    LOG_LEVEL = 'INFO'
     LOG_FILE = 'logs/flask_log.log'
     
     # Model Default Parameters

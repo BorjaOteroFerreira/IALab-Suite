@@ -59,7 +59,7 @@ class DefaultAgent:
         
         # Verificar si las herramientas están habilitadas
         if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
-            logger.warning("🔧 Las herramientas están deshabilitadas globalmente.")
+            logger.warning("Las herramientas están deshabilitadas globalmente.")
             self.final_response = self._generate_normal_response()
             return
         
@@ -79,7 +79,7 @@ class DefaultAgent:
         )
         
         # Iniciar el procesamiento del agente default
-        logger.info("🧠 Inicializando Default Agent (migración de Cortex)")
+        logger.info("Inicializando Default Agent (migración de Cortex)")
         self.final_response = self._default_processing()
     
     def _initialize_tools(self):
@@ -89,10 +89,10 @@ class DefaultAgent:
             from app.core.tools_manager import tools_manager
             
             if hasattr(tools_manager, '_registry') and tools_manager._registry:
-                logger.info("🔧 Default Agent: Using existing tool registry from ToolsManager")
+                logger.info("Default Agent: Using existing tool registry from ToolsManager")
                 self.tool_registry = tools_manager._registry
             else:
-                logger.info("🔧 Default Agent: Creating new ToolRegistry")
+                logger.info("Default Agent: Creating new ToolRegistry")
                 self.tool_registry = ToolRegistry()
                 try:
                     self.tool_registry.discover_tools()
@@ -102,7 +102,7 @@ class DefaultAgent:
             
             self.tools_manager = tools_manager
             self.tools = get_available_tools_dict(self.tool_registry)
-            logger.info(f"🔧 Default Agent: {len(self.tools)} tools available")
+            logger.info(f"Default Agent: {len(self.tools)} tools available")
             
             from app.core.socket_handler import SocketResponseHandler
             self.socket_handler = SocketResponseHandler
@@ -116,18 +116,18 @@ class DefaultAgent:
     def _default_processing(self) -> str:
         """Procesamiento principal del agente default (migración de Cortex)"""
         try:
-            logger.info("🧠 Default Agent processing started")
+            logger.info("Default Agent processing started")
             
             # Verificar si las herramientas están habilitadas globalmente
             if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
-                logger.info("🔧 Las herramientas están deshabilitadas globalmente. Generando respuesta directa.")
+                logger.info("Las herramientas están deshabilitadas globalmente. Generando respuesta directa.")
                 print(f"{Fore.YELLOW}🔧 Las herramientas están deshabilitadas globalmente.{Style.RESET_ALL}")
                 safe_emit_status(self.socket, "Las herramientas están deshabilitadas. Generando respuesta directa.")
                 return self._generate_normal_response()
             
             # Verificar si hay herramientas seleccionadas
             if hasattr(self, 'tools_manager') and not self.tools_manager.get_active_tools():
-                logger.info("🔧 No hay herramientas activas seleccionadas. Generando respuesta directa.")
+                logger.info("No hay herramientas activas seleccionadas. Generando respuesta directa.")
                 print(f"{Fore.YELLOW}🔧 No hay herramientas activas seleccionadas.{Style.RESET_ALL}")
                 safe_emit_status(self.socket, "No hay herramientas seleccionadas. Generando respuesta directa.")
                 return self._generate_normal_response()
@@ -158,7 +158,7 @@ class DefaultAgent:
             # Paso 4: Mostrar estadísticas del proceso
             self._display_processing_stats(resultados_herramientas)
             
-            logger.info("🧠 Default Agent processing completed")
+            logger.info("Default Agent processing completed")
             return final_response
             
         except Exception as e:
@@ -237,7 +237,7 @@ class DefaultAgent:
             stats_msg += f"   • Herramientas: {', '.join(herramientas_unicas)}\n"
             
             print(stats_msg)
-            logger.info(f"Estadísticas: {len(resultados_herramientas)} herramientas ejecutadas")
+            # logger.info(f"Estadísticas: {len(resultados_herramientas)} herramientas ejecutadas")
             safe_emit_status(self.socket, f"✅ Proceso completado: {len(resultados_herramientas)} herramientas ejecutadas")
             
         except Exception as e:

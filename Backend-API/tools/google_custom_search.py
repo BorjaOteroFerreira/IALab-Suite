@@ -3,11 +3,17 @@ Herramienta de búsqueda en internet usando Google Custom Search API gratuita.
 Compatible con el sistema base_tool de IALab Suite.
 """
 import os
+import re
 import requests
 import json
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
+
+# Importaciones para extracción de contenido (igual que search_tools.py)
+from sumy.parsers.html import HtmlParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer
 
 from .base_tool import BaseTool, ToolMetadata, ToolCategory, ToolExecutionResult
 
@@ -60,6 +66,16 @@ class GoogleSearchTool(BaseTool):
                     "type": "string",
                     "description": "Nivel de filtro de contenido (off, active)",
                     "default": "off"
+                },
+                "date_restrict": {
+                    "type": "string",
+                    "description": "Filtro de fecha para resultados recientes (d1=último día, w1=última semana, m1=último mes, y1=último año)",
+                    "default": "m1"
+                },
+                "sort_by_date": {
+                    "type": "boolean",
+                    "description": "Ordenar por fecha (más recientes primero)",
+                    "default": True
                 }
             }
         )
@@ -75,80 +91,35 @@ class GoogleSearchTool(BaseTool):
     def validate_cse_id(self, cse_id: str) -> bool:
         """Valida el formato del CSE ID"""
         # CSE ID debe ser alfanumérico con algunos caracteres especiales permitidos
-        import re
         # Formato típico: caracteres alfanuméricos, guiones, dos puntos
         pattern = r'^[a-zA-Z0-9_\-:\.]+$'
         return bool(re.match(pattern, cse_id)) and len(cse_id) > 10
     
     def execute(self, query: str, **kwargs) -> ToolExecutionResult:
         """
-        Ejecuta una búsqueda en Google.
+        Ejecuta una búsqueda en Google y devuelve resultados optimizados con contenido extraído.
         
         Args:
             query (str): Texto a buscar
             **kwargs: Parámetros opcionales (num_results, language, safe_search)
             
         Returns:
-            ToolExecutionResult: Resultado de la búsqueda
+            ToolExecutionResult: Resultado con contenido formateado y extraído de páginas web
         """
-        try:
-            # Validar configuración
-            if not self.validate_api_key():
-                return ToolExecutionResult(
-                    success=False,
-                    error="Configuración incompleta. Se requieren CUSTOM_SEARCH_API_KEY y GOOGLE_CSE_ID"
-                )
-            
-            # Validar formato del CSE ID
-            if not self.validate_cse_id(self.cse_id):
-                return ToolExecutionResult(
-                    success=False,
-                    error="GOOGLE_CSE_ID tiene formato inválido. Debe ser el ID completo del Custom Search Engine"
-                )
-            
-            # Parámetros de búsqueda
-            num_results = kwargs.get('num_results', 5)
-            language = kwargs.get('language', 'es')
-            safe_search = kwargs.get('safe_search', 'off')
-            
-            # Validar parámetros
-            num_results = max(1, min(10, num_results))
-            
-            # Realizar búsqueda
-            results = self._search_google(query, num_results, language, safe_search)
-            
-            if results:
-                return ToolExecutionResult(
-                    success=True,
-                    data=results,
-                    metadata={
-                        "query": query,
-                        "num_results": len(results.get('items', [])),
-                        "language": language,
-                        "total_results": results.get('searchInformation', {}).get('totalResults', '0')
-                    }
-                )
-            else:
-                return ToolExecutionResult(
-                    success=False,
-                    error="No se encontraron resultados para la búsqueda"
-                )
-                
-        except Exception as e:
-            return ToolExecutionResult(
-                success=False,
-                error=f"Error en la búsqueda: {str(e)}"
-            )
+        # Delegar al método optimizado que extrae contenido real
+        return self.search_with_formatting(query, **kwargs)
     
-    def _search_google(self, query: str, num_results: int = 5, language: str = 'es', safe_search: str = 'off') -> Optional[Dict]:
+    def _search_google(self, query: str, num_results: int = 5, language: str = 'es', safe_search: str = 'off', date_restrict: str = 'm1', sort_by_date: bool = True) -> Optional[Dict]:
         """
-        Realiza la búsqueda usando Google Custom Search API.
+        Realiza la búsqueda usando Google Custom Search API con filtros de fecha.
         
         Args:
             query (str): Consulta de búsqueda
             num_results (int): Número de resultados
             language (str): Idioma de los resultados
             safe_search (str): Nivel de filtro de contenido
+            date_restrict (str): Filtro temporal (d1, w1, m1, y1)
+            sort_by_date (bool): Ordenar por fecha más reciente
             
         Returns:
             Dict: Respuesta de la API de Google o None si hay error
@@ -198,6 +169,23 @@ class GoogleSearchTool(BaseTool):
             
             if safe_search != 'off':
                 params['safe'] = safe_search
+            
+            # Agregar filtros de fecha para resultados recientes
+            if date_restrict and date_restrict != 'all':
+                # Validar formato de date_restrict
+                valid_periods = {
+                    'd1': 'd1',   # último día
+                    'w1': 'w1',   # última semana  
+                    'm1': 'm1',   # último mes
+                    'm3': 'm3',   # últimos 3 meses
+                    'y1': 'y1'    # último año
+                }
+                if date_restrict in valid_periods:
+                    params['dateRestrict'] = date_restrict
+            
+            # Ordenar por fecha si se solicita
+            if sort_by_date:
+                params['sort'] = 'date'
             
             # Agregar headers para mejor identificación
             headers = {
@@ -281,9 +269,72 @@ class GoogleSearchTool(BaseTool):
             print(f"Error inesperado: {e}")
             return None
     
+    def _filter_raw_results(self, raw_results: Dict) -> Dict:
+        """
+        Filtra los resultados de Google API para conservar solo los datos esenciales.
+        Elimina metadatos innecesarios para reducir el uso de tokens.
+        
+        Args:
+            raw_results (Dict): Respuesta completa de Google API
+            
+        Returns:
+            Dict: Resultados filtrados con solo los datos necesarios
+        """
+        if not raw_results or 'items' not in raw_results:
+            return {'items': []}
+        
+        filtered_items = []
+        for item in raw_results['items'][:5]:  # Máximo 5 resultados
+            # Extraer solo campos esenciales
+            filtered_item = {
+                'title': item.get('title', ''),
+                'link': item.get('link', ''),
+                'snippet': item.get('snippet', ''),
+                'displayLink': item.get('displayLink', ''),
+                # Solo metadatos de imagen relevantes del pagemap
+                'pagemap': self._extract_essential_pagemap(item.get('pagemap', {}))
+            }
+            filtered_items.append(filtered_item)
+        
+        return {
+            'items': filtered_items,
+            'searchInformation': {
+                'totalResults': raw_results.get('searchInformation', {}).get('totalResults', '0')
+            }
+        }
+    
+    def _extract_essential_pagemap(self, pagemap: Dict) -> Dict:
+        """
+        Extrae solo los metadatos esenciales del pagemap para imágenes.
+        
+        Args:
+            pagemap (Dict): Pagemap completo de Google
+            
+        Returns:
+            Dict: Solo metadatos de imagen relevantes
+        """
+        essential = {}
+        
+        # Solo extraer og:image y twitter:image de metatags
+        if 'metatags' in pagemap and pagemap['metatags']:
+            meta = pagemap['metatags'][0]  # Solo el primer metatag
+            for key in ['og:image', 'twitter:image']:
+                if key in meta:
+                    if 'metatags' not in essential:
+                        essential['metatags'] = [{}]
+                    essential['metatags'][0][key] = meta[key]
+                    break  # Solo una imagen
+        
+        # CSE image como fallback
+        if 'cse_image' in pagemap and pagemap['cse_image']:
+            essential['cse_image'] = [{'src': pagemap['cse_image'][0].get('src', '')}]
+        
+        return essential
+
     def format_results(self, raw_results: Dict) -> List[Dict[str, Any]]:
         """
-        Formatea los resultados de Google para una presentación más limpia.
+        Formatea los resultados siguiendo el formato exacto de search_tools.py.
+        Filtra el contenido para usar el mínimo contexto posible.
         
         Args:
             raw_results (Dict): Resultados crudos de la API
@@ -291,23 +342,30 @@ class GoogleSearchTool(BaseTool):
         Returns:
             List[Dict]: Lista de resultados formateados
         """
+        # Primero filtrar para reducir contexto
+        filtered_results = self._filter_raw_results(raw_results)
         formatted_results = []
         
-        if not raw_results or 'items' not in raw_results:
+        if not filtered_results or 'items' not in filtered_results:
             return formatted_results
         
-        for item in raw_results['items']:
-            result = {
-                'title': item.get('title', ''),
-                'link': item.get('link', ''),
-                'snippet': item.get('snippet', ''),
-                'displayLink': item.get('displayLink', ''),
-                'formattedUrl': item.get('formattedUrl', '')
-            }
+        for item in filtered_results['items']:
+            title = item.get('title', '').replace('|', '-').replace('||', '--')
+            link = item.get('link', '')
+            snippet = item.get('snippet', '').replace('|', '-').replace('||', '--')
             
-            # Agregar imagen si está disponible
-            if 'pagemap' in item and 'cse_image' in item['pagemap']:
-                result['image'] = item['pagemap']['cse_image'][0].get('src', '')
+            if not link:
+                continue
+            
+            # Extraer contenido con el mismo formato que search_tools
+            content = self._extract_content_with_images(link)
+            
+            result = {
+                'title': title,
+                'link': link,
+                'snippet': snippet,
+                'content': content
+            }
             
             formatted_results.append(result)
         
@@ -315,26 +373,89 @@ class GoogleSearchTool(BaseTool):
     
     def search_with_formatting(self, query: str, **kwargs) -> ToolExecutionResult:
         """
-        Ejecuta búsqueda y devuelve resultados formateados.
+        Ejecuta búsqueda, visita enlaces y devuelve resultados con contenido extraído.
+        Optimizado para mínimo contexto.
         
         Args:
             query (str): Consulta de búsqueda
             **kwargs: Parámetros adicionales
             
         Returns:
-            ToolExecutionResult: Resultado con datos formateados
+            ToolExecutionResult: Resultado con datos formateados como string y contenido real extraído
         """
-        result = self.execute(query, **kwargs)
-        
-        if result.success and result.data:
-            formatted_data = self.format_results(result.data)
+        try:
+            # Validar configuración
+            if not self.validate_api_key():
+                return ToolExecutionResult(
+                    success=False,
+                    error="Configuración incompleta. Se requieren CUSTOM_SEARCH_API_KEY y GOOGLE_CSE_ID"
+                )
+            
+            # Validar formato del CSE ID
+            if not self.validate_cse_id(self.cse_id):
+                return ToolExecutionResult(
+                    success=False,
+                    error="GOOGLE_CSE_ID tiene formato inválido. Debe ser el ID completo del Custom Search Engine"
+                )
+            
+            # Parámetros de búsqueda - forzar máximo 5 resultados
+            num_results = min(kwargs.get('num_results', 5), 5)
+            language = kwargs.get('language', 'es')
+            safe_search = kwargs.get('safe_search', 'off')
+            date_restrict = kwargs.get('date_restrict', 'm1')  # Por defecto último mes
+            sort_by_date = kwargs.get('sort_by_date', True)    # Por defecto ordenar por fecha
+            
+            # Paso 1: Realizar búsqueda en Google API
+            print(f"🔍 Paso 1: Buscando '{query}' en Google API...")
+            print(f"📅 Filtro temporal: {date_restrict} (ordenar por fecha: {sort_by_date})")
+            raw_results = self._search_google(query, num_results, language, safe_search, date_restrict, sort_by_date)
+            
+            if not raw_results:
+                return ToolExecutionResult(
+                    success=False,
+                    error="No se encontraron resultados para la búsqueda"
+                )
+            
+            # Paso 2: Filtrar resultados básicos de Google
+            print("📊 Paso 2: Filtrando resultados de Google...")
+            filtered_results = self._filter_raw_results(raw_results)
+            
+            # Paso 3: Visitar enlaces y extraer contenido real
+            print("🌐 Paso 3: Visitando enlaces y extrayendo contenido...")
+            formatted_data = self.format_results(raw_results)  # Usar raw_results para format_results
+            
+            # Paso 4: Convertir a formato string final (exactamente como search_tools.py)
+            print("📄 Paso 4: Generando formato final...")
+            string_results = []
+            for item in formatted_data:
+                string_results.append('\n'.join([
+                    f"Title: {item['title']}",
+                    f"Link: {item['link']}",
+                    f"Snippet: {item['snippet']}",
+                    f"Content: {item['content']}",
+                    "\n-----------------"
+                ]))
+            
+            final_string = '\n'.join(string_results)
+            
+            print(f"✅ Proceso completado: {len(formatted_data)} resultados con contenido extraído")
+            
             return ToolExecutionResult(
                 success=True,
-                data=formatted_data,
-                metadata=result.metadata
+                data=final_string,
+                metadata={
+                    "query": query,
+                    "num_results": len(formatted_data),
+                    "language": language,
+                    "total_results": filtered_results.get('searchInformation', {}).get('totalResults', '0')
+                }
             )
-        
-        return result
+            
+        except Exception as e:
+            return ToolExecutionResult(
+                success=False,
+                error=f"Error en la búsqueda: {str(e)}"
+            )
     
     def get_search_suggestions(self, query: str) -> List[str]:
         """
@@ -356,6 +477,155 @@ class GoogleSearchTool(BaseTool):
         ]
         
         return suggestions[:3]  # Limitar a 3 sugerencias
+    
+    def _extract_content_with_images(self, url: str) -> str:
+        """
+        Extrae contenido siguiendo exactamente la misma lógica que search_tools.py.
+        
+        Args:
+            url (str): URL a procesar
+            
+        Returns:
+            str: Contenido formateado como en search_tools
+        """
+        # No incluir URLs de más de 150 caracteres
+        if len(url) > 150:
+            return "Content extraction failed."
+
+        try:
+            from requests_html import HTMLSession
+            from urllib.parse import urlparse
+            import requests
+            import json
+            
+            session = HTMLSession()
+            resp = session.get(url)
+            resp.raise_for_status()
+
+            # texto dentro de <article>, fallback a <p> y <h1-3>
+            elems = resp.html.xpath('//article//p | //article//h1 | //article//h2 | //article//h3')
+            if not elems:
+                elems = resp.html.xpath('//p | //h1 | //h2 | //h3')
+            content = '\n'.join([e.text.strip() for e in elems if e.text and e.text.strip()])
+
+            # Imágenes relevantes dentro de <article>
+            imgs = resp.html.xpath('//article//img')
+            srcs = set()
+            for img in imgs:
+                src = img.attrs.get('data-src') or img.attrs.get('src')
+                if not src or src.startswith('data:'):
+                    continue
+                if any(x in src.lower() for x in ['ads.', 'tracker.', 'pixel.', 'gettyimages']):
+                    continue
+                # Formato: ![imagen dominio_url](url_imagen)
+                domain = urlparse(url).netloc
+                src = requests.compat.urljoin(url, src)
+                if 'gettyimages' not in src.lower():
+                    srcs.add(f"![{domain}]({src})")
+
+            # Fallback a og:image si no hay imgs
+            if not srcs:
+                metas = resp.html.xpath('//meta[@property="og:image"]')
+                for m in metas:
+                    c = m.attrs.get('content')
+                    if c and 'gettyimages' not in c.lower():
+                        srcs.add(c)
+
+            # Imágenes de perfil de LinkedIn, Facebook e Instagram
+            perfil = []
+            if 'linkedin.com/in/' in url:
+                nodes = resp.html.xpath('//img[contains(@class,"profile-photo") or contains(@class,"pv-top-card__photo")]')
+                for n in nodes:
+                    src = n.attrs.get('src')
+                    if src and 'gettyimages' not in src.lower():
+                        perfil.append(requests.compat.urljoin(url, src))
+            elif 'facebook.com/' in url and ('/profile.php' in url or url.rstrip('/').count('/') == 3):
+                metas = resp.html.xpath('//meta[@property="og:image"]')
+                for m in metas:
+                    content = m.attrs.get('content')
+                    if content and 'gettyimages' not in content.lower():
+                        perfil.append(content)
+            elif 'instagram.com/' in url:
+                scripts = resp.html.xpath('//script[@type="application/ld+json"]')
+                for s in scripts:
+                    try:
+                        ld = json.loads(s.text)
+                        if 'image' in ld and 'gettyimages' not in ld['image'].lower():
+                            perfil.append(ld['image'])
+                    except:
+                        continue
+
+            
+            # Filtrar Getty Images una vez más antes del resultado final
+            final_filtered = []
+            sources_to_check = perfil[:1] if perfil else list(srcs)[:2]
+            
+            for img_src in sources_to_check:
+                # Verificar que no contenga gettyimages
+                if 'gettyimages' not in img_src.lower():
+                    final_filtered.append(img_src)
+            
+            final = final_filtered
+
+            # Formatear Markdown 
+            md_imgs = ' '.join(f'![{urlparse(url).netloc}]({i})' for i in final)
+            resumen = self._extract_relevant_content_from_text(content)
+
+            return f"Imágenes: {md_imgs}\nResumen: {resumen}" if content or md_imgs else "Content extraction failed."
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error extracting content: {e}")
+            return "Content extraction failed."
+    
+    def _extract_relevant_content_from_text(self, text: str) -> str:
+        """
+        Extrae contenido relevante usando la misma lógica que search_tools.py.
+        """
+        try:
+            parser = HtmlParser.from_string(text, Tokenizer('spanish'))
+            summarizer = LsaSummarizer()
+            summary = summarizer(parser.document, 1)  # Una sola frase
+            return str(summary[0]) if summary else ""
+        except Exception as e:
+            print(f"Error extracting content: {e}")
+            return ""
+    
+    def _extract_images_from_pagemap(self, item: Dict) -> str:
+        """
+        Extrae la imagen más relevante del pagemap de Google.
+        Optimizado para mínimo contexto.
+        
+        Args:
+            item (Dict): Item de resultado de Google
+            
+        Returns:
+            str: Una sola imagen en formato Markdown
+        """
+        if 'pagemap' not in item:
+            return ""
+        
+        pagemap = item['pagemap']
+        domain = item.get('displayLink', 'imagen')
+        
+        # Prioridad: og:image > cse_image > twitter:image
+        # Solo extraer UNA imagen, la más relevante
+        
+        # 1. Buscar og:image (más confiable)
+        if 'metatags' in pagemap:
+            for meta in pagemap['metatags'][:1]:  # Solo primer metatag
+                for key in ['og:image', 'twitter:image']:
+                    if key in meta:
+                        src = meta[key]
+                        if src and 'gettyimages' not in src.lower():
+                            return f"![{domain}]({src})"
+        
+        # 2. Fallback a cse_image
+        if 'cse_image' in pagemap and pagemap['cse_image']:
+            src = pagemap['cse_image'][0].get('src', '')
+            if src and 'gettyimages' not in src.lower():
+                return f"![{domain}]({src})"
+        
+        return ""
     
     def diagnosticar_configuracion(self) -> Dict[str, Any]:
         """
@@ -454,24 +724,84 @@ class GoogleSearchTool(BaseTool):
             return result.success
         except:
             return False
+    
+    @staticmethod
+    def search_internet(query: str, num_results: int = 5, language: str = 'es', date_restrict: str = 'm1') -> str:
+        """
+        Método estático para búsqueda en internet compatible con search_tools.py.
+        Optimizado para obtener resultados recientes por defecto.
+        
+        Args:
+            query (str): Consulta de búsqueda
+            num_results (int): Número de resultados (máximo 10)
+            language (str): Idioma de los resultados
+            date_restrict (str): Filtro temporal (d1=día, w1=semana, m1=mes, y1=año)
+            
+        Returns:
+            str: Resultado de la búsqueda formateado como string
+        """
+        tool = GoogleSearchTool()
+        
+        # Verificar configuración
+        if not tool.validate_api_key():
+            return "Error: CUSTOM_SEARCH_API_KEY y GOOGLE_CSE_ID no están configuradas en las variables de entorno."
+        
+        result = tool.search_with_formatting(
+            query, 
+            num_results=num_results, 
+            language=language,
+            date_restrict=date_restrict,
+            sort_by_date=True
+        )
+        
+        if result.success:
+            return result.data
+        else:
+            return f"Error en la búsqueda: {result.error}"
+    
+    @staticmethod
+    def extract_content(url: str) -> str:
+        """
+        Método estático para extraer contenido compatible con search_tools.py.
+        
+        Args:
+            url (str): URL a procesar
+            
+        Returns:
+            str: Contenido extraído
+        """
+        tool = GoogleSearchTool()
+        return tool._extract_content_with_images(url)
 
 
 # Función de conveniencia para uso directo
-def buscar_internet(query: str, num_results: int = 5, language: str = 'es') -> Dict[str, Any]:
+def buscar_internet(query: str, num_results: int = 5, language: str = 'es', date_restrict: str = 'm1') -> str:
     """
-    Función de conveniencia para búsquedas rápidas.
+    Función de conveniencia para búsquedas rápidas con resultados recientes.
+    Devuelve el resultado en formato string compatible con search_tools.
     
     Args:
         query (str): Texto a buscar
         num_results (int): Número de resultados
         language (str): Idioma de los resultados
+        date_restrict (str): Filtro temporal (d1=día, w1=semana, m1=mes, y1=año)
         
     Returns:
-        Dict: Resultado de la búsqueda
+        str: Resultado de la búsqueda formateado como string
     """
     tool = GoogleSearchTool()
-    result = tool.search_with_formatting(query, num_results=num_results, language=language)
-    return result.to_dict()
+    result = tool.search_with_formatting(
+        query, 
+        num_results=num_results, 
+        language=language,
+        date_restrict=date_restrict,
+        sort_by_date=True
+    )
+    
+    if result.success:
+        return result.data
+    else:
+        return f"Error en la búsqueda: {result.error}"
 
 
 # Alias para compatibilidad

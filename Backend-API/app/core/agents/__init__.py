@@ -16,7 +16,11 @@ from .task_analyzer import TaskAnalyzer
 from .task_planner import TaskPlanner
 from .task_executor import TaskExecutor
 from .response_generator import ResponseGenerator
+from .agent_registry import agent_registry, AgentRegistry, AgentInfo, AgentType
 from . import utils
+
+# Inicializar el registro de agentes al importar el módulo
+# Eliminado: doble inicialización innecesaria
 
 __all__ = [
     'DefaultAgent',
@@ -34,5 +38,9 @@ __all__ = [
     'AdaptiveTaskPlanner',
     'TaskExecutor',
     'ResponseGenerator',
+    'agent_registry',
+    'AgentRegistry',
+    'AgentInfo',
+    'AgentType',
     'utils'
 ]

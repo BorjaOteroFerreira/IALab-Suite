@@ -28,7 +28,7 @@ class AssistantController(BaseController):
             tools = data.get('tools')
             rag = data.get('rag')
             
-            logger.info(f"🔧 DEBUG: Received data - tools={tools}, rag={rag}")
+            logger.info(f"DEBUG: Received data - tools={tools}, rag={rag}")
             
             if not content:
                 return jsonify({'error': 'Missing required field: content'}), 400
@@ -76,7 +76,7 @@ class AssistantController(BaseController):
             tools = data.get('tools')
             rag = data.get('rag')
             
-            logger.info(f"🔧 Socket DEBUG: Received data - tools={tools}, rag={rag}")
+            logger.info(f"Socket DEBUG: Received data - tools={tools}, rag={rag}")
             
             if not content:
                 return {'success': False, 'error': 'Missing content'}

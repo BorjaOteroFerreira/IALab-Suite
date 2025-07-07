@@ -58,7 +58,7 @@ class DefaultToolExecutor:
             # Verificar si se debe detener la respuesta
             if self.assistant and self.assistant.stop_emit:
                 print(f"{Fore.RED}🛑 Stop signal detected, breaking tool iterations{Style.RESET_ALL}")
-                logger.warning("🛑 Stop signal detected, breaking tool iterations")
+                logger.warning("Stop signal detected, breaking tool iterations")
                 self._enviar_a_consola("🛑 Process stopped by user", 'info')
                 break
                 
@@ -270,7 +270,7 @@ class DefaultToolExecutor:
         
         resultado_herramienta = self.ejecutar_herramienta(funcion_texto, query_texto)
         print(f'{Fore.YELLOW}[!] Eureka!:{Style.RESET_ALL}\n{Fore.MAGENTA}{resultado_herramienta}{Style.RESET_ALL}')
-        logger.info(f'[!] Eureka!: {resultado_herramienta}')
+        # No loggear resultado_herramienta aquí para evitar problemas de codificación
         return resultado_herramienta
     
     def ejecutar_herramienta(self, nombre_herramienta: str, consulta: Any) -> str:
