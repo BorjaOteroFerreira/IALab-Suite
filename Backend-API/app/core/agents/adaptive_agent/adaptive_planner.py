@@ -67,7 +67,7 @@ class AdaptiveTaskPlanner:
                     break
                 
                 # Paso 1: Reflexionar sobre el estado actual
-                emit_status_func(f"**REFLEXIÓN ESTRATÉGICA** (Iteración {iteration + 1})")
+                emit_status_func(f"**REFLEXION ESTRATEGICA** (Iteración {iteration + 1})")
                 emit_status_func("Analizando situación actual...")
                 
                 reflection = self._reflect_on_current_state(current_plan, user_message, iteration)
@@ -531,7 +531,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
         # Mostrar análisis de eficiencia
         efficiency = reflection.get('efficiency_assessment', '')
         if efficiency and "no disponible" not in efficiency.lower():
-            insights_text += f"   ⚡ **Eficiencia:** {efficiency[:150]}{'...' if len(efficiency) > 150 else ''}\n"
+            insights_text += f"**Eficiencia:** {efficiency[:150]}{'...' if len(efficiency) > 150 else ''}\n"
         
         # Mostrar detección de patrones
         patterns = reflection.get('pattern_detection', '')

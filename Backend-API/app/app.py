@@ -87,8 +87,6 @@ def _register_routes(app):
     # Static routes
     app.route('/')(static_controller.serve_index)
     app.route('/fonts/<path:filename>')(static_controller.serve_fonts)
-    app.route('/playground')(static_controller.serve_playground)
-    app.route('/.well-known/acme-challenge/<challenge>')(static_controller.serve_letsencrypt_challenge)
     
     # API routes - Models
     app.route('/api/models-and-formats', methods=['GET'])(model_controller.get_models_and_formats)

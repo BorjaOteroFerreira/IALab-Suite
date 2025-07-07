@@ -108,12 +108,15 @@ class SocketResponseHandler:
             # Asegurar que el message sea serializable en JSON
             if not isinstance(message, (str, int, float, bool, type(None))):
                 message = str(message)
+                message = message.encode('utf-8', errors='replace')
+
             # Forzar a string UTF-8 si es posible
             if isinstance(message, bytes):
                 message = message.decode('utf-8', errors='replace')
             # Asegurar que role sea una cadena
             if not isinstance(role, str):
                 role = str(role) if role is not None else 'info'
+                   
             console_data = {
                 'content': message,
                 'role': role
@@ -232,7 +235,7 @@ class SocketResponseHandler:
             message (str): Mensaje a mostrar en la consola
             socket: Instancia del socket para enviar el mensaje
         """
-       
+        message = message.decode('utf-8', errors='replace')
         SocketResponseHandler.emit_console_output(socket, message, role='info')
 
     @staticmethod
