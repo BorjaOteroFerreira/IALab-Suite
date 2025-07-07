@@ -3,13 +3,12 @@ import './ErrorMessage.css';
 
 /**
  * Componente para mostrar errores de una manera amigable
- * con opciones para reintentar o resolver problemas comunes
  */
 const ErrorMessage = ({ 
   error, 
   onRetry = null,
   onDismiss = null,
-  timeout = 0  // 0 significa que no se ocultará automáticamente
+  timeout = 0  //  no se ocultará automáticamente
 }) => {
   const [visible, setVisible] = useState(true);
   

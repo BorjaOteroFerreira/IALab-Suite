@@ -9,7 +9,7 @@ const extractTikTokVideoId = (url) => {
   return match ? match[1] : null;
 };
 
-// Limpia enlaces markdown redundantes de TikTok (como el de YouTube)
+// Limpia enlaces markdown redundantes de TikTok
 export const cleanTikTokMarkdown = md => md.replace(
   /\[([^\]]+)\]\((https?:\/\/(www\.)?tiktok\.com\/@[\w.-]+\/video\/\d+)\)/gi,
   (match, text, url) => {

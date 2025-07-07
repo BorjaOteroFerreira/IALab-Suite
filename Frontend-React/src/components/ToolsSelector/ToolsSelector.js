@@ -105,7 +105,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         setAvailableTools(Object.values(data.available_tools || {}));
         setError(null);
         
-        // También actualizar las herramientas seleccionadas si vienen en la respuesta
+        // actualizar las herramientas seleccionadas si vienen en la respuesta
         if (data.active_tools) {
           setSelectedTools(data.active_tools);
           console.log('🔧 Herramientas seleccionadas actualizadas desde registry:', data.active_tools);

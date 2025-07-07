@@ -86,10 +86,8 @@ const DevConsole = () => {
         return () => el.removeEventListener('scroll', handleScroll);
     }, [isVisible]);
 
-    // --- Cambios para que SOLO DevConsole haga scroll cuando recibe mensajes nuevos ---
-    // El autoscroll de la consola solo se activa cuando se recibe un mensaje NUEVO para la consola
-    // y no depende de cambios en otros componentes (como MessageList)
-    //
+
+
     // Guardar el número de mensajes previos para detectar si hay mensajes nuevos
     const prevMessagesCount = useRef(messages.length);
 
@@ -100,9 +98,6 @@ const DevConsole = () => {
         }
         prevMessagesCount.current = messages.length;
     }, [messages, isVisible, autoScroll]);
-
-    // Elimina el scroll automático global que dependía de otros cambios
-    // (ya está controlado solo por los mensajes de la consola)
 
     // Escuchar mensajes del socket
     useEffect(() => {
@@ -119,14 +114,13 @@ const DevConsole = () => {
             setMessages(prev => {
                 // Limitar el número de mensajes para evitar problemas de memoria
                 const updatedMessages = [...prev, newMessage];
-                if (updatedMessages.length > 1000) {
-                    return updatedMessages.slice(-1000);
+                if (updatedMessages.length > 2000) {
+                    return updatedMessages.slice(-2000);
                 }
                 return updatedMessages;
             });
         };
 
-        // También escuchar otros eventos relevantes
         const handleAssistantResponse = (data) => {
             if (data.content && !data.finished) {
                 const newMessage = {
@@ -288,8 +282,8 @@ const DevConsole = () => {
             }
             
             // Limitar el tamaño máximo al viewport menos márgenes
-            const maxWidth = window.innerWidth - 100;
-            const maxHeight = window.innerHeight - 100;
+            const maxWidth = window.innerWidth;
+            const maxHeight = window.innerHeight;
             
             newWidth = Math.min(newWidth, maxWidth);
             newHeight = Math.min(newHeight, maxHeight);
@@ -368,7 +362,7 @@ const DevConsole = () => {
         centerConsole();
     };
 
-    // Inicializar showdown (igual que en MessageList)
+    // Inicializar showdown
     useEffect(() => {
         let mounted = true;
         (async () => {

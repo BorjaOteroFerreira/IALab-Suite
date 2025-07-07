@@ -10,7 +10,6 @@ import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-sql';
 
-// Componente de avatar tipo Perplexity
 const Avatar = ({ role }) => (
   <div className={`avatar ${role}`}>
     {role === 'user' ? (
@@ -28,7 +27,7 @@ function Message({ message }) {
   if (!message.role) {
     return <div className="message error">Error: Estructura de mensaje inválida</div>;
   }
-  // Manejar tanto el formato antiguo (content como string) como el nuevo (content como objeto)
+  // Manejar tanto  string como objeto
   const isNewFormat = typeof message.content === 'object' && message.content !== null;
   const textContent = isNewFormat ? message.content.text : message.content;
   if (typeof textContent !== 'string') {
