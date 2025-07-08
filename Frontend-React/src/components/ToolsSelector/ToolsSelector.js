@@ -34,6 +34,11 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   const [currentAgent, setCurrentAgent] = useState(null);
   const [agentsLoading, setAgentsLoading] = useState(false);
   
+  // Estado para herramientas remotas MCP
+  const [remoteTools, setRemoteTools] = useState([]);
+  const [remoteLoading, setRemoteLoading] = useState(false);
+  const [remoteError, setRemoteError] = useState(null);
+
   const popupRef = useRef(null);
 
   // Cargar herramientas disponibles al montar el componente
@@ -488,6 +493,21 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }
   }, [error]);
 
+  // Cargar herramientas remotas MCP al abrir el selector
+  useEffect(() => {
+    if (!isOpen) return;
+    setRemoteLoading(true);
+    setRemoteError(null);
+    fetch('/api/remote/tools')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setRemoteTools(data.tools || []);
+        else setRemoteError(data.error || 'Error al cargar herramientas remotas');
+      })
+      .catch(err => setRemoteError(err.message))
+      .finally(() => setRemoteLoading(false));
+  }, [isOpen]);
+
   return (
     <div className="tools-selector">
       <button
@@ -547,6 +567,26 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                       </button>
                     );
                   })}
+                </nav>
+              </div>
+
+              {/* Sección de Herramientas Remotas MCP */}
+              <div className="tools-sidebar-section">
+                <div className="tools-sidebar-header">
+                  <h3 className="tools-sidebar-title">
+                    <Zap size={18} style={{marginRight: 6}} /> Remote Tools
+                  </h3>
+                  <p className="tools-sidebar-subtitle">{remoteTools.length} disponibles</p>
+                </div>
+                <nav className="category-nav">
+                  <button
+                    className={`category-nav-item${currentSection === 'remote' ? ' active' : ''}`}
+                    onClick={() => setCurrentSection('remote')}
+                  >
+                    <span className="icon"><Zap size={16} className="icon" /></span>
+                    Herramientas Remotas
+                    <span className="category-count">{remoteTools.length}</span>
+                  </button>
                 </nav>
               </div>
 
@@ -642,6 +682,49 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                                   <div className="tool-badges">
                                     <span className="tool-badge badge-agent-type">{agent.type}</span>
                                   </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )
+                ) : currentSection === 'remote' ? (
+                  // Contenido de Herramientas Remotas MCP
+                  remoteLoading ? (
+                    <div className="tools-loading">
+                      <div className="loading-spinner" />
+                      <span>Cargando herramientas remotas...</span>
+                    </div>
+                  ) : remoteError ? (
+                    <div className="tools-error">
+                      <AlertCircle size={14} style={{marginRight: 4, color: '#e74c3c'}} /> {remoteError}
+                    </div>
+                  ) : (
+                    <>
+                      {remoteTools.length === 0 ? (
+                        <div className="empty-state">
+                          <div className="empty-state-icon">🌐</div>
+                          <div className="empty-state-title">No hay herramientas remotas</div>
+                          <div className="empty-state-description">Verifica la conexión MCP.</div>
+                        </div>
+                      ) : (
+                        <div className="tools-grid">
+                          {remoteTools.map((tool) => (
+                            <div
+                              key={tool}
+                              className="tool-card agent-card"
+                              // Aquí podrías agregar lógica para invocar la tool remota
+                            >
+                              <div className="tool-card-header">
+                                <div className="tool-checkbox-custom"></div>
+                                <div className="tool-info">
+                                  <div className="agent-icon-container">
+                                    <Zap size={16} />
+                                  </div>
+                                  <h4 className="tool-name">{tool}</h4>
+                                  {/* Puedes mostrar más info si la obtienes del endpoint info */}
                                 </div>
                               </div>
                             </div>

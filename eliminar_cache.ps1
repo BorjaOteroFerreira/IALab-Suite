@@ -1,0 +1,1 @@
+Get-ChildItem -Path . -Recurse -Directory -Force | Where-Object { $_.Name -eq '__pycache__' } | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
