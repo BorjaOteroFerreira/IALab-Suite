@@ -143,7 +143,7 @@ Open a command prompt and set the following environment variables.
 
 ```bash
 set FORCE_CMAKE=1
-set CMAKE_ARGS=-DGGML_CUDA=OFF
+set CMAKE_ARGS=-DGGML_CUDA=ON
 ```
 
 If you have an NVIDIA GPU, make sure DLLAMA_CUBLAS is set to ON.
