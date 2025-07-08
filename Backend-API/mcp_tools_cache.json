@@ -1,0 +1,57 @@
+{
+  "tools": {
+    "src": {
+      "name": "src",
+      "description": "Herramienta MCP: src",
+      "category": "utility",
+      "available": false,
+      "requires_api_key": false,
+      "parameters": {},
+      "metadata": {},
+      "install_command": "git clone https://github.com/docker/mcp-servers.git && cd src",
+      "github_url": "https://github.com/docker/mcp-servers/tree/main/src",
+      "version": null
+    },
+    "filesystem": {
+      "name": "filesystem",
+      "description": "Acceso al sistema de archivos",
+      "category": "filesystem",
+      "available": true,
+      "requires_api_key": false,
+      "parameters": {},
+      "metadata": null,
+      "install_command": "Built-in MCP tool",
+      "github_url": null,
+      "version": null
+    },
+    "stdio": {
+      "name": "stdio",
+      "description": "Entrada/salida est\u00e1ndar",
+      "category": "io",
+      "available": true,
+      "requires_api_key": false,
+      "parameters": {},
+      "metadata": null,
+      "install_command": "Built-in MCP tool",
+      "github_url": null,
+      "version": null
+    },
+    "memory": {
+      "name": "memory",
+      "description": "Almacenamiento en memoria",
+      "category": "storage",
+      "available": true,
+      "requires_api_key": false,
+      "parameters": {},
+      "metadata": null,
+      "install_command": "Built-in MCP tool",
+      "github_url": null,
+      "version": null
+    }
+  },
+  "selected_tools": [
+    "memory",
+    "stdio",
+    "filesystem"
+  ]
+}

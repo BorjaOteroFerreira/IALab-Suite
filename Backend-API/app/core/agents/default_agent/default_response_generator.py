@@ -135,24 +135,40 @@ class DefaultResponseGenerator:
         """
         try:
             logger.info("Generando respuesta normal sin herramientas")
-            
+
             # Crear prompt simple para respuesta directa
             messages = [
                 {"role": "system", "content": "Eres un asistente útil. Responde de manera clara y precisa basándote en tu conocimiento."},
                 {"role": "user", "content": self.original_prompt}
             ]
-            
-            # Generar respuesta 
-            response_content = ""
-            for chunk in model.create_chat_completion(messages=messages, max_tokens=8192, stream=True):
-                if 'choices' in chunk and len(chunk['choices']) > 0:
-                    delta = chunk['choices'][0].get('delta', {})
-                    if 'content' in delta:
-                        response_content += delta['content']
-            
+
+            # Calcular tokens de entrada
+            user_question = self.original_prompt if isinstance(self.original_prompt, str) else ""
+            tokensInput = user_question.encode()
+            tokens = self.model.tokenize(tokensInput)
+            total_user_tokens = len(tokens)
+
+            def safe_stop_condition():
+                try:
+                    return self.assistant and getattr(self.assistant, 'stop_emit', False)
+                except Exception:
+                    return False
+
+            from app.core.socket_handler import SocketResponseHandler
+            response_completa, total_assistant_tokens = SocketResponseHandler.stream_chat_completion(
+                model=self.model,
+                messages=messages,
+                socket=self.socket,
+                max_tokens=8192,
+                user_tokens=total_user_tokens,
+                process_line_breaks=True,
+                response_queue=self.response_queue,
+                stop_condition=safe_stop_condition
+            )
+            SocketResponseHandler.emit_finalization_signal(self.socket, total_user_tokens, total_assistant_tokens)
             logger.info("Respuesta normal generada exitosamente")
-            return response_content.strip()
-            
+            return response_completa.strip()
+
         except Exception as e:
             logger.error(f"Error generando respuesta normal: {e}")
             return f"Lo siento, no pude generar una respuesta adecuada. Error: {e}"

@@ -36,6 +36,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
   
   // Estado para herramientas remotas MCP
   const [remoteTools, setRemoteTools] = useState([]);
+  const [selectedRemoteTools, setSelectedRemoteTools] = useState([]); // NUEVO: selección remota
   const [remoteLoading, setRemoteLoading] = useState(false);
   const [remoteError, setRemoteError] = useState(null);
 
@@ -263,49 +264,46 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }
   };
 
+  // Unifica y guarda la selección de herramientas locales y remotas
+  const saveUnifiedSelection = async (newSelectedTools, newSelectedRemoteTools) => {
+    const unified = [...new Set([...newSelectedTools, ...newSelectedRemoteTools])];
+    try {
+      const response = await fetch('/api/tools/selected', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selected_tools: unified })
+      });
+      if (!response.ok) throw new Error('Error al guardar selección de herramientas');
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Error al actualizar herramientas');
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    }
+  };
+
   const handleToolToggle = async (toolName) => {
     const newSelectedTools = selectedTools.includes(toolName)
       ? selectedTools.filter(name => name !== toolName)
       : [...selectedTools, toolName];
-
     try {
       setSelectedTools(newSelectedTools);
-      
       const toolElement = document.querySelector(`.tool-item[data-tool="${toolName}"]`);
       if (toolElement) {
         toolElement.classList.add('tool-updating');
         setTimeout(() => toolElement.classList.remove('tool-updating'), 800);
       }
-      
-      const response = await fetch('/api/tools/selected', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          selected_tools: newSelectedTools
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Error al actualizar herramientas');
-      }
-      
+      // Guardar selección unificada
+      const ok = await saveUnifiedSelection(newSelectedTools, selectedRemoteTools);
+      if (!ok) throw new Error('Error al guardar selección');
       if (toolElement) {
         toolElement.classList.add('tool-update-success');
         setTimeout(() => toolElement.classList.remove('tool-update-success'), 800);
       }
     } catch (error) {
-      console.error('Error actualizando herramientas:', error);
-      // Revertir cambio en caso de error
-      setSelectedTools(selectedTools);
+      setSelectedTools(selectedTools); // revertir
       setError(error.message);
-      
       const toolElement = document.querySelector(`.tool-item[data-tool="${toolName}"]`);
       if (toolElement) {
         toolElement.classList.add('tool-update-error');
@@ -501,12 +499,56 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     fetch('/api/remote/tools')
       .then(res => res.json())
       .then(data => {
-        if (data.success) setRemoteTools(data.tools || []);
-        else setRemoteError(data.error || 'Error al cargar herramientas remotas');
+        if (data.success && data.data && data.data.available_tools) {
+          // Mapear igual que las locales
+          const tools = Object.entries(data.data.available_tools).map(([key, value]) => ({
+            name: key,
+            description: value.description || 'Sin descripción',
+            category: value.category || 'utility',
+            available: value.available !== false,
+            requires_api_key: value.requires_api_key || false
+          }));
+          setRemoteTools(tools);
+          // Si tienes la selección guardada en backend, aquí podrías setSelectedRemoteTools(...)
+        } else {
+          setRemoteTools([]);
+          setRemoteError(data.error || 'Error al cargar herramientas remotas');
+        }
       })
       .catch(err => setRemoteError(err.message))
       .finally(() => setRemoteLoading(false));
   }, [isOpen]);
+
+  // Cargar selección de herramientas remotas al abrir el selector
+  useEffect(() => {
+    if (!isOpen) return;
+    fetch('/api/remote/tools/selected')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && Array.isArray(data.data.selected_remote_tools)) {
+          setSelectedRemoteTools(data.data.selected_remote_tools);
+        } else {
+          setSelectedRemoteTools([]);
+        }
+      })
+      .catch(() => setSelectedRemoteTools([]));
+  }, [isOpen]);
+
+  // Manejar selección de herramientas remotas y guardar en backend
+  const handleRemoteToolToggle = async (toolName) => {
+    const newSelectedRemoteTools = selectedRemoteTools.includes(toolName)
+      ? selectedRemoteTools.filter(name => name !== toolName)
+      : [...selectedRemoteTools, toolName];
+    setSelectedRemoteTools(newSelectedRemoteTools);
+    try {
+      // Guardar selección unificada
+      const ok = await saveUnifiedSelection(selectedTools, newSelectedRemoteTools);
+      if (!ok) throw new Error('Error al guardar selección remota');
+    } catch (err) {
+      setRemoteError(err.message);
+      setSelectedRemoteTools(selectedRemoteTools); // revertir
+    }
+  };
 
   return (
     <div className="tools-selector">
@@ -713,18 +755,28 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                         <div className="tools-grid">
                           {remoteTools.map((tool) => (
                             <div
-                              key={tool}
-                              className="tool-card agent-card"
-                              // Aquí podrías agregar lógica para invocar la tool remota
+                              key={tool.name}
+                              className={`tool-card agent-card${selectedRemoteTools.includes(tool.name) ? ' selected' : ''}${!tool.available ? ' disabled' : ''}`}
+                              onClick={() => tool.available && handleRemoteToolToggle(tool.name)}
                             >
                               <div className="tool-card-header">
-                                <div className="tool-checkbox-custom"></div>
+                                <div className="tool-checkbox-custom">
+                                  {selectedRemoteTools.includes(tool.name) ? <Check size={14} /> : ''}
+                                </div>
                                 <div className="tool-info">
                                   <div className="agent-icon-container">
-                                    <Zap size={16} />
+                                    {CATEGORY_ICONS[tool.category || 'utility'] || <Zap size={16} />}
                                   </div>
-                                  <h4 className="tool-name">{tool}</h4>
-                                  {/* Puedes mostrar más info si la obtienes del endpoint info */}
+                                  <h4 className="tool-name">{tool.name}</h4>
+                                  <p className="tool-description">{tool.description}</p>
+                                  <div className="tool-badges">
+                                    {tool.requires_api_key && (
+                                      <span className="tool-badge badge-api-key"> <Key size={12} style={{marginRight: 2}} /> API Key</span>
+                                    )}
+                                    {!tool.available && (
+                                      <span className="tool-badge badge-unavailable"> <Ban size={12} style={{marginRight: 2}} /> No disponible</span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>

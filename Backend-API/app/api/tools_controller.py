@@ -6,6 +6,7 @@ Tools Controller - Maneja las API relacionadas con herramientas
 from flask import request, jsonify
 from app.utils.logger import logger
 from app.core.tools_manager import tools_manager
+from app.core.mcp_registry import MCPRegistry
 import json
 import traceback  # Importar aquí para evitar ImportError más adelante
 from enum import Enum
@@ -191,6 +192,51 @@ class ToolsController:
                 'success': False,
                 'error': f'Error actualizando herramientas: {str(e)}'
             }), 500
+    
+    @staticmethod
+    def get_mcp_tools():
+        """Obtener todas las herramientas MCP gratuitas (mock)"""
+        try:
+            mcp_registry = MCPRegistry()
+            mcp_tools_summary = mcp_registry.get_tools_summary()
+            return jsonify({
+                'success': True,
+                'data': mcp_tools_summary
+            })
+        except Exception as e:
+            logger.error(f"Error getting MCP tools: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return jsonify({
+                'success': False,
+                'error': f'Error obteniendo herramientas MCP: {str(e)}'
+            }), 500
+    
+    @staticmethod
+    def get_selected_remote_tools():
+        """Obtener las herramientas remotas MCP seleccionadas actualmente (usando MCPRegistry)"""
+        try:
+            mcp_registry = MCPRegistry()
+            selected = mcp_registry.get_selected_tools()
+            return jsonify({'success': True, 'data': {'selected_remote_tools': selected}})
+        except Exception as e:
+            logger.error(f"Error getting selected remote tools: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @staticmethod
+    def set_selected_remote_tools():
+        """Establecer las herramientas remotas MCP seleccionadas (usando MCPRegistry)"""
+        try:
+            data = request.get_json()
+            if not data or 'selected_remote_tools' not in data:
+                return jsonify({'success': False, 'error': 'No data provided'}), 400
+            selected = data['selected_remote_tools']
+            mcp_registry = MCPRegistry()
+            mcp_registry.set_selected_tools(selected)
+            return jsonify({'success': True, 'data': {'selected_remote_tools': mcp_registry.get_selected_tools()}})
+        except Exception as e:
+            logger.error(f"Error setting selected remote tools: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # Instancia del controlador
