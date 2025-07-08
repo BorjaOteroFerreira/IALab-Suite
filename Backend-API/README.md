@@ -50,7 +50,7 @@ llama.cpp supports multiple BLAS backends for faster processing. Use the FORCE_C
 Example installation with CUDA backend:
 
 ```bash
-CMAKE_ARGS="--DGGML_CUDA=ON" FORCE_CMAKE=1 pip install llama-cpp-python
+CMAKE_ARGS="-DGGML_CUDA=ON" FORCE_CMAKE=1 pip install llama-cpp-python
 ```
 
 **IMPORTANT:** If you have already installed the CPU-only version of the package, you must reinstall it from scratch. Consider the following command:
@@ -133,11 +133,7 @@ If you want to install llama-cpp-python by compiling it from the source, you can
   C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations
   ```
 
-Clone the git repository recursively to also get the llama.cpp submodule.
 
-```bash
-git clone --recursive -j8 https://github.com/abetlen/llama-cpp-python.git
-```
 
 Open a command prompt and set the following environment variables.
 
@@ -146,32 +142,22 @@ set FORCE_CMAKE=1
 set CMAKE_ARGS=-DGGML_CUDA=ON
 ```
 
-If you have an NVIDIA GPU, make sure DLLAMA_CUBLAS is set to ON.
+If you have an NVIDIA GPU, make sure DGGML is set to ON.
 
 #### Compilation and Installation
 
-Now you can navigate to the llama-cpp-python directory and install the package.
+Now you can install the package.
 
 ```bash
-python3 -m pip install -e .
+pip install --no-cache-dir llama-cpp-python 
 ```
 
 **IMPORTANT:** If you have already installed a CPU-only version of the package, you must reinstall it from scratch: consider the following command:
 
 ```bash
-python3 -m pip install -e . --force-reinstall --no-cache-dir
+python3 -m pip install --no-cache-dir llama-cpp-python   --force-reinstall --no-cache-dir
 ```
 
-## **IMPORTANT (Mac / Linux / Windows):**
-After installation:
-
-Go to the llama-cpp installation folder
-
-If you don't know where the directory is located, you can always do a quick search for the file llama_chat_format.py
-
-Rename the file llama_chat_format.py to llama_chat_format.bk and paste the attached file into this repository.
-
-This solution is provisional but necessary to be able to use models like Mixtral and others that need templates that are not included by default in the llama-cpp library. In the future I will implement a template editor to create, load and save templates without having to replace library files.
 
 ## Usage
 
@@ -182,14 +168,11 @@ The path looks like this:
 models/llama/llama-2-7b-chat.Q8_0.gguf
 ```
 
-This model is used as the default model, (dont need llama_chat_format.py file sustitution).
-
-
 
 You can add more models in .gguf format on [Hugging Face](https://huggingface.co/models?search=gguf) and they will be added directly to the list in the interface.
 
 
-[TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)[ Size - 8.87 GB | Max ram required - 	11.37 GB ] (need llama_chat_format.py sustitution and use Custom-IALab chat format)
+[TheBloke/mixtral_7bx2_moe](https://huggingface.co/TheBloke/Mixtral_7Bx2_MoE-GGUF/resolve/main/mixtral_7bx2_moe.Q5_0.gguf)[ Size - 8.87 GB | Max ram required - 	11.37 GB ] 
 
 
 The path looks like this:
