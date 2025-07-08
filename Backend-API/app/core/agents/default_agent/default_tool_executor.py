@@ -36,7 +36,9 @@ class DefaultToolExecutor:
         self._enviar_a_consola(f'💭 {response}', 'pensamiento')
         
         # Obtener solo herramientas ACTIVAS (habilitadas Y seleccionadas)
-        active_tools = self._get_all_active_tools()
+        active_tools = []
+        if hasattr(self.tools_manager, 'get_active_tools'):
+            active_tools = self.tools_manager.get_active_tools()
             
         # Si no hay herramientas activas, salir inmediatamente
         if not active_tools:
@@ -141,7 +143,8 @@ class DefaultToolExecutor:
             
             # Filtrar herramientas válidas
             valid_calls = []
-            active_tools = self._get_all_active_tools()
+            active_tools = self.tools_manager.get_active_tools() if hasattr(self.tools_manager, 'get_active_tools') else []
+            
             for tool_name, query in tool_calls:
                 if tool_name.lower() in [t.lower() for t in active_tools]:
                     valid_calls.append((tool_name, query))
@@ -354,9 +357,10 @@ class DefaultToolExecutor:
         """Crear prompt para que el modelo decida si necesita más herramientas"""
         # Crear información de herramientas disponibles
         herramientas_info = "HERRAMIENTAS DISPONIBLES:\n"
-        active_tools = self._get_all_active_tools()
-        for tool in active_tools:
-            herramientas_info += f"- {tool}\n"
+        if hasattr(self.tools_manager, 'get_active_tools'):
+            active_tools = self.tools_manager.get_active_tools()
+            for tool in active_tools:
+                herramientas_info += f"- {tool}\n"
         
         # Crear información de resultados obtenidos
         resultados_info = "\nRESULTADOS OBTENIDOS:\n"
@@ -400,15 +404,3 @@ Si no necesitas más herramientas, genera una respuesta final integrando toda la
                 logger.error(f"Message type: {type(mensaje)}, Message: {mensaje}")
                 import traceback
                 logger.error(f"Traceback: {traceback.format_exc()}")
-    
-    def _get_all_active_tools(self):
-        """Devuelve todas las herramientas activas, incluyendo MCP y locales"""
-        if hasattr(self.tools_manager, 'get_active_tools'):
-            active_tools = set(self.tools_manager.get_active_tools())
-        else:
-            active_tools = set()
-        # Incluir todas las herramientas MCP registradas en el tool_registry si no están ya
-        if hasattr(self.tool_registry, 'list_tools'):
-            for tool in self.tool_registry.list_tools():
-                active_tools.add(tool)
-        return list(active_tools)

@@ -108,11 +108,6 @@ def _register_routes(app):
     app.route('/api/tools/selected', methods=['POST'])(tools_controller.set_selected_tools)
     app.route('/api/tools/refresh', methods=['POST'])(tools_controller.refresh_tools)
     
-    # API routes - MCP Tools
-    app.route('/api/remote/tools', methods=['GET'])(tools_controller.get_mcp_tools)
-    app.route('/api/remote/tools/selected', methods=['GET'])(tools_controller.get_selected_remote_tools)
-    app.route('/api/remote/tools/selected', methods=['POST'])(tools_controller.set_selected_remote_tools)
-    
     # Register Blueprints - Agents
     app.register_blueprint(agent_controller)
 

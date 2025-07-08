@@ -17,7 +17,6 @@ except ImportError:
 
 from app.utils.logger import logger
 from dotenv import load_dotenv
-from app.core.mcp_manager import mcp_manager
 
 # Importar módulos del agente default
 from .config import DefaultAgentConfig
@@ -56,8 +55,6 @@ class DefaultAgent:
         self.config = DefaultAgentConfig()
         
         # Inicializar el registry de herramientas
-        self.mcp_registry = mcp_manager.registry
-        mcp_manager.set_tools_enabled(True)  # Habilitar herramientas MCP siempre al crear el agente
         self._initialize_tools()
         
         # Verificar si las herramientas están habilitadas
@@ -90,18 +87,26 @@ class DefaultAgent:
         try:
             from tools.tool_registry import ToolRegistry
             from app.core.tools_manager import tools_manager
-            from app.core.mcp_manager import mcp_manager
-
-            # Usar el singleton de MCPRegistry
-            self.tool_registry = mcp_manager
+            
+            if hasattr(tools_manager, '_registry') and tools_manager._registry:
+                logger.info("Default Agent: Using existing tool registry from ToolsManager")
+                self.tool_registry = tools_manager._registry
+            else:
+                logger.info("Default Agent: Creating new ToolRegistry")
+                self.tool_registry = ToolRegistry()
+                try:
+                    self.tool_registry.discover_tools()
+                except Exception as e:
+                    logger.error(f"Error during tool discovery in default agent: {e}")
+                tools_manager.initialize_registry(self.tool_registry)
+            
             self.tools_manager = tools_manager
-            # Registrar herramientas MCP como disponibles en el mismo formato que las locales
             self.tools = get_available_tools_dict(self.tool_registry)
-            logger.info(f"Default Agent: {len(self.tools)} tools available (incluyendo MCP)")
-
+            logger.info(f"Default Agent: {len(self.tools)} tools available")
+            
             from app.core.socket_handler import SocketResponseHandler
             self.socket_handler = SocketResponseHandler
-
+            
         except Exception as e:
             logger.error(f"Error initializing tools in default agent: {e}")
             self.tools = {}
@@ -112,70 +117,50 @@ class DefaultAgent:
         """Procesamiento principal del agente default (migración de Cortex)"""
         try:
             logger.info("Default Agent processing started")
-
+            
             # Verificar si las herramientas están habilitadas globalmente
-            tools_enabled = False
-            if hasattr(self, 'tools_manager') and hasattr(self.tools_manager, 'is_tools_enabled'):
-                tools_enabled = self.tools_manager.is_tools_enabled()
-            if hasattr(self, 'tool_registry') and hasattr(self.tool_registry, 'is_tools_enabled'):
-                tools_enabled = tools_enabled or self.tool_registry.is_tools_enabled()
-            if not tools_enabled:
+            if hasattr(self, 'tools_manager') and not self.tools_manager.is_tools_enabled():
                 logger.info("Las herramientas están deshabilitadas globalmente. Generando respuesta directa.")
                 print(f"{Fore.YELLOW}🔧 Las herramientas están deshabilitadas globalmente.{Style.RESET_ALL}")
                 safe_emit_status(self.socket, "Las herramientas están deshabilitadas. Generando respuesta directa.")
                 return self._generate_normal_response()
-
-            # Detectar todas las herramientas activas (locales y MCP)
-            active_tools = set()
-            # MCP
-            if hasattr(self, 'tool_registry') and hasattr(self.tool_registry, 'get_active_tools'):
-                mcp_activas = self.tool_registry.get_active_tools()
-                logger.info(f"MCP activas: {mcp_activas}")
-                active_tools.update(mcp_activas)
-            # Locales
-            if hasattr(self, 'tools_manager') and hasattr(self.tools_manager, 'get_active_tools'):
-                locales_activas = self.tools_manager.get_active_tools()
-                logger.info(f"Locales activas: {locales_activas}")
-                active_tools.update(locales_activas)
-            active_tools = [t for t in active_tools if t]  # Filtrar vacíos
-
-            logger.info(f"Herramientas activas detectadas (final): {active_tools}")
-
-            if not active_tools:
-                logger.info("No hay herramientas activas seleccionadas (ni MCP ni locales). Generando respuesta directa.")
-                print(f"{Fore.YELLOW}🔧 No hay herramientas activas seleccionadas (ni MCP ni locales).{Style.RESET_ALL}")
+            
+            # Verificar si hay herramientas seleccionadas
+            if hasattr(self, 'tools_manager') and not self.tools_manager.get_active_tools():
+                logger.info("No hay herramientas activas seleccionadas. Generando respuesta directa.")
+                print(f"{Fore.YELLOW}🔧 No hay herramientas activas seleccionadas.{Style.RESET_ALL}")
                 safe_emit_status(self.socket, "No hay herramientas seleccionadas. Generando respuesta directa.")
                 return self._generate_normal_response()
-
+            
             # Paso 1: Determinar herramientas necesarias
             safe_emit_status(self.socket, "🧠 Analizando necesidades de herramientas...")
             herramientas_necesarias = self.need_analyzer.determinar_herramientas_necesarias(self.original_prompt)
             self.output_console = f' {herramientas_necesarias}'
-
+            
             # Enviar pensamiento al frontend
             safe_emit_status(self.socket, self.output_console, 'pensamiento')
-
+            
             # Paso 2: Procesar herramientas necesarias (detección iterativa y ejecución)
             safe_emit_status(self.socket, "🔧 Procesando herramientas detectadas...")
             processed_response, resultados_herramientas = self.tool_executor.process_tool_needs(
                 herramientas_necesarias, self.model
             )
-
+            
             # Paso 3: Generar respuesta final
             safe_emit_status(self.socket, "📝 Generando respuesta final...")
-
+            
             # Convertir resultados al formato esperado por ResponseGenerator
             execution_results = self._convert_results_to_execution_format(resultados_herramientas)
-
+            
             # Generar respuesta final usando el ResponseGenerator estándar
             final_response = self.response_generator.generar_respuesta_final(resultados_herramientas, self._safe_emit_status)
-
+            
             # Paso 4: Mostrar estadísticas del proceso
             self._display_processing_stats(resultados_herramientas)
-
+            
             logger.info("Default Agent processing completed")
             return final_response
-
+            
         except Exception as e:
             logger.error(f"Error in Default Agent processing: {e}")
             import traceback
