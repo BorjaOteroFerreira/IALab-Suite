@@ -47,10 +47,10 @@ pip install --upgrade --quiet llama-cpp-python
 
 llama.cpp supports multiple BLAS backends for faster processing. Use the FORCE_CMAKE=1 environment variable to force the use of cmake and install the pip package for the desired BLAS backend.
 
-Example installation with cuBLAS backend:
+Example installation with CUDA backend:
 
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python
+CMAKE_ARGS="--DGGML_CUDA=ON" FORCE_CMAKE=1 pip install llama-cpp-python
 ```
 
 **IMPORTANT:** If you have already installed the CPU-only version of the package, you must reinstall it from scratch. Consider the following command:
