@@ -55,187 +55,69 @@
 /* Layout Principal  */
 .app-layout {
   display: flex;
-  height: 100vh;  height: 100dvh; /* Dynamic viewport height para Safari */
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  position: relative;
-  overflow-y: auto; /* Permitir scroll vertical para chat */
-  overflow-x: hidden; /* Evitar scroll horizontal */
-  /* Safari específico */
-  min-height: -webkit-fill-available;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
 }
 
-.main-container {
-  flex: 1;
+.main-flex-content {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+}
+
+.main-flex-content > .chat-sidebar {
+  position: relative !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 440px !important;
+  min-width: 320px;
+  max-width: 520px;
+  height: auto !important;
+  z-index: 1 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin: 0;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.main-flex-content > .config-sidebar {
+  position: relative !important;
+  right: 0 !important;
+  top: 0 !important;
+  width: 440px !important;
+  min-width: 320px;
+  max-width: 520px;
+  height: auto !important;
+  z-index: 1 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin: 0;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.main-flex-content > .messages-container,
+.main-flex-content > .messages-list,
+.main-flex-content > div {
+  flex: 1 1 0%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  transition: margin 0.3s ease;
-  min-width: 0;
-}
-
-.main-container.sidebar-left-open {
-  margin-left: 280px;
-}
-
-
-/* Header  */
-.app-header {
-  background: var(--surface-elevated);
-  backdrop-filter: blur(20px);
-  border-bottom: 2px solid var(--border-primary); /* Borde más grueso */
-  padding: 1.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 50;
-  position: sticky;
-  top: 0;
-  min-height: 80px;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.app-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.tokens-counter {
-  display: block;
-  font-style: italic;
-  background: none;
-  border: none;
-  padding: 0;
-  text-align: center;
-  width: 100%;
-  font-size: 0.85em;
-  margin-bottom: 4px;
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.toggle-group {
-  display: flex;
-  gap: 1.5rem;
-  margin-right: 1.5rem;
-  padding: 0.75rem 1.25rem; /* Más padding */
-  background: var(--surface-secondary);
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--border-secondary); /* Borde más visible */
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--text-primary); /* Color más visible */
-  cursor: pointer;
-  user-select: none;
-  font-weight: 600; /* Texto más grueso */
-}
-
-.toggle-label input[type="checkbox"] {
-  display: none;
-}
-
-.toggle-slider {
-  width: 44px; /* Más grande */
-  height: 24px;
-  background: var(--surface-primary); /* Fondo más sólido */
-  border: 2px solid var(--border-primary); /* Borde más visible */
-  border-radius: 12px;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 18px; /* Más grande */
-  height: 18px;
-  background: var(--text-secondary);
-  border-radius: 50%;
-  top: 1px;
-  left: 1px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Sombra para mayor visibilidad */
-}
-
-.toggle-label input[type="checkbox"]:checked + .toggle-slider {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-primary-alpha); /* Glow effect */
-}
-
-.toggle-label input[type="checkbox"]:checked + .toggle-slider::before {
-  transform: translateX(20px);
-  background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-}
-
-.header-button {
-  padding: 1rem;
-  background: var(--surface-secondary);
-  border: 2px solid var(--border-secondary); /* Borde más visible */
-  border-radius: var(--radius-lg);
-  color: var(--text-primary); /* Color más visible */
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 48px;
-  height: 48px;
-  font-weight: 600; /* Texto más grueso */
-}
-
-.header-button:hover {
-  background: var(--surface-hover);
-  border-color: var(--accent-primary); /* Borde de hover más visible */
-  color: var(--text-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); /* Sombra colorida */
-}
-
-.header-button.active {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: white;
-  box-shadow: 0 4px 12px var(--accent-primary-alpha);
-}
-
-.header-button.danger {
-  background: var(--error-bg);
-  border-color: var(--error-border);
-  color: var(--error-text);
-}
-
-.header-button.danger:hover {
-  background: var(--error-hover);
-  border-color: var(--error-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  height: 100%;
 }
 
 /* Eliminado: .messages-container, .messages-list, .message, .message.user, .message.assistant, .message-avatar, .message-content, .user-message, .assistant-message, .typing-indicator, etc. (migrado a MessageList.css) */
 
 /* Área de Input centrada */
 .input-area {
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
   padding: 0.25rem 0.5rem !important;
   border-top: 2px solid var(--border-primary); /* Borde */
   background: var(--surface-elevated);
@@ -348,7 +230,7 @@
 
 .chat-sidebar {
   left: 0;
-  width: 320px;
+  width: 440px;
   height: 100vh;
   background: var(--surface-elevated);
   backdrop-filter: blur(20px);
@@ -377,7 +259,7 @@
 
 .config-sidebar {
   right: 0;
-  width: 320px;
+  width: 440px;
   /* Oculto por defecto */
   transform: translateX(100%);
 }
@@ -1062,5 +944,22 @@
     height: calc(100vh - 50px);
     height: calc(100dvh - 50px);
     min-height: -webkit-fill-available;
+  }
+}
+
+/* Ajustes para pantallas de escritorio */
+@media (min-width: 769px) {
+  .main-flex-content > .chat-sidebar,
+  .main-flex-content > .config-sidebar {
+    width: 440px !important;
+    min-width: 320px;
+    max-width: 520px;
+  }
+
+  .chat-sidebar,
+  .config-sidebar {
+    width: 440px !important;
+    max-width: 520px;
+    min-width: 320px;
   }
 }

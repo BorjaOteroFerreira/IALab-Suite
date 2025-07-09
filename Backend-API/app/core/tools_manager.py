@@ -56,6 +56,7 @@ class ToolsManager:
                     "available": tool_info.get("available", False),
                     "requires_api_key": tool_info.get("requires_api_key", False),
                     "parameters": tool_info.get("parameters", {}),
+                    "usage_example": tool_info.get("usage_example", None),
                     "metadata": tool_instance.metadata if tool_instance else None
                 }
         
@@ -121,7 +122,64 @@ class ToolsManager:
                 self._available_tools[tool_name]["available"])
     
     def get_tools_info_for_model(self) -> str:
-        """Generar información de herramientas para el modelo (solo las activas)"""
+        """Generar información detallada de herramientas para el modelo (solo las activas)"""
+        if not self.is_tools_enabled():
+            return "No hay herramientas disponibles."
+        
+        active_tools = self.get_active_tools()
+        if not active_tools:
+            return "No hay herramientas seleccionadas."
+        
+        instructions = "HERRAMIENTAS DISPONIBLES:\n"
+        instructions += "="*60 + "\n\n"
+        
+        for i, tool_name in enumerate(active_tools, 1):
+            tool_info = self._available_tools.get(tool_name)
+            if not tool_info:
+                continue
+                
+            instructions += f"{i}. HERRAMIENTA: {tool_info['name']}\n"
+            instructions += f"   Identificador: '{tool_name}'\n"
+            instructions += f"   Descripción: {tool_info['description']}\n"
+            
+            # Agregar parámetros si existen
+            if tool_info.get('parameters'):
+                instructions += f"   Parámetros:\n"
+                for param_name, param_desc in tool_info['parameters'].items():
+                    instructions += f"     - {param_name}: {param_desc}\n"
+            
+            # Agregar ejemplos de uso si existen
+            usage_example = tool_info.get('usage_example')
+            if usage_example:
+                instructions += f"   Ejemplos de uso:\n"
+                
+                if isinstance(usage_example, dict):
+                    for example_key, example_value in usage_example.items():
+                        if isinstance(example_value, list):
+                            instructions += f"     {example_key}:\n"
+                            for item in example_value:
+                                instructions += f"       • {item}\n"
+                        else:
+                            instructions += f"     {example_key}: {example_value}\n"
+                elif isinstance(usage_example, str):
+                    instructions += f"     {usage_example}\n"
+                elif isinstance(usage_example, list):
+                    for example in usage_example:
+                        instructions += f"     • {example}\n"
+            
+            instructions += "\n" + "-"*50 + "\n\n"
+        
+        instructions += "INSTRUCCIONES DE USO:\n"
+        instructions += "Para usar una herramienta, utiliza el formato:\n"
+        instructions += '{"tool": "nombre_herramienta", "query": "tu_consulta"}\n\n'
+        instructions += "Donde:\n"
+        instructions += "- 'nombre_herramienta' es el identificador de la herramienta\n"
+        instructions += "- 'tu_consulta' es la consulta o parámetros necesarios\n\n"
+        
+        return instructions
+    
+    def get_tools_info_for_model_simple(self) -> str:
+        """Generar información simplificada de herramientas para el modelo (formato original)"""
         if not self.is_tools_enabled():
             return "No hay herramientas disponibles."
         

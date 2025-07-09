@@ -21,7 +21,14 @@ class SearchTools(BaseTool):
             description="Busca información en internet sobre un tema específico",
             category=ToolCategory.SEARCH,
             requires_api_key=True,
-            api_key_env_var="SERPER_API_KEY"
+            api_key_env_var="SERPER_API_KEY",
+            usage_example={
+                "búsqueda_simple": '{"tool": "serper.dev", "query": "últimas noticias de IA"}',
+                "con_api_key": 'Requiere SERPER_API_KEY en variables de entorno',
+                "formatos_soportados": [
+                    'query: texto de búsqueda (string)'
+                ]
+            }
         )
 
     @classmethod

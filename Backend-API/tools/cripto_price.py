@@ -13,7 +13,15 @@ class CriptoPrice(BaseTool):
             name="Precios Criptomonedas",
             description="Obtiene el precio actual de criptomonedas en USD",
             category=ToolCategory.FINANCE,
-            requires_api_key=False
+            requires_api_key=False,
+            usage_example={
+                "búsqueda_simple": '{"tool": "cripto_price", "query": "bitcoin"}',
+                "varias_criptos": '{"tool": "cripto_price", "query": ["bitcoin", "ethereum", "dogecoin"]}',
+                "formato_lista": '{"tool": "cripto_price", "query": "bitcoin, ethereum, solana"}',
+                "formatos_soportados": [
+                    'query: nombre o lista de nombres de criptomonedas (string o lista de strings)'
+                ]
+            }
         )
     
     @classmethod

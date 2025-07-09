@@ -37,7 +37,17 @@ class ImageSearchTool(BaseTool):
             description="Busca imágenes usando DuckDuckGo (sin API key)",
             category=ToolCategory.MEDIA,
             requires_api_key=False,
-            api_key_env_var=None
+            api_key_env_var=None,
+            usage_example={
+                "búsqueda_simple": '{"tool": "image_search_tool", "query": "gatos divertidos"}',
+                "con_max_results": '{"tool": "image_search_tool", "query": "paisajes", "max_results": 8}',
+                "con_safe_search": '{"tool": "image_search_tool", "query": "arte moderno", "safe_search": false}',
+                "formatos_soportados": [
+                    'query: palabra clave de búsqueda (string)',
+                    'max_results: número máximo de imágenes (opcional, int)',
+                    'safe_search: activar filtro seguro (opcional, bool)'
+                ]
+            }
         )
     
     @classmethod

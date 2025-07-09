@@ -37,46 +37,20 @@ class GoogleSearchTool(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="Google Search",
-            description="Busca información en internet usando Google Custom Search API gratuita (100 búsquedas/día)",
+            name="Google Custom Search",
+            description="Busca información en internet usando Google Custom Search API (requiere API key y CSE ID)",
             category=ToolCategory.SEARCH,
-            version="1.0.0",
-            author="IALab Suite",
             requires_api_key=True,
             api_key_env_var="CUSTOM_SEARCH_API_KEY",
-            parameters={
-                "query": {
-                    "type": "string",
-                    "description": "Texto a buscar en internet",
-                    "required": True
-                },
-                "num_results": {
-                    "type": "integer",
-                    "description": "Número de resultados a devolver (máximo 10)",
-                    "default": 5,
-                    "min": 1,
-                    "max": 10
-                },
-                "language": {
-                    "type": "string",
-                    "description": "Idioma de los resultados (es, en, fr, etc.)",
-                    "default": "es"
-                },
-                "safe_search": {
-                    "type": "string",
-                    "description": "Nivel de filtro de contenido (off, active)",
-                    "default": "off"
-                },
-                "date_restrict": {
-                    "type": "string",
-                    "description": "Filtro de fecha para resultados recientes (d1=último día, w1=última semana, m1=último mes, y1=último año)",
-                    "default": "m1"
-                },
-                "sort_by_date": {
-                    "type": "boolean",
-                    "description": "Ordenar por fecha (más recientes primero)",
-                    "default": True
-                }
+            usage_example={
+                "búsqueda_simple": '{"tool": "google_custom_search", "query": "historia de la inteligencia artificial"}',
+                "con_opciones": '{"tool": "google_custom_search", "query": "machine learning", "num_results": 3, "language": "es"}',
+                "formatos_soportados": [
+                    'query: texto de búsqueda (string)',
+                    'num_results: número de resultados (int, opcional)',
+                    'language: idioma (string, opcional)',
+                    'date_restrict: filtro temporal (string, opcional)'
+                ]
             }
         )
     

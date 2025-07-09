@@ -4,7 +4,7 @@
  */
 
 .config-sidebar {
-  width: 320px;
+  width: 400px;
   height: 100vh;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
@@ -144,7 +144,7 @@
 }
 
 /* Close button */
-.close-btn {
+/* .close-btn {
   background: none;
   border: none;
   font-size: 18px;
@@ -168,7 +168,7 @@
 
 .close-btn:active {
   transform: scale(0.95);
-}
+} */
 
 /* Form groups */
 .form-group {
@@ -755,47 +755,32 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 /* Botón trigger del selector */
 .model-selector-trigger {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: #2a2a2a;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  text-align: left;
-  position: relative;
-  min-height: 48px;
-}
-
-.model-selector-trigger:hover:not(:disabled) {
-  background: #383838;
-  border-color: var(--border-focus);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.model-selector-trigger:disabled {
-  background: #1a1a1a;
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.model-selector-trigger.open {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: #333333; /* Igual que la tarjeta */
+  border: 1px solid #444; /* Igual que la tarjeta */
+  padding: 0 !important;
+  margin: 0;
+  border-radius: var(--radius-md);
 }
 
 /* Display del modelo seleccionado */
 .selected-model-display {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 2px;
   flex: 1;
+  padding: 2px 4px; /* Padding mínimo */
+  border-radius: var(--radius-md);
+  background: #333333;
+  border: 1px solid #444;
+  margin-bottom: 2px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Indicador de visión para el modelo seleccionado */
@@ -863,18 +848,30 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 .placeholder-display {
   color: var(--text-secondary);
   font-style: italic;
+  min-height: 48px; /* Igual que .model-card */
+  display: flex;
+  align-items: center;
+  padding: 8px 8px;
+  border-radius: var(--radius-md);
+  background: #333333;
+  border: 1px solid #444;
+  box-sizing: border-box;
+  width: 100%; /* Ocupa todo el ancho del selector */
+  min-width: 0;
 }
 
 /* Flecha dropdown */
 .dropdown-arrow {
-  font-size: 12px;
-  color: var(--text-secondary);
-  transition: transform 0.3s ease;
-  margin-left: var(--spacing-sm);
+  font-size: 0.75em;
+  margin-left: 2px;
+  vertical-align: middle;
+  transition: transform 0.2s;
+  color: var(--primary); /* Color acorde a la interfaz */
 }
 
 .dropdown-arrow.open {
   transform: rotate(180deg);
+  color: var(--primary); /* Mantener color en estado abierto */
 }
 
 /* Dropdown container */
@@ -888,20 +885,19 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  margin-top: var(--spacing-xs);
+  margin-top: 2px;
   max-height: 300px;
   overflow: hidden;
-  animation: slideDown 0.2s ease-out;
+  /* Eliminar transform de la animación para evitar salto visual */
+  animation: fadeInDropdown 0.18s ease-out;
 }
 
-@keyframes slideDown {
+@keyframes fadeInDropdown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -909,7 +905,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 .model-cards-container {
   max-height: 300px;
   overflow-y: auto;
-  padding: var(--spacing-xs);
+  padding: 0 1px; /* Padding mínimo horizontal y sin padding vertical */
   background: #2a2a2a;
   
   /* Custom scrollbar */
@@ -934,15 +930,16 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 .model-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
+  gap: 8px;
+  padding: 8px 8px; /* Más altura y espacio horizontal */
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
   position: relative;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   background: #333333;
+  min-height: 48px; /* Altura mínima para evitar que se vean aplastadas */
 }
 
 .model-card:hover {
@@ -991,6 +988,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 .model-card-info {
   flex: 1;
   min-width: 0;
+  /* Asegura que los badges no se vean afectados por el check */
 }
 
 .model-card-name {
@@ -998,7 +996,7 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   color: var(--text-primary);
   font-size: var(--font-size-sm);
   line-height: 1.3;
-  margin-bottom: 2px;
+  margin-bottom: 6px; /* Más espacio vertical respecto a los badges */
 }
 
 .model-card-meta {
@@ -1047,13 +1045,28 @@ input[type="number"].form-control::-webkit-inner-spin-button {
   border: 1px solid rgba(185, 182, 16, 0.3);
 }
 
+.model-meta-weight {
+  font-size: var(--font-size-xs);
+  color: #f59e42;
+  background: rgba(245, 158, 66, 0.18);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  border: 1px solid rgba(245, 158, 66, 0.25);
+}
+
 /* Indicador seleccionado */
 .selected-indicator {
   font-size: 16px;
   color: var(--success, #10b981);
   font-weight: bold;
   flex-shrink: 0;
-  margin-left: var(--spacing-sm);
+  margin-left: 0;
+  position: absolute;
+  right: 8px;
+  top: 2px;
+  transform: none;
+  z-index: 2;
   animation: checkmark 0.3s ease-in-out;
 }
 

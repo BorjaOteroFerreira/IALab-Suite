@@ -26,6 +26,7 @@ class ToolMetadata:
     requires_api_key: bool = False
     api_key_env_var: Optional[str] = None
     parameters: Dict[str, Any] = None
+    usage_example: Optional[dict] = None  # <-- Añadido para soportar ejemplos de uso
 
 class BaseTool(ABC):
     """

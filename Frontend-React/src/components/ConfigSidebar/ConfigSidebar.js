@@ -13,99 +13,80 @@ const ConfigSidebar = ({ visible, onClose }) => {
     const fetchData = async () => {
       try {
         console.log('ConfigSidebar: Cargando modelos...');
-        
         if (fetchModelsAndFormats) {
-          const data = await fetchModelsAndFormats();          if (data && data.models && Array.isArray(data.models)) {
-            console.log(`ConfigSidebar: ${data.models.length} modelos cargados desde el backend`);
-              // Guardar lista completa para detectar archivos mmproj
-            setAllModelsList(data.models);
-            
+          const data = await fetchModelsAndFormats();
+          if (data && data.models && Array.isArray(data.models)) {
+            // Normalizar: asegurar que todos los modelos sean objetos {path, size}
+            const normalizedModels = data.models
+              .map(model => {
+                if (typeof model === 'string') {
+                  return { path: model, size: null };
+                }
+                if (model && typeof model === 'object' && model.path) {
+                  return { path: model.path, size: model.size ?? null };
+                }
+                return null;
+              })
+              .filter(Boolean);
+            setAllModelsList(normalizedModels);
             // Filtrar archivos que contengan "mmproj" en el nombre
-            const filteredModels = data.models.filter(model => 
-              !model.toLowerCase().includes('mmproj')
+            const filteredModels = normalizedModels.filter(modelObj =>
+              typeof modelObj.path === 'string' && !modelObj.path.toLowerCase().includes('mmproj')
             );
-            
-            console.log(`ConfigSidebar: ${filteredModels.length} modelos después de filtrar mmproj`);
-            setModelsList(filteredModels);          } else {
-            console.warn('ConfigSidebar: No se encontraron modelos válidos en la respuesta del backend');
+            setModelsList(filteredModels);
+          } else {
             setModelsList([]);
             setAllModelsList([]);
           }
         } else {
-          console.warn('ConfigSidebar: fetchModelsAndFormats no disponible');
           setModelsList([]);
           setAllModelsList([]);
         }
       } catch (error) {
-        console.error('ConfigSidebar: Error al cargar los modelos:', error);
         setModelsList([]);
         setAllModelsList([]);
       }
     };
-    
     fetchData();
-  }, [fetchModelsAndFormats]);  // Función para formatear el nombre del modelo 
-  const formatModelName = (modelPath) => {
-    if (!modelPath) return '';
-    
-    // Extraer solo el nombre del archivo de la última barra invertida
-    const fileName = modelPath.split('\\').pop() || modelPath.split('/').pop();
-    let cleanName = fileName;
-    
-    // Quitar extensiones comunes
+  }, [fetchModelsAndFormats]);
+
+  // Adaptar el resto del código para trabajar con objetos {path, size}
+  const formatModelName = (modelObjOrPath) => {
+    if (!modelObjOrPath) return '';
+    const path = typeof modelObjOrPath === 'object' ? modelObjOrPath.path : modelObjOrPath;
+    if (!path) return '';
+    const fileName = path.split(/[/\\]/).pop();
+    let cleanName = fileName || '';
     cleanName = cleanName.replace(/\.(gguf|bin|pt|pth|safetensors)$/i, '');
-    // Quitar información de cuantización del nombre (Q4, Q3, Q8, etc.)
     cleanName = cleanName.replace(/[-_]?Q\d+(_K|_M|_KM|_KS)?/gi, '');
-    // Quitar información de tamaño del nombre (7b, 13b, etc.)
     cleanName = cleanName.replace(/[-_]?(\d+)\.?\d*[Bb]/gi, '');
-    // Reemplazar guiones y guiones bajos con espacios
     cleanName = cleanName.replace(/[-_]/g, ' ');
-    // Limpiar espacios múltiples
     cleanName = cleanName.replace(/\s+/g, ' ').trim();
-    // Capitalizar las primeras letras de cada palabra
     cleanName = cleanName.replace(/\b\w/g, l => l.toUpperCase());
-    
     return cleanName;
-  };  // Función para obtener información adicional del modelo
-  const getModelInfo = (modelPath) => {
-    if (!modelPath) return { size: null, type: null, quantization: null, icon: '🤖', hasVision: false };
-    const fileName = modelPath.split('\\').pop() || modelPath.split('/').pop();
-    
-    // Detectar tamaño del modelo
+  };
+
+  const getModelInfo = (modelObjOrPath) => {
+    if (!modelObjOrPath) return { size: null, type: null, quantization: null, icon: '🤖', hasVision: false, fileSize: null };
+    const path = typeof modelObjOrPath === 'object' ? modelObjOrPath.path : modelObjOrPath;
+    if (!path) return { size: null, type: null, quantization: null, icon: '🤖', hasVision: false, fileSize: null };
+    const fileName = path.split(/[/\\]/).pop();
     const size = fileName.match(/(\d+)\.?\d*[Bb]/i);
-    // Detectar tipo de modelo
     const type = fileName.match(/(chat|instruct|base|code)/i);
-    // Detectar cuantización (Q4, Q3, Q8, etc.)
     const quantization = fileName.match(/Q(\d+)(_K|_M|_KM|_KS)?/i);
-    // Verificar si hay un archivo con "mmproj" en el nombre en la misma carpeta del modelo
     let hasVision = false;
-    
     if (allModelsList.length > 0) {
-      // Obtener la carpeta del modelo actual
-      const folderPath = modelPath.substring(0, Math.max(
-        modelPath.lastIndexOf('/'), 
-        modelPath.lastIndexOf('\\')
-      ));
-      
+      const folderPath = path.substring(0, Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\')));
       hasVision = allModelsList.some(model => {
-        // Obtener la carpeta del modelo en la lista
-        const modelFolder = model.substring(0, Math.max(
-          model.lastIndexOf('/'), 
-          model.lastIndexOf('\\')
-        ));
-        
-        const modelFileName = model.split(/[/\\]/).pop();
-        
-        // Verificar si está en la misma carpeta, contiene "mmproj" y es un archivo diferente
+        const modelPath = typeof model === 'object' ? model.path : model;
+        const modelFolder = modelPath.substring(0, Math.max(modelPath.lastIndexOf('/'), modelPath.lastIndexOf('\\')));
+        const modelFileName = modelPath.split(/[/\\]/).pop();
         const isSameFolder = modelFolder === folderPath;
-        const isMMProj = modelFileName.toLowerCase().includes('mmproj');
-        const isDifferentFile = model !== modelPath;
-        
+        const isMMProj = modelFileName && modelFileName.toLowerCase().includes('mmproj');
+        const isDifferentFile = modelPath !== path;
         return isSameFolder && isMMProj && isDifferentFile;
       });
     }
-    
-    // Seleccionar icono basado en el tipo 
     let icon = '🤖';
     if (type) {
       const typeStr = type[0].toLowerCase();
@@ -113,13 +94,14 @@ const ConfigSidebar = ({ visible, onClose }) => {
       else if (typeStr === 'instruct') icon = '📝';
       else if (typeStr === 'code') icon = '💻';
     }
-    
+    let fileSize = typeof modelObjOrPath === 'object' && modelObjOrPath.size ? modelObjOrPath.size : null;
     return {
       size: size ? size[0].toUpperCase() : null,
       type: type ? type[0].toLowerCase() : null,
       quantization: quantization ? quantization[0].toUpperCase() : null,
       icon: icon,
-      hasVision: hasVision
+      hasVision: hasVision,
+      fileSize: fileSize
     };
   };
 
@@ -193,18 +175,11 @@ const ConfigSidebar = ({ visible, onClose }) => {
   
   // Memoizar la información de los modelos para evitar recálculos innecesarios
   const modelsWithInfo = useMemo(() => {
-    console.log(`🔄 Recalculando modelos. modelsList: ${modelsList.length}, allModelsList: ${allModelsList.length}`);
-    
-    return modelsList.map(model => {
-      const info = getModelInfo(model);
-      const displayName = formatModelName(model);
-      
-      if (info.hasVision) {
-        console.log(`👁️ Modelo con visión detectado: ${displayName} (${model})`);
-      }
-      
+    return modelsList.map(modelObj => {
+      const info = getModelInfo(modelObj);
+      const displayName = formatModelName(modelObj);
       return {
-        path: model,
+        path: typeof modelObj === 'object' ? modelObj.path : modelObj,
         info,
         displayName
       };
@@ -218,118 +193,120 @@ const ConfigSidebar = ({ visible, onClose }) => {
     <div className={`config-sidebar ${visible ? 'visible' : 'hidden'}`}>
       <div className="sidebar-header">
         <h5>⚙️ Configuración del modelo</h5>
-        {onClose && (
-          <button type="button" className="close-btn" onClick={onClose} title="Cerrar">
-            ✕
-          </button>
-        )}
+
       </div>
       <form onSubmit={handleSubmit}>        <div className="form-group">
-          <label htmlFor="modelPath" className="model-label">
-            🤖 Modelo de IA:
-          </label>          <select
-            className="form-control model-select"
-            id="modelPath"
-            name="modelPath"
-            value={modelConfig.modelPath || ''}
-            onChange={handleChange}
-            required
-            disabled={modelsList.length === 0}
-          >
-            <option value="" className="placeholder-option">
-              {modelsList.length === 0 ? '⏳ Cargando modelos...' : '🔍 Selecciona un modelo'}
-            </option>{modelsWithInfo.map(({ path, info, displayName }, index) => {
-              return (
-                <option key={index} value={path} className="model-option">
-                  {displayName}
-                  {info.size && ` • ${info.size}`}
-                  {info.type && ` • ${info.type}`}
-                </option>
-              );
-            })}</select>
-          <style>{`
-            .form-control.model-select {
-              display: none !important;
-            }
-          `}</style>
-          <button
-            type="button"
-            className={`model-selector-trigger ${isModelSelectorOpen ? 'open' : ''}`}
-            onClick={() => setIsModelSelectorOpen(!isModelSelectorOpen)}
-            disabled={modelsList.length === 0}
-          >            {modelConfig.modelPath ? (
-              <div className="selected-model-display">
-                <span className="model-icon">{
-                  selected.info.icon || '🤖'
-                }</span>
-                <div className="model-details">
-                  <span className="model-name">{
-                    selected.displayName || formatModelName(modelConfig.modelPath)
-                  }</span>
-                  <div className="model-badges">
-                    {selected.info.size && (
-                      <span className="model-size">{selected.info.size}</span>
-                    )}
-                    {selected.info.quantization && (
-                      <span className="model-quantization">{selected.info.quantization}</span>
-                    )}
-                    {selected.info.type && (
-                      <span className="model-meta-type">{selected.info.type}</span>
-                    )}
-                    {selected.info.hasVision && (
-                      <span className="model-meta-vision">visión</span>
-                    )}
+
+          {/* Agrupar trigger y dropdown en un contenedor relativo */}
+          <div className="model-selector-wrapper" style={{ position: 'relative' }}>
+            <select
+              className="form-control model-select"
+              id="modelPath"
+              name="modelPath"
+              value={modelConfig.modelPath || ''}
+              onChange={handleChange}
+              required
+              disabled={modelsList.length === 0}
+            >
+              <option value="" className="placeholder-option">
+                {modelsList.length === 0 ? '⏳ Cargando modelos...' : '🔍 Selecciona un modelo'}
+              </option>{modelsWithInfo.map(({ path, info, displayName }, index) => {
+                return (
+                  <option key={index} value={path} className="model-option">
+                    {displayName}
+                    {info.size && ` • ${info.size}`}
+                    {info.type && ` • ${info.type}`}
+                  </option>
+                );
+              })}
+            </select>
+            <style>{`
+              .form-control.model-select {
+                display: none !important;
+              }
+            `}</style>
+            <button
+              type="button"
+              className={`model-selector-trigger ${isModelSelectorOpen ? 'open' : ''}`}
+              onClick={() => setIsModelSelectorOpen(!isModelSelectorOpen)}
+              disabled={modelsList.length === 0}
+            >
+              {modelConfig.modelPath ? (
+                <div className="selected-model-display">
+                  {/* <span className="model-icon">{selected.info.icon || '🤖'}</span> */}
+                  <div className="model-details">
+                    <span className="model-name">{
+                      selected.displayName || formatModelName(modelConfig.modelPath)
+                    }</span>
+                    <div className="model-badges">
+                      {selected.info.size && (
+                        <span className="model-size">{selected.info.size}</span>
+                      )}
+                      {selected.info.quantization && (
+                        <span className="model-quantization">{selected.info.quantization}</span>
+                      )}
+                      {selected.info.type && (
+                        <span className="model-meta-type">{selected.info.type}</span>
+                      )}
+                      {selected.info.hasVision && (
+                        <span className="model-meta-vision">visión</span>
+                      )}
+                      {selected.info.fileSize && selected.info.fileSize > 0 && (
+                        <span className="model-meta-weight">{(selected.info.fileSize / (1024*1024*1024)).toFixed(2)} GB</span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="placeholder-display">
-                {modelsList.length === 0 ? (
-                  <>⏳ Cargando modelos...</>
-                ) : (
-                  <>🔍 Selecciona un modelo</>
-                )}
+              ) : (
+                <div className="placeholder-display">
+                  {modelsList.length === 0 ? (
+                    <>⏳ Cargando modelos...</>
+                  ) : (
+                    <>🔍 Selecciona un modelo</>
+                  )}
+                </div>
+              )}
+              <span className={`dropdown-arrow ${isModelSelectorOpen ? 'open' : ''}`}>▼</span>
+            </button>
+            {/* Dropdown ahora está dentro del wrapper relativo */}
+            {isModelSelectorOpen && (
+              <div className="model-selector-dropdown">
+                <div className="model-cards-container">
+                  {modelsWithInfo.map(({ path, info, displayName }, index) => {
+                    const isSelected = modelConfig.modelPath === path;
+                    return (
+                      <div
+                        key={index}
+                        className={`model-card ${isSelected ? 'selected' : ''} ${info.hasVision ? 'has-vision' : ''}`}
+                        onClick={() => handleModelSelect(path)}
+                      >
+                        {/* <div className="model-card-icon">{info.icon}</div> */}
+                        <div className="model-card-info">
+                          <div className="model-card-name">{displayName}</div>
+                          <div className="model-card-meta">
+                            {info.size && <span className="model-meta-size">{info.size}</span>}
+                            {info.quantization && <span className="model-meta-quantization">{info.quantization}</span>}
+                            {info.type && <span className="model-meta-type">{info.type}</span>}
+                            {info.hasVision && <span className="model-meta-vision">visión</span>}
+                            {info.fileSize && info.fileSize > 0 && (
+                              <span className="model-meta-weight">{(info.fileSize / (1024*1024*1024)).toFixed(2)} GB</span>
+                            )}
+                          </div>
+                        </div>
+                        {isSelected && <div className="selected-indicator">✓</div>}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
-            <span className={`dropdown-arrow ${isModelSelectorOpen ? 'open' : ''}`}>▼</span>
-          </button>
-          
-          {/* Lista de modelos como cards */}
-          {isModelSelectorOpen && (
-            <div className="model-selector-dropdown">
-              <div className="model-cards-container">
-                {modelsWithInfo.map(({ path, info, displayName }, index) => {
-                  const isSelected = modelConfig.modelPath === path;
-                  
-                  return (                    <div
-                      key={index}
-                      className={`model-card ${isSelected ? 'selected' : ''} ${info.hasVision ? 'has-vision' : ''}`}
-                      onClick={() => handleModelSelect(path)}
-                    >
-                      <div className="model-card-icon">{info.icon}</div>
-                      <div className="model-card-info">
-                        <div className="model-card-name">{displayName}</div>                        <div className="model-card-meta">
-                          {info.size && <span className="model-meta-size">{info.size}</span>}
-                          {info.quantization && <span className="model-meta-quantization">{info.quantization}</span>}
-                          {info.type && <span className="model-meta-type">{info.type}</span>}
-                          {info.hasVision && <span className="model-meta-vision">visión</span>}
-                        </div>
-                      </div>
-                      {isSelected && <div className="selected-indicator">✓</div>}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          
+          </div>
           {/* Mostrar el modelo seleccionado */}
           {modelConfig.modelPath && (
             <div className="selected-model-info">
               ✅ Modelo seleccionado: <strong>{formatModelName(modelConfig.modelPath)}</strong>
             </div>
           )}
-          
           <div className="model-info">
             📊 {modelsList.length} modelo{modelsList.length !== 1 ? 's' : ''} disponible{modelsList.length !== 1 ? 's' : ''}
           </div>

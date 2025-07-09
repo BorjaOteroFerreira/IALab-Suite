@@ -13,7 +13,19 @@ class NewsFeedTool(BaseTool):
             description="Obtiene las últimas noticias por categorías o temas específicos",
             category=ToolCategory.SEARCH,
             requires_api_key=True,
-            api_key_env_var="NEWS_API_KEY"
+            api_key_env_var="NEWS_API_KEY",
+            usage_example={
+                "por_tema": '{"tool": "news_feed", "query": "tecnología"}',
+                "por_categoria": '{"tool": "news_feed", "category": "sports"}',
+                "con_opciones": '{"tool": "news_feed", "query": "política", "country": "es", "language": "es", "page_size": 5}',
+                "formatos_soportados": [
+                    'query: tema de búsqueda (string, opcional)',
+                    'category: categoría de noticias (string, opcional)',
+                    'country: país (string, opcional)',
+                    'language: idioma (string, opcional)',
+                    'page_size: número de resultados (int, opcional)'
+                ]
+            }
         )
 
     @classmethod

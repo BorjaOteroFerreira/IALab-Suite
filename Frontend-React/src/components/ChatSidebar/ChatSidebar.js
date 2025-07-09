@@ -17,14 +17,8 @@ function ChatSidebar({ visible, onLoadChat, onDeleteChat, onClose }) {
   return (
     <div className={`chat-sidebar ${visible ? 'visible' : ''}`}>
       <div className="sidebar-header">
-        <h3>📁 Historial de Chat</h3>
-        <button 
-          className="close-btn"
-          onClick={onClose}
-          title="Cerrar"
-        >
-          ✕
-        </button>
+        <h3>Historial de Chat</h3>
+ 
       </div>
       
       <div className="chat-list">

@@ -14,8 +14,8 @@ class ModelService:
     def __init__(self):
         self._chat_formats_cache = None
     
-    def get_available_models(self) -> List[str]:
-        """Get list of available models"""
+    def get_available_models(self) -> List[dict]:
+        """Get list of available models with size"""
         try:
             models = file_manager.get_models_list(Config.MODELS_DIRECTORY)
             logger.debug(f"Found {len(models)} available models")

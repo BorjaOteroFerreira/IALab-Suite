@@ -9,7 +9,13 @@ class IpInfoTool(BaseTool):
             name="Ip Lookup",
             description="Obtiene información geográfica y detalles sobre una dirección IP",
             category=ToolCategory.UTILITY,
-            requires_api_key=False
+            requires_api_key=False,
+            usage_example={
+                "búsqueda_simple": '{"tool": "ip_lookup", "query": "8.8.8.8"}',
+                "formatos_soportados": [
+                    'query: dirección IP (string)'
+                ]
+            }
         )
     
     def execute(self, query: str, **kwargs):

@@ -4,6 +4,7 @@ from urllib.parse import urljoin, urlparse
 import re
 from collections import Counter
 from .base_tool import BaseTool, ToolMetadata, ToolCategory
+import json
 
 class WebContentExtractorTool(BaseTool):
     
@@ -11,22 +12,161 @@ class WebContentExtractorTool(BaseTool):
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
             name="Url Content Extractor",
-            description="Extrae y resume el contenido más relevante de una URL incluyendo texto principal, imágenes y estructura",
+            description="Extrae y resume el contenido más relevante de una URL o múltiples URLs incluyendo texto principal, imágenes y estructura",
             category=ToolCategory.UTILITY,
             requires_api_key=False,
             parameters={
-                "url": "URL completa https://ejemplo.com",
-                "summary_length": "Longitud del resumen en caracteres (default: 1)",
-                "include_images": "Incluir información de imágenes (default: True)"
+                "url": "URL completa https://ejemplo.com o array de URLs ['https://ejemplo1.com', 'https://ejemplo2.com']",
+                "summary_length": "Longitud del resumen en caracteres (default: 1000)",
+                "include_images": "Incluir información de imágenes (default: True)",
+                "max_concurrent": "Número máximo de URLs a procesar simultáneamente (default: 5)"
+            },
+            usage_example={
+                "una_url": '{"tool": "url_content_extractor", "query": "https://ejemplo.com"}',
+                "multiples_urls": '{"tool": "url_content_extractor", "query": ["https://ejemplo1.com", "https://ejemplo2.com"]}',
+                "formatos_soportados": [
+                    'URL individual: "https://ejemplo.com"',
+                    'Array JSON: ["https://ejemplo1.com", "https://ejemplo2.com"]',
+                    "Lista Python: ['https://ejemplo1.com', 'https://ejemplo2.com']",
+                    'URLs separadas: "https://ejemplo1.com, https://ejemplo2.com"'
+                ]
             }
         )
     
     def execute(self, query: str, **kwargs):
-        """Extrae contenido relevante de una URL y genera un resumen"""
+        """Extrae contenido relevante de una URL o múltiples URLs"""
         summary_length = kwargs.get('summary_length', 1000)
         include_images = kwargs.get('include_images', True)
+        max_concurrent = kwargs.get('max_concurrent', 5)
         
-        return self.extract_and_summarize(query, summary_length, include_images)
+        try:
+            # Determinar si es una URL individual o múltiples URLs
+            urls = self._parse_urls(query)
+            
+            if len(urls) == 1:
+                return self.extract_and_summarize(urls[0], summary_length, include_images)
+            else:
+                return self.extract_multiple_urls(urls, summary_length, include_images, max_concurrent)
+                
+        except Exception as e:
+            return f"""
+Error al procesar la consulta: {str(e)}
+
+Uso de la herramienta:
+{{"tool": "url_content_extractor", "query": "https://ejemplo.com"}}
+
+Para múltiples URLs:
+{{"tool": "url_content_extractor", "query": ["https://ejemplo1.com", "https://ejemplo2.com"]}}
+
+Formatos soportados:
+- URL individual: "https://ejemplo.com"
+- Array JSON: ["https://ejemplo1.com", "https://ejemplo2.com"]
+- Lista Python: ['https://ejemplo1.com', 'https://ejemplo2.com']
+- URLs separadas: "https://ejemplo1.com, https://ejemplo2.com"
+
+"""
+    
+    @staticmethod
+    def _parse_urls(query):
+        """Parsea la entrada para determinar si es una URL individual o múltiples URLs"""
+        query = query.strip()
+        
+        # Intentar parsear como JSON (array de URLs)
+        try:
+            parsed = json.loads(query)
+            if isinstance(parsed, list):
+                return [url for url in parsed if isinstance(url, str) and url.strip()]
+        except (json.JSONDecodeError, ValueError):
+            pass
+        
+        # Intentar parsear como lista de Python
+        try:
+            if query.startswith('[') and query.endswith(']'):
+                # Evaluar de forma segura solo si parece una lista
+                parsed = eval(query)
+                if isinstance(parsed, list):
+                    return [url for url in parsed if isinstance(url, str) and url.strip()]
+        except:
+            pass
+        
+        # Buscar múltiples URLs en texto plano (separadas por comas, espacios o saltos de línea)
+        url_pattern = r'https?://[^\s,\n]+'
+        urls = re.findall(url_pattern, query)
+        
+        if urls:
+            return urls
+        
+        # Si no se encontraron URLs con patrón, tratar como URL individual
+        return [query]
+    
+    @staticmethod
+    def extract_multiple_urls(urls, summary_length=1000, include_images=True, max_concurrent=5):
+        """Extrae contenido de múltiples URLs"""
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        import time
+        
+        # Limitar el número de URLs a procesar
+        urls = urls[:max_concurrent]
+        
+        results = []
+        
+        def extract_single_url(url):
+            """Función auxiliar para extraer contenido de una URL"""
+            try:
+                return {
+                    'url': url,
+                    'content': WebContentExtractorTool.extract_and_summarize(url, summary_length, include_images),
+                    'success': True
+                }
+            except Exception as e:
+                return {
+                    'url': url,
+                    'content': f"""Error al procesar {url}: {str(e)}
+
+Uso de la herramienta:
+{{"tool": "url_content_extractor", "query": "https://ejemplo.com"}}
+
+Para múltiples URLs:
+{{"tool": "url_content_extractor", "query": ["https://ejemplo1.com", "https://ejemplo2.com"]}}""",
+                    'success': False
+                }
+        
+        # Usar ThreadPoolExecutor para procesar URLs en paralelo
+        with ThreadPoolExecutor(max_workers=min(3, len(urls))) as executor:
+            # Enviar todas las tareas
+            future_to_url = {executor.submit(extract_single_url, url): url for url in urls}
+            
+            # Recopilar resultados
+            for future in as_completed(future_to_url):
+                result = future.result()
+                results.append(result)
+        
+        # Ordenar resultados por URL original
+        results.sort(key=lambda x: urls.index(x['url']) if x['url'] in urls else float('inf'))
+        
+        # Formatear resultado final
+        final_result = f"""
+EXTRACCIÓN DE CONTENIDO DE MÚLTIPLES URLs
+{'='*60}
+URLs procesadas: {len(urls)}
+Exitosas: {sum(1 for r in results if r['success'])}
+Con errores: {sum(1 for r in results if not r['success'])}
+
+{'='*60}
+"""
+        
+        for i, result in enumerate(results, 1):
+            final_result += f"\n{i}. {result['url']}\n"
+            final_result += f"{'='*60}\n"
+            
+            if result['success']:
+                final_result += result['content']
+            else:
+                final_result += f"❌ {result['content']}"
+            
+            final_result += f"\n{'='*60}\n"
+        
+        return final_result
     
     @staticmethod
     def clean_text(text):
@@ -220,7 +360,7 @@ Título: {title_text}
                 if keywords:
                     result += f"Palabras clave: {keywords}\n"
                 
-                result += f"\nENCONTENIDO PRINCIPAL:\n{'-'*30}\n"
+                result += f"\nCONTENIDO PRINCIPAL:\n{'-'*30}\n"
                 
                 if main_headings:
                     result += "ESTRUCTURA PRINCIPAL:\n"
@@ -264,9 +404,32 @@ Título: {title_text}
                 return f"Error al acceder a la URL: Código de estado {response.status_code}"
                 
         except requests.exceptions.RequestException as e:
-            return f"Error de conexión: {str(e)}"
+            return f"""
+Error de conexión: {str(e)}
+
+Asegúrate de que la URL es válida y accesible.
+Uso de la herramienta: 
+{{"tool": "url_content_extractor", "query": "https://ejemplo.com"}}
+
+Para múltiples URLs:
+{{"tool": "url_content_extractor", "query": ["https://ejemplo1.com", "https://ejemplo2.com"]}}
+"""
         except Exception as e:
-            return f"Error al extraer contenido: {str(e)}"
+            return f"""
+Error al extraer contenido: {str(e)}
+
+Uso de la herramienta:
+{{"tool": "url_content_extractor", "query": "https://ejemplo.com"}}
+
+Para múltiples URLs:
+{{"tool": "url_content_extractor", "query": ["https://ejemplo1.com", "https://ejemplo2.com"]}}
+
+Formatos soportados:
+- URL individual: "https://ejemplo.com"
+- Array JSON: ["https://ejemplo1.com", "https://ejemplo2.com"]
+- Lista Python: ['https://ejemplo1.com', 'https://ejemplo2.com']
+- URLs separadas: "https://ejemplo1.com, https://ejemplo2.com"
+"""
     
     @classmethod
     def get_tool_name(cls) -> str:

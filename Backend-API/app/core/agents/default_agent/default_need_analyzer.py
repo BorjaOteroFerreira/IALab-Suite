@@ -65,7 +65,7 @@ responde unicamente con la o las herramientas a lanzar usando formato JSON, ejem
 supongamos que necesitas buscar el tiempo en internet , contestas: 
 {"tool": "buscar_en_internet", "query": "tiempo proximos dias"}
 Para múltiples herramientas usa un array:
-[{"tool": "buscar_en_internet", "query": "noticias"}, {"tool": "video_search_tool", "query": "tutoriales"}]
+[{"tool": "url_content_extractor", "query": "https://urlejemplo.com"}, {"tool": "video_search_tool", "query": "tutoriales"}]
 Asegurate de que utilizas la sintaxis JSON correcta.
 Puedes usar mas de una herramienta si lo necesitas.
 Debes contestar solo con el JSON de las funciones que usarias sin texto antes ni despues

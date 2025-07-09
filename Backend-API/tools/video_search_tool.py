@@ -30,7 +30,15 @@ class YoutubeVideoSearchTool(BaseTool):
             description="Busca videos en YouTube basado en palabras clave",
             category=ToolCategory.MEDIA,
             requires_api_key=True,
-            api_key_env_var="YOUTUBE_API_KEY"
+            api_key_env_var="YOUTUBE_API_KEY",
+            usage_example={
+                "búsqueda_simple": '{"tool": "youtube_video_search_tool", "query": "tutorial python"}',
+                "con_max_results": '{"tool": "youtube_video_search_tool", "query": "noticias tecnología", "max_results": 6}',
+                "formatos_soportados": [
+                    'query: palabra clave de búsqueda (string)',
+                    'max_results: número máximo de vídeos (opcional, int)'
+                ]
+            }
         )
     
     @classmethod

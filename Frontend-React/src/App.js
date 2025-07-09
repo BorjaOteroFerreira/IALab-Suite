@@ -57,22 +57,34 @@ function ChatComponent({ onOpenDownloader }) {
 
   return (
     <div className="app-layout">
-      {/* Contenedor principal */}
-      <div className={`main-container ${configSidebarVisible ? 'sidebar-right-open' : ''}`}>
-        <Header
-          tools={tools}
-          rag={rag}
-          tokensCount={tokensCount}
-          chatSidebarVisible={chatSidebarVisible}
-          configSidebarVisible={configSidebarVisible}
-          onToggleTools={setTools}
-          onToggleRag={setRag}
-          onToggleChatSidebar={() => setChatSidebarVisible(!chatSidebarVisible)}
-          onToggleConfigSidebar={() => setConfigSidebarVisible(!configSidebarVisible)}
-          onClearChat={clearChat}
-          onOpenDownloader={onOpenDownloader}
-        />
+      {/* Header siempre arriba */}
+      <Header
+        tools={tools}
+        rag={rag}
+        tokensCount={tokensCount}
+        chatSidebarVisible={chatSidebarVisible}
+        configSidebarVisible={configSidebarVisible}
+        onToggleTools={setTools}
+        onToggleRag={setRag}
+        onToggleChatSidebar={() => setChatSidebarVisible(!chatSidebarVisible)}
+        onToggleConfigSidebar={() => setConfigSidebarVisible(!configSidebarVisible)}
+        onClearChat={clearChat}
+        onOpenDownloader={onOpenDownloader}
+      />
 
+      {/* Contenedor central flex para sidebars y mensajes */}
+      <div className="main-flex-content" style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        {/* ChatSidebar a la izquierda si visible */}
+        {chatSidebarVisible && (
+          <ChatSidebar
+            visible={chatSidebarVisible}
+            onLoadChat={handleLoadChat}
+            onDeleteChat={handleDeleteChat}
+            onClose={() => setChatSidebarVisible(false)}
+          />
+        )}
+
+        {/* MessageList SIEMPRE como hermano de los sidebars */}
         <MessageList
           messages={messages}
           currentResponse={currentResponse}
@@ -80,49 +92,42 @@ function ChatComponent({ onOpenDownloader }) {
           messagesEndRef={messagesEndRef}
         />
 
-        <InputArea
-          input={input}
-          setInput={setInput}
-          onSubmit={sendMessage}
-          isLoading={isLoading}
-          currentResponse={currentResponse}
-          onStopResponse={stopResponse}
-          tokensCount={tokensCount}
-          tools={tools}
-          rag={rag}
-          onToggleTools={setTools}
-          onToggleRag={setRag}
-        />
-      </div>
-
-      {/* Overlay y Sidebar de Chat - Solo renderizar cuando esté visible */}
-      {chatSidebarVisible && (
-        <>
-          <div 
-            className="sidebar-overlay"
-            onClick={() => setChatSidebarVisible(false)}
-          />
-          <ChatSidebar 
-            visible={chatSidebarVisible} 
-            onLoadChat={handleLoadChat}
-            onDeleteChat={handleDeleteChat}
-            onClose={() => setChatSidebarVisible(false)}
-          />
-        </>
-      )}
-
-      {/* Overlay y Sidebar de Configuración - Solo renderizar cuando esté visible */}
-      {configSidebarVisible && (
-        <>
-          <div 
-            className="sidebar-overlay"
-            onClick={() => setConfigSidebarVisible(false)}
-          />
-          <ConfigSidebarComponent 
-            visible={configSidebarVisible} 
+        {/* ConfigSidebar a la derecha si visible */}
+        {configSidebarVisible && (
+          <ConfigSidebarComponent
+            visible={configSidebarVisible}
             onClose={() => setConfigSidebarVisible(false)}
           />
-        </>
+        )}
+      </div>
+
+      {/* InputArea siempre abajo */}
+      <InputArea
+        input={input}
+        setInput={setInput}
+        onSubmit={sendMessage}
+        isLoading={isLoading}
+        currentResponse={currentResponse}
+        onStopResponse={stopResponse}
+        tokensCount={tokensCount}
+        tools={tools}
+        rag={rag}
+        onToggleTools={setTools}
+        onToggleRag={setRag}
+      />
+
+      {/* Overlay para cerrar sidebars (sin sidebar flotante) */}
+      {chatSidebarVisible && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setChatSidebarVisible(false)}
+        />
+      )}
+      {configSidebarVisible && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setConfigSidebarVisible(false)}
+        />
       )}
     </div>
   );
