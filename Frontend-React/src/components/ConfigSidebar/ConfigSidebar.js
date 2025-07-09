@@ -175,7 +175,20 @@ const ConfigSidebar = ({ visible, onClose }) => {
   
   // Memoizar la información de los modelos para evitar recálculos innecesarios
   const modelsWithInfo = useMemo(() => {
-    return modelsList.map(modelObj => {
+    // Ordenar por la primera letra del nombre (ascendente) y, si hay empate, por tamaño (descendente)
+    const sorted = [...modelsList].sort((a, b) => {
+      const nameA = formatModelName(a).toLowerCase();
+      const nameB = formatModelName(b).toLowerCase();
+      const firstA = nameA.charAt(0);
+      const firstB = nameB.charAt(0);
+      if (firstA < firstB) return -1;
+      if (firstA > firstB) return 1;
+      // Si la primera letra es igual, ordenar por tamaño descendente (mayor a menor)
+      const sizeA = (typeof a.size === 'number') ? a.size : (parseFloat(a.size) || 0);
+      const sizeB = (typeof b.size === 'number') ? b.size : (parseFloat(b.size) || 0);
+      return sizeB - sizeA;
+    });
+    return sorted.map(modelObj => {
       const info = getModelInfo(modelObj);
       const displayName = formatModelName(modelObj);
       return {
@@ -396,7 +409,24 @@ const ConfigSidebar = ({ visible, onClose }) => {
           </button>
         </div>
       </form>
+      <style>{`
+        .model-card-plain {
+          background: #232b3a;
+          border: 1px solid #2d384d;
+          box-shadow: 0 1px 4px 0 rgba(30,40,60,0.18);
+          border-radius: 10px;
+          color: #e3e8f0;
+          transition: box-shadow 0.2s, border 0.2s, background 0.2s, color 0.2s;
+        }
+        .model-card-plain:hover {
+          background: #2e3a4e;
+          border: 1.5px solid #3a4a6b;
+          box-shadow: 0 4px 16px 0 rgba(40,60,100,0.22);
+          color: #fff;
+        }
+      `}</style>
     </div>
+    
   );
 };
 
