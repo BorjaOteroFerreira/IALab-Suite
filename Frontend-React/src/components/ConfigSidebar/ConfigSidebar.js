@@ -409,24 +409,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
           </button>
         </div>
       </form>
-      <style>{`
-        .model-card-plain {
-          background: #232b3a;
-          border: 1px solid #2d384d;
-          box-shadow: 0 1px 4px 0 rgba(30,40,60,0.18);
-          border-radius: 10px;
-          color: #e3e8f0;
-          transition: box-shadow 0.2s, border 0.2s, background 0.2s, color 0.2s;
-        }
-        .model-card-plain:hover {
-          background: #2e3a4e;
-          border: 1.5px solid #3a4a6b;
-          box-shadow: 0 4px 16px 0 rgba(40,60,100,0.22);
-          color: #fff;
-        }
-      `}</style>
     </div>
-    
   );
 };
 
