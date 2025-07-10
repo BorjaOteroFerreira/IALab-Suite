@@ -25,6 +25,7 @@ from .adaptive_planner import AdaptiveTaskPlanner
 from ..response_generator import ResponseGenerator
 from ..utils import get_available_tools_dict, safe_emit_status
 from .config import AdaptiveAgentConfig
+from app.core.socket_handler import SocketResponseHandler
 
 load_dotenv()
 
@@ -114,7 +115,7 @@ class AdaptiveAgent:
         """Procesamiento con planificación adaptativa y deliberativa"""
         try:
             # Paso 1: Analizar la tarea del usuario
-            self._safe_emit_status("🧠 Analizando la tarea solicitada...")
+            self._safe_emit_status("🧠 Analizando la tarea solicitada...", 'info')
             task_analysis = self.task_analyzer.analyze_user_task(self.original_prompt)
             
             if not task_analysis:
@@ -122,7 +123,7 @@ class AdaptiveAgent:
                 return self._generate_normal_response()
             
             # Paso 2: Ejecutar planificación adaptativa
-            self._safe_emit_status("🎯 Iniciando planificación adaptativa - Pensamiento paso a paso...")
+            self._safe_emit_status("🎯 Iniciando planificación", 'info')
             execution_results = self.adaptive_planner.run_adaptive_plan(
                 task_analysis, 
                 self.original_prompt, 
@@ -130,7 +131,7 @@ class AdaptiveAgent:
             )
             
             # Paso 3: Generar respuesta final basada en los resultados
-            self._safe_emit_status("📝 Sintetizando información recopilada...")
+            self._safe_emit_status("📝 Sintetizando información recopilada..." , 'info')
             final_response = self.response_generator.generate_final_response(execution_results, self._safe_emit_status)
             
             # Paso 4: Mostrar estadísticas del proceso adaptativo
@@ -151,7 +152,7 @@ class AdaptiveAgent:
     def _display_adaptive_summary(self, execution_results: Dict[str, Any]):
         """Muestra un resumen de la experiencia adaptativa"""
         try:
-            summary_text = "\n🎯 **RESUMEN DE EXPERIENCIA ADAPTATIVA**\n\n"
+            summary_text = "\n🎯 **RESUMEN**\n\n"
             
             # Información sobre adaptaciones
             adaptations = execution_results.get('adaptations_made', 0)
@@ -193,12 +194,12 @@ class AdaptiveAgent:
         """Emite un mensaje de estado al socket"""
         print(f"{Fore.MAGENTA}[ADAPTATIVO]{Style.RESET_ALL} {message}")
         logger.info(f"[ADAPTATIVO] {message}")
-        from app.core.socket_handler import SocketResponseHandler
         SocketResponseHandler.emit_console_output(self.socket, message, 'info')
 
-    def _safe_emit_status(self, message: str):
+    def _safe_emit_status(self, message: str, type: str = 'info'):
         """Emite mensaje de estado de forma segura, manejando errores de encoding"""
-        safe_emit_status(self.socket, message, 'info')
+        SocketResponseHandler.emit_console_output(self.socket, message,  type)
+
 
     def get_response(self) -> str:
         """Obtiene la respuesta final"""

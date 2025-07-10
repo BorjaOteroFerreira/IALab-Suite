@@ -33,7 +33,7 @@ class DefaultToolExecutor:
         """
         print('Iniciando proceso iterativo de detección y uso de herramientas')
         logger.info('Iniciando proceso iterativo de detección y uso de herramientas')
-        self._enviar_a_consola(f'💭 {response}', 'pensamiento')
+        self._enviar_a_consola(f'{response}', 'pensamiento')
         
         # Obtener solo herramientas ACTIVAS (habilitadas Y seleccionadas)
         active_tools = []

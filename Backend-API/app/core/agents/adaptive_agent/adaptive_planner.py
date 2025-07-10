@@ -57,7 +57,7 @@ class AdaptiveTaskPlanner:
         }
         
         try:
-            emit_status_func("Iniciando planificación adaptativa...")
+
             
             # Bucle principal de planificación y ejecución paso a paso
             for iteration in range(self.max_iterations):
@@ -67,8 +67,8 @@ class AdaptiveTaskPlanner:
                     break
                 
                 # Paso 1: Reflexionar sobre el estado actual
-                emit_status_func(f"**REFLEXION ESTRATEGICA** (Iteración {iteration + 1})")
-                emit_status_func("Analizando situación actual...")
+                emit_status_func(f"**Analizando situación actual...** (Iteración {iteration + 1})" , 'pensamiento')
+              
                 
                 reflection = self._reflect_on_current_state(current_plan, user_message, iteration)
                 execution_results['reflections'].append(reflection)
@@ -77,7 +77,7 @@ class AdaptiveTaskPlanner:
                 self._display_reflection_insights(reflection, emit_status_func)
                 
                 if reflection.get('task_completion_assessment', False):
-                    emit_status_func("**TAREA COMPLETADA** - El agente considera que se ha cumplido el objetivo")
+                    emit_status_func("**TAREA COMPLETADA** - El agente considera que se ha cumplido el objetivo", 'info')
                     # Generar respuesta final limpia
                     self._generate_clean_final_response(user_message, execution_results, emit_status_func)
                     break
@@ -86,7 +86,7 @@ class AdaptiveTaskPlanner:
                 next_step = self._decide_next_step(current_plan, reflection, user_message)
                 
                 if not next_step:
-                    emit_status_func("No se pudo determinar el siguiente paso. Finalizando.")
+                    emit_status_func("No se pudo determinar el siguiente paso. Finalizando.", 'info')
                     break
                 
                 # Paso 3: Agregar el paso al plan y mostrarlo
@@ -118,7 +118,7 @@ class AdaptiveTaskPlanner:
             
             # Si tenemos información útil pero no se completó explícitamente, generar respuesta final
             if not any(reflection.get('task_completion_assessment', False) for reflection in execution_results['reflections']) and self.execution_context:
-                emit_status_func("📋 **FINALIZANDO CON INFORMACIÓN DISPONIBLE**")
+                emit_status_func("📋 **FINALIZANDO CON INFORMACIÓN DISPONIBLE**", 'info')
                 self._generate_clean_final_response(user_message, execution_results, emit_status_func)
             
             return execution_results
@@ -516,7 +516,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
     
     def _display_reflection_insights(self, reflection: Dict[str, Any], emit_status_func):
         """Muestra los insights de la reflexión al usuario con análisis de eficiencia"""
-        insights_text = "💡 **INSIGHTS DE LA REFLEXIÓN:**\n"
+        insights_text = "💡 **REFLEXIÓN:**\n"
         
         # Mostrar comprensión actual
         understanding = reflection.get('current_understanding', reflection.get('mental_process', ''))
@@ -553,7 +553,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
         confidence_emoji = {'alto': '🟢', 'medio': '🟡', 'bajo': '🔴'}.get(confidence, '🟡')
         insights_text += f"   {confidence_emoji} **Confianza:** {confidence.upper()}\n"
         
-        emit_status_func(insights_text)
+        emit_status_func(insights_text, 'pensamiento')
     
     def _parse_single_step(self, step_response: str, step_number: int) -> Optional[TaskStep]:
         """Parsea un solo paso de la respuesta del modelo"""
@@ -581,13 +581,13 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
     
     def _display_current_step(self, step: TaskStep, step_number: int, emit_status_func):
         """Muestra el paso actual que se va a ejecutar con información más rica"""
-        step_text = f"**PASO {step_number} - PLANIFICACIÓN ADAPTATIVA**\n"
+        step_text = f"**PASO {step_number} - PLANIFICACIÓN**\n"
         step_text += f"**Objetivo:** {step.description}\n"
         step_text += f"**Herramienta:** `{step.tool_name}`\n"
         step_text += f"**Consulta estratégica:** `{step.query}`\n"
         step_text += f"**Estado:** Ejecutando...\n"
         
-        emit_status_func(step_text)
+        emit_status_func(step_text, 'pensamiento')
     
     def _execute_step(self, step: TaskStep, emit_status_func):
         """Ejecuta un paso individual"""
@@ -637,7 +637,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
     
     def display_execution_stats(self, execution_results: Dict[str, Any], emit_status_func):
         """Muestra las estadísticas de ejecución mejoradas"""
-        stats_text = "**=== ESTADÍSTICAS DE EJECUCIÓN ADAPTATIVA ===**\n\n"
+        stats_text = "**ESTADÍSTICAS DE EJECUCIÓN**\n\n"
         stats_text += f"**Rendimiento General:**\n"
         stats_text += f"   • Pasos ejecutados: {execution_results['total_steps']}\n"
         stats_text += f"   • Pasos completados: {len(execution_results['completed_steps'])}\n"
@@ -667,9 +667,9 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
                 most_used = max(tool_usage.items(), key=lambda x: x[1])
                 stats_text += f"🔧 **Herramienta más utilizada:** {most_used[0]} ({most_used[1]} veces)\n\n"
         
-        stats_text += "================================================\n"
+        stats_text += "-----------------------------------------------\n"
         
-        emit_status_func(stats_text)
+        emit_status_func(stats_text, 'info')
     
     def _analyze_productivity_patterns(self, steps: List[TaskStep]) -> str:
         """
@@ -871,11 +871,11 @@ Proporciona una respuesta directa y útil a la pregunta del usuario, considerand
                     final_response += chunk['choices'][0]['delta']['content']
             
             # Mostrar la respuesta final limpia
-            emit_status_func("\n" + "="*50)
-            emit_status_func("🎯 **RESPUESTA FINAL:**")
-            emit_status_func("="*50)
+            emit_status_func("\n" + "="*50, 'info')
+            emit_status_func("🎯 **RESPUESTA FINAL:**",'info')
+            emit_status_func("="*50,'info')
             emit_status_func(final_response.strip())
-            emit_status_func("="*50)
+            emit_status_func("="*50,'info')
             
             return final_response.strip()
             
@@ -883,11 +883,11 @@ Proporciona una respuesta directa y útil a la pregunta del usuario, considerand
             logger.error(f"Error generando respuesta final limpia: {e}")
             # Respuesta de fallback
             fallback_response = "Lamento no poder proporcionar una respuesta completa en este momento debido a limitaciones técnicas."
-            emit_status_func("\n" + "="*50)
-            emit_status_func("🎯 **RESPUESTA FINAL:**")
-            emit_status_func("="*50)
-            emit_status_func(fallback_response)
-            emit_status_func("="*50)
+            emit_status_func("\n" + "="*50,'info')
+            emit_status_func("🎯 **RESPUESTA FINAL:**",'info')
+            emit_status_func("="*50,'info')
+            emit_status_func(fallback_response,'info')
+            emit_status_func("="*50,'info')
             return fallback_response
     
     def _summarize_conversation_history(self) -> str:

@@ -133,8 +133,9 @@ class ResponseGenerator:
             
             # Instrucciones para la respuesta final
             instrucciones_finales = """
-Responde en Markdown con formato profesional, limpio y compacto.
-
+Responde en Markdown con formato profesional, limpio y compacto ya que esta es tu respuesta final.
+Debes responder siempre en español.
+No hagas referencias o pienses en inglés.
 Utiliza toda la información obtenida para proporcionar una respuesta completa y útil.
 
 IMPORTANTE - Reglas de formato:
@@ -148,7 +149,7 @@ IMPORTANTE - Reglas de formato:
 - NO uses múltiples saltos de línea consecutivos
 - Mantén un formato limpio y legible sin espacios innecesarios
 
-Si algunos pasos fallaron, menciona qué información no se pudo obtener pero proporciona la mejor respuesta posible con la información disponible.
+Si algunos pasos fallaron, proporciona la mejor respuesta posible con la información disponible.
             """
             
             # Añadir mensajes al prompt

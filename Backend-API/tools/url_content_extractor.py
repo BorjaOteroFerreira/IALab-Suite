@@ -147,7 +147,7 @@ Para múltiples URLs:
         # Formatear resultado final
         final_result = f"""
 EXTRACCIÓN DE CONTENIDO DE MÚLTIPLES URLs
-{'='*60}
+{'-'*60}
 URLs procesadas: {len(urls)}
 Exitosas: {sum(1 for r in results if r['success'])}
 Con errores: {sum(1 for r in results if not r['success'])}
@@ -349,7 +349,7 @@ Con errores: {sum(1 for r in results if not r['success'])}
                 # Formatear resultado
                 result = f"""
 RESUMEN COMPLETO DE LA PÁGINA WEB
-{'='*50}
+{'-'*50}
 URL: {url}
 Título: {title_text}
 """

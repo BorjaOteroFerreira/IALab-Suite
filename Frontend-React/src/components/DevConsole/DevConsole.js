@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { ChatContext } from '../../context/ChatContext';
 import './DevConsole.css';
+import { Filter, Download, Trash2, X } from 'lucide-react';
 
 // Importar showdown dinámicamente como en MessageList
 
@@ -583,7 +584,7 @@ const DevConsole = () => {
                         onClick={() => setShowFilters(!showFilters)}
                         title="Mostrar/Ocultar filtros de roles"
                     >
-                        🔍
+                        <Filter size={16} />
                     </button>
                     
                     <button 
@@ -591,7 +592,7 @@ const DevConsole = () => {
                         className="console-export"
                         title="Exportar logs"
                     >
-                        📥
+                        <Download size={16} />
                     </button>
                     
                     <button 
@@ -599,7 +600,7 @@ const DevConsole = () => {
                         className="console-clear"
                         title="Limpiar consola"
                     >
-                        🗑️
+                        <Trash2 size={16} />
                     </button>
                     
                     <button 
@@ -607,7 +608,7 @@ const DevConsole = () => {
                         className="console-close"
                         title="Cerrar (ESC)"
                     >
-                        ✕
+                        <X size={16} />
                     </button>
                 </div>
             </div>
