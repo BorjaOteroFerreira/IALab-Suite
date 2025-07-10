@@ -108,6 +108,10 @@
   box-shadow: 0 2px 8px rgba(135, 206, 235, 0.1);
   outline: none;
   transition: border 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  position: relative;
+  width: 100%;
+  min-height: 38px;
+  /* El padding-left se ajusta dinámicamente desde el componente si hay imagen */
   /* Ocultar barra de scroll en todos los navegadores */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
@@ -261,4 +265,51 @@ body .agent-selector-popup {
 /* Asegurar que el popup se posicione correctamente */
 .input-side-buttons .agent-selector-popup {
   bottom: 45px; /* Ajustar para que aparezca justo encima del botón circular */
+}
+
+.image-inside-textarea {
+  background: none;
+  border: none;
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: #87CEEB;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.image-inside-textarea:hover {
+  opacity: 1;
+}
+
+.clip-inside-textarea {
+  background: none;
+  border: none;
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: #87CEEB;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.clip-inside-textarea:hover {
+  opacity: 1;
+}
+
+.textarea-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }

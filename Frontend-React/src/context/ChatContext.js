@@ -258,15 +258,22 @@ export const ChatProvider = ({ children }) => {
     
     loadInitialData();
   }, []); // Sin dependencias para ejecutar solo una vez  // Función para enviar mensaje - optimizada con useCallback
-    const sendMessage = useCallback(async (message) => {
-    console.log('📤 DEBUG: sendMessage LLAMADO con mensaje:', message.trim().substring(0, 50) + '...');
-    if (!message.trim()) {
+  const sendMessage = useCallback(async (message) => {
+    // Soporte para string o objeto (texto + imagen)
+    let text = '';
+    let image_base64 = null;
+    if (typeof message === 'string') {
+      text = message.trim();
+    } else if (typeof message === 'object' && message !== null) {
+      text = (message.text || '').trim();
+      image_base64 = message.image_base64 || null;
+    }
+    // Si no hay texto ni imagen, cancelar
+    if (!text && !image_base64) {
       console.log('📤 DEBUG: sendMessage CANCELADO (mensaje vacío)');
       return;
     }
-    
-    console.log('📤 DEBUG: sendMessage EJECUTANDO, isLoading actual:', isLoading);
-    
+    console.log('📤 DEBUG: sendMessage LLAMADO con mensaje:', text.substring(0, 50) + '...' + (image_base64 ? ' [imagen]' : ''));
     // Generar un ID único para este mensaje
     const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     setCurrentMessageId(messageId);
@@ -274,19 +281,17 @@ export const ChatProvider = ({ children }) => {
     setLoadingType('thinking');
     setLoadingMessage('Procesando tu mensaje...');
     hideError();
-      // Añadir mensaje del usuario al chat (esto ya actualiza conversationHistory.current)
-    addMessageToChat('user', message);    try {
+    // Añadir mensaje del usuario al chat (esto ya actualiza conversationHistory.current)
+    addMessageToChat('user', image_base64 ? { text, image_base64 } : text);
+    try {
       // Debug: mostrar el historial que se va a enviar
       console.log('📤 Enviando historial al backend:', JSON.stringify(conversationHistory.current, null, 2));
-      
       // Enviar mensaje al servidor con el historial actual
-      // El backend ya sabe qué agente está activo a través del registro de agentes
       await axios.post('/user_input', {
         content: conversationHistory.current,
         tools,
         rag
       });
-      
       // La respuesta vendrá a través de Socket.io
       // También guardamos automáticamente el chat después de enviar un mensaje
       if (messages.length > 0 || conversationHistory.current.length > 1) {
@@ -296,7 +301,6 @@ export const ChatProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
-      // Añadir mensaje de error al chat addMessageToChat('system', 'Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.');
       setIsLoading(false);
       showError(error);
     }
