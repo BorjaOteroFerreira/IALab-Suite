@@ -19,22 +19,69 @@ class ResponseGenerator:
         self.assistant = assistant
     
     def generate_final_response(self, execution_results: Dict[str, Any], emit_status_func) -> str:
-        """Genera la respuesta final basada en los resultados de ejecución"""
+        """Genera la respuesta final basada en los resultados de ejecución y la envía por streaming al usuario"""
         try:
             emit_status_func("📝 Consolidando resultados y generando respuesta final...")
-            
-            # Preparar prompt final con todos los resultados
-            final_prompt = self._create_final_response_prompt(execution_results)
-            
-            # Generar respuesta final
-            response_final = self._stream_final_response(final_prompt)
-            
+
+            prompt_final = copy.deepcopy(self.original_prompt)
+
+            # Extraer el contexto de la conversación (última pregunta del usuario)
+            user_question = ""
+            for message in reversed(self.original_prompt):
+                if message['role'] == 'user':
+                    user_question = message['content']
+                    break
+
+            # Consolidar solo los resultados devueltos por las tools usadas
+            resultados_tools = "Resultados obtenidos por las herramientas:\n"
+            tool_results = execution_results.get('tool_results', [])
+            if tool_results:
+                for idx, result in enumerate(tool_results, 1):
+                    if isinstance(result, dict):
+                        tool_name = result.get('tool_name', f"Tool {idx}")
+                        output = result.get('output', str(result))
+                        resultados_tools += f"• [{tool_name}]: {clean_text_content(str(output))}\n"
+                    else:
+                        resultados_tools += f"• {clean_text_content(str(result))}\n"
+            else:
+                completed_steps = execution_results.get('completed_steps', [])
+                for step in completed_steps:
+                    if hasattr(step, 'result') and step.result:
+                        resultados_tools += f"• {clean_text_content(str(step.result))}\n"
+
+            # Añadir la respuesta final del planificador
+            respuesta_final_planificador = execution_results.get('final_response', '')
+
+            # Instrucciones para la respuesta final
+            instrucciones_finales = """
+Responde en Markdown con formato profesional, limpio y compacto ya que esta es tu respuesta final.
+Utiliza toda la información obtenida para proporcionar una respuesta completa y útil.
+IMPORTANTE - Reglas de formato:
+- Evita saltos de línea excesivos.
+- Usa formato profesional y compacto.
+- Incrusta imágenes con ![descripción](url) 
+- Enlaces de YouTube sin formato markdown, solo el URL
+- Organiza la información de manera clara y estructurada sin espaciado excesivo
+- Incluye enlaces e imágenes relevantes encontradas
+- NO uses múltiples saltos de línea consecutivos
+- Mantén un formato limpio y legible sin espacios innecesarios
+Si algunos pasos fallaron, proporciona la mejor respuesta posible con la información disponible.
+            """
+
+            # Construir el mensaje final: contexto + respuesta del planificador + resultados de tools + instrucciones
+            mensaje_final = f"# Pregunta del usuario\n{user_question}\n\n# Respuesta del planificador\n{respuesta_final_planificador}\n\n# Resultados de herramientas\n{resultados_tools}\n\n{instrucciones_finales}"
+
+            # Añadir mensajes al prompt
+            prompt_final.append({"role": "assistant", "content": "He completado la ejecución del plan de tareas."})
+            prompt_final.append({"role": "user", "content": mensaje_final})
+
+            # Stream de la respuesta enriquecida usando el socket
+            response_final = self._stream_final_response(prompt_final)
+
             return response_final
-            
         except Exception as e:
             error_clean = clean_text_content(str(e))
             logger.error(f"Error generando respuesta final: {error_clean}")
-            
             # Fallback: crear respuesta simple con los resultados
             try:
                 fallback_response = self._create_fallback_response(execution_results)
@@ -135,7 +182,6 @@ class ResponseGenerator:
             instrucciones_finales = """
 Responde en Markdown con formato profesional, limpio y compacto ya que esta es tu respuesta final.
 Utiliza toda la información obtenida para proporcionar una respuesta completa y útil.
-
 IMPORTANTE - Reglas de formato:
 - Evita saltos de línea excesivos.
 - Usa formato profesional y compacto.

@@ -826,6 +826,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
 - NO menciones procesos técnicos o pasos internos
 - NO digas números como "10 noticias", "primera de X", "más información disponible"
 - NO prometas información futura o procesos pendientes
+- NO utilices formato de listas para los parrafos.
 
 ✅ COMPORTAMIENTO CORRECTO:
 - Presenta TODA la información disponible de forma integrada y natural
@@ -878,7 +879,10 @@ Proporciona una respuesta directa y útil a la pregunta del usuario, considerand
             emit_status_func("="*50,'info')
             emit_status_func(final_response.strip())
             emit_status_func("="*50,'info')
-            
+            execution_results['completed_steps'].append({
+                'type': 'final_response',
+                'result': final_response.strip()
+            })  # <-- Añade la respuesta final como un resultado más
             return final_response.strip()
             
         except Exception as e:
