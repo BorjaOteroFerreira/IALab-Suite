@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image as ImageIcon, BarChart2, Key, Ban, AlertCircle, Bot, Brain, MessageSquare, Zap, ChevronDown } from 'lucide-react';
 import './ToolsSelector.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 const CATEGORY_ICONS = {
   search: <Search size={16} className="icon" />, // Búsqueda
@@ -20,6 +21,9 @@ const AGENT_ICONS = {
 };
 
 const ToolsSelector = ({ tools, onToggleTools, socket }) => {
+  const { getStrings } = useLanguage();
+  const strings = getStrings('toolsSelector');
+
   const [isOpen, setIsOpen] = useState(false);
   const [availableTools, setAvailableTools] = useState([]);
   const [selectedTools, setSelectedTools] = useState([]);
@@ -494,7 +498,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         type="button"
         onClick={() => onToggleTools(!tools)}
         className={`tools-button ${tools ? 'active' : ''} ${isLoading ? 'loading' : ''} ${isInitializing ? 'initializing' : ''}`}
-        title={`Herramientas ${isLoading ? '(Cargando...)' : isInitializing ? '(Inicializando...)' : tools ? '(Activadas)' : '(Desactivadas)'}`}
+        title={strings.selectTools || strings.toolsTitle}
       >
         <Wrench size={23} />
         {selectedTools.length > 0 && (
@@ -508,7 +512,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="tools-config-button"
-          title="Seleccionar herramientas"
+          title={strings.selectTools || strings.toolsTitle}
         >
           <ListFilter size={14} />
         </button>
@@ -523,9 +527,9 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
               <div className="tools-sidebar-section">
                 <div className="tools-sidebar-header">
                   <h3 className="tools-sidebar-title">
-                    <Wrench size={18} style={{marginRight: 6}} /> Herramientas
+                    <Wrench size={18} style={{marginRight: 6}} /> {strings.toolsTitle}
                   </h3>
-                  <p className="tools-sidebar-subtitle">{selectedTools.length} de {availableTools.length} seleccionadas</p>
+                  <p className="tools-sidebar-subtitle">{selectedTools.length} {strings.of} {availableTools.length} {strings.selected}</p>
                 </div>
                 <nav className="category-nav">
                   {categories.map(([cat, toolsArr]) => {
@@ -554,10 +558,10 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
               <div className="tools-sidebar-section">
                 <div className="tools-sidebar-header">
                   <h3 className="tools-sidebar-title">
-                    <Bot size={18} style={{marginRight: 6}} /> Agentes
+                    <Bot size={18} style={{marginRight: 6}} /> {strings.agentsTitle}
                   </h3>
                   <p className="tools-sidebar-subtitle">
-                    {currentAgent ? `Activo: ${availableAgents.find(a => a.id === currentAgent)?.name || currentAgent}` : 'Ninguno seleccionado'}
+                    {currentAgent ? `${strings.active}: ${availableAgents.find(a => a.id === currentAgent)?.name || currentAgent}` : strings.noneSelected}
                   </p>
                 </div>
                 <nav className="category-nav">
@@ -566,7 +570,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                     onClick={() => setCurrentSection('agents')}
                   >
                     <span className="icon"><Bot size={16} className="icon" /></span>
-                    Seleccionar Agente
+                    Agentes
                     <span className="category-count">{availableAgents.length}</span>
                   </button>
                 </nav>
@@ -577,7 +581,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
               <div className="tools-main-header">
                 <h2 className="tools-main-title">
                   {currentSection === 'agents' 
-                    ? 'Agentes' 
+                    ? 'Agentes'
                     : (currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) : '')
                   }
                 </h2>
@@ -585,7 +589,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                   <button
                     className="action-button"
                     onClick={currentSection === 'agents' ? loadAvailableAgents : handleRefreshTools}
-                    title="Refrescar"
+                    title={strings.refresh}
                     disabled={isLoading || agentsLoading}
                   >
                     <RefreshCw size={16} />
@@ -593,7 +597,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                   <button
                     className="action-button"
                     onClick={() => setIsOpen(false)}
-                    title="Cerrar"
+                    title={strings.close}
                   >
                     <X size={16} />
                   </button>
@@ -605,21 +609,19 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                     <AlertCircle size={14} style={{marginRight: 4, color: '#e74c3c'}} /> {error}
                   </div>
                 )}
-                
                 {currentSection === 'agents' ? (
-                  // Contenido de Agentes
                   agentsLoading ? (
                     <div className="tools-loading">
                       <div className="loading-spinner" />
-                      <span>Cargando agentes...</span>
+                      <span>{strings.loadingAgents}</span>
                     </div>
                   ) : (
                     <>
                       {availableAgents.length === 0 ? (
                         <div className="empty-state">
                           <div className="empty-state-icon">🤖</div>
-                          <div className="empty-state-title">No hay agentes disponibles</div>
-                          <div className="empty-state-description">Intenta refrescar para cargar los agentes.</div>
+                          <div className="empty-state-title">{strings.noAgents}</div>
+                          <div className="empty-state-description">{strings.tryRefreshAgents}</div>
                         </div>
                       ) : (
                         <div className="tools-grid">
@@ -651,19 +653,18 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                     </>
                   )
                 ) : (
-                  // Contenido de Herramientas (existente)
                   isLoading || isInitializing ? (
                     <div className="tools-loading">
                       <div className="loading-spinner" />
-                      <span>{isInitializing ? 'Inicializando herramientas...' : 'Cargando herramientas...'}</span>
+                      <span>{isInitializing ? strings.initializingTools : strings.loadingTools}</span>
                     </div>
                   ) : (
                     <>
                       {currentTools.length === 0 ? (
                         <div className="empty-state">
                           <div className="empty-state-icon">🔍</div>
-                          <div className="empty-state-title">No hay herramientas en esta categoría</div>
-                          <div className="empty-state-description">Selecciona otra categoría o refresca.</div>
+                          <div className="empty-state-title">{strings.noToolsInCategory}</div>
+                          <div className="empty-state-description">{strings.selectOtherOrRefresh}</div>
                         </div>
                       ) : (
                         <div className="tools-grid">
@@ -685,10 +686,10 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
                                   <p className="tool-description">{tool.description}</p>
                                   <div className="tool-badges">
                                     {tool.requires_api_key && (
-                                      <span className="tool-badge badge-api-key"> <Key size={12} style={{marginRight: 2}} /> API Key</span>
+                                      <span className="tool-badge badge-api-key"> <Key size={12} style={{marginRight: 2}} /> {strings.apiKey} </span>
                                     )}
                                     {!tool.available && (
-                                      <span className="tool-badge badge-unavailable"> <Ban size={12} style={{marginRight: 2}} /> No disponible</span>
+                                      <span className="tool-badge badge-unavailable"> <Ban size={12} style={{marginRight: 2}} /> {strings.notAvailable}</span>
                                     )}
                                   </div>
                                 </div>

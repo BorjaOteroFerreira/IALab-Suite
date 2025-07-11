@@ -1,10 +1,13 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 /*
  * Componente de indicador de carga avanzado que muestra diferentes estados
  * basados en el tipo de operación que se está realizando
  */
 const LoadingIndicator = ({ type = 'default', message = '' }) => {
+  const { getStrings } = useLanguage();
+  const strings = getStrings('loading');
   
   // Diferentes estilos de animación según el tipo de operación
   const renderIndicator = () => {
@@ -15,7 +18,7 @@ const LoadingIndicator = ({ type = 'default', message = '' }) => {
           <div className="model-loading-indicator">
             <div className="spinner-ring"></div>
             <div className="loading-text">
-              {message || 'Cargando modelo...'}
+              {message || strings.model}
             </div>
           </div>
         );
@@ -30,7 +33,7 @@ const LoadingIndicator = ({ type = 'default', message = '' }) => {
               <span></span>
             </div>
             <div className="loading-text">
-              {message || 'Procesando...'}
+              {message || strings.processing}
             </div>
           </div>
         );
@@ -43,7 +46,7 @@ const LoadingIndicator = ({ type = 'default', message = '' }) => {
               <div className="progress-fill"></div>
             </div>
             <div className="loading-text">
-              {message || 'Guardando...'}
+              {message || strings.saving}
             </div>
           </div>
         );

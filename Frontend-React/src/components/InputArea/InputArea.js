@@ -1,8 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import './InputArea.css';
-import { Send, Square, Database, Image as ImageIcon, Paperclip } from 'lucide-react';
+import { Send, Square, Database, Image as ImageIcon, Paperclip, Globe, ChevronUp, Download } from 'lucide-react';
 import ToolsSelector from '../ToolsSelector/ToolsSelector';
 import { useChatContext } from '../../hooks/useChatContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 function getModelInfo(modelObjOrPath, allModelsList = []) {
   if (!modelObjOrPath) return { size: null, type: null, quantization: null, icon: '🤖', hasVision: false, fileSize: null };
@@ -43,6 +44,55 @@ function getModelInfo(modelObjOrPath, allModelsList = []) {
   };
 }
 
+function LanguageDropdown({ lang, setLang }) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { availableLangs } = useLanguage();
+
+  // Genera las opciones dinámicamente según los idiomas detectados
+  const options = availableLangs.map(code => ({ value: code, label: code.toUpperCase() }));
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="custom-lang-dropdown" ref={dropdownRef}>
+      <button
+        className="lang-dropdown-btn"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <Globe size={15} style={{ marginRight: 6, opacity: 0.7 }} />
+        <span>{options.find(o => o.value === lang)?.label}</span>
+        <ChevronUp size={14} style={{ marginLeft: 2, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }} />
+      </button>
+      {open && (
+        <ul className="lang-dropdown-list" role="listbox">
+          {options.map(opt => (
+            <li
+              key={opt.value}
+              className={`lang-dropdown-item${lang === opt.value ? ' selected' : ''}`}
+              onClick={() => { setLang(opt.value); setOpen(false); }}
+              role="option"
+              aria-selected={lang === opt.value}
+            >
+              {opt.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function InputArea({ 
   input, 
   setInput, 
@@ -51,11 +101,13 @@ function InputArea({
   tokensCount, 
   currentResponse, 
   onStopResponse, 
-  tools, rag, onToggleTools, onToggleRag 
+  tools, rag, onToggleTools, onToggleRag, onOpenDownloader 
 }) {
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const { socket, modelConfig, modelList, formatList } = useChatContext();
+  const { lang, setLang, getStrings } = useLanguage();
+  const strings = getStrings('inputArea');
   // Estado para imagen base64 y preview
   const [imageBase64, setImageBase64] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -126,7 +178,7 @@ function InputArea({
     <div className="input-area">
       <form onSubmit={handleSubmit} className="message-form">
         <span className="tokens-counter">
-          Contexto usado: {tokensCount} Tokens
+          {strings.contextUsed}: {tokensCount} {strings.tokens}
         </span>
         <div className="input-container">
           {/* Botón RAG */}
@@ -134,7 +186,7 @@ function InputArea({
             type="button"
             onClick={() => onToggleRag(!rag)}
             className={`input-icon-button${!!rag ? ' active' : ''}`}
-            title="RAG"
+            title={strings.ragTooltip || strings.rag}
             style={{ marginRight: 6 }}
           >
             <Database size={23} />
@@ -153,7 +205,7 @@ function InputArea({
             <button
               type="button"
               className="input-icon-button clip-inside-textarea"
-              title="Adjuntar archivo"
+              title={strings.attachFileTooltip || strings.attachFile}
               style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
               tabIndex={-1}
               // onClick={handleClipClick} // Implementa si quieres funcionalidad
@@ -166,7 +218,7 @@ function InputArea({
                 <button
                   type="button"
                   className="input-icon-button image-inside-textarea"
-                  title="Subir imagen"
+                  title={strings.uploadImageTooltip || strings.uploadImage}
                   onClick={handleImageButtonClick}
                   style={{ position: 'absolute', left: 38, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
                   tabIndex={-1}
@@ -176,8 +228,8 @@ function InputArea({
                 <input
                   type="file"
                   accept="image/*"
-                  style={{ display: 'none' }}
                   ref={fileInputRef}
+                  style={{ display: 'none' }}
                   onChange={handleFileChange}
                 />
               </>
@@ -193,7 +245,7 @@ function InputArea({
                   e.target.form.requestSubmit();
                 }
               }}
-              placeholder="Escribe tu mensaje aquí... (Enter para enviar, Shift+Enter para nueva línea)"
+              placeholder={strings.placeholder}
               className="message-textarea"
               disabled={isLoading}
               rows={1}
@@ -203,8 +255,8 @@ function InputArea({
             {imagePreview && (
               <div className="image-ready-indicator" style={{ position: 'absolute', left: 70, top: '50%', transform: 'translateY(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: 6, padding: '2px 6px', boxShadow: '0 1px 4px #0001' }}>
                 <img src={imagePreview} alt="preview" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4, marginRight: 6 }} />
-                <span style={{ fontSize: 13, color: '#333', marginRight: 4 }}>Imagen lista</span>
-                <button type="button" onClick={handleRemoveImage} style={{ background: 'none', border: 'none', color: '#c00', fontWeight: 'bold', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }} title="Quitar imagen">×</button>
+                <span style={{ fontSize: 13, color: '#333', marginRight: 4 }}>{strings.imageReady}</span>
+                <button type="button" onClick={handleRemoveImage} style={{ background: 'none', border: 'none', color: '#c00', fontWeight: 'bold', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }} title={strings.removeImage}>{strings.removeImage}</button>
               </div>
             )}
             {/* Botón de enviar superpuesto a la derecha */}
@@ -213,7 +265,7 @@ function InputArea({
                 type="button"
                 onClick={onStopResponse}
                 className="send-button stop"
-                title="Detener respuesta"
+                title={strings.stopResponse}
                 style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
               >
                 <Square size={20} />
@@ -223,7 +275,7 @@ function InputArea({
                 type="submit"
                 disabled={isLoading || (!(typeof input === 'string' && input.trim().length > 0) && !imageBase64)}
                 className="send-button"
-                title="Enviar mensaje"
+                title={strings.sendMessage}
                 style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
               >
                 ➤
@@ -232,6 +284,21 @@ function InputArea({
           </div>
         </div>
       </form>
+      {/* Selector de idioma flotante custom en la esquina inferior izquierda */}
+      <div className="floating-language-selector compact" style={{ zIndex: 3001 }}>
+        <LanguageDropdown lang={lang} setLang={setLang} />
+      </div>
+      {/* Leyenda de shortcuts flotante: mover más a la derecha */}
+      <style>{`.shortcuts-legend-floating { left: 4.5rem !important; }`}</style>
+      {/* Botón flotante para abrir el Downloader en la esquina inferior derecha */}
+      <button
+        className="header-button floating-downloader-btn"
+        title={strings.downloadModelsTooltip || strings.downloadModels || 'Download GGUF models'}
+        onClick={onOpenDownloader}
+        style={{ position: 'fixed', right: '1.5rem', bottom: 16, zIndex: 2000 }}
+      >
+        <Download size={22} />
+      </button>
     </div>
     
   );

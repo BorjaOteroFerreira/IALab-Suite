@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './CodeBlock.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 const CodeBlock = ({ language, children }) => {
   const [copied, setCopied] = useState(false);
+  const { getStrings } = useLanguage();
+  const strings = getStrings('codeblock');
 
   const copyToClipboard = async () => {
     try {
@@ -26,7 +29,7 @@ const CodeBlock = ({ language, children }) => {
         <button 
           onClick={copyToClipboard}
           className={`copy-button ${copied ? 'copied' : ''}`}
-          title={copied ? 'Copiado!' : 'Copiar código'}
+          title={copied ? strings.copied : strings.copy}
         >
           {copied ? (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">

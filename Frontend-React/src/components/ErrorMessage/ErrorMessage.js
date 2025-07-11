@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ErrorMessage.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 /**
  * Componente para mostrar errores de una manera amigable
@@ -10,6 +11,9 @@ const ErrorMessage = ({
   onDismiss = null,
   timeout = 0  //  no se ocultará automáticamente
 }) => {
+  const { getStrings } = useLanguage();
+  const strings = getStrings('error');
+  
   const [visible, setVisible] = useState(true);
   
   // Determinar el tipo de error para mostrar la UI adecuada
@@ -71,35 +75,35 @@ const ErrorMessage = ({
       
       <div className="error-content">
         <h3>
-          {errorType === 'network' ? 'Error de conexión' :
-           errorType === 'timeout' ? 'Tiempo de espera agotado' :
-           errorType === 'model' ? 'Error en el modelo' : 'Error'}
+          {errorType === 'network' ? strings.error.networkTitle :
+           errorType === 'timeout' ? strings.error.timeoutTitle :
+           errorType === 'model' ? strings.error.modelTitle : strings.general.error}
         </h3>
         
-        <p>{error?.message || error?.toString() || 'Ocurrió un error desconocido'}</p>
+        <p>{error?.message || error?.toString() || strings.error.unknown}</p>
         
         {/* Sugerencias específicas para cada tipo de error */}
         {errorType === 'network' && (
           <ul className="error-tips">
-            <li>Verifica tu conexión a Internet</li>
-            <li>Asegúrate que el servidor de Flask esté ejecutándose</li>
-            <li>Comprueba si hay un firewall bloqueando la conexión</li>
+            <li>{strings.error.networkTip1}</li>
+            <li>{strings.error.networkTip2}</li>
+            <li>{strings.error.networkTip3}</li>
           </ul>
         )}
         
         {errorType === 'timeout' && (
           <ul className="error-tips">
-            <li>La operación está tomando demasiado tiempo</li>
-            <li>Intenta con una solicitud más pequeña</li>
-            <li>Verifica el rendimiento del servidor</li>
+            <li>{strings.error.timeoutTip1}</li>
+            <li>{strings.error.timeoutTip2}</li>
+            <li>{strings.error.timeoutTip3}</li>
           </ul>
         )}
         
         {errorType === 'model' && (
           <ul className="error-tips">
-            <li>Comprueba si el modelo está correctamente cargado</li>
-            <li>Verifica la ruta y el formato del modelo</li>
-            <li>Intenta con otro modelo o formato</li>
+            <li>{strings.error.modelTip1}</li>
+            <li>{strings.error.modelTip2}</li>
+            <li>{strings.error.modelTip3}</li>
           </ul>
         )}
       </div>
@@ -107,11 +111,11 @@ const ErrorMessage = ({
       <div className="error-actions">
         {onRetry && (
           <button className="retry-btn" onClick={onRetry}>
-            Reintentar
+            {strings.error.retry}
           </button>
         )}
         <button className="close-btn" onClick={handleClose}>
-          Cerrar
+          {strings.error.close}
         </button>
       </div>
     </div>

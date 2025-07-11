@@ -1,0 +1,15 @@
+export default {
+  filter: 'Filtra',
+  download: 'Scarica',
+  clear: 'Pulisci',
+  close: 'Chiudi',
+  all: 'Tutti',
+  info: 'Info',
+  pensiero: 'Pensiero',
+  tool: 'Strumento',
+  assistant: 'Assistente',
+  error: 'Errore',
+  warning: 'Avviso',
+  success: 'Successo',
+  debug: 'Debug',
+};

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { ChatContext } from '../../context/ChatContext';
+import { useLanguage } from '../../context/LanguageContext';
 import './DevConsole.css';
 import { Filter, Download, Trash2, X } from 'lucide-react';
 
@@ -26,10 +27,13 @@ const DevConsole = () => {
     const messagesEndRef = useRef(null);
     const consoleRef = useRef(null);
     const { socket } = useContext(ChatContext);
+    const { getStrings, currentLang } = useLanguage();
+    const strings = getStrings('devconsole');
+    const lang = currentLang;
 
     // Configuración de colores por rol
     const roleColors = {
-        info: '#00d4ff',      // Azul cyan
+        info: '#5ecbfa',      // Azul pastel
         pensamiento: '#ff9500', // Naranja
         tool: '#00ff41',      // Verde
         assistant: '#ffffff',  // Blanco
@@ -39,12 +43,15 @@ const DevConsole = () => {
         debug: '#888888'      // Gris
     };
 
-    // Obtener lista de roles únicos de los mensajes
+    // Normalizar roles para consistencia en filtros y visualización
+    const normalizeRole = (role) => (role || '').toLowerCase().replace(/\s+/g, '');
+
+    // Obtener lista de roles únicos de los mensajes (normalizados)
     const getUniqueRoles = useCallback(() => {
         const roles = new Set();
         messages.forEach(msg => {
             if (msg.role) {
-                roles.add(msg.role);
+                roles.add(normalizeRole(msg.role));
             }
         });
         return Array.from(roles).sort();
@@ -109,9 +116,8 @@ const DevConsole = () => {
                 id: Date.now() + Math.random(),
                 timestamp: new Date(),
                 content: data.content || '',
-                role: data.role || 'info'
+                role: normalizeRole(data.role || 'info')
             };
-            
             setMessages(prev => {
                 // Limitar el número de mensajes para evitar problemas de memoria
                 const updatedMessages = [...prev, newMessage];
@@ -130,6 +136,8 @@ const DevConsole = () => {
                     content: `Assistant: ${data.content.substring(0, 100)}${data.content.length > 100 ? '...' : ''}`,
                     role: 'assistant'
                 };
+                // Normalizar role
+                newMessage.role = normalizeRole(newMessage.role);
                 setMessages(prev => [...prev, newMessage]);
             }
         };
@@ -141,6 +149,7 @@ const DevConsole = () => {
                 content: `Utilidades: ${JSON.stringify(data)}`,
                 role: 'tool'
             };
+            newMessage.role = normalizeRole(newMessage.role);
             setMessages(prev => [...prev, newMessage]);
         };
 
@@ -199,18 +208,20 @@ const DevConsole = () => {
         URL.revokeObjectURL(url);
     };
 
-    // Filtrar mensajes según roles seleccionados
+    // Filtrar mensajes según roles seleccionados (usando roles normalizados)
     const filteredMessages = messages.filter(msg => {
+        const normRole = normalizeRole(msg.role);
+        if (selectedRoles.size === 0) return false; // Si no hay roles seleccionados, no mostrar nada
         if (selectedRoles.has('all')) return true;
-        return selectedRoles.has(msg.role);
+        return selectedRoles.has(normRole);
     });
 
-    // Obtener roles únicos para el filtro
+    // Obtener roles únicos para el filtro (ya normalizados)
     const uniqueRoles = getUniqueRoles();
 
     // Formatear timestamp
     const formatTime = (timestamp) => {
-        return timestamp.toLocaleTimeString('es-ES', {
+        return timestamp.toLocaleTimeString(lang === 'es' ? 'es-ES' : 'en-US', {
             hour12: false,
             hour: '2-digit',
             minute: '2-digit',
@@ -223,7 +234,6 @@ const DevConsole = () => {
     const handleRoleToggle = (role) => {
         setSelectedRoles(prev => {
             const newSelection = new Set(prev);
-            
             if (role === 'all') {
                 if (newSelection.has('all')) {
                     newSelection.clear();
@@ -235,19 +245,13 @@ const DevConsole = () => {
                 if (newSelection.has('all')) {
                     newSelection.delete('all');
                 }
-                
                 if (newSelection.has(role)) {
                     newSelection.delete(role);
                 } else {
                     newSelection.add(role);
                 }
-                
-                // Si no hay ningún rol seleccionado, seleccionar 'all'
-                if (newSelection.size === 0) {
-                    newSelection.add('all');
-                }
+                // Ya no seleccionamos 'all' automáticamente si queda vacío
             }
-            
             return newSelection;
         });
     };
@@ -516,7 +520,7 @@ const DevConsole = () => {
 
     // Renderizar el contenido del mensaje como Markdown interpretado
     const renderMarkdown = (text) => {
-        if (!showdown) return <span>Cargando...</span>;
+        if (!showdown) return <span>{lang === 'es' ? 'Cargando...' : 'Loading...'}</span>;
         // Si el texto es JSON.stringify, no lo proceses como markdown
         if (typeof text === 'string' && text.trim().startsWith('{') && text.trim().endsWith('}')) {
             return <span>{text}</span>;
@@ -569,12 +573,12 @@ const DevConsole = () => {
                 className="console-header" 
                 onMouseDown={handleHeaderMouseDown} 
                 onDoubleClick={handleHeaderDoubleClick}
-                title="Arrastra para mover | Doble clic para centrar"
+                title={lang === 'es' ? 'Arrastra para mover | Doble clic para centrar' : 'Drag to move | Double click to center'}
             >
                 <div className="console-title">
                     <span className="console-icon">⚡</span>
                     <span className="drag-indicator">≡</span>
-                    Consola de Desarrollo
+                    {lang === 'es' ? 'Consola de Desarrollo' : 'Dev Console'}
                     <span className="message-count">({filteredMessages.length})</span>
                 </div>
                 
@@ -582,7 +586,7 @@ const DevConsole = () => {
                     <button
                         className="console-filter-btn"
                         onClick={() => setShowFilters(!showFilters)}
-                        title="Mostrar/Ocultar filtros de roles"
+                        title={strings.filter}
                     >
                         <Filter size={16} />
                     </button>
@@ -590,7 +594,7 @@ const DevConsole = () => {
                     <button 
                         onClick={exportConsole}
                         className="console-export"
-                        title="Exportar logs"
+                        title={strings.download}
                     >
                         <Download size={16} />
                     </button>
@@ -598,7 +602,7 @@ const DevConsole = () => {
                     <button 
                         onClick={clearConsole}
                         className="console-clear"
-                        title="Limpiar consola"
+                        title={strings.clear}
                     >
                         <Trash2 size={16} />
                     </button>
@@ -606,7 +610,7 @@ const DevConsole = () => {
                     <button 
                         onClick={() => setIsVisible(false)}
                         className="console-close"
-                        title="Cerrar (ESC)"
+                        title={strings.close + ' (ESC)'}
                     >
                         <X size={16} />
                     </button>
@@ -616,7 +620,7 @@ const DevConsole = () => {
             {/* Panel de filtros */}
             {showFilters && (
                 <div className="console-filters">
-                    <div className="filter-title">Filtrar por roles:</div>
+                    <div className="filter-title">{strings.filter} {lang === 'es' ? 'por roles:' : 'by roles:'}</div>
                     <div className="filter-checkboxes">
                         <label className="filter-checkbox">
                             <input
@@ -625,14 +629,15 @@ const DevConsole = () => {
                                 onChange={() => handleRoleToggle('all')}
                             />
                             <span className="checkmark"></span>
-                            Todos ({messages.length})
+                            {strings.all} ({messages.length})
                         </label>
                         {uniqueRoles.map(role => {
-                            const count = messages.filter(m => m.role === role).length;
+                            const count = messages.filter(m => normalizeRole(m.role) === role).length;
                             return (
                                 <label key={role} className="filter-checkbox">
                                     <input
                                         type="checkbox"
+                                        value={role}
                                         checked={selectedRoles.has(role)}
                                         onChange={() => handleRoleToggle(role)}
                                     />
@@ -640,7 +645,7 @@ const DevConsole = () => {
                                         className="checkmark"
                                         style={{ backgroundColor: roleColors[role] || '#ffffff' }}
                                     ></span>
-                                    {role.charAt(0).toUpperCase() + role.slice(1)} ({count})
+                                    {strings[role] || role.charAt(0).toUpperCase() + role.slice(1)} ({count})
                                 </label>
                             );
                         })}
@@ -653,16 +658,16 @@ const DevConsole = () => {
                     {filteredMessages.map(message => (
                         <div 
                             key={message.id} 
-                            className={`console-message console-${message.role}`}
+                            className={`console-message console-${normalizeRole(message.role)}`}
                         >
                             <span className="message-timestamp">
                                 [{formatTime(message.timestamp)}]
                             </span>
                             <span 
                                 className="message-role"
-                                style={{ color: roleColors[message.role] || '#ffffff' }}
+                                style={{ color: roleColors[normalizeRole(message.role)] || '#ffffff' }}
                             >
-                                [{message.role.toUpperCase()}]
+                                [{(strings[normalizeRole(message.role)] || normalizeRole(message.role)).toUpperCase()}]
                             </span>
                             <span className="message-content">
                                 {renderMarkdown(message.content)}
@@ -675,11 +680,11 @@ const DevConsole = () => {
             
             <div className="console-footer">
                 <div className="console-shortcuts">
-                    <span>Shift+T: Toggle</span>
-                    <span>ESC: Cerrar</span>
-                    <span>Arrastrar: Mover</span>
-                    <span>Doble clic: Centrar</span>
-                    <span>Mensajes: {messages.length}</span>
+                    <span>Shift+T: {lang === 'es' ? 'Mostrar/Ocultar' : 'Toggle'}</span>
+                    <span>ESC: {strings.close}</span>
+                    <span>{lang === 'es' ? 'Arrastrar: Mover' : 'Drag: Move'}</span>
+                    <span>{lang === 'es' ? 'Doble clic: Centrar' : 'Double click: Center'}</span>
+                    <span>{lang === 'es' ? 'Mensajes' : 'Messages'}: {messages.length}</span>
                 </div>
             </div>
         </div>

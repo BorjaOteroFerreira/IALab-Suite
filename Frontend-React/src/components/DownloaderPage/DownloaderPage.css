@@ -4,7 +4,7 @@
   --accent-primary-hover: #b983ff; /* Púrpura pastel para hover */
   --accent-secondary: #FFB6C1; /* Rosa pastel para acentos */
   --surface-elevated: #3A455B;
-  --surface-secondary: #2F3A50;
+  --surface-selected: #404A60;
   --surface: linear-gradient(135deg, #2F3A50, #3A455B);
   --border-light: rgba(135, 206, 235, 0.3);
   --border-strong: #87CEEB;
@@ -13,6 +13,16 @@
   --radius-lg: 1.2rem;
   --radius-md: 0.7rem;
   --radius-sm: 0.4rem;
+  --card-padding: 10px 18px 10px 18px;
+  --border-card: #b983ff22;
+  --surface-elevated: #23272f;
+  --surface-selected: #404A60;
+  --accent-primary: #b983ff;
+  --accent-secondary: #b983ffcc;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --text-primary: #fff;
+  --text-secondary: #b0b0b0;
 }
 
 .lm-studio-app {
@@ -127,23 +137,29 @@
   background: transparent;
 }
 
-.model-card {
-  background: var(--surface-elevated);
-  border: 1px solid transparent;
-  border-radius: 12px;
-  margin: 10px 12px 0 12px;
-  padding: 12px 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.model-card,
+.model-card-modern {
+  padding: var(--card-padding);
+  border-bottom: 1px solid var(--border-card);
+  border-radius: 0;
+  background: linear-gradient(90deg, #23272f 70%, #3A455B 100%);
+  transition: background 0.18s, box-shadow 0.18s;
   cursor: pointer;
-  transition: border 0.18s, background 0.18s;
-  box-shadow: none;
+  outline: none;
 }
-.model-card.selected,
+.model-card.selected, .model-card-modern.selected {
+  background: linear-gradient(90deg, var(--surface-selected) 80%, var(--accent-primary) 100%);
+  box-shadow: 0 2px 12px #b983ff33;
+  border-left: 4px solid var(--accent-primary);
+  z-index: 2;
+}
+.model-card.focused {
+  outline: 2px solid var(--accent-primary);
+  z-index: 2;
+}
 .model-card:hover {
-  border: 1px solid var(--accent-primary);
-  background: #404A60;
+  background: #3a3f5a;
+  box-shadow: 0 2px 8px #b983ff33;
 }
 .model-card-icon {
   font-size: 1.3rem;
@@ -156,8 +172,8 @@
   justify-content: center;
 }
 .model-card-info {
-  flex: 1;
   min-width: 0;
+  flex: 1;
 }
 .model-card-name {
   font-weight: 600;
@@ -166,6 +182,15 @@
   display: flex;
   align-items: center;
   gap: 5px;
+}
+.model-card-readme-preview {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: 6px;
+  max-height: 36px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre-line;
 }
 .model-card-meta {
   display: flex;
@@ -176,9 +201,8 @@
 }
 .selected-indicator {
   color: var(--accent-primary);
-  font-size: 1.1rem;
   font-weight: bold;
-  margin-left: 6px;
+  margin-left: 8px;
 }
 
 .main-content {
@@ -250,6 +274,10 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px #0001;
+  transition: all 0.25s;
+  padding:18px;
 }
 .sidebar-header {
   display: flex;
@@ -334,9 +362,15 @@
   align-items: center;
   padding: 30px;
   color: var(--accent-primary);
+  gap: 8px;
+  font-weight: 600;
 }
 .error {
-  color: #ef4444;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
   padding: 13px;
   background: #7f1d1d;
   border-radius: 6px;
@@ -349,7 +383,9 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #b983ff77;
+  color: var(--text-secondary);
+  font-size: 15px;
+  padding: 24px 0;
   text-align: center;
 }
 .spinner {
@@ -430,6 +466,8 @@
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
+  padding:18px
+
 }
 .readme-content {
   flex: 1 1 auto;
@@ -439,7 +477,7 @@
   overflow-y: auto;
   overflow-x: auto;
   background: var(--surface);
-  border-radius: 6px;
+  border-radius : 0px !important;
   padding: 0 0.7rem 1rem 0.7rem;
   margin: 7px 7px 0 7px;
 }
@@ -543,4 +581,19 @@
   .main-content {
     height: 35vh;
   }
+}
+
+.model-card-repo {
+  color: var(--accent-secondary);
+  font-size: 12px;
+  margin-top: 2px;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(185, 131, 255, 0.10); /* acorde a --accent-primary y --surface-elevated */
+  border-radius: 6px;
+  padding: 2px 8px;
+  display: inline-block;
 }

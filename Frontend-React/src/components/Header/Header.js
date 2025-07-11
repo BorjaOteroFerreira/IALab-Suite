@@ -3,6 +3,7 @@ import './Header.css';
 import { Download, Folder, Settings, Plus, MessagesSquare, Database } from 'lucide-react';
 import ToolsSelector from '../ToolsSelector/ToolsSelector';
 import { useChatContext } from '../../hooks/useChatContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 function Header({ 
   tools, 
@@ -18,24 +19,26 @@ function Header({
 }) {
   // Obtener el socket del contexto de chat
   const { socket } = useChatContext();
+  const { getStrings } = useLanguage();
+  const strings = getStrings('header');
   return (
     <header className="app-header">
       <div className="header-left">
-        <h1 className="app-title">🤖 AI Lab Suite</h1>
+        <h1 className="app-title">{strings.logo}</h1>
       </div>
       
       <div className="header-controls">
         <button
           onClick={onClearChat}
           className="header-button"
-          title="Nuevo chat"
+          title={strings.newChatTooltip || strings.newChat || 'Nuevo chat'}
         >
           <Plus size={22} />
         </button>
         <button
           onClick={onToggleChatSidebar}
           className={`header-button ${chatSidebarVisible ? 'active' : ''}`}
-          title="Historial"
+          title={strings.historyTooltip || strings.history || 'Historial'}
         >
           <MessagesSquare size={22} />
         </button>
@@ -43,19 +46,9 @@ function Header({
         <button
           onClick={onToggleConfigSidebar}
           className={`header-button ${configSidebarVisible ? 'active' : ''}`}
-          title="Configuración"
+          title={strings.settingsTooltip || strings.settings || 'Configuración'}
         >
           <Settings size={22} />
-        </button>
-        
-
-        
-        <button
-          onClick={onOpenDownloader}
-          className="header-button"
-          title="Descargar modelos GGUF"
-        >
-          <Download size={22} />
         </button>
       </div>
     </header>

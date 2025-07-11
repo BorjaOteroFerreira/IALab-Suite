@@ -329,7 +329,7 @@
 .chat-item {
   display: flex;
   align-items: center;
-  background: var(--surface-secondary);
+  background: linear-gradient(90deg, #23272f 70%, #3A455B 100%);
   border: 2px solid var(--border-secondary); 
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -338,7 +338,8 @@
 
 .chat-item:hover {
   border-color: var(--accent-primary);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px #b983ff33;
+  background: linear-gradient(90deg, #3A455B 70%, #b983ff 100%);
 }
 
 

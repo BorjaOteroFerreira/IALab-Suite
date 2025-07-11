@@ -6,7 +6,7 @@
 .config-sidebar {
   width: 400px;
   height: 100vh;
-  background: var(--glass-bg);
+  background: linear-gradient(135deg, #23233a 0%, #3A455B 60%, #4A3B6B 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-left: 1px solid var(--border-light);
@@ -101,10 +101,11 @@
   margin: 0;
   font-size: var(--font-size-lg);
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: linear-gradient(90deg, #87CEEB, #b983ff, #87CEEB);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
@@ -1112,3 +1113,38 @@ input[type="number"].form-control::-webkit-inner-spin-button {
 }
 
 /* ===== FIN SELECTOR  ===== */
+
+/* Estilos para el header de configuración */
+.config-title-gradient {
+  background: linear-gradient(90deg, #b983ff 0%, #87CEEB 100%);
+  border-bottom: 2.5px solid #e0e0e0;
+  border-radius: 0 0 18px 18px;
+  padding: 1.2rem 1.5rem 1.1rem 1.5rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.config-title-text {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.config-title-text-gradient {
+  background: linear-gradient(90deg, #87CEEB, #b983ff, #87CEEB);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}

@@ -313,3 +313,177 @@ body .agent-selector-popup {
   display: flex;
   align-items: center;
 }
+
+.floating-language-selector {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 2000;
+  background: rgba(30, 30, 40, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.floating-language-selector select {
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.floating-language-selector select:focus {
+  background: #222;
+}
+
+/* Forzar el desplegable a aparecer encima (solo navegadores modernos) */
+.floating-language-selector.compact select {
+  /* Para navegadores que soportan esto */
+  /* direction: rtl; */
+  position: relative;
+  z-index: 10;
+}
+
+/* Personalización visual del desplegable */
+.floating-language-selector.compact select option {
+  background: #23232b;
+  color: #fff;
+  font-size: 13px;
+  border: none;
+  padding: 6px 12px;
+}
+
+/* Hack para mostrar el desplegable encima (no estándar, pero ayuda en la mayoría de navegadores) */
+.floating-language-selector.compact select:focus {
+  position: relative;
+  z-index: 9999;
+}
+
+/* Si se quiere un efecto más marcado, se puede usar un box-shadow al enfocar */
+.floating-language-selector.compact select:focus {
+  box-shadow: 0 0 0 2px #87ceeb44;
+}
+
+.floating-language-selector.compact {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2000;
+  background: rgba(30, 30, 40, 0.92);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+  padding: 2px 6px 2px 4px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  min-height: 28px;
+  min-width: 0;
+}
+
+.floating-language-selector.compact select {
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  padding: 0 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 36px;
+  height: 22px;
+}
+
+.floating-language-selector.compact select:focus {
+  background: #222;
+}
+
+.floating-language-selector.compact svg {
+  vertical-align: middle;
+  color: #b3b3b3;
+}
+
+.custom-lang-dropdown {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.lang-dropdown-btn {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  padding: 3px 10px 3px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 36px;
+  min-height: 26px;
+  transition: background 0.15s;
+  gap: 8px;
+}
+.lang-dropdown-btn:focus,
+.lang-dropdown-btn:hover {
+  background: #23232b;
+}
+.lang-dropdown-btn svg {
+  font-size: 16px;
+}
+.lang-dropdown-btn > span {
+  font-size: 14px;
+  margin: 0 2px;
+}
+.lang-dropdown-btn .chevron {
+  margin-left: 8px;
+  font-size: 14px;
+}
+.lang-dropdown-list {
+  position: absolute;
+  left: 0;
+  bottom: 110%; /* Aparece encima del botón */
+  background: #23232b;
+  color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  min-width: 48px;
+  padding: 2px 0;
+  margin: 0;
+  z-index: 9999;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #23232b;
+  animation: fadeInUp 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.lang-dropdown-item {
+  padding: 6px 16px 6px 12px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: #fff;
+  transition: background 0.15s, color 0.15s;
+}
+.lang-dropdown-item.selected,
+.lang-dropdown-item:hover {
+  background: #2e2e3a;
+  color: #87ceeb;
+}
+.lang-dropdown-item span {
+  font-size: 18px;
+  line-height: 1.2;
+}

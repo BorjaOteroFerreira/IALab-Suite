@@ -6,6 +6,7 @@ import './styles//animations.css';
 import './styles//fonts.css';
 import './styles//safari-mobile-fix.css';
 import { ChatProvider } from './context/ChatContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { useChatContext } from './hooks/useChatContext';
 import ConfigSidebarComponent from './components/ConfigSidebar/ConfigSidebar';
 import ChatSidebar from './components/ChatSidebar/ChatSidebar';
@@ -22,6 +23,7 @@ function ChatComponent({ onOpenDownloader }) {
   const [configSidebarVisible, setConfigSidebarVisible] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
+  const { getStrings } = useLanguage();
 
   const {
     messages,
@@ -39,6 +41,8 @@ function ChatComponent({ onOpenDownloader }) {
     deleteChat
   } = useChatContext();
 
+  const strings = getStrings('app');
+
   // Auto-scroll a los mensajes más recientes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -46,11 +50,11 @@ function ChatComponent({ onOpenDownloader }) {
 
   const handleLoadChat = (chatName) => {
     loadChat(chatName);
-    setChatSidebarVisible(false);
+    // setChatSidebarVisible(false); // Eliminado para que el sidebar no se cierre al cargar un chat
   };
 
   const handleDeleteChat = (chatName) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${chatName}"?`)) {
+    if (window.confirm(strings.app?.confirmDelete?.replace('{chatName}', chatName) || `¿Eliminar chat ${chatName}?`)) {
       deleteChat(chatName);
     }
   };
@@ -114,6 +118,7 @@ function ChatComponent({ onOpenDownloader }) {
         rag={rag}
         onToggleTools={setTools}
         onToggleRag={setRag}
+        onOpenDownloader={onOpenDownloader}
       />
 
       {/* Overlay para cerrar sidebars (sin sidebar flotante) */}
@@ -145,4 +150,10 @@ function App() {
   );
 }
 
-export default App;
+export default function AppWithLangProvider(props) {
+  return (
+    <LanguageProvider>
+      <App {...props} />
+    </LanguageProvider>
+  );
+}

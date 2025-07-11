@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import './MessageInput.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 const MessageInput = forwardRef(({ onSendMessage, onStopResponse, isResponding }, ref) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef(null);
   const shouldFocusRef = useRef(true);
+  const { getStrings } = useLanguage();
+  const strings = getStrings('chat');
 
   // Exponer el método focus al padre
   useImperativeHandle(ref, () => ({
@@ -77,7 +80,7 @@ const MessageInput = forwardRef(({ onSendMessage, onStopResponse, isResponding }
     <div className="message-input-container">
       {isResponding && (
         <button className="stop-button" onClick={onStopResponse}>
-          Detener
+          {strings.stop || 'Detener'}
         </button>
       )}      <textarea
         ref={textareaRef}
@@ -99,7 +102,7 @@ const MessageInput = forwardRef(({ onSendMessage, onStopResponse, isResponding }
             }, 10);
           }
         }}
-        placeholder="Escribe tu mensaje aquí..."
+        placeholder={strings.inputPlaceholder || 'Escribe tu mensaje aquí...'}
         rows={1}
         autoFocus
         style={{
@@ -119,7 +122,7 @@ const MessageInput = forwardRef(({ onSendMessage, onStopResponse, isResponding }
         onClick={handleSend}
         disabled={isResponding || !message.trim()}
       >
-        Enviar
+        {strings.send || 'Enviar'}
       </button>
     </div>
   );

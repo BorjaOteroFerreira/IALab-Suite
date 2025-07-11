@@ -632,8 +632,8 @@
 /* Sidebar de categorías */
 .tools-sidebar {
   width: 240px;
-  background: var(--surface-secondary, #2a2a3e);
-  border-right: 1px solid var(--border-subtle, #2a2a3e);
+  background: linear-gradient(135deg, #2F3A50 0%, #3A455B 60%, #4A3B6B 100%);
+  border-right: 1.5px solid var(--border-light, #b983ff33);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -725,6 +725,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: linear-gradient(135deg, #23233a 0%, #3A455B 60%, #4A3B6B 100%);
 }
 
 .tools-main-header {

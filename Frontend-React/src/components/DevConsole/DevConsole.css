@@ -343,9 +343,9 @@
 
 /* Estilos específicos por rol */
 .console-info .message-content {
-    color: var(--accent-primary, #6366f1);
+    color: #5ecbfa !important; /* Azul pastel, forzado */
     font-weight: bold;
-    filter: brightness(1.3) saturate(1.2);
+    filter: brightness(1.1) saturate(1.1);
 }
 
 .console-pensamiento .message-content {
@@ -517,6 +517,10 @@
     font-size: 10px;
     font-weight: bold;
     line-height: 1;
+}
+
+.filter-checkbox input[type="checkbox"][value="assistant"]:checked + .checkmark::after {
+    color: #111;
 }
 
 /* Botón del filtro */

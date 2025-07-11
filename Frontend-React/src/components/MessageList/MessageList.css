@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative; /* Asegurar que los atajos floten sobre el área de mensajes */
 }
 
 .messages-list {
@@ -142,6 +143,19 @@
   40% { opacity: 1; }
 }
 
+.floating-messages {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  z-index: 1002;
+}
+
 .welcome-message {
   text-align: center;
   margin: 0 auto;
@@ -150,10 +164,7 @@
   border-radius: 0;
   box-shadow: none;
   padding: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: static;
 }
 
 .welcome-message h2 {
@@ -187,4 +198,88 @@
     display: flex;
     flex-direction: row;
     
+}
+
+.shortcuts-legend {
+  margin: 1.5rem auto 0 auto;
+  padding: 1.2rem 2rem 1.2rem 2rem;
+  background: linear-gradient(90deg, #e0e7ff 0%, #f0fdfa 100%);
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px 0 rgba(60,60,90,0.08);
+  max-width: 420px;
+  text-align: left;
+  font-size: 1.05em;
+  color: rgba(210, 210, 210, 0.82); /* Gris claro igual que kbd */
+  border: 1.5px solid #b6e0fe;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.shortcuts-legend-floating {
+  position: static;
+  margin-top: 1.2rem;
+  max-width: 420px;
+  min-width: 220px;
+  text-align: left;
+  font-size: 0.92em;
+  color: rgba(210, 210, 210, 0.82); /* Gris claro igual que kbd */
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem 0.7rem 1.1rem;
+  pointer-events: auto;
+  transition: opacity 0.2s;
+}
+
+.shortcuts-legend-floating .shortcuts-title {
+  font-weight: 700;
+  font-size: 1.05em;
+  background: linear-gradient(90deg, #87CEEB, #b983ff, #87CEEB); /* Igual que welcome-message h2 */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  margin-bottom: 0.3rem;
+}
+
+.shortcuts-legend-floating .shortcuts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.shortcuts-legend-floating .shortcuts-list li {
+  margin-bottom: 0.18em;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.98em;
+  color: rgba(210, 210, 210, 0.82); /* Igual que la leyenda y kbd */
+}
+
+.shortcuts-legend-floating .shortcuts-list kbd,
+.shortcuts-legend .shortcuts-list kbd {
+  background: #222; /* Fondo negro oscuro */
+  border: 1.5px solid #111; /* Borde negro más oscuro */
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.93em;
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'monospace';
+  color: rgba(210, 210, 210, 0.82); /* Igual que la leyenda */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+@media (max-width: 700px) {
+  .shortcuts-legend-floating {
+    left: 0.5rem;
+    bottom: 5.5rem;
+    min-width: 140px;
+    padding: 0.5rem 0.7rem 0.5rem 0.7rem;
+    font-size: 0.85em;
+  }
 }

@@ -3,6 +3,8 @@ import { LinkRenderer as YouTubeLinkRenderer } from '../YoutubeRender/YouTubeRen
 import { LinkRenderer as TikTokLinkRenderer, cleanTikTokMarkdown } from '../TikTokRender/TikTokRenderer';
 import ImageRenderer from '../ImageRenderer/ImageRenderer';
 import GoogleMapsRenderer from '../GoogleMapsRenderer/GoogleMapsRenderer';
+
+import { useLanguage } from '../../context/LanguageContext';
 import './MessageList.css';
 
 // Utilidades de detección de enlaces e imágenes
@@ -127,6 +129,8 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
   const [showdown, setShowdown] = useState(null);
   const [hljs, setHljs] = useState(null);
   const htmlRefs = useRef([]);
+  const { lang, getStrings } = useLanguage();
+  const general = getStrings('general');
 
   useEffect(() => {
     let mounted = true;
@@ -157,7 +161,7 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
   }, [messages, currentResponse, hljs]);
 
   const renderMarkdown = (text, idx) => {
-    if (!showdown) return <div className="assistant-message">Cargando...</div>;
+    if (!showdown) return <div className="assistant-message">{lang === 'es' ? 'Cargando...' : 'Loading...'}</div>;
     const parts = splitMarkdownWithLinks(text || '');
     const blockRe = /<(h[1-6]|p|ul|ol|li|blockquote|table|pre|code)/i;
 
@@ -261,25 +265,47 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef }) {
     );
   };
 
+  function ShortcutsLegend({ floating = false }) {
+    const { getStrings } = useLanguage();
+    const shortcuts = getStrings('shortcuts');
+    return (
+      <div className={floating ? "shortcuts-legend-floating" : "shortcuts-legend"}>
+
+        <ul className="shortcuts-list">
+          <li><kbd>{shortcuts.devConsoleShortcut}</kbd> - {shortcuts.devConsole}</li>
+          <li><kbd>{shortcuts.sendMessageShortcut}</kbd> - {shortcuts.sendMessage}</li>
+          <li><kbd>{shortcuts.newLineShortcut}</kbd> - {shortcuts.newLine}</li>
+          <li><kbd>{shortcuts.focusInputShortcut}</kbd> - {shortcuts.focusInput}</li>
+        </ul>
+      </div>
+    );
+  }
+
   return (
     <div className="messages-container">
-      <div className="messages-list">
-        {messages.length === 0 ? (
+      {messages.length === 0 && (
+        <div className="floating-messages">
           <div className="welcome-message">
-            <h2>¡Bienvenido a AI Lab Suite!</h2>
-            <p className="welcome-message-p">Escribe un mensaje para comenzar la conversación.</p>
+            <h2>{general.welcome}</h2>
+            <p className="welcome-message-p">{general.welcomeSubtitle}</p>
           </div>
-        ) : messages.map((m, i) => (
-          <div key={i} className={`message ${m.role}`}>
-            <div className="message-avatar">{m.role==='user'? '👤' : '🤖'}</div>
-            <div className="message-content">
-              {m.role === 'user'
-                ? <div className="user-message">{m.content}</div>
-                : renderMarkdown(m.content, i)
-              }
+          <ShortcutsLegend floating={true} />
+        </div>
+      )}
+      <div className="messages-list">
+        {messages.length === 0 ? null : (
+          messages.map((m, i) => (
+            <div key={i} className={`message ${m.role}`}>
+              <div className="message-avatar">{m.role==='user'? '👤' : '🤖'}</div>
+              <div className="message-content">
+                {m.role === 'user'
+                  ? <div className="user-message">{m.content}</div>
+                  : renderMarkdown(m.content, i)
+                }
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
         {currentResponse && (
           <div className="message assistant">
             <div className="message-avatar">🤖</div>

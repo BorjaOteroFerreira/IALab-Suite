@@ -1,0 +1,23 @@
+// Stringhe in italiano per ConfigSidebar
+export default {
+  title: 'Configurazione del modello',
+  loadingModels: 'Caricamento modelli...',
+  selectModel: 'Seleziona un modello',
+  selectedModel: 'Modello selezionato:',
+  modelsAvailable: (n) => `${n} modello${n !== 1 ? 'i' : ''} disponibile${n !== 1 ? 'i' : ''}`,
+  temperature: 'Temperatura:',
+  temperaturePlaceholder: 'Esempio: 0.8',
+  context: 'Contesto massimo:',
+  contextPlaceholder: 'Esempio: 8192',
+  systemMessage: 'Messaggio di sistema:',
+  systemMessagePlaceholder: 'Sei un assistente in italiano. Rispondi sempre in italiano.',
+  gpuLayers: 'Livelli GPU:',
+  apply: 'Applica configurazione',
+  applying: 'Applicazione in corso...',
+  unload: 'Scarica',
+  selectModelAlert: 'Seleziona un modello',
+  errorApply: 'Errore durante l’applicazione della configurazione. Controlla la console per maggiori dettagli.',
+  vision: 'visione',
+  gb: 'GB',
+  textareaDefault: 'Sei un assistente onesto e disponibile',
+};

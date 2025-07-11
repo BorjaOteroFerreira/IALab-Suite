@@ -1,5 +1,8 @@
 import React from 'react';
 import './TikTokRender.css';
+import { useLanguage } from '../../context/LanguageContext';
+import en_tiktokRenderer from '../../strings/en/en_tiktokRenderer';
+import es_tiktokRenderer from '../../strings/es/es_tiktokRenderer';
 
 // Función para extraer ID de video de TikTok desde diferentes formatos de URL
 const extractTikTokVideoId = (url) => {
@@ -23,12 +26,14 @@ export const cleanTikTokMarkdown = md => md.replace(
 
 // Componente para renderizar iframe de TikTok
 export const TikTokEmbed = ({ videoId }) => {
+  const { lang } = useLanguage();
+
   return (
     <div className="tiktok-embed-container">
       <iframe
         className="tiktok-embed-iframe"
         src={`https://www.tiktok.com/embed/v2/${videoId}`}
-        title="TikTok video player"
+        title="Reproductor de TikTok"
         allow="autoplay; encrypted-media"
         allowFullScreen
       />

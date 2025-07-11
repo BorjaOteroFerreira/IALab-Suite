@@ -1,5 +1,6 @@
 import React from 'react';
 import './YoutubeRender.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Función para extraer ID de video de YouTube desde diferentes formatos de URL
 const extractYouTubeVideoId = (url) => {
@@ -43,7 +44,7 @@ export const YouTubeEmbed = ({ videoId }) => {
           borderRadius: '8px'
         }}
         src={`https://www.youtube.com/embed/${videoId}`}
-        title="YouTube video player"
+        title="Reproductor de YouTube"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
@@ -54,6 +55,9 @@ export const YouTubeEmbed = ({ videoId }) => {
 
 // Componente personalizado para enlaces que detecta YouTube - SOLO EMBED
 export const LinkRenderer = ({ href, children }) => {
+  const { getStrings } = useLanguage();
+  const strings = getStrings('youtubeRenderer');
+  
   const videoId = extractYouTubeVideoId(href);
   
   if (videoId) {

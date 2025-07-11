@@ -1,12 +1,80 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useChatContext } from '../../hooks/useChatContext';
 import './ConfigSidebar.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 const ConfigSidebar = ({ visible, onClose }) => {
   const { modelConfig, setModelConfig, applyConfig, unloadModel, fetchModelsAndFormats } = useChatContext();
   const [modelsList, setModelsList] = useState([]);
   const [allModelsList, setAllModelsList] = useState([]); // Lista completa incluyendo .mmproj
   const [isApplying, setIsApplying] = useState(false);
+  // Obtener strings dinámicamente en cada render para reflejar el idioma actual
+  const { getStrings, currentLang } = useLanguage();
+  const strings = getStrings('configSidebar');
+
+  // Guardar el valor por defecto anterior en un ref
+  const prevDefaultRef = React.useRef(getStrings('configSidebar').textareaDefault);
+  // Estado local para saber si el usuario ha editado el textarea
+  const [userEdited, setUserEdited] = useState(false);
+
+  // Obtener el valor por defecto actual del idioma
+  const defaultText = getStrings('configSidebar').textareaDefault;
+
+  // Determinar el valor a mostrar en el textarea
+  const textareaValue = useMemo(() => {
+    if (
+      !userEdited && (
+        modelConfig.systemMessage === undefined ||
+        modelConfig.systemMessage === null ||
+        modelConfig.systemMessage === '' ||
+        modelConfig.systemMessage === prevDefaultRef.current
+      )
+    ) {
+      return defaultText;
+    }
+    return modelConfig.systemMessage ?? defaultText;
+    // eslint-disable-next-line
+  }, [userEdited, modelConfig.systemMessage, defaultText]);
+
+  // Actualizar el ref del valor por defecto anterior en cada render
+  useEffect(() => {
+    prevDefaultRef.current = defaultText;
+  }, [defaultText]);
+
+  // Cambiar el texto por defecto de systemMessage al cambiar de idioma si el usuario no lo ha tocado
+  useEffect(() => {
+    const defaultText = getStrings('configSidebar').textareaDefault;
+    // Solo actualizar si el usuario NO ha editado el textarea (valor local igual al anterior por defecto, vacío, null o undefined)
+    if (
+      modelConfig.systemMessage === prevDefaultRef.current ||
+      modelConfig.systemMessage === undefined ||
+      modelConfig.systemMessage === null ||
+      modelConfig.systemMessage === ''
+    ) {
+      setModelConfig({
+        ...modelConfig,
+        systemMessage: defaultText
+      });
+    }
+    prevDefaultRef.current = defaultText;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLang, modelConfig.systemMessage]);
+
+  // Sincronizar modelConfig.systemMessage con el default del idioma si el usuario no ha editado o el valor es vacío
+  useEffect(() => {
+    if (
+      !userEdited ||
+      modelConfig.systemMessage === undefined ||
+      modelConfig.systemMessage === null ||
+      modelConfig.systemMessage === ''
+    ) {
+      setModelConfig({
+        ...modelConfig,
+        systemMessage: defaultText
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultText, currentLang]);
 
   // Obtener la lista de modelos al cargar el componente
   useEffect(() => {
@@ -49,6 +117,15 @@ const ConfigSidebar = ({ visible, onClose }) => {
     };
     fetchData();
   }, [fetchModelsAndFormats]);
+
+  // Cuando el usuario edita el textarea, marcar como editado y actualizar config
+  const handleSystemMessageChange = (e) => {
+    setUserEdited(true);
+    setModelConfig({
+      ...modelConfig,
+      systemMessage: e.target.value
+    });
+  };
 
   // Adaptar el resto del código para trabajar con objetos {path, size}
   const formatModelName = (modelObjOrPath) => {
@@ -145,7 +222,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
     
     // Validar campos obligatorios
     if (!modelConfig.modelPath) {
-      alert('Por favor selecciona un modelo');
+      alert(strings.selectModelAlert);
       return;
     }
     
@@ -167,7 +244,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
       
     } catch (error) {
       console.error('ConfigSidebar: Error al aplicar configuración:', error);
-      alert('Error al aplicar la configuración. Revisa la consola para más detalles.');
+      alert(strings.errorApply);
     } finally {
       setIsApplying(false);
     }
@@ -204,9 +281,8 @@ const ConfigSidebar = ({ visible, onClose }) => {
 
   return (
     <div className={`config-sidebar ${visible ? 'visible' : 'hidden'}`}>
-      <div className="sidebar-header">
-        <h5>⚙️ Configuración del modelo</h5>
-
+      <div className="sidebar-header config-title-gradient">
+        <h5 className="config-title-text config-title-text-gradient">{strings.title}</h5>
       </div>
       <form onSubmit={handleSubmit}>        <div className="form-group">
 
@@ -222,16 +298,15 @@ const ConfigSidebar = ({ visible, onClose }) => {
               disabled={modelsList.length === 0}
             >
               <option value="" className="placeholder-option">
-                {modelsList.length === 0 ? '⏳ Cargando modelos...' : '🔍 Selecciona un modelo'}
-              </option>{modelsWithInfo.map(({ path, info, displayName }, index) => {
-                return (
-                  <option key={index} value={path} className="model-option">
-                    {displayName}
-                    {info.size && ` • ${info.size}`}
-                    {info.type && ` • ${info.type}`}
-                  </option>
-                );
-              })}
+                {modelsList.length === 0 ? `⏳ ${strings.loadingModels}` : `🔍 ${strings.selectModel}`}
+              </option>
+              {modelsWithInfo.map(({ path, info, displayName }, index) => (
+                <option key={index} value={path} className="model-option">
+                  {displayName}
+                  {info.size && ` • ${info.size}`}
+                  {info.type && ` • ${info.type}`}
+                </option>
+              ))}
             </select>
             <style>{`
               .form-control.model-select {
@@ -248,9 +323,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
                 <div className="selected-model-display">
                   {/* <span className="model-icon">{selected.info.icon || '🤖'}</span> */}
                   <div className="model-details">
-                    <span className="model-name">{
-                      selected.displayName || formatModelName(modelConfig.modelPath)
-                    }</span>
+                    <span className="model-name">{selected.displayName || formatModelName(modelConfig.modelPath)}</span>
                     <div className="model-badges">
                       {selected.info.size && (
                         <span className="model-size">{selected.info.size}</span>
@@ -262,10 +335,10 @@ const ConfigSidebar = ({ visible, onClose }) => {
                         <span className="model-meta-type">{selected.info.type}</span>
                       )}
                       {selected.info.hasVision && (
-                        <span className="model-meta-vision">visión</span>
+                        <span className="model-meta-vision">{strings.vision}</span>
                       )}
                       {selected.info.fileSize && selected.info.fileSize > 0 && (
-                        <span className="model-meta-weight">{(selected.info.fileSize / (1024*1024*1024)).toFixed(2)} GB</span>
+                        <span className="model-meta-weight">{(selected.info.fileSize / (1024*1024*1024)).toFixed(2)} {strings.gb}</span>
                       )}
                     </div>
                   </div>
@@ -273,9 +346,9 @@ const ConfigSidebar = ({ visible, onClose }) => {
               ) : (
                 <div className="placeholder-display">
                   {modelsList.length === 0 ? (
-                    <>⏳ Cargando modelos...</>
+                    <>⏳ {strings.loadingModels}</>
                   ) : (
-                    <>🔍 Selecciona un modelo</>
+                    <>🔍 {strings.selectModel}</>
                   )}
                 </div>
               )}
@@ -300,9 +373,9 @@ const ConfigSidebar = ({ visible, onClose }) => {
                             {info.size && <span className="model-meta-size">{info.size}</span>}
                             {info.quantization && <span className="model-meta-quantization">{info.quantization}</span>}
                             {info.type && <span className="model-meta-type">{info.type}</span>}
-                            {info.hasVision && <span className="model-meta-vision">visión</span>}
+                            {info.hasVision && <span className="model-meta-vision">{strings.vision}</span>}
                             {info.fileSize && info.fileSize > 0 && (
-                              <span className="model-meta-weight">{(info.fileSize / (1024*1024*1024)).toFixed(2)} GB</span>
+                              <span className="model-meta-weight">{(info.fileSize / (1024*1024*1024)).toFixed(2)} {strings.gb}</span>
                             )}
                           </div>
                         </div>
@@ -317,16 +390,16 @@ const ConfigSidebar = ({ visible, onClose }) => {
           {/* Mostrar el modelo seleccionado */}
           {modelConfig.modelPath && (
             <div className="selected-model-info">
-              ✅ Modelo seleccionado: <strong>{formatModelName(modelConfig.modelPath)}</strong>
+              ✅ {strings.selectedModel} <strong>{formatModelName(modelConfig.modelPath)}</strong>
             </div>
           )}
           <div className="model-info">
-            📊 {modelsList.length} modelo{modelsList.length !== 1 ? 's' : ''} disponible{modelsList.length !== 1 ? 's' : ''}
+            📊 {strings.modelsAvailable(modelsList.length)}
           </div>
         </div>
         
         <div className="form-group">
-          <label htmlFor="temperature">Temperatura:</label>
+          <label htmlFor="temperature">{strings.temperature}</label>
           <input
             type="number"
             className="form-control"
@@ -335,41 +408,41 @@ const ConfigSidebar = ({ visible, onClose }) => {
             step="0.01"
             min="0"
             max="1"
-            placeholder="Ejemplo: 0.8"
+            placeholder={strings.temperaturePlaceholder}
             value={modelConfig.temperature || 0.8}
             onChange={handleChange}
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="context">Contexto máximo:</label>
+          <label htmlFor="context">{strings.context}</label>
           <input
             type="number"
             className="form-control"
             id="context"
             name="context"
-            placeholder="Ejemplo: 8192"
+            placeholder={strings.contextPlaceholder}
             value={modelConfig.context || 8192}
             onChange={handleChange}
           />
         </div>
         
         <div className="form-group">
-          <label htmlFor="systemMessage">Mensaje de sistema:</label>
+          <label htmlFor="systemMessage">{strings.systemMessage}</label>
           <textarea
             className="form-control"
             id="systemMessage"
             name="systemMessage"
             rows="3"
-            placeholder="Eres un asistente en español. Debes responder siempre en español."
-            value={modelConfig.systemMessage || 'Eres un asistente en español. Debes responder siempre en español'}
-            onChange={handleChange}
+            placeholder={strings.systemMessagePlaceholder}
+            value={textareaValue}
+            onChange={handleSystemMessageChange}
           />
         </div>
         
         <div className="form-group">
           <label htmlFor="gpuLayers">
-            Capas GPU: <span className="slider-value">{modelConfig.gpuLayers || -1}</span>
+            {strings.gpuLayers} <span className="slider-value">{modelConfig.gpuLayers || -1}</span>
           </label>
           <input
             type="range"
@@ -393,10 +466,9 @@ const ConfigSidebar = ({ visible, onClose }) => {
             type="submit" 
             className={`btn btn-primary ${isApplying ? 'loading' : ''}`}
             disabled={isApplying}
-   
           >
             <span style={{opacity: isApplying ? 0 : 1}}>
-              {isApplying ? 'Aplicando...' : 'Aplicar configuración'}
+              {isApplying ? strings.applying : strings.apply}
             </span>
           </button>
           <button 
@@ -405,7 +477,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
             onClick={unloadModel}
             disabled={isApplying}
           >
-            Desmontar
+            {strings.unload}
           </button>
         </div>
       </form>

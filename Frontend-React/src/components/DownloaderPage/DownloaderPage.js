@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
-  Download,
-  Star,
-  AlertCircle,
-  CheckCircle,
-  Clock,
   HardDrive,
   ExternalLink,
+  Download,
+  Star,
   ChevronDown,
-  ChevronUp,
-  X
+  ChevronUp
 } from 'lucide-react';
-
+import { useLanguage } from '../../context/LanguageContext';
+import ModelCard from './ModelCard';
+import DownloadSection from './DownloadSection';
+import ReadmeSection from './ReadmeSection';
+import SortSelect from './SortSelect';
 import './DownloaderPage.css';
 
 const FunctionalLMStudioDownloader = ({ open, onClose }) => {
+  const { getStrings } = useLanguage();
+  const strings = getStrings('downloader');
+  const general = getStrings('general');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -28,6 +32,8 @@ const FunctionalLMStudioDownloader = ({ open, onClose }) => {
   const [readmeHtml, setReadmeHtml] = useState('');
   const [readmeLoading, setReadmeLoading] = useState(false);
   const [readmeError, setReadmeError] = useState(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const listRef = useRef();
 
   const searchModels = async (query = 'GGUF', limit = 30) => {
     setLoading(true);
@@ -38,10 +44,27 @@ const FunctionalLMStudioDownloader = ({ open, onClose }) => {
       );
       if (!res.ok) throw new Error(`status ${res.status}`);
       const data = await res.json();
-      setModels(data.filter(m =>
+      const filtered = data.filter(m =>
         m.tags?.includes('gguf') ||
         m.id.toLowerCase().includes('gguf')
-      ));
+      );
+      // Precargar README preview para cada modelo
+      const previews = await Promise.all(
+        filtered.map(async (model) => {
+          try {
+            const res = await fetch(`https://huggingface.co/${model.id}/raw/main/README.md`);
+            if (res.status === 404) {
+              return { ...model, readmePreview: '__NO_README__' };
+            }
+            if (!res.ok) return { ...model, readmePreview: '__ERROR__' };
+            const text = await res.text();
+            return { ...model, readmePreview: text.split('\n').slice(0, 2).join(' ') };
+          } catch {
+            return { ...model, readmePreview: '__ERROR__' };
+          }
+        })
+      );
+      setModels(previews);
     } catch (err) {
       setError(`Error al buscar modelos: ${err.message}`);
     } finally {
@@ -110,7 +133,8 @@ const FunctionalLMStudioDownloader = ({ open, onClose }) => {
     setSelectedModel({ ...model, files: [], loadingFiles: true });
     const files = await getModelFiles(model.id);
     setSelectedModel(prev => ({ ...prev, files, loadingFiles: false }));
-    setDownloadsOpen(true);
+    setDownloadsOpen(false); // Al seleccionar, descargas cerrado
+    setShowReadme(true);     // y README abierto
   };
 
   useEffect(() => { searchModels(); }, [sortBy]);
@@ -160,6 +184,18 @@ const FunctionalLMStudioDownloader = ({ open, onClose }) => {
     }
   };
 
+  // Vista previa del README (primeras 2 líneas)
+  const getReadmePreview = async (modelId) => {
+    try {
+      const res = await fetch(`https://huggingface.co/${modelId}/raw/main/README.md`);
+      if (!res.ok) return '';
+      const text = await res.text();
+      return text.split('\n').slice(0, 2).join(' ');
+    } catch {
+      return '';
+    }
+  };
+
   // Cargar README cuando se selecciona un modelo y se despliega el apartado
   useEffect(() => {
     if (showReadme && selectedModel) {
@@ -192,236 +228,203 @@ const FunctionalLMStudioDownloader = ({ open, onClose }) => {
     }
   }, [showReadme, selectedModel]);
 
+  // Accesibilidad: navegación con teclado
+  const handleListKeyDown = (e) => {
+    if (!models.length) return;
+    if (e.key === 'ArrowDown') {
+      setFocusedIndex(i => Math.min(i + 1, models.length - 1));
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      setFocusedIndex(i => Math.max(i - 1, 0));
+      e.preventDefault();
+    } else if (e.key === 'Enter' && focusedIndex >= 0) {
+      selectModel(models[focusedIndex]);
+      e.preventDefault();
+    }
+  };
+
   return (
     open ? (
       <div className="gguf-modal-overlay">
         <div className="gguf-modal">
-          <button className="gguf-modal-close" onClick={onClose} title="Cerrar" style={{ position: 'absolute', top: 10, right: 10, padding: 0, width: 32, height: 32, minWidth: 0, minHeight: 0, background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
-            <X size={18} />
+          <button className="gguf-modal-close" onClick={onClose} title={general.cancel}>
+            X
           </button>
           <div className="lm-studio-app">
-            <div className="sidebar">
-              <div className="search-header">
-                <div className="search-form">
+            <aside className="sidebar">
+              <header className="search-header">
+                <form className="search-form" onSubmit={e => { e.preventDefault(); searchModels(searchQuery); }}>
                   <Search size={16} className="search-icon"/>
                   <input
                     type="text"
                     className="search-input"
-                    placeholder="Buscar modelos..."
+                    placeholder={strings.searchPlaceholder}
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    onKeyPress={e => e.key==='Enter'&& searchModels(searchQuery)}
                   />
-                </div>
+                </form>
                 <div className="filters">
                   <span className="gguf-badge">GGUF</span>
-                  <select
-                    className="filter-select"
-                    value={sortBy}
-                    onChange={e => setSortBy(e.target.value)}
-                  >
-                    <option value="lastModified">Mejor Coincidencia</option>
-                    <option value="downloads">Más Descargados</option>
-                    <option value="likes">Más Populares</option>
-                    <option value="createdAt">Más Recientes</option>
-                  </select>
-                  <span className="staff-picks">Staff Pick ⭐</span>
+                  <SortSelect
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    strings={strings}
+                  />
                 </div>
-              </div>
-
-              <div className="models-list">
-                {loading && <div className="loading"><div className="spinner"/></div>}
-                {error && <div className="error"><AlertCircle size={16}/> {error}</div>}
-                {!loading && !error && models.map(model => {
-                  const { size, quant, type } = getModelBadges(model);
-                  const isSelected = selectedModel?.id === model.id;
-                  const tags = model.tags || [];
-                  const hasVision = tags.some(t => t.toLowerCase().includes('vision') || t.toLowerCase().includes('mmproj'));
-                  const hasTools = tags.some(t => t.toLowerCase().includes('tools'));
-                  const hasReasoning = tags.some(t => t.toLowerCase().includes('reasoning'));
-                  return (
-                    <div
-                      key={model.id}
-                      className={`model-card ${isSelected?'selected':''}`}
-                      onClick={() => selectModel(model)}
-                    >
-                      <div className="model-card-icon">🤖</div>
-                      <div className="model-card-info">
-                        <div className="model-card-name" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                          {model.id.split('/')[1]||model.id}
-                          {/* Badges de capabilities en la lista */}
-                          {hasVision && (
-                            <span className="model-meta-vision" style={{ background: '#f59e42', color: '#fff', borderRadius: 5, padding: '1px 7px', fontSize: 11, fontWeight: 500 }}>visión</span>
-                          )}
-                          {hasTools && (
-                            <span className="model-meta-tools" style={{ background: '#22c55e', color: '#fff', borderRadius: 5, padding: '1px 7px', fontSize: 11, fontWeight: 500 }}>tools</span>
-                          )}
-                          {hasReasoning && (
-                            <span className="model-meta-reasoning" style={{ background: '#a855f7', color: '#fff', borderRadius: 5, padding: '1px 7px', fontSize: 11, fontWeight: 500 }}>reasoning</span>
-                          )}
-                        </div>
-                        <div className="model-card-meta">
-                          {size && <span className="model-meta-size">{size}</span>}
-                          {quant && <span className="model-meta-quantization">{quant}</span>}
-                          {type && <span className="model-meta-type">{type}</span>}
-                        </div>
-                      </div>
-                      {isSelected && <div className="selected-indicator">✓</div>}
-                    </div>
-                  );
-                })}
+              </header>
+              <section
+                className="models-list"
+                style={{overflowX: 'hidden', padding: 0}}
+                tabIndex={0}
+                ref={listRef}
+                onKeyDown={handleListKeyDown}
+                role="listbox"
+                aria-activedescendant={focusedIndex >= 0 ? `model-card-${focusedIndex}` : undefined}
+              >
+                {loading && <div className="loading"><div className="spinner"/>{strings.loadingModels}</div>}
+                {error && <div className="error"><span>⚠️</span> {error}</div>}
+                {!loading && !error && models.map((model, idx) => (
+                  <ModelCard
+                    key={model.id}
+                    id={`model-card-${idx}`}
+                    model={model}
+                    isSelected={selectedModel?.id === model.id}
+                    isFocused={focusedIndex === idx}
+                    tabIndex={0}
+                    onClick={() => selectModel(model)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') selectModel(model);
+                    }}
+                    readmePreview={
+                      model.readmePreview === '__ERROR__'
+                        ? <span style={{ color: '#b0b0b0', fontStyle: 'italic' }}>{strings.readmeError || 'No se pudo obtener la vista previa del README'}</span>
+                        : model.readmePreview === '__NO_README__'
+                          ? <span style={{ color: '#b0b0b0', fontStyle: 'italic' }}>{strings.noReadmePreview || 'Este repositorio no tiene README'}</span>
+                          : (model.readmePreview && model.readmePreview.trim() !== ''
+                            ? model.readmePreview
+                            : strings.noReadmePreview || 'Sin descripción disponible')
+                    }
+                    badges={{
+                      ...getModelBadges(model),
+                      updatedAt: model.lastModified ? formatTimeAgo(model.lastModified) : null,
+                      downloads: model.downloads
+                    }}
+                    strings={strings}
+                  />
+                ))}
                 {!loading && !error && models.length===0 && (
                   <div className="empty-state">
                     <Search size={48}/>
-                    <p>No se encontraron modelos</p>
+                    <p>{strings.noModelsFound}</p>
                   </div>
                 )}
-              </div>
-            </div>
-
-            <div className="main-content">
+              </section>
+            </aside>
+            <main className="main-content" style={{background: 'var(--surface)', borderRadius: '0 1.2rem 1.2rem 0', boxShadow: '0 2px 24px #0002', padding: 0, display: 'flex', flexDirection: 'column'}}>
               {!selectedModel ? (
                 <div className="empty-state">
                   <HardDrive size={48}/>
-                  <h2>Selecciona un modelo</h2>
+                  <h2>{strings.selectModel}</h2>
                 </div>
               ) : (
-                <div className="model-details">
-                  <h1 className="model-title">
+                <section className="model-details" style={{background: 'rgba(60,60,90,0.10)', borderRadius: 18, margin: 18, boxShadow: '0 2px 16px #0001', padding: '32px 28px 24px 28px', display: 'flex', flexDirection: 'column', gap: 0}}>
+                  <h1 className="model-title" style={{fontSize: 28, fontWeight: 800, color: 'var(--accent-primary)', marginBottom: 6, letterSpacing: '-0.5px'}}>
                     {selectedModel.id.split('/')[1]||selectedModel.id}
                     <a
                       href={`https://huggingface.co/${selectedModel.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="model-title-link"
-                      title="Ver en HuggingFace"
+                      title="HuggingFace"
                     >
                       <ExternalLink size={22} className="model-title-link-icon" />
                     </a>
                   </h1>
-                  <p className="model-subtitle">
-                    {selectedModel.id} por {selectedModel.id.split('/')[0]}
-                  </p>
-                  {/* Arquitectura y tamaño en parámetros justo encima de la sección de descargas */}
-                  <div className="model-params-row">
+                  <div style={{background: 'rgba(135,206,235,0.08)', border: '1.5px solid var(--border-light)', borderRadius: 8, padding: '7px 16px', marginBottom: 18, color: '#b983ff', fontSize: 14, fontWeight: 600, display: 'inline-block', maxWidth: 420}}>
+                    {selectedModel.id} {strings.by} {selectedModel.id.split('/')[0]}
+                  </div>
+                  <div className="model-params-row" style={{marginBottom: 18, gap: 12}}>
                     {selectedModel.cardData?.architecture && (
-                      <span className="model-meta-architecture">
+                      <span className="model-meta-architecture" style={{background: '#6366f1', color: '#fff', borderRadius: 7, padding: '4px 14px', fontSize: 14, fontWeight: 600, letterSpacing: '0.5px'}}>
                         {selectedModel.cardData.architecture}
                       </span>
                     )}
                     {selectedModel.cardData?.parameters && (
-                      <span className="model-meta-params">
-                        {selectedModel.cardData.parameters} parámetros
+                      <span className="model-meta-params" style={{background: '#0ea5e9', color: '#fff', borderRadius: 7, padding: '4px 14px', fontSize: 14, fontWeight: 600, letterSpacing: '0.5px'}}>
+                        {selectedModel.cardData.parameters} {strings.parameters}
                       </span>
                     )}
                   </div>
-                  {/* Badges de capabilities debajo del subtítulo */}
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 18, alignItems: 'center', flexWrap: 'wrap' }}>
                     {(selectedModel.cardData?.capabilities?.includes('vision') || getModelBadges(selectedModel).vision) && (
-                      <span className="model-meta-vision" style={{ background: '#f59e42', color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 500 }}>
-                        visión
+                      <span className="model-meta-vision" style={{ background: '#f59e42', color: '#fff', borderRadius: 8, padding: '4px 16px', fontSize: 15, fontWeight: 700, letterSpacing: '0.5px' }}>
+                        {strings.vision}
                       </span>
                     )}
                     {(selectedModel.cardData?.capabilities?.includes('tools') || selectedModel.tags?.some(t => t.toLowerCase().includes('tools'))) && (
-                      <span className="model-meta-tools" style={{ background: '#22c55e', color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 500 }}>
-                        tools
+                      <span className="model-meta-tools" style={{ background: '#22c55e', color: '#fff', borderRadius: 8, padding: '4px 16px', fontSize: 15, fontWeight: 700, letterSpacing: '0.5px' }}>
+                        {strings.tools}
                       </span>
                     )}
                     {(selectedModel.cardData?.capabilities?.includes('reasoning') || selectedModel.tags?.some(t => t.toLowerCase().includes('reasoning'))) && (
-                      <span className="model-meta-reasoning" style={{ background: '#a855f7', color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 500 }}>
-                        reasoning
+                      <span className="model-meta-reasoning" style={{ background: '#a855f7', color: '#fff', borderRadius: 8, padding: '4px 16px', fontSize: 15, fontWeight: 700, letterSpacing: '0.5px' }}>
+                        {strings.reasoning}
                       </span>
                     )}
                   </div>
-
-                  <div className="download-section">
-                    <div
-                      className="sidebar-header"
-                      style={{ cursor: 'pointer' }}
+                  {/* Sección de descargas con cabecera desplegable e icono, colapsable visualmente */}
+                  <div className={`download-section collapsible-section${downloadsOpen ? ' open' : ''}`} style={{borderRadius: 12, boxShadow: downloadsOpen ? '0 2px 12px #0001' : 'none', background: downloadsOpen ? 'rgba(135,206,235,0.07)' : 'transparent', marginBottom: 18, overflow: 'hidden', transition: 'all 0.25s'}}> 
+                    <button
+                      className="section-toggle-title"
+                      style={{margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '18px 0 18px 0', outline: 'none', display: 'flex', alignItems: 'center', gap: 8, width: '100%', borderRadius: 0, borderBottom: downloadsOpen ? '1.5px solid var(--border-light)' : 'none', transition: 'background 0.2s'}}
                       onClick={() => setDownloadsOpen(o => !o)}
+                      aria-expanded={downloadsOpen}
                     >
-                      <h5>
-                        <Download size={18}/> Opciones de Descarga
-                        {hasVision && <span className="model-meta-vision" style={{ marginLeft: '8px' }}>visión</span>}
-                      </h5>
-                      {downloadsOpen ? <ChevronUp/> : <ChevronDown/>}
+                      <Download size={18} style={{verticalAlign: 'middle'}}/>
+                      {strings.downloadSectionTitle || 'Descargas'}
+                      <span style={{flex: 1}}/>
+                      {downloadsOpen ? <ChevronUp size={20} style={{marginLeft: 6}}/> : <ChevronDown size={20} style={{marginLeft: 6}}/>}
+                    </button>
+                    <div style={{maxHeight: downloadsOpen ? 600 : 0, overflow: 'hidden', transition: 'max-height 0.3s cubic-bezier(.4,0,.2,1)'}}>
+                      <DownloadSection
+                        open={downloadsOpen}
+                        onToggle={() => setDownloadsOpen(o => !o)}
+                        files={selectedModel.files}
+                        loadingFiles={selectedModel.loadingFiles}
+                        downloadStatus={downloadStatus}
+                        handleDownload={handleDownload}
+                        strings={strings}
+                        hasVision={hasVision}
+                      />
                     </div>
-                    {downloadsOpen && (
-                      <div className="section-scrollable" style={{ maxHeight: '372px', overflowY: 'auto' }}>
-                        {selectedModel.loadingFiles && (
-                          <div className="loading">
-                            <div className="spinner"/><span>Cargando archivos...</span>
-                          </div>
-                        )}
-                        {selectedModel.files?.map((file, idx) => {
-                          const key = `${file.downloadUrl}-${file.name}`;
-                          const status = downloadStatus[key];
-                          const fileQuant = (file.name.match(/Q(\d+)((_[A-Z])+)?/i) || [null])[0]?.toUpperCase();
-                          const fileType = (file.name.match(/(chat|instruct|base|code)/i) || [null])[0]?.toLowerCase();
-                          const isVision = file.name.toLowerCase().endsWith('.mmproj');
-                          return (
-                            <div key={idx} className="model-card">
-                              <div className="model-card-info">
-                                <div className="model-card-name">{file.name}</div>
-                                <div className="model-card-meta">
-                                  <span className="model-meta-size">{file.size}</span>
-                                  {fileQuant && <span className="model-meta-quantization">{fileQuant}</span>}
-                                  {fileType && <span className="model-meta-type">{fileType}</span>}
-                                  {isVision && <span className="model-meta-vision">visión</span>}
-                                </div>
-                              </div>
-                              <button
-                                className={`btn btn-primary ${status||''}`}
-                                onClick={() => handleDownload(file.downloadUrl, file.name)}
-                                disabled={status==='downloading'}
-                              >
-                                {status==='downloading' && <Clock size={14}/>}
-                                {status==='completed'   && <CheckCircle size={14}/>}
-                                {!status && <Download size={14}/>}
-                                {status==='downloading' ? 'Descargando...' :
-                                 status==='completed'   ? 'Completado' :
-                                 'Descargar'}
-                              </button>
-                            </div>
-                          );
-                        })}
-                        {!selectedModel.loadingFiles && selectedModel.files?.length===0 && (
-                          <div className="empty-state">
-                            <AlertCircle size={24}/>
-                            <p>No hay archivos GGUF o MMProj</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
-
-                  {/* Apartado desplegable para el README */}
-                  <div className="readme-section">
-                    <div
-                      className="sidebar-header"
-                      style={{ cursor: 'pointer', marginTop: 16 }}
+                  {/* Sección README con cabecera desplegable e icono, colapsable visualmente */}
+                  <div className={`readme-section collapsible-section${showReadme ? ' open' : ''}`} style={{borderRadius: 12, boxShadow: showReadme ? '0 2px 12px #0001' : 'none', background: showReadme ? 'rgba(135,206,235,0.07)' : 'transparent', marginBottom: 0, overflow: 'hidden', transition: 'all 0.25s'}}> 
+                    <button
+                      className="section-toggle-title"
+                      style={{margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '18px 0 18px 0', outline: 'none', display: 'flex', alignItems: 'center', gap: 8, width: '100%', borderRadius: 0, borderBottom: showReadme ? '1.5px solid var(--border-light)' : 'none', transition: 'background 0.2s'}}
                       onClick={() => setShowReadme(o => !o)}
+                      aria-expanded={showReadme}
                     >
-                      <h5>
-                        <Star size={18}/> Ver README del modelo
-                      </h5>
-                      {showReadme ? <ChevronUp/> : <ChevronDown/>}
+                      <Star size={18} style={{verticalAlign: 'middle'}}/>
+                      {strings.readmeSectionTitle || 'Readme'}
+                      <span style={{flex: 1}}/>
+                      {showReadme ? <ChevronUp size={20} style={{marginLeft: 6}}/> : <ChevronDown size={20} style={{marginLeft: 6}}/>}
+                    </button>
+                    <div style={{maxHeight: showReadme ? 800 : 0, overflow: 'hidden', transition: 'max-height 0.3s cubic-bezier(.4,0,.2,1)'}}>
+                      <ReadmeSection
+                        open={showReadme}
+                        onToggle={() => setShowReadme(o => !o)}
+                        readmeHtml={readmeHtml}
+                        loading={readmeLoading}
+                        error={readmeError}
+                        strings={strings}
+                      />
                     </div>
-                    {showReadme && (
-                      <div className="readme-content" style={{ flex: 1, height: '100%', overflowY: 'auto',  borderRadius: 8, padding: 0, marginTop: 8 }}>
-                        {readmeLoading ? (
-                          <div className="loading"><div className="spinner"/>Cargando README...</div>
-                        ) : readmeError ? (
-                          <div className="error"><AlertCircle size={16}/> {readmeError}</div>
-                        ) : (
-                          <div dangerouslySetInnerHTML={{ __html: readmeHtml }} />
-                        )}
-                      </div>
-                    )}
                   </div>
-                </div>
+                </section>
               )}
-            </div>
+            </main>
           </div>
         </div>
       </div>
