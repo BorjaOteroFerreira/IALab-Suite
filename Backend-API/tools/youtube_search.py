@@ -26,14 +26,14 @@ class YoutubeVideoSearchTool(BaseTool):
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
-            name="Búsqueda de vídeos en YouTube",
+            name="YouTube",
             description="Busca videos en YouTube basado en palabras clave",
             category=ToolCategory.MEDIA,
             requires_api_key=True,
             api_key_env_var="YOUTUBE_API_KEY",
             usage_example={
-                "búsqueda_simple": '{"tool": "youtube_video_search_tool", "query": "tutorial python"}',
-                "con_max_results": '{"tool": "youtube_video_search_tool", "query": "noticias tecnología", "max_results": 6}',
+                "búsqueda_simple": '{"tool": "YouTube", "query": "tutorial python"}',
+                "con_max_results": '{"tool": "YouTube", "query": "noticias tecnología", "max_results": 6}',
                 "formatos_soportados": [
                     'query: palabra clave de búsqueda (string)',
                     'max_results: número máximo de vídeos (opcional, int)'
@@ -43,7 +43,7 @@ class YoutubeVideoSearchTool(BaseTool):
     
     @classmethod
     def get_tool_name(cls) -> str:
-        return "Búsqueda de vídeos en YouTube"
+        return "YouTube"
     
     def execute(self, query: str, **kwargs):
         """Ejecuta búsqueda de videos en YouTube"""
@@ -100,15 +100,12 @@ class YoutubeVideoSearchTool(BaseTool):
                 item["snippet"]["publishedAt"].replace('Z', '+00:00')).astimezone(timezone.utc)
             days_since_published = (datetime.now(
                 timezone.utc) - publish_date).days
-            results.append(VideoSearchResult(
-                video_id=video_id,
-                title=title,
-                channel_id=channel_id,
-                channel_title=channel_title,
-                days_since_published=days_since_published
-            ))
+            video_url = f"https://www.youtube.com/watch?v={video_id}"
+            # Incluir el enlace en el resultado textual
+            result_str = f"Título: {title}\nCanal: {channel_title}\nPublicado hace: {days_since_published} días\nEnlace: {video_url}"
+            results.append(result_str)
 
-        results_str = '\n'.join(str(result) for result in reversed(results))
+        results_str = '\n\n'.join(str(result) for result in reversed(results))
         if results_str != '':
             print(ids)
             return f'{results_str}', ids  # Devolver resultado e IDs

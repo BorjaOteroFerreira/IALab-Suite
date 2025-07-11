@@ -48,7 +48,6 @@ class AgentRegistry:
             from .default_agent.config import DefaultAgentConfig
             from .adaptive_agent.adaptive_agent import AdaptiveAgent
             from .adaptive_agent.config import AdaptiveAgentConfig
-            from .lineal_agent.lineal_agent import LinealAgent
             
             # Registrar agente por defecto
             self.register_agent(AgentInfo(
@@ -72,16 +71,7 @@ class AgentRegistry:
                 icon="🧠"
             ))
             
-            # Registrar agente lineal
-            self.register_agent(AgentInfo(
-                name="lineal",
-                display_name="Agente Lineal",
-                description="Agente con planificación tradicional secuencial",
-                agent_type=AgentType.LINEAL,
-                agent_class=LinealAgent,
-                config_class=None,
-                icon="📋"
-            ))
+  
             
             # Establecer agente por defecto
             self._current_agent = "default"

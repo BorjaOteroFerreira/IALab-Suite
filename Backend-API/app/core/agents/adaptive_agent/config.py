@@ -4,7 +4,7 @@ Configuración del Agente Adaptativo
 """
 import os
 from typing import Dict, Any
-
+from llama_cpp import llama
 
 class AdaptiveAgentConfig:
     """Configuración para el agente adaptativo"""

@@ -4,8 +4,8 @@ Ejecutor de tareas y pasos para el agente autónomo
 """
 import time
 from typing import Dict, Any, List, Optional
-from .models import TaskPlan, TaskStep, TaskStatus
-from .utils import clean_error_message, safe_emit_tool_result
+from ..models import TaskPlan, TaskStep, TaskStatus
+from ..utils import clean_error_message, safe_emit_tool_result
 from app.utils.logger import logger
 
 

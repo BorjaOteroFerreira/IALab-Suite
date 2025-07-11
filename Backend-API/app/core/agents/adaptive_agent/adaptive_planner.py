@@ -87,6 +87,8 @@ class AdaptiveTaskPlanner:
                 
                 if not next_step:
                     emit_status_func("No se pudo determinar el siguiente paso. Finalizando.", 'info')
+                    # Generar respuesta final enriquecida aunque no se haya completado explícitamente
+                    self._generate_clean_final_response(user_message, execution_results, emit_status_func)
                     break
                 
                 # Paso 3: Agregar el paso al plan y mostrarlo
@@ -115,6 +117,8 @@ class AdaptiveTaskPlanner:
             
             # Calcular estadísticas finales
             self._calculate_final_stats(execution_results, start_time)
+            # Mostrar estadísticas de ejecución en consola
+            self.display_execution_stats(execution_results, emit_status_func)
             
             # Si tenemos información útil pero no se completó explícitamente, generar respuesta final
             if not any(reflection.get('task_completion_assessment', False) for reflection in execution_results['reflections']) and self.execution_context:
@@ -322,8 +326,8 @@ FORMATO DE RESPUESTA (JSON estricto):
 {{
     "step_id": "paso_estrategico_X",
     "step_description": "Descripción específica y clara del objetivo del paso",
-    "tool_name": "herramienta_exacta_de_la_lista",
-    "strategic_query": "Consulta muy específica y estratégica",
+    "tool_name": "nombre_exacto_de_la_herramienta",
+    "strategic_query": "Consulta literal, breve y directa para esa herramienta . NO incluyas explicaciones, contexto ni frases informativas. ,
     "expected_outcome": "Qué información específica espero obtener",
     "strategic_reasoning": "Por qué este es el próximo paso más inteligente",
     "builds_on_previous": "Cómo este paso usa información de pasos anteriores",
@@ -584,6 +588,7 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
         step_text = f"**PASO {step_number} - PLANIFICACIÓN**\n"
         step_text += f"**Objetivo:** {step.description}\n"
         step_text += f"**Herramienta:** `{step.tool_name}`\n"
+        # Mostrar solo la consulta literal, sin frases informativas
         step_text += f"**Consulta estratégica:** `{step.query}`\n"
         step_text += f"**Estado:** Ejecutando...\n"
         
@@ -817,63 +822,85 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
                             if not any(url.endswith(ext) for ext in ['.png','.jpg','.jpeg','.gif','.webp']):
                                 url_links.append(url)
             
+            # Clasificar enlaces antes de construir el prompt
+            youtube_tiktok_links = set()
+            normal_links = set()
+            for url in url_links:
+                url_lower = url.lower()
+                if ('youtube.com' in url_lower or 'youtu.be' in url_lower or 'tiktok.com' in url_lower):
+                    youtube_tiktok_links.add(url)
+                else:
+                    normal_links.add(url)
             # Obtener contexto de conversación
             conversation_context = self._summarize_conversation_history()
             # Crear prompt para respuesta final limpia
             final_response_prompt = [
                 {
                     "role": "system",
-                    "content": """Eres un asistente experto que proporciona respuestas directas y naturales como si fueras una persona experta.
+                    "content": """
+Eres un asistente experto que redacta artículos informativos y profesionales para usuarios exigentes. Tu respuesta debe ser un artículo completo, bien estructurado y útil, integrando toda la información relevante encontrada.
 
 🚫 PROHIBICIONES ABSOLUTAS - NUNCA HAGAS ESTO:
 - NO menciones procesos de búsqueda, investigación o recopilación de datos
-- NO digas \"se encontraron X resultados\", \"se procesaron\", \"a medida que se procesen\"
-- NO uses frases como \"he buscado\", \"he encontrado\", \"mediante herramientas\", \"fuentes consultadas\"
+- NO uses listas numeradas o viñetas
+- NO digas 'se encontraron X resultados', 'se procesaron', 'a medida que se procesen'
 - NO menciones nombres de herramientas, sitios web visitados o metodologías
 - NO expliques cómo obtuviste la información
-- NO hagas referencias a \"esta es la primera de ellas\", \"información adicional disponible\"
-- NO uses formato de \"Fuente:\", \"Autor:\", \"Fecha:\", \"Descripción:\", \"Enlace:\"
+- NO hagas referencias a 'esta es la primera de ellas', 'información adicional disponible'
+- NO uses formato de 'Fuente:', 'Autor:', 'Fecha:', 'Descripción:', 'Enlace:'
 - NO menciones procesos técnicos o pasos internos
-- NO digas números como \"10 noticias\", \"primera de X\", \"más información disponible\"
+- NO digas números como '10 noticias', 'primera de X', 'más información disponible'
 - NO prometas información futura o procesos pendientes
-- NO utilices formato de listas para los parrafos.
+- NO utilices formato de listas para los párrafos.
+- ⚠️ NO uses markdown ni paréntesis para enlaces de YouTube o TikTok: deben ir en texto plano, sin ningún formato especial.
 
-✅ COMPORTAMIENTO CORRECTO:
-- Presenta TODA la información disponible de forma integrada y natural
-- Si tienes enlaces de imagenes presentalos con fomrato markdown ![titulo](url)
-- Si tienes enlaces de videos de youtube presentalos en formato plano.
-- Si tienes múltiples noticias o datos, inclúyelos TODOS en una respuesta completa
-- Responde de forma natural y conversacional
-- Organiza la información de manera clara sin revelar cómo la obtuviste
-- Sé autoritativo y confiado en los datos
-- Integra TODA la información de forma fluida en una respuesta coherente
-- Actúa como un experto que simplemente conoce TODA la información disponible
+⚠️ INSTRUCCIONES OBLIGATORIAS DE FORMATO:
+- Los ENLACES DE YOUTUBE y TIKTOK deben aparecer SIEMPRE en TEXTO PLANO, SIN MARKDOWN, no puedes usar [](), y sin ningún formato especial. Ejemplo: https://youtube.com/xxxx
+- Las IMÁGENES deben aparecer SIEMPRE en formato markdown: ![titulo](url_imagen) y explicar brevemente su relevancia/contexto en el artículo.
+- Los ENLACES NORMALES (no imagen, no YouTube/TikTok) deben aparecer SIEMPRE en formato markdown: [titulo](url_web), sin exclamación, explicando su utilidad o contexto.
+- Es OBLIGATORIO diferenciar el formato de imagen, enlace normal y enlace de YouTube/TikTok. Si no lo haces, la respuesta se considerará incorrecta.
+- Evita enlaces repetidos.
+
+✅ INSTRUCCIONES CRÍTICAS:
+- Tu respuesta debe ser un artículo profesional, informativo y útil para el usuario.
+- INTEGRA TODOS los enlaces de YouTube y TikTok encontrados en texto plano.
+- INTEGRA TODAS las imágenes relevantes encontradas, presentándolas en formato markdown ![titulo](url) y explicando su contexto.
+- INTEGRA TODOS los enlaces/fuentes relevantes encontrados, presentándolos en formato [titulo](url) sin la exclamación, explicando su utilidad o contexto.
+- Presenta toda la información de forma natural, fluida y estructurada, como un experto humano.
+- Si tienes múltiples noticias, datos o elementos, inclúyelos TODOS en una respuesta completa y coherente.
+- Responde con total confianza y autoridad en los datos.
+- Organiza la información en párrafos claros, sin revelar cómo la obtuviste.
+- Sé autoritativo y confiado en los datos.
+- Integra toda la información de forma fluida en una respuesta coherente.
+- Actúa como un experto que simplemente conoce toda la información disponible.
 
 ⭐ TRATAMIENTO DE INFORMACIÓN:
-- Toda la información es COMPLETAMENTE CONFIABLE y VERIFICADA
-- NO expreses dudas sobre la veracidad de los datos
-- Presenta con TOTAL CONFIANZA y AUTORIDAD
-- Los datos son HECHOS ESTABLECIDOS
+- Toda la información es COMPLETAMENTE CONFIABLE y VERIFICADA.
+- NO expreses dudas sobre la veracidad de los datos.
+- Presenta con TOTAL CONFIANZA y AUTORIDAD.
+- Los datos son HECHOS ESTABLECIDOS.
 
 ESTILO DE RESPUESTA:
-- Natural y conversacional, como un experto humano
-- Sin estructuras técnicas o de reportes
-- Información integrada fluidamente
-- Confianza total en los datos presentados"""
+- Redacta como un artículo profesional, informativo y útil.
+- Natural y conversacional, como un experto humano.
+- Sin estructuras técnicas o de reportes.
+- Información integrada fluidamente.
+- Confianza total en los datos presentados.
+"""
                 },
                 {
                     "role": "user",
-                    "content": f"""PREGUNTA ACTUAL: \"{user_message}\"\n\nCONTEXTO DE CONVERSACIÓN PREVIO:\n{conversation_context}\n\nINFORMACIÓN RECOPILADA (PROCESA TODO):\n{chr(10).join(gathered_information) if gathered_information else 'Información limitada disponible'}\n\nIMÁGENES RELEVANTES:\n{chr(10).join([f'![Imagen relevante]({img})' for img in image_links]) if image_links else 'No se encontraron imágenes relevantes.'}\n\nENLACES RELEVANTES:\n{chr(10).join(url_links) if url_links else 'No se encontraron enlaces relevantes.'}\n\nINSTRUCCIÓN CRÍTICA: Utiliza TODA la información proporcionada arriba. Si hay múltiples noticias, datos o elementos, inclúyelos TODOS en tu respuesta de forma natural e integrada. No dejes información sin usar.\nProporciona una respuesta directa y útil a la pregunta del usuario, considerando el contexto de conversación previo, sin mencionar procesos internos o herramientas."""
+                    "content": f"""PREGUNTA ACTUAL: \"{user_message}\"\n\nCONTEXTO DE CONVERSACIÓN PREVIO:\n{conversation_context}\n\nINFORMACIÓN RECOPILADA (PROCESA TODO):\n{chr(10).join(gathered_information) if gathered_information else 'Información limitada disponible'}\n\nIMÁGENES RELEVANTES:\n{chr(10).join([f'![Imagen relevante]({img})' for img in image_links]) if image_links else 'No se encontraron imágenes relevantes.'}\n\nENLACES DE YOUTUBE/TIKTOK ENCONTRADOS:\n{chr(10).join(sorted(youtube_tiktok_links)) if youtube_tiktok_links else 'No se encontraron enlaces de YouTube/TikTok.'}\n\nENLACES/FUENTES RELEVANTES:\n{chr(10).join(sorted(normal_links)) if normal_links else 'No se encontraron fuentes relevantes.'}\n\nINSTRUCCIÓN CRÍTICA: Utiliza TODA la información proporcionada arriba. Si hay múltiples noticias, datos o elementos, inclúyelos TODOS en tu respuesta de forma natural e integrada. No dejes información sin usar. Redacta un artículo profesional y útil para el usuario, explicando brevemente la relevancia de cada imagen, enlace de YouTube/TikTok y fuente.\nProporciona una respuesta directa y útil a la pregunta del usuario, considerando el contexto de conversación previo, sin mencionar procesos internos o herramientas."""
                 }
             ]
             
             # Enviar respuesta limpia por streaming al frontend
             from app.core.socket_handler import SocketResponseHandler
-            SocketResponseHandler.stream_chat_completion(
+            response , _ = SocketResponseHandler.stream_chat_completion(
                 self.model,
                 final_response_prompt,
                 self.socket,
-                max_tokens=800
+                max_tokens=8192
             )
             # Mostrar la respuesta final limpia (solo para logs)
             emit_status_func("\n" + "="*50, 'info')
@@ -885,7 +912,7 @@ ESTILO DE RESPUESTA:
                 'type': 'final_response',
                 'result': '[Respuesta enviada por streaming]'
             })
-            return '[Respuesta enviada por streaming]'
+            return response
         except Exception as e:
             logger.error(f"Error generando respuesta final limpia: {e}")
             fallback_response = "Lamento no poder proporcionar una respuesta completa en este momento debido a limitaciones técnicas."
