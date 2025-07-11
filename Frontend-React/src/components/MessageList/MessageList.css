@@ -153,7 +153,7 @@
   align-items: center;
   width: 100%;
   max-width: 480px;
-  z-index: 1002;
+  z-index: 10; /* Menor que los modales */
 }
 
 .welcome-message {
@@ -282,4 +282,11 @@
     padding: 0.5rem 0.7rem 0.5rem 0.7rem;
     font-size: 0.85em;
   }
+}
+
+/* Asegúrate de que las ventanas modales tengan un z-index mayor, por ejemplo: */
+.download-modal, .ajustes-herramientas-modal {
+  z-index: 1100 !important;
+  position: fixed;
+  /* ...otros estilos de modal... */
 }

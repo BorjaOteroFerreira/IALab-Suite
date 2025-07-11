@@ -60,17 +60,17 @@ TU PRINCIPAL OBJETIVO ES DETERMINAR QUE HERRAMIENTA NECESITAS
             # Obtener las instrucciones dinámicas de herramientas SOLO para herramientas activas
             tool_instructions = self._get_tool_instructions()
             
-            additional_instructions = """
+   
+
+            additional_instructions = f"""
 responde unicamente con la o las herramientas a lanzar usando formato JSON, ejemplo: 
-supongamos que necesitas buscar el tiempo en internet , contestas: 
-{"tool": "buscar_en_internet", "query": "tiempo proximos dias"}
+supongamos que usar una sola herramienta , contestas: 
+{{"tool": "tool_name", "query": "tiempo proximos dias"}}
 Para múltiples herramientas usa un array:
-[{"tool": "url_content_extractor", "query": "https://urlejemplo.com"}, {"tool": "video_search_tool", "query": "tutoriales"}]
+[{{"tool": "tool_name", "query": "https://urlejemplo.com"}}, {{"tool": "tool_name", "query": "tutoriales"}}]
 Asegurate de que utilizas la sintaxis JSON correcta.
 Puedes usar mas de una herramienta si lo necesitas.
-Debes contestar solo con el JSON de las funciones que usarias sin texto antes ni despues
-IMPORTANTE: Sólo puedes usar las herramientas listadas arriba. No uses ninguna otra herramienta.
-SIEMPRE DEBES RESPONDER EN ESPAÑOL.
+Debes contestar solo con el JSON de las funciones que usarias sin texto antes ni despues.
 """
             
             # Construir el prompt completo

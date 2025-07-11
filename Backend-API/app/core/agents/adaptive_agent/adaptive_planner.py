@@ -829,6 +829,8 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
 
 ✅ COMPORTAMIENTO CORRECTO:
 - Presenta TODA la información disponible de forma integrada y natural
+- Si tienes enlaces de imagenes presentalos con fomrato markdown ![titulo](url)
+- Si tienes enlaces de videos de youtube presentalos en formato plano.
 - Si tienes múltiples noticias o datos, inclúyelos TODOS en una respuesta completa
 - Responde de forma natural y conversacional
 - Organiza la información de manera clara sin revelar cómo la obtuviste

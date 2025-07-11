@@ -56,7 +56,7 @@ class TaskAnalyzer:
         if self.tools_manager:
             active_tools = self.tools_manager.get_active_tools()
         
-        tools_info = "Herramientas disponibles:\n"
+        tools_info = "Estas son las únicas herramientas disponibles que puedes utilizar, no te inventes nombes de herramientas:\n"
         for tool_name in active_tools:
             tool_info = self.tool_registry.get_tool_info(tool_name)
             if tool_info:
@@ -88,7 +88,6 @@ Responde ÚNICAMENTE en formato JSON válido:
 
 Ejemplos de tareas que requieren herramientas:
 - Buscar información actualizada
-- Obtener precios de criptomonedas
 - Encontrar videos específicos
 - Investigar temas complejos
 - Análisis de datos externos

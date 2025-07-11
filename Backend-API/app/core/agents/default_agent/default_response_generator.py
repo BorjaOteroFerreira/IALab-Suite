@@ -88,11 +88,10 @@ class DefaultResponseGenerator:
         """
         instrucciones = (
             "Responde en Markdown.\n"
-            "Tus respuestas deben estar bien maquetadas, agradables a la vista y fáciles de leer.\n"
+            "Tus respuestas deben estar bien maquetadas y compactas, agradables a la vista y fáciles de leer.\n"
             "Incrusta las imágenes con este formato ![dominio](url_imagen).\n"
             "No incluyas imágenes o mapas si no te las han facilitado las herramientas.\n"
             "IMPORTANTE: Los videos de youtube debes insertarlos solo como enlace aplanado, sin formato markdown.\n"
-            "Después de ':' añade un salto de línea y un espacio antes de continuar, salvo que sea el primer carácter de la línea.\n"
             "Utiliza toda la información proporcionada por las herramientas para responder al usuario.\n"
             "A continuación tienes toda la informacion recopilada por las herramentas\n\n"
         )

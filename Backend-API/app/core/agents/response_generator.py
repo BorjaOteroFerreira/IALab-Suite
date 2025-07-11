@@ -134,21 +134,17 @@ class ResponseGenerator:
             # Instrucciones para la respuesta final
             instrucciones_finales = """
 Responde en Markdown con formato profesional, limpio y compacto ya que esta es tu respuesta final.
-Debes responder siempre en español.
-No hagas referencias o pienses en inglés.
 Utiliza toda la información obtenida para proporcionar una respuesta completa y útil.
 
 IMPORTANTE - Reglas de formato:
-- Evita saltos de línea excesivos - máximo 1 línea en blanco entre secciones
-- Usa formato profesional
+- Evita saltos de línea excesivos.
+- Usa formato profesional y compacto.
 - Incrusta imágenes con ![descripción](url) 
 - Enlaces de YouTube sin formato markdown, solo el URL
 - Organiza la información de manera clara y estructurada sin espaciado excesivo
 - Incluye enlaces e imágenes relevantes encontradas
-- Responde completamente en español
 - NO uses múltiples saltos de línea consecutivos
 - Mantén un formato limpio y legible sin espacios innecesarios
-
 Si algunos pasos fallaron, proporciona la mejor respuesta posible con la información disponible.
             """
             

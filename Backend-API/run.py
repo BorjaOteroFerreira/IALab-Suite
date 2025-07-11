@@ -5,6 +5,10 @@ Entry point for IALab Suite API
 import os
 import sys
 
+# Parcheo eventlet para WebSockets
+import eventlet
+eventlet.monkey_patch()
+
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -28,7 +32,7 @@ def main():
     print(f"🐛 Debug mode: {debug}")
     print(f"🔄 Auto-reload: {use_reloader}")
     
-    # Run the application
+    # Ejecutar con eventlet
     socketio.run(
         app,
         host=host,

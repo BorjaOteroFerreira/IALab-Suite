@@ -45,7 +45,7 @@ class TaskPlanner:
         if self.tools_manager:
             active_tools = self.tools_manager.get_active_tools()
         
-        tools_info = "Herramientas disponibles:\n"
+        tools_info = "Estas son tus unicas herramientas disponibles, no te inventes nombres de herramientas:\n"
         for tool_name in active_tools:
             tool_info = self.tool_registry.get_tool_info(tool_name)
             if tool_info:
@@ -87,7 +87,7 @@ Crea un plan paso a paso en formato JSON:
 }}
 
 Reglas importantes:
-1. Solo usa herramientas disponibles en la lista
+1. Solo usa herramientas disponibles en la lista con su nombre exacto.
 2. Ordena los pasos lógicamente
 3. Especifica dependencias entre pasos
 4. Haz consultas específicas y claras
