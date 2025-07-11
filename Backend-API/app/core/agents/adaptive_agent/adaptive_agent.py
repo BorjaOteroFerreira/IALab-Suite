@@ -122,26 +122,17 @@ class AdaptiveAgent:
                 self._safe_emit_status("⚠️ No se pudo analizar la tarea. Generando respuesta directa...")
                 return self._generate_normal_response()
             
-            # Paso 2: Ejecutar planificación adaptativa
+            # Paso 2: Ejecutar planificación adaptativa (el planificador ya envía la respuesta por streaming)
             self._safe_emit_status("🎯 Iniciando planificación", 'info')
             execution_results = self.adaptive_planner.run_adaptive_plan(
                 task_analysis, 
                 self.original_prompt, 
                 self._safe_emit_status
             )
-            
-            # Paso 3: Generar respuesta final basada en los resultados
-            self._safe_emit_status("📝 Sintetizando información recopilada..." , 'info')
-            final_response = self.response_generator.generate_final_response(execution_results, self._safe_emit_status)
-            
-            # Paso 4: Mostrar estadísticas del proceso adaptativo
-            self.adaptive_planner.display_execution_stats(execution_results, self._safe_emit_status)
-            
-            # Paso 5: Mostrar resumen de la experiencia adaptativa
-            self._display_adaptive_summary(execution_results)
-            
-            return final_response
-            
+            # Paso 3: Emitir la señal de finalización tras el streaming
+            from app.core.socket_handler import SocketResponseHandler
+            SocketResponseHandler.emit_finalization_signal(self.socket)
+            return execution_results.get('final_prompt', '')
         except Exception as e:
             from ..utils import clean_error_message
             error_clean = clean_error_message(str(e))

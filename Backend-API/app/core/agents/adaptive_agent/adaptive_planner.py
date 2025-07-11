@@ -795,20 +795,30 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
     
     def _generate_clean_final_response(self, user_message: str, execution_results: Dict[str, Any], emit_status_func) -> str:
         """
-        Genera una respuesta final limpia y directa al usuario, sin mencionar herramientas o procesos internos.
+        Genera una respuesta final limpia y directa al usuario, incluyendo imágenes y enlaces relevantes.
         """
         try:
             # Recopilar toda la información útil obtenida
             gathered_information = []
+            image_links = []
+            url_links = []
             for step_data in self.execution_context.values():
                 if isinstance(step_data, dict) and step_data.get('result'):
                     result = step_data.get('result', '')
-                    if result and len(result.strip()) > 10:  # Solo incluir resultados significativos
+                    if result and len(result.strip()) > 10:
                         gathered_information.append(result.strip())
+                        # Buscar imágenes (formato URL de imagen)
+                        img_matches = re.findall(r'(https?://[^\s]+\.(?:png|jpg|jpeg|gif|webp))', result, re.IGNORECASE)
+                        for img_url in img_matches:
+                            image_links.append(img_url)
+                        # Buscar enlaces (URLs no de imagen)
+                        url_matches = re.findall(r'(https?://[^\s]+)', result)
+                        for url in url_matches:
+                            if not any(url.endswith(ext) for ext in ['.png','.jpg','.jpeg','.gif','.webp']):
+                                url_links.append(url)
             
             # Obtener contexto de conversación
             conversation_context = self._summarize_conversation_history()
-            
             # Crear prompt para respuesta final limpia
             final_response_prompt = [
                 {
@@ -817,14 +827,14 @@ Diseña el próximo paso MÁS ESTRATÉGICO e INTELIGENTE."""
 
 🚫 PROHIBICIONES ABSOLUTAS - NUNCA HAGAS ESTO:
 - NO menciones procesos de búsqueda, investigación o recopilación de datos
-- NO digas "se encontraron X resultados", "se procesaron", "a medida que se procesen"
-- NO uses frases como "he buscado", "he encontrado", "mediante herramientas", "fuentes consultadas"
+- NO digas \"se encontraron X resultados\", \"se procesaron\", \"a medida que se procesen\"
+- NO uses frases como \"he buscado\", \"he encontrado\", \"mediante herramientas\", \"fuentes consultadas\"
 - NO menciones nombres de herramientas, sitios web visitados o metodologías
 - NO expliques cómo obtuviste la información
-- NO hagas referencias a "esta es la primera de ellas", "información adicional disponible"
-- NO uses formato de "Fuente:", "Autor:", "Fecha:", "Descripción:", "Enlace:"
+- NO hagas referencias a \"esta es la primera de ellas\", \"información adicional disponible\"
+- NO uses formato de \"Fuente:\", \"Autor:\", \"Fecha:\", \"Descripción:\", \"Enlace:\"
 - NO menciones procesos técnicos o pasos internos
-- NO digas números como "10 noticias", "primera de X", "más información disponible"
+- NO digas números como \"10 noticias\", \"primera de X\", \"más información disponible\"
 - NO prometas información futura o procesos pendientes
 - NO utilices formato de listas para los parrafos.
 
@@ -853,41 +863,31 @@ ESTILO DE RESPUESTA:
                 },
                 {
                     "role": "user",
-                    "content": f"""PREGUNTA ACTUAL: "{user_message}"
-
-CONTEXTO DE CONVERSACIÓN PREVIO:
-{conversation_context}
-
-INFORMACIÓN RECOPILADA (PROCESA TODO):
-{chr(10).join(gathered_information) if gathered_information else "Información limitada disponible"}
-
-INSTRUCCIÓN CRÍTICA: Utiliza TODA la información proporcionada arriba. Si hay múltiples noticias, datos o elementos, inclúyelos TODOS en tu respuesta de forma natural e integrada. No dejes información sin usar.
-
-Proporciona una respuesta directa y útil a la pregunta del usuario, considerando el contexto de conversación previo, sin mencionar procesos internos o herramientas."""
+                    "content": f"""PREGUNTA ACTUAL: \"{user_message}\"\n\nCONTEXTO DE CONVERSACIÓN PREVIO:\n{conversation_context}\n\nINFORMACIÓN RECOPILADA (PROCESA TODO):\n{chr(10).join(gathered_information) if gathered_information else 'Información limitada disponible'}\n\nIMÁGENES RELEVANTES:\n{chr(10).join([f'![Imagen relevante]({img})' for img in image_links]) if image_links else 'No se encontraron imágenes relevantes.'}\n\nENLACES RELEVANTES:\n{chr(10).join(url_links) if url_links else 'No se encontraron enlaces relevantes.'}\n\nINSTRUCCIÓN CRÍTICA: Utiliza TODA la información proporcionada arriba. Si hay múltiples noticias, datos o elementos, inclúyelos TODOS en tu respuesta de forma natural e integrada. No dejes información sin usar.\nProporciona una respuesta directa y útil a la pregunta del usuario, considerando el contexto de conversación previo, sin mencionar procesos internos o herramientas."""
                 }
             ]
             
-            # Obtener respuesta limpia del modelo
-            final_response = ""
-            for chunk in self.model.create_chat_completion(messages=final_response_prompt, max_tokens=800, stream=True, temperature=0.3):
-                if 'content' in chunk['choices'][0]['delta']:
-                    final_response += chunk['choices'][0]['delta']['content']
-            
-            # Mostrar la respuesta final limpia
+            # Enviar respuesta limpia por streaming al frontend
+            from app.core.socket_handler import SocketResponseHandler
+            SocketResponseHandler.stream_chat_completion(
+                self.model,
+                final_response_prompt,
+                self.socket,
+                max_tokens=800
+            )
+            # Mostrar la respuesta final limpia (solo para logs)
             emit_status_func("\n" + "="*50, 'info')
             emit_status_func("🎯 **RESPUESTA FINAL:**",'info')
             emit_status_func("="*50,'info')
-            emit_status_func(final_response.strip())
+            emit_status_func("[Respuesta enviada por streaming]",'info')
             emit_status_func("="*50,'info')
             execution_results['completed_steps'].append({
                 'type': 'final_response',
-                'result': final_response.strip()
-            })  # <-- Añade la respuesta final como un resultado más
-            return final_response.strip()
-            
+                'result': '[Respuesta enviada por streaming]'
+            })
+            return '[Respuesta enviada por streaming]'
         except Exception as e:
             logger.error(f"Error generando respuesta final limpia: {e}")
-            # Respuesta de fallback
             fallback_response = "Lamento no poder proporcionar una respuesta completa en este momento debido a limitaciones técnicas."
             emit_status_func("\n" + "="*50,'info')
             emit_status_func("🎯 **RESPUESTA FINAL:**",'info')
