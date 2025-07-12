@@ -16,6 +16,7 @@ import InputArea from './components/Chat/InputArea/InputArea';
 import DownloaderPage from './components/UI/DownloaderPage/DownloaderPage';
 import DevConsole from './components/DevConsole/DevConsole';
 import { Download, MessageCircle } from 'lucide-react';
+import { SocketProvider } from './context/SocketContext';
 
 // Componente principal de Chat
 function ChatComponent({ onOpenDownloader }) {
@@ -142,11 +143,13 @@ function App() {
   const [showDownloader, setShowDownloader] = useState(false);
 
   return (
-    <ChatProvider>
-      <ChatComponent onOpenDownloader={() => setShowDownloader(true)} />
-      <DownloaderPage open={showDownloader} onClose={() => setShowDownloader(false)} />
-      <DevConsole />
-    </ChatProvider>
+    <SocketProvider>
+      <ChatProvider>
+        <ChatComponent onOpenDownloader={() => setShowDownloader(true)} />
+        <DownloaderPage open={showDownloader} onClose={() => setShowDownloader(false)} />
+        <DevConsole />
+      </ChatProvider>
+    </SocketProvider>
   );
 }
 

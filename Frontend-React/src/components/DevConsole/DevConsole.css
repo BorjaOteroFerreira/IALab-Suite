@@ -490,20 +490,20 @@
     align-items: center;
 }
 
-/* Efectos de entrada para nuevos mensajes */
-.console-message {
-    animation: fadeInMessage 0.3s ease-out;
+/* Eliminar animaciones y transiciones globalmente en la consola */
+.dev-console, .dev-console *,
+.console-message, .console-message *,
+.console-header, .console-header *,
+.console-body, .console-body *,
+.console-messages, .console-messages *,
+.console-footer, .console-footer * {
+    transition: none !important;
+    animation: none !important;
 }
 
-@keyframes fadeInMessage {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Eliminar animación de entrada de mensajes */
+.console-message {
+    animation: none !important;
 }
 
 /* Estados de resizing y dragging */
@@ -522,8 +522,33 @@
 }
 
 .dev-console.dragging {
-    transition: none;
+    transition: none !important;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+}
+
+.dev-console.dragging,
+.dev-console.dragging * {
+    transition: none !important;
+}
+
+.dev-console.dragging .console-message,
+.dev-console.dragging .message-content,
+.dev-console.dragging .console-messages,
+.dev-console.dragging .console-md-fragment,
+.dev-console.dragging .message-role,
+.dev-console.dragging .message-timestamp {
+    transition: none !important;
+    animation: none !important;
+}
+
+.dev-console.resizing .console-message,
+.dev-console.resizing .message-content,
+.dev-console.resizing .console-messages,
+.dev-console.resizing .console-md-fragment,
+.dev-console.resizing .message-role,
+.dev-console.resizing .message-timestamp {
+    transition: none !important;
+    animation: none !important;
 }
 
 /* Panel de filtros de roles */

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useMessageList } from '../../../hooks/useMessageList';
 import MessageItem from './MessageItem';
 import ShortcutsLegend from './ShortcutsLegend';
@@ -14,6 +14,15 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef, tts
     toggleTTS,
     renderMarkdown
   } = useMessageList(messages, currentResponse, messagesEndRef, ttsEnabled);
+
+  // Autoscroll independiente para MessageList
+  const prevMessagesCount = useRef(messages.length);
+  useEffect(() => {
+    if (messagesEndRef?.current && messages.length > prevMessagesCount.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevMessagesCount.current = messages.length;
+  }, [messages, messagesEndRef]);
 
   return (
     <div className="messages-container">

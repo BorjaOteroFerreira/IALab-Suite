@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { ChatContext } from '../context/ChatContext';
+import { useState, useEffect, useRef, useCallback, useContext, useMemo } from 'react';
+import { useSocket } from '../context/SocketContext';
 import { useLanguage } from '../context/LanguageContext';
 
 export function useDevConsole() {
@@ -14,9 +14,10 @@ export function useDevConsole() {
     const [resizeDirection, setResizeDirection] = useState(null);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [showdown, setShowdown] = useState(null);
+    const [isPiPMode, setIsPiPMode] = useState(false);
     const messagesEndRef = useRef(null);
     const consoleRef = useRef(null);
-    const { socket } = useContext(ChatContext);
+    const socket = useSocket();
     const { getStrings, currentLang } = useLanguage();
     const strings = getStrings('devconsole');
     const lang = currentLang;
@@ -99,13 +100,14 @@ export function useDevConsole() {
         };
         socket.on('output_console', handleConsoleOutput);
         socket.on('assistant_response', handleAssistantResponse);
+        
         socket.on('utilidades', handleUtilities);
         return () => {
             socket.off('output_console', handleConsoleOutput);
             socket.off('assistant_response', handleAssistantResponse);
             socket.off('utilidades', handleUtilities);
         };
-    }, [socket]);
+    }, [socket, isPiPMode]); // Added isPiPMode dependency
     const clearConsole = () => {
         setMessages([]);
         localStorage.removeItem('devConsole_messages');
@@ -351,13 +353,18 @@ export function useDevConsole() {
                 return 'default';
         }
     };
-    return {
+    // Memoizar el objeto de retorno para evitar renders innecesarios
+    return useMemo(() => ({
         isVisible, setIsVisible, messages, setMessages, selectedRoles, setSelectedRoles, showFilters, setShowFilters,
         dimensions, setDimensions, position, setPosition, isResizing, setIsResizing, isDragging, setIsDragging,
-        resizeDirection, setResizeDirection, dragOffset, setDragOffset, showdown, setShowdown,
+        resizeDirection, setResizeDirection, dragOffset, setDragOffset, showdown, setShowdown, isPiPMode, setIsPiPMode,
         messagesEndRef, consoleRef, socket, getStrings, currentLang, strings, lang,
         normalizeRole, getUniqueRoles, autoScroll, setAutoScroll, prevMessagesCount,
         clearConsole, exportConsole, filteredMessages, uniqueRoles, formatTime,
         handleRoleToggle, handleMouseDown, handleHeaderMouseDown, centerConsole, handleHeaderDoubleClick, getCursorStyle
-    };
+    }), [
+        isVisible, messages, selectedRoles, showFilters, dimensions, position, isResizing, isDragging,
+        resizeDirection, dragOffset, showdown, isPiPMode, socket, getStrings, currentLang, strings, lang,
+        autoScroll, prevMessagesCount, filteredMessages, uniqueRoles
+    ]);
 }

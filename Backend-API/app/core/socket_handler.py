@@ -184,7 +184,6 @@ class SocketResponseHandler:
             )
         # Añadir '/no_think' al final del último prompt de usuario
         if messages and isinstance(messages, list):
-            # Buscar el último mensaje de rol 'user'
             for msg in reversed(messages):
                 if isinstance(msg, dict) and msg.get('role') == 'user' and 'content' in msg:
                     msg['content'] = f"{msg['content'].rstrip()} /no_think"
