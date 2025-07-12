@@ -74,7 +74,7 @@ class ToolRegistry:
     
     def _scan_directory(self, directory: Path) -> int:
         """
-        Escanea un directorio buscando herramientas.
+        Escanea un directorio y sus subdirectorios buscando herramientas.
         
         Args:
             directory (Path): Directorio a escanear
@@ -84,8 +84,8 @@ class ToolRegistry:
         """
         count = 0
         
-        # Buscar archivos Python que no sean __init__.py o base_tool.py
-        for python_file in directory.glob("*.py"):
+        # Buscar archivos Python en el directorio y subdirectorios
+        for python_file in directory.rglob("*.py"):
             if python_file.name in ["__init__.py", "base_tool.py", "tool_registry.py"]:
                 continue
             

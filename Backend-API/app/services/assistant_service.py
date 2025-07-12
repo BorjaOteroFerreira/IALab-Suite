@@ -5,7 +5,6 @@ Migrado completamente a la arquitectura modular
 """
 from typing import Optional, List, Dict, Any
 from app.core.assistant import Assistant
-from app.core.cortex import Cortex
 from app.core.rag import Retriever
 from app.core.socket_handler import SocketResponseHandler
 from app.models.data_models import ModelConfig, UserInput, ApiResponse
