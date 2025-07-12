@@ -211,7 +211,7 @@ class TaskExecutor:
                 resultado = resultado_texto
             
             # Limpiar resultado de caracteres problemáticos
-            from .utils import clean_text_content
+            from ..utils import clean_text_content
             if isinstance(resultado, str):
                 resultado = clean_text_content(resultado)
             else:

@@ -182,7 +182,13 @@ class SocketResponseHandler:
                 user_tokens=user_tokens,
                 finished=False
             )
-        
+        # Añadir '/no_think' al final del último prompt de usuario
+        if messages and isinstance(messages, list):
+            # Buscar el último mensaje de rol 'user'
+            for msg in reversed(messages):
+                if isinstance(msg, dict) and msg.get('role') == 'user' and 'content' in msg:
+                    msg['content'] = f"{msg['content'].rstrip()} /no_think"
+                    break
         try:
             for chunk in model.create_chat_completion(messages=messages, max_tokens=max_tokens, stream=True):
                 if 'content' in chunk['choices'][0]['delta']:

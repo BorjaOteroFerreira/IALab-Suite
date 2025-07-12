@@ -1,0 +1,63 @@
+.tts-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(90deg, #181824 0%, #232946 100%);
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 2px 8px rgba(35,41,70,0.10);
+  border: 1px solid #00fff7;
+  margin-top: 6px;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 340px;
+}
+.tts-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.2s, box-shadow 0.2s;
+  color: #00fff7;
+  font-size: 1em;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tts-btn:hover {
+  background: rgba(0,255,247,0.08);
+}
+.tts-progress {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.tts-progress input[type=range] {
+  width: 90px;
+  accent-color: #00fff7;
+  height: 3px;
+  border-radius: 3px;
+  background: #232946;
+  border: none;
+}
+.tts-progress span {
+  font-size: 0.85em;
+  color: #00fff7;
+  background: transparent;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-family: 'Orbitron', 'Montserrat', 'Roboto', sans-serif;
+  letter-spacing: 0.5px;
+}
+.tts-player::before, .tts-player::after {
+  display: none;
+}
+.tts-player > * {
+  z-index: 1;
+}

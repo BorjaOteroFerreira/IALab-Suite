@@ -8,12 +8,12 @@ import './styles//safari-mobile-fix.css';
 import { ChatProvider } from './context/ChatContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { useChatContext } from './hooks/useChatContext';
-import ConfigSidebarComponent from './components/ConfigSidebar/ConfigSidebar';
-import ChatSidebar from './components/ChatSidebar/ChatSidebar';
-import Header from './components/Header/Header';
-import MessageList from './components/MessageList/MessageList';
-import InputArea from './components/InputArea/InputArea';
-import DownloaderPage from './components/DownloaderPage/DownloaderPage';
+import ConfigSidebarComponent from './components/UI/ConfigSidebar/ConfigSidebar';
+import ChatSidebar from './components/Chat/ChatSidebar/ChatSidebar';
+import Header from './components/UI/Header/Header';
+import MessageList from './components/Chat/MessageList/MessageList';
+import InputArea from './components/Chat/InputArea/InputArea';
+import DownloaderPage from './components/UI/DownloaderPage/DownloaderPage';
 import DevConsole from './components/DevConsole/DevConsole';
 import { Download, MessageCircle } from 'lucide-react';
 
