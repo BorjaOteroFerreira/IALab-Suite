@@ -110,8 +110,12 @@ const ChatContainer = ({ toggleChatSidebar, toggleConfigSidebar }) => {
   }, [messages]);
 
   const handleToolsToggle = useCallback(() => {
-    setTools(prev => !prev);
-  }, [setTools]);
+    console.log('ChatContainer: Alternando tools. Valor actual:', tools);
+    setTools(prev => {
+      console.log('ChatContainer: Cambiando tools de', prev, 'a', !prev);
+      return !prev;
+    });
+  }, [setTools, tools]);
 
   const handleRagToggle = useCallback(() => {
     setRag(prev => !prev);
@@ -206,6 +210,12 @@ const ChatContainer = ({ toggleChatSidebar, toggleConfigSidebar }) => {
           onSendMessage={sendMessage}
           onStopResponse={stopResponse}
           isResponding={!!currentResponse || isLoading}
+          tools={tools}
+          rag={rag}
+          onToggleTools={handleToolsToggle}
+          onToggleRag={handleRagToggle}
+          tokensCount={tokensCount}
+          currentResponse={currentResponse}
         />
         <div className="sidebar-buttons">
           <button onClick={toggleChatSidebar} title="Historial de conversaciones">🗂️</button>

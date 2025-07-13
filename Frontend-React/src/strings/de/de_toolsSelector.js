@@ -17,6 +17,7 @@ const de_toolsSelector = {
   noToolsInCategory: "Keine Werkzeuge in dieser Kategorie",
   selectOtherOrRefresh: "Wählen Sie eine andere Kategorie oder aktualisieren Sie.",
   apiKey: "API-Schlüssel",
-  notAvailable: "Nicht verfügbar"
+  notAvailable: "Nicht verfügbar",
+  agentsLabel: "Agenten"
 };
 export default de_toolsSelector;

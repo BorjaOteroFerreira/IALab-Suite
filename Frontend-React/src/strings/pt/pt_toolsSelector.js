@@ -17,6 +17,7 @@ const pt_toolsSelector = {
   noToolsInCategory: "Nenhuma ferramenta nesta categoria",
   selectOtherOrRefresh: "Selecione outra categoria ou atualize.",
   apiKey: "Chave API",
-  notAvailable: "Não disponível"
+  notAvailable: "Não disponível",
+  agentsLabel: "Agentes"
 };
 export default pt_toolsSelector;

@@ -46,6 +46,7 @@ function MessageList({ messages, currentResponse, isLoading, messagesEndRef, tts
               toggleTTS={toggleTTS}
               ttsEnabled={ttsEnabled}
               renderMarkdown={renderMarkdown}
+              showDivider={i < messages.length - 1}
             />
           ))
         )}

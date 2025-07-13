@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import './MessageInput.css';
 import { useLanguage } from '../../../context/LanguageContext';
+import { Volume2 } from 'lucide-react';
 
 const MessageInput = forwardRef(({ onSendMessage, onStopResponse, isResponding }, ref) => {
   const [message, setMessage] = useState('');
@@ -117,12 +118,13 @@ const MessageInput = forwardRef(({ onSendMessage, onStopResponse, isResponding }
           maxHeight: '120px'
         }}
       />
-      <button 
-        className="send-button" 
+      <button
+        className="send-button"
         onClick={handleSend}
         disabled={isResponding || !message.trim()}
+        title={strings.send || 'Enviar'}
       >
-        {strings.send || 'Enviar'}
+        <Volume2 size={22} />
       </button>
     </div>
   );

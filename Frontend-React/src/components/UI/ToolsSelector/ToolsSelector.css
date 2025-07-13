@@ -71,35 +71,6 @@
   border-top: 2px solid transparent;
 }
 
-/* Contador de herramientas pequeño */
-.tools-count {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #87CEEB; /* Azul pastel para estado normal */
-  color: #fff;
-  border-radius: 50%;
-  min-width: 18px;
-  height: 18px;
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(135, 206, 235, 0.3);
-  padding: 0 5px;
-  box-sizing: border-box;
-  z-index: 2;
-  line-height: 1;
-  pointer-events: none;
-}
-
-.tools-button.active .tools-count {
-  background: #b983ff; /* Púrpura pastel para estado activo */
-  color: #fff;
-  border: 2px solid rgba(185, 131, 255, 0.5);
-}
-
 /* Botón de configuración */
 .tools-config-button {
   background: transparent;
@@ -345,8 +316,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  /* Elimina el padding extra para que el layout no cambie respecto a tools-content */
+  padding: 1rem 1.5rem 1.5rem;
   color: var(--text-secondary);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .loading-spinner {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Wrench, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image as ImageIcon, BarChart2, Key, Ban, AlertCircle, Bot, Brain, MessageSquare, Zap, ChevronDown } from 'lucide-react';
+import { Wrench, Users, X, RefreshCw, Check, Settings, List, ListFilter, Search, Film, DollarSign, Image as ImageIcon, BarChart2, Key, Ban, AlertCircle, Bot, Brain, MessageSquare, Zap, ChevronDown } from 'lucide-react';
 import './ToolsSelector.css';
 import { useLanguage } from '../../../context/LanguageContext';
 
@@ -459,6 +459,9 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }
   };
 
+  // Orden fijo de categorías
+  const FIXED_CATEGORY_ORDER = ['search', 'media', 'finance', 'image', 'analysis', 'utility'];
+
   // Agrupar herramientas por categoría
   const groupToolsByCategory = (tools) => {
     return tools.reduce((groups, tool) => {
@@ -471,11 +474,14 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }, {});
   };
 
-  // Determinar categorías y la activa
-  const categories = Object.entries(groupToolsByCategory(availableTools));
+  // Determinar categorías y la activa, ordenando por FIXED_CATEGORY_ORDER
+  const grouped = groupToolsByCategory(availableTools);
+  const categories = FIXED_CATEGORY_ORDER
+    .filter(cat => grouped[cat])
+    .map(cat => [cat, grouped[cat]]);
   const defaultCategory = categories.length > 0 ? categories[0][0] : null;
   const currentCategory = activeCategory || defaultCategory;
-  const currentTools = currentCategory ? groupToolsByCategory(availableTools)[currentCategory] || [] : [];
+  const currentTools = currentCategory ? grouped[currentCategory] || [] : [];
 
   // Selección visual y lógica
   const handleCategoryClick = (cat) => setActiveCategory(cat);
@@ -500,11 +506,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
         className={`tools-button ${tools ? 'active' : ''} ${isLoading ? 'loading' : ''} ${isInitializing ? 'initializing' : ''}`}
         title={strings.selectTools || strings.toolsTitle}
       >
-        <Wrench size={23} />
-        {selectedTools.length > 0 && (
-          <span className="tools-count">{selectedTools.length}</span>
-        )}
-        {(isLoading || isInitializing) && <span className="tools-loading-indicator"></span>}
+        <Users size={23} />
       </button>
 
       {tools && (
@@ -527,7 +529,7 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
               <div className="tools-sidebar-section">
                 <div className="tools-sidebar-header">
                   <h3 className="tools-sidebar-title">
-                    <Wrench size={18} style={{marginRight: 6}} /> {strings.toolsTitle}
+                    <Users size={18} style={{marginRight: 6}} /> <span style={{fontWeight: 500}}>{strings.agentsLabel}</span>
                   </h3>
                   <p className="tools-sidebar-subtitle">{selectedTools.length} {strings.of} {availableTools.length} {strings.selected}</p>
                 </div>

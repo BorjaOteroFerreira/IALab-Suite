@@ -1,10 +1,28 @@
+.input-area-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 .input-area {
-  padding: 0.25rem 0.5rem !important;
-  border-top: 2px solid #87CEEB;
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05));
+  border-top: none !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05)) !important;
+  /* Elimina cualquier diferencia visual con el textarea */
   backdrop-filter: blur(20px);
   display: flex;
   justify-content: center;
+  min-height: 88px;
+  transition: none;
+  max-width: 768px;
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: -2px;
+  position: relative;
+  top: -15px;
+  /* Eleva el input-area 10px */
 }
 
 .tokens-counter {
@@ -26,7 +44,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px; /* Pequeño espacio entre elementos */
+  gap: 8px;
   width: 100%;
 }
 
@@ -41,22 +59,22 @@
   border-radius: 8px;
   box-shadow: none;
   padding: 2px 0 2px 0;
-  flex-wrap: nowrap; /* Mantener en una línea */
+  flex-wrap: nowrap;
   min-width: fit-content;
-  flex-shrink: 0; /* No permitir que se reduzca */
+  flex-shrink: 0;
 }
 
 .input-side-buttons > * {
-  height: 40px; /* Altura consistente */
+  height: 40px;
 }
 
 .input-icon-button {
   background: transparent;
   border: none;
-  padding: 7px 10px;
+  padding: 4px 7px;
   border-radius: 7px;
-  color: #87CEEB; /* Azul pastel */
-  font-size: 1.7rem;
+  color: #87CEEB;
+  font-size: 0.95rem;
   box-shadow: none;
   transition: color 0.18s, text-shadow 0.18s;
   cursor: pointer;
@@ -64,28 +82,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px; /* Ancho mínimo fijo */
-  height: 44px; /* Altura fija */
-  flex-shrink: 0; /* No permitir que se reduzca */
+  min-width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  position: static !important;
 }
 
 .input-icon-button.active {
-  color: #b983ff; /* Púrpura pastel para estado activo */
+  color: #b983ff;
   background: transparent;
   box-shadow: none;
   text-shadow: 0 0 16px #b983ff, 0 0 32px rgba(185, 131, 255, 0.8), 0 0 48px rgba(255, 255, 255, 0.1);
 }
 
 .input-icon-button:hover {
-  color: #87CEEB; /* Mantener azul pastel en hover */
+  color: #87CEEB;
   background: transparent;
   box-shadow: none;
   text-shadow: 0 0 8px rgba(135, 206, 235, 0.3);
 }
 
-/* Mantener el color púrpura y los efectos cuando el botón activo tiene hover */
 .input-icon-button.active:hover {
-  color: #b983ff; /* mantener el púrpura pastel */
+  color: #b983ff;
   background: transparent;
   box-shadow: none;
   text-shadow: 0 0 16px #b983ff, 0 0 32px rgba(185, 131, 255, 0.8), 0 0 48px rgba(255, 255, 255, 0.1);
@@ -96,25 +114,30 @@
 }
 
 .message-textarea {
-  flex: 1; /* Tomar todo el espacio disponible */
-  min-height: 44px;
-  padding: 0.75rem 2.3rem 0.75rem 1rem;
+  border: none !important;
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05)) !important;
+  box-shadow: none !important;
+  flex: 1;
+  /* Dimensiones fijas iniciales para evitar parpadeo */
+  min-height: 96px;
+  max-height: 160px; /* Permite crecer hasta 5 filas antes de scroll */
+  padding: 0.75rem 40px 0.75rem 16px; /* Padding fijo inicial */
   font-size: 0.9rem;
   border-radius: var(--radius-lg);
   resize: none;
-  border: 2px solid #87CEEB;
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05));
   color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.1);
-  outline: none;
-  transition: border 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   position: relative;
   width: 100%;
-  min-height: 38px;
-  /* El padding-left se ajusta dinámicamente desde el componente si hay imagen */
-  /* Ocultar barra de scroll en todos los navegadores */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  /* Ocultar barra de scroll */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Prevenir cambios de layout durante la carga */
+  box-sizing: border-box;
+}
+
+/* Clase para cuando el modelo tiene visión - se aplica después de cargar */
+.message-textarea.has-vision {
+  padding-bottom: 40px; /* Solo aplicar cuando sabemos que tiene visión */
 }
 
 .message-textarea:focus {
@@ -124,22 +147,24 @@
 }
 
 .message-textarea::-webkit-scrollbar {
-  display: none; /* Chrome, Safari y Opera */
+  display: none;
 }
 
 .send-button {
-  position: absolute;
-  right: 0.7rem;
-  bottom: 0.6rem;
+  position: relative !important;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  right: 0;
+  bottom: 0;
+  margin-left: 0.3rem;
+  margin-right: 0;
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #87CEEB, #b983ff);
   color: #fff;
   border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 1rem;
   box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
   transition: all 0.3s ease;
@@ -189,59 +214,56 @@
   transform: translateY(-1px);
 }
 
-/* Estilos específicos para el AgentSelector en InputArea */
 .input-container .agent-selector {
-  margin: 0; /* Eliminar cualquier margen */
-  flex-shrink: 0; /* No permitir que se reduzca */
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .input-container .agent-selector-toggle {
-  height: 44px; /* Altura consistente con otros botones */
-  width: auto; /* Ancho automático para ajustarse al contenido */
-  min-width: 120px; /* Ancho mínimo para mostrar nombres de agentes */
-  max-width: 200px; /* Ancho máximo para no ocupar demasiado espacio */
-  border-radius: 8px; /* Bordes redondeados pero no circular */
-  padding: 8px 12px; /* Padding para el contenido */
+  height: 32px;
+  width: auto;
+  min-width: 80px;
+  max-width: 140px;
+  border-radius: 8px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .input-container .agent-selector-toggle:hover {
-  border-radius: 8px; /* Mantener bordes redondeados en hover */
+  border-radius: 8px;
 }
 
 .input-container .agent-selector-toggle .agent-text {
-  display: block !important; /* Mostrar el texto del agente incluso en pantallas pequeñas */
+  display: block !important;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .input-container .agent-selector-toggle .agent-name {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 9px;
+  font-weight: 400;
 }
 
 .input-container .agent-selector-toggle .agent-type {
-  display: none; /* Ocultar el tipo para ahorrar espacio */
+  display: none;
 }
 
-/* Posicionamiento del popup del AgentSelector cuando está en el InputArea */
 .input-container .agent-selector .agent-selector-popup {
   position: fixed !important;
-  z-index: 10000 !important; /* Z-index muy alto para estar por encima de todo */
+  z-index: 10000 !important;
   width: 320px;
   max-height: 400px;
   transform: none !important;
 }
 
-/* Ajustar la flecha del popup para que apunte hacia abajo */
 .input-container .agent-selector .agent-selector-popup::after {
   content: '';
   position: absolute;
   bottom: -8px;
-  left: 15px; /* Alinear con el botón del selector */
+  left: 15px;
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
@@ -250,21 +272,18 @@
   z-index: 10001;
 }
 
-/* Asegurar que el input-area no oculte el popup */
 .input-area {
   position: relative;
   z-index: 1;
 }
 
-/* Asegurar que el popup sea visible por encima del contenido */
 body .agent-selector-popup {
   position: fixed !important;
   z-index: 10000 !important;
 }
 
-/* Asegurar que el popup se posicione correctamente */
 .input-side-buttons .agent-selector-popup {
-  bottom: 45px; /* Ajustar para que aparezca justo encima del botón circular */
+  bottom: 45px;
 }
 
 .image-inside-textarea {
@@ -281,6 +300,8 @@ body .agent-selector-popup {
   color: #87CEEB;
   opacity: 0.85;
   transition: opacity 0.2s;
+  width: 27px;
+  height: 27px;
 }
 
 .image-inside-textarea:hover {
@@ -312,6 +333,11 @@ body .agent-selector-popup {
   width: 100%;
   display: flex;
   align-items: center;
+  /* Altura mínima fija para evitar saltos */
+  min-height: 56px;
+  /* Eliminar padding */
+  padding: 0 !important;
+  background: transparent !important;
 }
 
 .floating-language-selector {
@@ -343,15 +369,11 @@ body .agent-selector-popup {
   background: #222;
 }
 
-/* Forzar el desplegable a aparecer encima (solo navegadores modernos) */
 .floating-language-selector.compact select {
-  /* Para navegadores que soportan esto */
-  /* direction: rtl; */
   position: relative;
   z-index: 10;
 }
 
-/* Personalización visual del desplegable */
 .floating-language-selector.compact select option {
   background: #23232b;
   color: #fff;
@@ -360,13 +382,11 @@ body .agent-selector-popup {
   padding: 6px 12px;
 }
 
-/* Hack para mostrar el desplegable encima (no estándar, pero ayuda en la mayoría de navegadores) */
 .floating-language-selector.compact select:focus {
   position: relative;
   z-index: 9999;
 }
 
-/* Si se quiere un efecto más marcado, se puede usar un box-shadow al enfocar */
 .floating-language-selector.compact select:focus {
   box-shadow: 0 0 0 2px #87ceeb44;
 }
@@ -416,6 +436,7 @@ body .agent-selector-popup {
   flex-direction: column;
   align-items: flex-start;
 }
+
 .lang-dropdown-btn {
   display: flex;
   align-items: center;
@@ -433,25 +454,30 @@ body .agent-selector-popup {
   transition: background 0.15s;
   gap: 8px;
 }
+
 .lang-dropdown-btn:focus,
 .lang-dropdown-btn:hover {
   background: #23232b;
 }
+
 .lang-dropdown-btn svg {
   font-size: 16px;
 }
+
 .lang-dropdown-btn > span {
   font-size: 14px;
   margin: 0 2px;
 }
+
 .lang-dropdown-btn .chevron {
   margin-left: 8px;
   font-size: 14px;
 }
+
 .lang-dropdown-list {
   position: absolute;
   left: 0;
-  bottom: 110%; /* Aparece encima del botón */
+  bottom: 110%;
   background: #23232b;
   color: #fff;
   border-radius: 6px;
@@ -466,10 +492,12 @@ body .agent-selector-popup {
   border: 1px solid #23232b;
   animation: fadeInUp 0.18s cubic-bezier(0.4,0,0.2,1);
 }
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .lang-dropdown-item {
   padding: 6px 16px 6px 12px;
   cursor: pointer;
@@ -478,12 +506,116 @@ body .agent-selector-popup {
   color: #fff;
   transition: background 0.15s, color 0.15s;
 }
+
 .lang-dropdown-item.selected,
 .lang-dropdown-item:hover {
   background: #2e2e3a;
   color: #87ceeb;
 }
+
 .lang-dropdown-item span {
   font-size: 18px;
   line-height: 1.2;
+}
+
+.input-bottom-buttons {
+  margin-top: 4px;
+  background: none !important;
+  border: none !important;
+  border-radius: 8px;
+}
+
+.input-bottom-buttons-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  /* Altura mínima fija para evitar saltos */
+  min-height: 44px;
+  background: transparent !important;
+}
+
+.input-bottom-buttons-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  position: relative;
+}
+
+.input-bottom-buttons-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  margin-right: 12px;
+}
+
+.image-float-button {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 10;
+  background: rgba(135, 206, 235, 0.1);
+  border: 1px solid #87CEEB;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  color: #87CEEB;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.2);
+  /* Inicialmente oculto para evitar parpadeo */
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Clase para mostrar el botón cuando el modelo tiene visión */
+.image-float-button.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.image-float-button:hover {
+  background: rgba(135, 206, 235, 0.2);
+  border-color: #b983ff;
+  color: #b983ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+}
+
+.image-float-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(135, 206, 235, 0.2);
+}
+
+/* Estilos para los botones de agentes y tool selector para evitar parpadeo y mantener padding/espaciado fijo */
+.input-bottom-buttons-left > button,
+.input-bottom-buttons-left > .tools-selector {
+  min-width: 27px;
+  height: 27px;
+  box-sizing: border-box;
+  margin-right: 0px;
+  margin-left: 0px;
+  padding: 0 !important;
+  /* Elimina cualquier cambio de padding/margin durante el render */
+  transition: none !important;
+}
+
+.input-bottom-buttons-left > .tools-selector {
+  min-width: 27px;
+  height: 27px;
+  padding: 0 !important;
+}
+
+.tools-button {
+  min-width: 27px;
+  height: 27px;
+  padding: 0 !important;
 }

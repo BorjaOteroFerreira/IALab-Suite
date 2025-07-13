@@ -17,5 +17,6 @@ export default {
   refresh: "Aggiorna",
   close: "Chiudi",
   apiKey: "API Key",
-  notAvailable: "Non disponibile"
+  notAvailable: "Non disponibile",
+  agentsLabel: "Agenti"
 };

@@ -17,6 +17,7 @@ import DownloaderPage from './components/UI/DownloaderPage/DownloaderPage';
 import DevConsole from './components/DevConsole/DevConsole';
 import { Download, MessageCircle } from 'lucide-react';
 import { SocketProvider } from './context/SocketContext';
+import LanguageSelector from './components/UI/LanguageSelector/LanguageSelector';
 
 // Componente principal de Chat
 function ChatComponent({ onOpenDownloader }) {
@@ -107,20 +108,34 @@ function ChatComponent({ onOpenDownloader }) {
       </div>
 
       {/* InputArea siempre abajo */}
-      <InputArea
-        input={input}
-        setInput={setInput}
-        onSubmit={sendMessage}
-        isLoading={isLoading}
-        currentResponse={currentResponse}
-        onStopResponse={stopResponse}
-        tokensCount={tokensCount}
-        tools={tools}
-        rag={rag}
-        onToggleTools={setTools}
-        onToggleRag={setRag}
-        onOpenDownloader={onOpenDownloader}
-      />
+      <div className="input-area-wrapper">
+        <InputArea
+          input={input}
+          setInput={setInput}
+          onSubmit={sendMessage}
+          isLoading={isLoading}
+          currentResponse={currentResponse}
+          onStopResponse={stopResponse}
+          tokensCount={tokensCount}
+          tools={tools}
+          rag={rag}
+          onToggleTools={setTools}
+          onToggleRag={setRag}
+        />
+      </div>
+      {/* Marca de agua fija en la parte inferior */}
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, textAlign: 'center', fontSize: '0.69rem', color: '#888', zIndex: 1500, pointerEvents: 'none', paddingBottom: '4px' }}>
+        Los modelos de lenguaje pueden cometer errores. Considera verificar la información importante. Ver preferencias de cookies.
+      </div>
+      {/* Botones flotantes fuera del input area */}
+      <button
+        className="header-button floating-downloader-btn-global"
+        title="Descargar modelos GGUF"
+        style={{ position: 'fixed', right: '1.5rem', bottom: 16, zIndex: 2000 }}
+        onClick={onOpenDownloader}
+      >
+        <Download size={22} />
+      </button>
 
       {/* Overlay para cerrar sidebars (sin sidebar flotante) */}
       {chatSidebarVisible && (
@@ -146,6 +161,10 @@ function App() {
     <SocketProvider>
       <ChatProvider>
         <ChatComponent onOpenDownloader={() => setShowDownloader(true)} />
+        {/* Selector de idioma flotante al mismo nivel que el botón de descargas */}
+        <div className="floating-language-selector-global" style={{ position: 'fixed', left: '1.5rem', bottom: 16, zIndex: 3001 }}>
+          <LanguageSelector />
+        </div>
         <DownloaderPage open={showDownloader} onClose={() => setShowDownloader(false)} />
         <DevConsole />
       </ChatProvider>

@@ -4,6 +4,7 @@ const es_toolsSelector = {
   of: "de",
   selected: "seleccionadas",
   agentsTitle: "Agentes",
+  agentsLabel: "Agentes",
   active: "Activo",
   noneSelected: "Ninguno seleccionado",
   loadingAgents: "Cargando agentes...",

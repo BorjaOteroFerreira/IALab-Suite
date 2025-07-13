@@ -101,16 +101,16 @@ function InputArea({
   tokensCount, 
   currentResponse, 
   onStopResponse, 
-  tools, rag, onToggleTools, onToggleRag, onOpenDownloader 
+  tools, rag, onToggleTools, onToggleRag 
 }) {
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
-  const { socket, modelConfig, modelList, formatList } = useChatContext();
-  const { lang, setLang, getStrings } = useLanguage();
+  const { socket, modelConfig, modelList } = useChatContext();
+  const { getStrings } = useLanguage();
   const strings = getStrings('inputArea');
-  // Estado para imagen base64 y preview
   const [imageBase64, setImageBase64] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [showDownloader, setShowDownloader] = useState(false);
 
   // Auto-resize del textarea
   const adjustTextareaHeight = () => {
@@ -177,96 +177,89 @@ function InputArea({
   return (
     <div className="input-area">
       <form onSubmit={handleSubmit} className="message-form">
-        <span className="tokens-counter">
-          {strings.contextUsed}: {tokensCount} {strings.tokens}
-        </span>
-        <div className="input-container">
-          {/* Botón RAG */}
-          <button
-            type="button"
-            onClick={() => onToggleRag(!rag)}
-            className={`input-icon-button${!!rag ? ' active' : ''}`}
-            title={strings.ragTooltip || strings.rag}
-            style={{ marginRight: 6 }}
-          >
-            <Database size={23} />
-          </button>
-          {/* Botón de herramientas */}
-          <div className="input-side-buttons" style={{ marginRight: 6 }}>
+        <div className="textarea-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          {/* Botón de imagen superpuesto a la izquierda, después del clip */}
+          {hasVision && (
+            <>
+              <button
+                type="button"
+                className="input-icon-button image-inside-textarea"
+                title={strings.uploadImageTooltip || strings.uploadImage}
+                onClick={handleImageButtonClick}
+                style={{ position: 'absolute', left: 38, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
+                tabIndex={-1}
+              >
+                <ImageIcon size={22} />
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            </>
+          )}
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                e.target.form.requestSubmit();
+              }
+            }}
+            placeholder={strings.placeholder}
+            className="message-textarea"
+            disabled={isLoading}
+            rows={2} // Cambiado de 3 a 2 filas
+            style={{ minHeight: 56 }} // paddingLeft y paddingRight eliminados
+          />
+        </div>
+        {/* Botones debajo del textarea in dos grupos: izquierda y derecha */}
+        <div className="input-bottom-buttons-row">
+          <div className="input-bottom-buttons-left" style={{marginLeft: 8}}>
+            <button
+              type="button"
+              onClick={() => onToggleRag(!rag)}
+              className={`input-icon-button${!!rag ? ' active' : ''}`}
+              title={strings.ragTooltip || strings.rag}
+            >
+              <Database size={23} />
+            </button>
             <ToolsSelector 
               tools={tools} 
               onToggleTools={onToggleTools}
               socket={socket}
             />
           </div>
-          {/* Textarea con botones superpuestos */}
-          <div className="textarea-wrapper" style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
-            {/* Botón de clip superpuesto a la izquierda */}
+          <div className="input-bottom-buttons-right">
+            {/* Botón de clip a la izquierda del de enviar */}
             <button
               type="button"
-              className="input-icon-button clip-inside-textarea"
+              className="input-icon-button"
               title={strings.attachFileTooltip || strings.attachFile}
-              style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
               tabIndex={-1}
-              // onClick={handleClipClick} // Implementa si quieres funcionalidad
+              onClick={handleImageButtonClick}
             >
               <Paperclip size={20} />
             </button>
-            {/* Botón de imagen superpuesto a la izquierda, después del clip */}
             {hasVision && (
-              <>
-                <button
-                  type="button"
-                  className="input-icon-button image-inside-textarea"
-                  title={strings.uploadImageTooltip || strings.uploadImage}
-                  onClick={handleImageButtonClick}
-                  style={{ position: 'absolute', left: 38, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
-                  tabIndex={-1}
-                >
-                  <ImageIcon size={22} />
-                </button>
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
-              </>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
             )}
-            {/* Textarea con padding a ambos lados */}
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  e.target.form.requestSubmit();
-                }
-              }}
-              placeholder={strings.placeholder}
-              className="message-textarea"
-              disabled={isLoading}
-              rows={1}
-              style={hasVision ? { paddingLeft: 85, paddingRight: 40 } : { paddingLeft: 53, paddingRight: 40 }}
-            />
-            {/* Indicador de imagen lista */}
-            {imagePreview && (
-              <div className="image-ready-indicator" style={{ position: 'absolute', left: 70, top: '50%', transform: 'translateY(-50%)', zIndex: 3, display: 'flex', alignItems: 'center', background: '#f5f5f5', borderRadius: 6, padding: '2px 6px', boxShadow: '0 1px 4px #0001' }}>
-                <img src={imagePreview} alt="preview" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4, marginRight: 6 }} />
-                <span style={{ fontSize: 13, color: '#333', marginRight: 4 }}>{strings.imageReady}</span>
-                <button type="button" onClick={handleRemoveImage} style={{ background: 'none', border: 'none', color: '#c00', fontWeight: 'bold', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }} title={strings.removeImage}>{strings.removeImage}</button>
-              </div>
-            )}
-            {/* Botón de enviar superpuesto a la derecha */}
             {isLoading && currentResponse ? (
               <button
                 type="button"
                 onClick={onStopResponse}
                 className="send-button stop"
                 title={strings.stopResponse}
-                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
               >
                 <Square size={20} />
               </button>
@@ -276,7 +269,6 @@ function InputArea({
                 disabled={isLoading || (!(typeof input === 'string' && input.trim().length > 0) && !imageBase64)}
                 className="send-button"
                 title={strings.sendMessage}
-                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}
               >
                 ➤
               </button>
@@ -284,23 +276,7 @@ function InputArea({
           </div>
         </div>
       </form>
-      {/* Selector de idioma flotante custom en la esquina inferior izquierda */}
-      <div className="floating-language-selector compact" style={{ zIndex: 3001 }}>
-        <LanguageDropdown lang={lang} setLang={setLang} />
-      </div>
-      {/* Leyenda de shortcuts flotante: mover más a la derecha */}
-      <style>{`.shortcuts-legend-floating { left: 4.5rem !important; }`}</style>
-      {/* Botón flotante para abrir el Downloader en la esquina inferior derecha */}
-      <button
-        className="header-button floating-downloader-btn"
-        title={strings.downloadModelsTooltip || strings.downloadModels || 'Download GGUF models'}
-        onClick={onOpenDownloader}
-        style={{ position: 'fixed', right: '1.5rem', bottom: 16, zIndex: 2000 }}
-      >
-        <Download size={22} />
-      </button>
     </div>
-    
   );
 }
 
