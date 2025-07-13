@@ -234,6 +234,12 @@ function InputArea({
               socket={socket}
             />
           </div>
+          {/* Recuento de tokens centrado entre los grupos de botones */}
+          <div className="input-bottom-tokens-count" style={{flex: 1, textAlign: 'center', fontSize: '0.95em', color: '#888', pointerEvents: 'none'}}>
+            {typeof tokensCount === 'number' && (
+              <span>{strings.contextUsed} {tokensCount} {strings.tokens}</span>
+            )}
+          </div>
           <div className="input-bottom-buttons-right">
             {/* Botón de clip a la izquierda del de enviar */}
             <button

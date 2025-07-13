@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Folder, Settings, Plus, MessagesSquare, Database, Volume2, VolumeX } from 'lucide-react';
+import { Download, Folder, Settings, Plus, MessagesSquare, Database, Volume2, VolumeX, ChevronDown } from 'lucide-react';
 import ToolsSelector from '../ToolsSelector/ToolsSelector';
 import { useChatContext } from '../../../hooks/useChatContext';
 import { useLanguage } from '../../../context/LanguageContext';
@@ -17,12 +17,31 @@ function Header({
   onClearChat,
   onOpenDownloader,
   ttsEnabled,
-  setTTSEnabled
+  setTTSEnabled,
+  headerHidden,
+  onToggleHeader
 }) {
   // Obtener el socket del contexto de chat
   const { socket } = useChatContext();
   const { getStrings } = useLanguage();
   const strings = getStrings('header');
+
+  if (headerHidden) {
+    // Solo mostrar el botón flotante para mostrar la cabecera
+    return (
+      <div className="app-header-hidden" style={{width: '100%', height: '0px', position: 'relative', zIndex: 3000, background: 'transparent'}}>
+        <button
+          className="show-header-btn"
+          style={{position: 'absolute', left: '50%', top: '2px', transform: 'translateX(-50%)', background: '#fff', border: '1px solid #ccc', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 3001}}
+          title={strings.showHeaderTooltip || 'Mostrar cabecera'}
+          onClick={onToggleHeader}
+        >
+          <ChevronDown size={18} />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <header className="app-header">
       <div className="header-left">
@@ -51,6 +70,14 @@ function Header({
           title={strings.settingsTooltip || strings.settings || 'Configuración'}
         >
           <Settings size={22} />
+        </button>
+        {/* Botón para ocultar la cabecera */}
+        <button
+          onClick={onToggleHeader}
+          className="header-button"
+          title={strings.hideHeaderTooltip || 'Ocultar cabecera'}
+        >
+          <ChevronDown size={20} />
         </button>
       </div>
     </header>

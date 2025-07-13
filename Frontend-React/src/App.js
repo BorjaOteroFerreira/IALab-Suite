@@ -20,7 +20,7 @@ import { SocketProvider } from './context/SocketContext';
 import LanguageSelector from './components/UI/LanguageSelector/LanguageSelector';
 
 // Componente principal de Chat
-function ChatComponent({ onOpenDownloader }) {
+function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader }) {
   const [chatSidebarVisible, setChatSidebarVisible] = useState(false);
   const [configSidebarVisible, setConfigSidebarVisible] = useState(false);
   const [input, setInput] = useState('');
@@ -76,6 +76,8 @@ function ChatComponent({ onOpenDownloader }) {
         onToggleConfigSidebar={() => setConfigSidebarVisible(!configSidebarVisible)}
         onClearChat={clearChat}
         onOpenDownloader={onOpenDownloader}
+        headerHidden={headerHidden}
+        onToggleHeader={onToggleHeader}
       />
 
       {/* Contenedor central flex para sidebars y mensajes */}
@@ -156,11 +158,14 @@ function ChatComponent({ onOpenDownloader }) {
 
 function App() {
   const [showDownloader, setShowDownloader] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
+
+  const handleToggleHeader = () => setHeaderHidden(h => !h);
 
   return (
     <SocketProvider>
       <ChatProvider>
-        <ChatComponent onOpenDownloader={() => setShowDownloader(true)} />
+        <ChatComponent onOpenDownloader={() => setShowDownloader(true)} headerHidden={headerHidden} onToggleHeader={handleToggleHeader} />
         {/* Selector de idioma flotante al mismo nivel que el botón de descargas */}
         <div className="floating-language-selector-global" style={{ position: 'fixed', left: '1.5rem', bottom: 16, zIndex: 3001 }}>
           <LanguageSelector />
