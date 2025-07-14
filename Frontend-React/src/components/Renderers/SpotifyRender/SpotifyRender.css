@@ -1,0 +1,17 @@
+.spotify-embed-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.spotify-embed-iframe {
+  border-radius: 12px;
+  min-width: 250px;
+  max-width: 600px;
+  width: 100%;
+  height: 80px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(30, 215, 96, 0.15);
+  background: #181818;
+}
