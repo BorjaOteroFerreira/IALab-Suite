@@ -131,6 +131,8 @@ export const ChatProvider = ({ children }) => {
           if (currentResponseValue.length > 0) {
             console.log('📝 Añadiendo mensaje de assistant al historial');
             addMessageToChat('assistant', currentResponseValue);
+            // Guardar el historial cada vez que se añade un mensaje del asistente
+            saveChat();
           } else {
             console.log('⚠️ WARNING: currentResponse está vacío, no se añade mensaje');
           }

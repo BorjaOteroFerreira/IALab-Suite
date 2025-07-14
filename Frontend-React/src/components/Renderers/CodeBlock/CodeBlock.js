@@ -16,12 +16,12 @@ function CodeBlock({ code, language }) {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', marginBottom: '2em' }}>
       <SyntaxHighlighter
         language={language || 'plaintext'}
         style={vscDarkPlus}
         showLineNumbers
-        customStyle={{ borderRadius: '8px', fontSize: '1em', margin: '1em 0', overflowX: 'auto', paddingBottom: '2.5em' }}
+        customStyle={{ borderRadius: '8px', fontSize: '1em', margin: '1em 0', overflowX: 'auto', paddingBottom: '2.5em', background: '#23272f' }}
       >
         {code}
       </SyntaxHighlighter>
@@ -45,6 +45,8 @@ function CodeBlock({ code, language }) {
       >
         {copied ? <Check size={18} color="#fff" /> : <Copy size={18} color="#bbb" />}
       </button>
+      {/* Fix: Añadimos un div vacío para asegurar el flujo y evitar problemas de renderizado con tokens posteriores */}
+      <div style={{ clear: 'both', height: 0 }}></div>
     </div>
   );
 }
