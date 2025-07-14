@@ -4,14 +4,6 @@ import { useDevConsole } from '../../hooks/useDevConsole';
 import './DevConsole.css';
 import { Filter, Download, Trash2, X, ExternalLink } from 'lucide-react';
 
-/**
- * DevConsole component
- * --------------------
- * Fixes implemented:
- * 1. Auto‑scroll now triggers **only** when the user is viewing the **bottom half**
- *    of the scrollable area (instead of a fixed pixel threshold).
- * 2. No scrolling occurs for messages filtered‑out from view.
- */
 const DevConsole = () => {
   const [pipWindow, setPipWindow] = useState(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
@@ -53,10 +45,7 @@ const DevConsole = () => {
 
   const supportsPiP = 'documentPictureInPicture' in window;
 
-  /**
-   * Returns `true` when the bottom edge of the viewport is inside the
-   * lower half of the scrollable content.
-   */
+
 
   /* --------------------------------------------------- */
   /* PiP helpers                                         */
@@ -148,7 +137,7 @@ const DevConsole = () => {
   };
 
   /* --------------------------------------------------- */
-  /* Memoised styles                                     */
+  /* M styles                                     */
   /* --------------------------------------------------- */
 
   const consoleStyle = useMemo(
