@@ -110,7 +110,6 @@
   height: 100%;
 }
 
-/* Eliminado: .messages-container, .messages-list, .message, .message.user, .message.assistant, .message-avatar, .message-content, .user-message, .assistant-message, .typing-indicator, etc. (migrado a MessageList.css) */
 
 /* Área de Input centrada */
 .input-area {

@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 from ..models import TaskPlan
 from .task_analyzer import TaskAnalyzer
 from .adaptive_planner import AdaptiveTaskPlanner
+from .planer_optimizado import OptimizedAdaptiveTaskPlanner
 from ..utils import get_available_tools_dict, safe_emit_status
 from .config import AdaptiveAgentConfig
 from app.core.socket_handler import SocketResponseHandler
@@ -72,7 +73,7 @@ class AdaptiveAgent:
         
         # Inicializar componentes modulares del agente adaptativo
         self.task_analyzer = TaskAnalyzer(self.model, self.tools_manager, self.tool_registry)
-        self.adaptive_planner = AdaptiveTaskPlanner(self.model, self.tools_manager, self.tool_registry, self.socket, self.assistant)
+        self.adaptive_planner = OptimizedAdaptiveTaskPlanner(self.model, self.tools_manager, self.tool_registry, self.socket, self.assistant)
         
         # Iniciar el procesamiento adaptativo
         logger.info("Inicializando Agente Adaptativo")

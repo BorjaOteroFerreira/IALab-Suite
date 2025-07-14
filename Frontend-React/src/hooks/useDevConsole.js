@@ -54,60 +54,66 @@ export function useDevConsole() {
     }, [isVisible]);
     const prevMessagesCount = useRef(messages.length);
     useEffect(() => {
-        if (isVisible && autoScroll && messages.length > prevMessagesCount.current) {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }
+        // Eliminado: autoscroll en el hook
+        // if (isVisible && autoScroll && messages.length > prevMessagesCount.current) {
+        //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        // }
         prevMessagesCount.current = messages.length;
     }, [messages, isVisible, autoScroll]);
     useEffect(() => {
         if (!socket) return;
         const handleConsoleOutput = (data) => {
-            const newMessage = {
-                id: Date.now() + Math.random(),
-                timestamp: new Date(),
-                content: data.content || '',
-                role: normalizeRole(data.role || 'info')
-            };
-            setMessages(prev => {
-                const updatedMessages = [...prev, newMessage];
-                if (updatedMessages.length > 2000) {
-                    return updatedMessages.slice(-2000);
-                }
-                return updatedMessages;
-            });
+            const normRole = normalizeRole(data.role || 'info');
+            // Solo agregar si el rol está seleccionado
+            if (selectedRoles.has('all') || selectedRoles.has(normRole)) {
+                const newMessage = {
+                    id: Date.now() + Math.random(),
+                    timestamp: new Date(),
+                    content: data.content || '',
+                    role: normRole
+                };
+                setMessages(prev => {
+                    const updatedMessages = [...prev, newMessage];
+                    if (updatedMessages.length > 2000) {
+                        return updatedMessages.slice(-2000);
+                    }
+                    return updatedMessages;
+                });
+            }
         };
         const handleAssistantResponse = (data) => {
-            if (data.content && !data.finished) {
+            const normRole = 'assistant';
+            if ((selectedRoles.has('all') || selectedRoles.has(normRole)) && data.content && !data.finished) {
                 const newMessage = {
                     id: Date.now() + Math.random(),
                     timestamp: new Date(),
                     content: `Assistant: ${data.content.substring(0, 100)}${data.content.length > 100 ? '...' : ''}`,
-                    role: 'assistant'
+                    role: normRole
                 };
-                newMessage.role = normalizeRole(newMessage.role);
                 setMessages(prev => [...prev, newMessage]);
             }
         };
         const handleUtilities = (data) => {
-            const newMessage = {
-                id: Date.now() + Math.random(),
-                timestamp: new Date(),
-                content: `Utilidades: ${JSON.stringify(data)}`,
-                role: 'tool'
-            };
-            newMessage.role = normalizeRole(newMessage.role);
-            setMessages(prev => [...prev, newMessage]);
+            const normRole = 'tool';
+            if (selectedRoles.has('all') || selectedRoles.has(normRole)) {
+                const newMessage = {
+                    id: Date.now() + Math.random(),
+                    timestamp: new Date(),
+                    content: `Utilidades: ${JSON.stringify(data)}`,
+                    role: normRole
+                };
+                setMessages(prev => [...prev, newMessage]);
+            }
         };
         socket.on('output_console', handleConsoleOutput);
         socket.on('assistant_response', handleAssistantResponse);
-        
         socket.on('utilidades', handleUtilities);
         return () => {
             socket.off('output_console', handleConsoleOutput);
             socket.off('assistant_response', handleAssistantResponse);
             socket.off('utilidades', handleUtilities);
         };
-    }, [socket, isPiPMode]); // Added isPiPMode dependency
+    }, [socket, isPiPMode, selectedRoles]); // Added selectedRoles dependency
     const clearConsole = () => {
         setMessages([]);
         localStorage.removeItem('devConsole_messages');

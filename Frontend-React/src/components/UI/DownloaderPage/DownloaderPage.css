@@ -5,7 +5,7 @@
   --accent-secondary: #FFB6C1; /* Rosa pastel para acentos */
   --surface-elevated: #3A455B;
   --surface-selected: #404A60;
-  --surface: linear-gradient(135deg, #2F3A50, #3A455B);
+  --surface: linear-gradient(120deg, #191a1a 0%, #23272f 100%);
   --border-light: rgba(135, 206, 235, 0.3);
   --border-strong: #87CEEB;
   --text-primary: #fff;

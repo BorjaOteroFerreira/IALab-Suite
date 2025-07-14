@@ -115,6 +115,10 @@ const DevConsole = () => {
                 flex: 1;
                 overflow-y: auto;
                 padding: 8px;
+                pointer-events: auto;
+                overscroll-behavior: contain;
+                position: relative;
+                z-index: 1;
             }
             
             .console-message {
@@ -123,6 +127,7 @@ const DevConsole = () => {
                 gap: 8px;
                 word-wrap: break-word;
                 align-items: flex-start;
+                pointer-events: auto;
             }
             
             .message-timestamp {
@@ -327,9 +332,9 @@ const DevConsole = () => {
     };
 
     const ConsoleMessages = memo(({ filteredMessages, normalizeRole, formatTime, strings, lang, renderMarkdown, messagesEndRef, isPipMode }) => (
-        <div className="console-messages">
+        <div className="console-messages" style={{ pointerEvents: 'auto', overscrollBehavior: 'contain', position: 'relative', zIndex: 1 }}>
             {filteredMessages.map(message => (
-                <div key={message.id} className={`console-message console-${normalizeRole(message.role)}`}>
+                <div key={message.id} className={`console-message console-${normalizeRole(message.role)}`} style={{ pointerEvents: 'auto' }}>
                     <span className="message-timestamp">[{formatTime(message.timestamp)}]</span>
                     <span className="message-role">
                         [{(strings[normalizeRole(message.role)] || normalizeRole(message.role)).toUpperCase()}]
@@ -451,7 +456,7 @@ const DevConsole = () => {
                     </div>
                 )}
                 
-                <div className="console-body">
+                <div className="console-body" style={{ overflow: 'auto', flex: 1 }}>
                     <ConsoleMessages
                         filteredMessages={filteredMessages}
                         normalizeRole={normalizeRole}
@@ -472,6 +477,15 @@ const DevConsole = () => {
             </div>
         );
     };
+
+    // Autoscroll solo si el mensaje está en los filtrados y no se está redimensionando
+    const prevFilteredCount = useRef(filteredMessages.length);
+    useEffect(() => {
+        if (!isResizing && messagesEndRef?.current && filteredMessages.length > prevFilteredCount.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+        prevFilteredCount.current = filteredMessages.length;
+    }, [filteredMessages, messagesEndRef, isResizing]);
 
     // Renderizar en PiP window si está disponible
     if (isPiPMode && pipWindow && !pipWindow.closed) {
