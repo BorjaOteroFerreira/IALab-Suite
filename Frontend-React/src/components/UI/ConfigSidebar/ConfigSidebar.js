@@ -402,7 +402,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
           <label htmlFor="temperature">{strings.temperature}</label>
           <input
             type="number"
-            className="form-control"
+            className="form-control param-temperature"
             id="temperature"
             name="temperature"
             step="0.01"
@@ -418,7 +418,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
           <label htmlFor="context">{strings.context}</label>
           <input
             type="number"
-            className="form-control"
+            className="form-control param-context"
             id="context"
             name="context"
             placeholder={strings.contextPlaceholder}
@@ -430,7 +430,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
         <div className="form-group">
           <label htmlFor="systemMessage">{strings.systemMessage}</label>
           <textarea
-            className="form-control"
+            className="form-control param-system-message"
             id="systemMessage"
             name="systemMessage"
             rows="3"
@@ -446,7 +446,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
           </label>
           <input
             type="range"
-            className="form-control slider"
+            className="form-control slider param-gpu-layers"
             id="gpuLayers"
             name="gpuLayers"
             min="-1"
@@ -464,7 +464,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
         <div className="config-buttons">
           <button 
             type="submit" 
-            className={`btn btn-primary ${isApplying ? 'loading' : ''}`}
+            className={`btn btn-primary apply-btn ${isApplying ? 'loading' : ''}`}
             disabled={isApplying}
           >
             <span style={{opacity: isApplying ? 0 : 1}}>

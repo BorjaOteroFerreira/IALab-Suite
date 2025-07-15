@@ -1,0 +1,16 @@
+/* Estilos básicos para el embed de Dailymotion */
+.dailymotion-embed-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 1em auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dailymotion-embed-iframe {
+  width: 100%;
+  min-height: 270px;
+  border: none;
+  border-radius: 8px;
+  background: #000;
+}

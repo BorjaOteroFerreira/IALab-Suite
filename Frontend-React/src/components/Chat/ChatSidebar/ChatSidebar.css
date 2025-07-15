@@ -1,18 +1,21 @@
-/* Chat Sidebar */
+/* Chat Sidebar - fondo y lista transparentes, sin bordes ni sombras */
 .chat-sidebar {
   width: 320px;
   height: 100vh;
-  background: none !important;
+  background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 50;
-  transition: transform var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  color: var(--text-primary);
+  font-family: inherit;
+  backdrop-filter: none;
   scrollbar-width: none; /* Firefox */
 }
 
@@ -24,74 +27,74 @@
   transform: translateX(-100%);
 }
 
-/* Eliminar header y bordes */
 .sidebar-header, .header-chat-menu {
   display: none !important;
 }
 
-/* Ajustar padding de la lista de chats si es necesario */
 .chat-list {
   padding: 0 !important;
-  background: none !important;
+  background: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* Lista de Conversaciones */
 .conversations-list {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0;
+  padding: var(--spacing-md);
+  overflow-y: auto;
+  min-height: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  scrollbar-width: none; /* Firefox */
+}
+
+.conversations-list::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .conversations-list:empty::after {
   content: 'No hay conversaciones guardadas';
   text-align: center;
-  color: rgba(135, 206, 235, 0.8);
+  color: var(--text-secondary);
+  font-weight: 500;
   font-style: italic;
-  padding: var(--space-8);
+  padding: var(--spacing-xl);
   display: block;
 }
 
-/* Item de Conversación */
 .load-history {
-  background: linear-gradient(135deg, 
-    #3A455B 0%, 
-    #4A3B6B 100%);
-  border-radius: 16px;
-  border: 2px solid var(--border-light);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all var(--transition-fast);
+  transition: all 0.2s;
   display: flex;
   align-items: stretch;
-  box-shadow: 0 4px 15px #b983ff22;
-  backdrop-filter: blur(10px);
+  margin-bottom: 4px; /* Añadido para separar elementos */
 }
 
 .load-history:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px #b983ff33;
-  border-color: var(--accent-primary-hover);
-  background: linear-gradient(135deg, 
-    #b983ff 0%, 
-    #87CEEB 100%);
+  background: var(--surface-hover) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Botón de Cargar */
 .load-btn {
   flex: 1;
   background: none !important;
   border: none !important;
-  color: #fff;
-  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
   text-align: left;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 500;
-  transition: all var(--transition-fast);
+  transition: all 0.2s;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -101,44 +104,43 @@
   background: none !important;
   border: none !important;
   box-shadow: none !important;
+  color: var(--accent-primary);
+  font-weight: 600;
 }
 
-/* Botón de Eliminar */
 .delete-btn {
   background: none !important;
   border: none !important;
-  color: rgba(255, 182, 193, 0.8);
-  padding: var(--space-3);
+  color: var(--error-bg);
+  padding: var(--spacing-sm);
   cursor: pointer;
-  font-size: 16px;
-  transition: all var(--transition-fast);
+  font-size: 1.1rem;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 44px;
-  border-left: 2px solid rgba(135, 206, 235, 0.3);
+  border-left: 2px solid var(--border-secondary);
 }
 
 .delete-btn:hover {
-  background: linear-gradient(135deg, 
-    rgba(255, 182, 193, 0.8) 0%, 
-    rgba(255, 105, 135, 0.8) 100%);
-  color: #ffffff;
+  background: var(--error-bg);
+  color: var(--error-text);
+  font-weight: 600;
 }
 
-/* Overlay para cerrar sidebar en móvil */
 .sidebar-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(135, 206, 235, 0.3);
+  background: rgba(99, 102, 241, 0.08);
   backdrop-filter: blur(8px);
-  z-index: 40;
+  z-index: 999;
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-fast);
+  transition: all 0.2s;
 }
 
 .sidebar-overlay.visible {
@@ -146,31 +148,29 @@
   visibility: visible;
 }
 
-/* Estados de Carga */
 .conversations-list.loading {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 200px;
 }
+
 .delete-chat-btn {
   background: none !important;
   border: none !important;
-  border-right: 2px solid rgba(135, 206, 235, 0.3);
-  color: rgba(255, 182, 193, 0.9);
+  border-right: 2px solid var(--border-secondary);
+  color: var(--error-bg);
   padding: 0.3em !important;
   cursor: pointer;
-  font-size: 0.8rem !important;
+  font-size: 0.9rem !important;
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
   font-weight: 600;
 }
 
 .delete-chat-btn:hover {
-  background: linear-gradient(135deg, 
-    rgba(255, 182, 193, 0.3) 0%, 
-    rgba(255, 105, 135, 0.3) 100%);
-  color: #ffffff;
+  background: var(--error-bg);
+  color: var(--error-text);
 }
 
 .delete-chat-btn svg {
@@ -178,12 +178,11 @@
   height: 16px !important;
 }
 
-
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid rgba(135, 206, 235, 0.3);
-  border-top: 3px solid rgba(135, 206, 235, 0.9);
+  border: 3px solid var(--border-secondary);
+  border-top: 3px solid var(--accent-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -193,7 +192,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .chat-sidebar {
     width: 280px;
@@ -204,32 +202,40 @@
   .chat-sidebar {
     width: 100vw;
   }
-  
   .header-chat-menu {
-    padding: var(--space-4) var(--space-3) var(--space-3);
+    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-sm);
   }
-  
   .conversations-list {
-    padding: var(--space-3);
+    padding: var(--spacing-sm);
   }
 }
 
+/* CORRECCIÓN PRINCIPAL: Estructura correcta para los elementos de chat */
 .chat-item {
-  background: none !important;
+  background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   transition: font-size 0.18s;
-  font-size: 0.85em !important;
+  font-size: 0.95em !important;
   display: flex;
   align-items: center;
-  gap: 0.3em;
+  gap: 0.5em;
+  color: var(--text-primary) !important;
+  margin-bottom: 4px; /* Espacio entre elementos */
+  padding: 8px 12px; /* Padding interno */
+  border-radius: 8px; /* Bordes redondeados */
+  min-height: 40px; /* Altura mínima */
+  width: 100%; /* Ancho completo */
+  box-sizing: border-box; /* Incluir padding en el cálculo del ancho */
+  position: relative; /* Posicionamiento relativo para evitar superposición */
 }
 
 .chat-item:hover {
-  background: none !important;
+  background: var(--surface-hover) !important;
   border: none !important;
   box-shadow: none !important;
-  font-size: 1.1em !important;
+  font-size: 1.08em !important;
+  color: var(--accent-primary) !important;
 }
 
 .chat-name-btn,
@@ -238,8 +244,147 @@
   border: none !important;
   box-shadow: none !important;
   font-size: 1em !important;
-  color: var(--text-primary, #fff) !important;
+  color: inherit !important; /* Heredar color del padre */
+  font-weight: 600;
   transition: none;
-  padding-left: 0.3em !important;
-  padding-right: 0.3em !important;
+  padding: 0.3em !important;
+  flex: 1; /* Tomar el espacio disponible */
+  text-align: left; /* Alinear texto a la izquierda */
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Header del ChatSidebar con estilo original, fondo y bordes suaves */
+.chat-sidebar-header {
+  padding: 16px;
+  border-bottom: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-shrink: 0; /* No se encoge */
+  color: white !important;
+}
+
+.chat-sidebar-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #f3f4f6 !important;
+}
+
+.close-chat-sidebar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-sidebar-search {
+  position: relative;
+  margin-bottom: 12px;
+  background: transparent;
+  flex-shrink: 0; /* No se encoge */
+}
+
+.chat-sidebar-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+.chat-sidebar-search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.05), rgba(173, 216, 230, 0.05)) !important;
+  color: #1f2937;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.chat-sidebar-search-input:focus {
+  border-color: #3b82f6;
+}
+
+.chat-sidebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: transparent;
+  flex-shrink: 0; /* No se encoge */
+  margin-bottom: 12px;
+}
+
+.chat-sidebar-controls-btn {
+  background: #7c3aed !important;
+  color: #fff !important;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.chat-sidebar-controls-btn:hover {
+  background: #a78bfa !important;
+  color: #fff !important;
+}
+
+/* Sección de grupo de chats (por ejemplo, 'Ayer', 'Hoy') con scroll propio */
+.chat-group {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-bottom: 16px;
+}
+
+.chat-group-content {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Espacio consistente entre elementos */
+  padding-right: 2px;
+  scrollbar-width: thin; /* Firefox */
+  max-height: unset;
+}
+
+.chat-group-content::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.chat-group-content::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 6px;
+}
+
+/* Opcional: título de la sección */
+.chat-group-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
+  margin-top: 2px;
+  flex-shrink: 0; /* No se encoge */
 }

@@ -15,14 +15,16 @@ import MessageList from './components/Chat/MessageList/MessageList';
 import InputArea from './components/Chat/InputArea/InputArea';
 import DownloaderPage from './components/UI/DownloaderPage/DownloaderPage';
 import DevConsole from './components/DevConsole/DevConsole';
-import { Download, MessageCircle } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { SocketProvider } from './context/SocketContext';
 import LanguageSelector from './components/UI/LanguageSelector/LanguageSelector';
+import AppTour from './components/AppTour';
+import ConfigSidebarTour from './components/ConfigSidebarTour';
+import DownloaderTour from './components/DownloaderTour';
+import ToolSelectorTour from './components/ToolSelectorTour';
 
 // Componente principal de Chat
-function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader }) {
-  const [chatSidebarVisible, setChatSidebarVisible] = useState(false);
-  const [configSidebarVisible, setConfigSidebarVisible] = useState(false);
+function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSidebarVisible, setChatSidebarVisible, configSidebarVisible, setConfigSidebarVisible }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const { getStrings } = useLanguage();
@@ -159,19 +161,68 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader }) {
 function App() {
   const [showDownloader, setShowDownloader] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
+  const [chatSidebarVisible, setChatSidebarVisible] = useState(false);
+  const [configSidebarVisible, setConfigSidebarVisible] = useState(false);
+  // Estados para mostrar los tours contextuales solo la primera vez
+  const [showDownloaderTour, setShowDownloaderTour] = useState(false);
+  const [hasSeenDownloaderTour, setHasSeenDownloaderTour] = useState(false);
+  const [showConfigSidebarTour, setShowConfigSidebarTour] = useState(false);
+  const [hasSeenConfigSidebarTour, setHasSeenConfigSidebarTour] = useState(false);
+  const [showToolSelectorTour, setShowToolSelectorTour] = useState(false);
+  const [hasSeenToolSelectorTour, setHasSeenToolSelectorTour] = useState(false);
 
   const handleToggleHeader = () => setHeaderHidden(h => !h);
+
+  // Mostrar tour contextual al abrir DownloaderPage por primera vez
+  useEffect(() => {
+    if (showDownloader && !hasSeenDownloaderTour) {
+      setShowDownloaderTour(true);
+      setHasSeenDownloaderTour(true);
+    }
+  }, [showDownloader, hasSeenDownloaderTour]);
+
+  // Mostrar tour contextual al abrir ConfigSidebar por primera vez
+  useEffect(() => {
+    if (configSidebarVisible && !hasSeenConfigSidebarTour) {
+      setShowConfigSidebarTour(true);
+      setHasSeenConfigSidebarTour(true);
+    }
+  }, [configSidebarVisible, hasSeenConfigSidebarTour]);
+
+  // Mostrar tour contextual al abrir ToolSelector por primera vez
+  useEffect(() => {
+    const handleOpenToolsSelector = () => {
+      if (!hasSeenToolSelectorTour) {
+        setShowToolSelectorTour(true);
+        setHasSeenToolSelectorTour(true);
+      }
+    };
+    window.addEventListener('open-tools-selector-ui', handleOpenToolsSelector);
+    return () => window.removeEventListener('open-tools-selector-ui', handleOpenToolsSelector);
+  }, [hasSeenToolSelectorTour]);
 
   return (
     <SocketProvider>
       <ChatProvider>
-        <ChatComponent onOpenDownloader={() => setShowDownloader(true)} headerHidden={headerHidden} onToggleHeader={handleToggleHeader} />
+        <ChatComponent
+          onOpenDownloader={() => setShowDownloader(true)}
+          headerHidden={headerHidden}
+          onToggleHeader={handleToggleHeader}
+          chatSidebarVisible={chatSidebarVisible}
+          setChatSidebarVisible={setChatSidebarVisible}
+          configSidebarVisible={configSidebarVisible}
+          setConfigSidebarVisible={setConfigSidebarVisible}
+        />
         {/* Selector de idioma flotante al mismo nivel que el botón de descargas */}
         <div className="floating-language-selector-global" style={{ position: 'fixed', left: '1.5rem', bottom: 16, zIndex: 3001 }}>
           <LanguageSelector />
         </div>
         <DownloaderPage open={showDownloader} onClose={() => setShowDownloader(false)} />
         <DevConsole />
+        {/* Tours contextuales independientes */}
+        {showDownloaderTour && <DownloaderTour run={showDownloaderTour} onClose={() => setShowDownloaderTour(false)} />}
+        {showConfigSidebarTour && <ConfigSidebarTour run={showConfigSidebarTour} onClose={() => setShowConfigSidebarTour(false)} />}
+        {showToolSelectorTour && <ToolSelectorTour run={showToolSelectorTour} onClose={() => setShowToolSelectorTour(false)} />}
       </ChatProvider>
     </SocketProvider>
   );

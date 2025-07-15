@@ -498,6 +498,18 @@ const ToolsSelector = ({ tools, onToggleTools, socket }) => {
     }
   }, [error]);
 
+  // Tour: abrir/cerrar ToolsSelector
+  useEffect(() => {
+    const openHandler = () => setIsOpen(true);
+    const closeHandler = () => setIsOpen(false);
+    window.addEventListener('open-tools-selector-ui', openHandler);
+    window.addEventListener('close-tools-selector-ui', closeHandler);
+    return () => {
+      window.removeEventListener('open-tools-selector-ui', openHandler);
+      window.removeEventListener('close-tools-selector-ui', closeHandler);
+    };
+  }, []);
+
   return (
     <div className="tools-selector">
       <button

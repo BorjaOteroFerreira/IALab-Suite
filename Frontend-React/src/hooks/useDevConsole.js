@@ -27,6 +27,7 @@ export function useDevConsole() {
     const [isPiPMode, setIsPiPMode] = useState(false);
 
     const consoleRef = useRef(null);
+    const messagesEndRef = useRef(null);
 
     // Refs para conservar la posición exacta entre renders
     const prevScrollHeightRef = useRef(0);

@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  
 }
 
 .youtube-video {
@@ -14,6 +15,7 @@
   box-shadow: var(--shadow-md);
   overflow: hidden;
   background: #000;
+  max-height: 270px;
 }
 
 .youtube-title {

@@ -5,6 +5,7 @@ import { LinkRenderer as YouTubeLinkRenderer } from '../components/Renderers/You
 import { LinkRenderer as TikTokLinkRenderer, cleanTikTokMarkdown } from '../components/Renderers/TikTokRender/TikTokRenderer';
 import { LinkRenderer as SpotifyLinkRenderer, cleanSpotifyMarkdown } from '../components/Renderers/SpotifyRender/SpotifyRenderer';
 import { LinkRenderer as SoundCloudLinkRenderer, cleanSoundCloudMarkdown } from '../components/Renderers/SoundCloudRender/SoundCloudRenderer';
+import { DailymotionLinkRenderer } from '../components/Renderers/DailymotionRender/DailymotionRenderer';
 import ImageRenderer from '../components/Renderers/ImageRenderer/ImageRenderer';
 import GoogleMapsRenderer from '../components/Renderers/GoogleMapsRenderer/GoogleMapsRenderer';
 import CodeBlock from '../components/Renderers/CodeBlock/CodeBlock';
@@ -13,6 +14,7 @@ const isYoutubeLink = href => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/
 const isTikTokLink = href => /^(https?:\/\/)?(www\.)?tiktok\.com\//.test(href);
 const isSpotifyLink = href => /^(https?:\/\/)?(open\.)?spotify\.com\/(?:[a-zA-Z0-9\-]+\/)?(track|album|playlist|artist)\//.test(href);
 const isSoundCloudLink = href => /^(https?:\/\/)?(www\.)?soundcloud\.com\//.test(href);
+const isDailymotionLink = href => /^(https?:\/\/)?(www\.)?dailymotion\.com\/video\//.test(href);
 const isImageLink = href => /\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(href);
 const isGoogleMapsLink = href => /https?:\/\/(www\.)?maps\.google\.com\/maps\?q=[^\s)]+/i.test(href);
 
@@ -48,6 +50,7 @@ const splitMarkdownWithLinks = markdownInput => {
     tiktok: /(https?:\/\/(?:www\.)?tiktok\.com\/[\w\-?&=;%#@/.]+)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi,
     spotify: /(https?:\/\/(open\.)?spotify\.com\/(?:[a-zA-Z0-9\-]+\/)?(track|album|playlist|artist)\/[a-zA-Z0-9]+(\?si=[\w-]+)?)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi,
     soundcloud: /(https?:\/\/(www\.)?soundcloud\.com\/[\w\-]+\/[\w\-]+)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi,
+    dailymotion: /(https?:\/\/(www\.)?dailymotion\.com\/video\/[\w]+)(?=\s|$|\)|,|\.|!|\?|;|:|"|')/gi,
     googlemaps: /(https?:\/\/(?:www\.)?maps\.google\.com\/maps\?q=[^\s)]+)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi
   };
   
@@ -59,6 +62,7 @@ const splitMarkdownWithLinks = markdownInput => {
     const tiktokMatches = [...text.matchAll(patterns.tiktok)];
     const spotifyMatches = [...text.matchAll(patterns.spotify)];
     const soundcloudMatches = [...text.matchAll(patterns.soundcloud)];
+    const dailymotionMatches = [...text.matchAll(patterns.dailymotion)];
     const googleMapsMatches = [...text.matchAll(patterns.googlemaps)];
     
     const allMatches = [
@@ -72,6 +76,7 @@ const splitMarkdownWithLinks = markdownInput => {
         else if (isTikTokLink(url)) linkType = 'tiktok';
         else if (isSpotifyLink(url)) linkType = 'spotify';
         else if (isSoundCloudLink(url)) linkType = 'soundcloud';
+        else if (isDailymotionLink(url)) linkType = 'dailymotion';
         else if (isGoogleMapsLink(url)) linkType = 'googlemaps';
         
         return {
@@ -106,6 +111,13 @@ const splitMarkdownWithLinks = markdownInput => {
       ...soundcloudMatches.map(m => ({ 
         ...m, 
         type: 'soundcloud', 
+        url: cleanUrl(m[1]),
+        fullMatch: m[0],
+        matchLength: m[1].length
+      })),
+      ...dailymotionMatches.map(m => ({ 
+        ...m, 
+        type: 'dailymotion', 
         url: cleanUrl(m[1]),
         fullMatch: m[0],
         matchLength: m[1].length
@@ -187,6 +199,10 @@ const splitMarkdownWithLinks = markdownInput => {
         const soundcloudUrl = match.url;
         const soundcloudText = match.text || soundcloudUrl;
         resultArray.push({ type: 'soundcloud', value: soundcloudUrl, text: soundcloudText });
+      } else if (match.type === 'dailymotion') {
+        const dailymotionUrl = match.url;
+        const dailymotionText = match.text || dailymotionUrl;
+        resultArray.push({ type: 'dailymotion', value: dailymotionUrl, text: dailymotionText });
       } else if (match.type === 'googlemaps') {
         const googleMapsUrl = match.url;
         const googleMapsText = match.text || googleMapsUrl;
@@ -336,11 +352,13 @@ export function useMessageList(messages, currentResponse, messagesEndRef, ttsEna
           if (part.type === 'tiktok') return <TikTokLinkRenderer key={i} href={part.value}>{part.text}</TikTokLinkRenderer>;
           if (part.type === 'spotify') return <SpotifyLinkRenderer key={i} href={part.value}>{part.text}</SpotifyLinkRenderer>;
           if (part.type === 'soundcloud') return <SoundCloudLinkRenderer key={i} href={part.value}>{part.text}</SoundCloudLinkRenderer>;
+          if (part.type === 'dailymotion') return <DailymotionLinkRenderer key={i} href={part.value}>{part.text}</DailymotionLinkRenderer>;
           if (part.type === 'link') {
             if (isYoutubeLink(part.value)) return <YouTubeLinkRenderer key={i} href={part.value}>{part.text}</YouTubeLinkRenderer>;
             if (isTikTokLink(part.value)) return <TikTokLinkRenderer key={i} href={part.value}>{part.text}</TikTokLinkRenderer>;
             if (isSpotifyLink(part.value)) return <SpotifyLinkRenderer key={i} href={part.value}>{part.text}</SpotifyLinkRenderer>;
             if (isSoundCloudLink(part.value)) return <SoundCloudLinkRenderer key={i} href={part.value}>{part.text}</SoundCloudLinkRenderer>;
+            if (isDailymotionLink(part.value)) return <DailymotionLinkRenderer key={i} href={part.value}>{part.text}</DailymotionLinkRenderer>;
             return <a key={i} href={part.value} target="_blank" rel="noopener noreferrer">{part.text}</a>;
           }
           if (part.type === 'text') {
