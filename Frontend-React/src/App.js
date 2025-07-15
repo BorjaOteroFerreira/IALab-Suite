@@ -82,33 +82,44 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
         onToggleHeader={onToggleHeader}
       />
 
-      {/* Contenedor central flex para sidebars y mensajes */}
-      <div className="main-flex-content" style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        {/* ChatSidebar a la izquierda si visible */}
-        {chatSidebarVisible && (
+      {/* Sidebar overlay y sidebar fuera del main-flex-content para overlay real */}
+      {chatSidebarVisible && (
+        <>
+          <div
+            className="sidebar-overlay"
+            onClick={() => setChatSidebarVisible(false)}
+          />
           <ChatSidebar
             visible={chatSidebarVisible}
             onLoadChat={handleLoadChat}
             onDeleteChat={handleDeleteChat}
             onClose={() => setChatSidebarVisible(false)}
+            headerHidden={headerHidden}
           />
-        )}
+        </>
+      )}
+      {configSidebarVisible && (
+        <>
+          <div
+            className="sidebar-overlay"
+            onClick={() => setConfigSidebarVisible(false)}
+          />
+          <ConfigSidebarComponent
+            visible={configSidebarVisible}
+            onClose={() => setConfigSidebarVisible(false)}
+            headerHidden={headerHidden}
+          />
+        </>
+      )}
 
-        {/* MessageList SIEMPRE como hermano de los sidebars */}
+      {/* Contenedor central flex SOLO para mensajes */}
+      <div className="main-flex-content" style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <MessageList
           messages={messages}
           currentResponse={currentResponse}
           isLoading={isLoading}
           messagesEndRef={messagesEndRef}
         />
-
-        {/* ConfigSidebar a la derecha si visible */}
-        {configSidebarVisible && (
-          <ConfigSidebarComponent
-            visible={configSidebarVisible}
-            onClose={() => setConfigSidebarVisible(false)}
-          />
-        )}
       </div>
 
       {/* InputArea siempre abajo */}
@@ -140,20 +151,6 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
       >
         <Download size={22} />
       </button>
-
-      {/* Overlay para cerrar sidebars (sin sidebar flotante) */}
-      {chatSidebarVisible && (
-        <div
-          className="sidebar-overlay"
-          onClick={() => setChatSidebarVisible(false)}
-        />
-      )}
-      {configSidebarVisible && (
-        <div
-          className="sidebar-overlay"
-          onClick={() => setConfigSidebarVisible(false)}
-        />
-      )}
     </div>
   );
 }

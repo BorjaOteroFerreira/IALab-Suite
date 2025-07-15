@@ -16,7 +16,6 @@
   color: var(--text-primary);
   font-family: inherit;
   backdrop-filter: none;
-  scrollbar-width: none; /* Firefox */
 }
 
 .chat-sidebar::-webkit-scrollbar {
@@ -50,6 +49,8 @@
   border: none !important;
   box-shadow: none !important;
   scrollbar-width: none; /* Firefox */
+  ms-overflow-style: none;
+  overflow-x: hidden;
 }
 
 .conversations-list::-webkit-scrollbar {
@@ -342,6 +343,10 @@
   cursor: pointer;
   transition: 0.2s;
 }
+.chat-sidebar {
+  width:100px;
+  min-width:80px;
+}
 
 .chat-sidebar-controls-btn:hover {
   background: #a78bfa !important;
@@ -350,33 +355,16 @@
 
 /* Sección de grupo de chats (por ejemplo, 'Ayer', 'Hoy') con scroll propio */
 .chat-group {
-  flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  margin-bottom: 16px;
+  /* Elimina cualquier flex, min-height, max-height, flex-grow, flex-shrink, etc. */
+  /* Solo ocupa el alto de su contenido */
 }
 
 .chat-group-content {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 4px; /* Espacio consistente entre elementos */
-  padding-right: 2px;
-  scrollbar-width: thin; /* Firefox */
-  max-height: unset;
-}
-
-.chat-group-content::-webkit-scrollbar {
-  width: 6px;
-  background: transparent;
-}
-
-.chat-group-content::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
-  border-radius: 6px;
+  /* Elimina cualquier flex, min-height, max-height, flex-grow, flex-shrink, etc. */
 }
 
 /* Opcional: título de la sección */
@@ -387,4 +375,22 @@
   margin-bottom: 6px;
   margin-top: 2px;
   flex-shrink: 0; /* No se encoge */
+}
+
+.chat-sidebar, .chat-sidebar *,
+.conversations-list, .conversations-list *,
+.chat-group, .chat-group *,
+.chat-group-content, .chat-group-content * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.chat-sidebar::-webkit-scrollbar,
+.chat-sidebar *::-webkit-scrollbar,
+.conversations-list::-webkit-scrollbar,
+.conversations-list *::-webkit-scrollbar,
+.chat-group::-webkit-scrollbar,
+.chat-group *::-webkit-scrollbar,
+.chat-group-content::-webkit-scrollbar,
+.chat-group-content *::-webkit-scrollbar {
+  display: none !important;
 }

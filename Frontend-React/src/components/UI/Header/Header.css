@@ -7,6 +7,11 @@
   border-bottom: 2px solid #87CEEB;
   box-shadow: 0 4px 12px rgba(135, 206, 235, 0.15);
   backdrop-filter: blur(20px);
+  transition: top 0.2s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-header-hidden {
+  transition: top 0.2s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-left {

@@ -3,7 +3,7 @@ import { useChatContext } from '../../../hooks/useChatContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import './ConfigSidebar.css';
 
-const ConfigSidebar = ({ visible, onClose }) => {
+const ConfigSidebar = ({ visible, onClose, headerHidden }) => {
   const { modelConfig, setModelConfig, applyConfig, unloadModel, fetchModelsAndFormats } = useChatContext();
   const [modelsList, setModelsList] = useState([]);
   const [allModelsList, setAllModelsList] = useState([]); // Lista completa incluyendo .mmproj
@@ -279,8 +279,21 @@ const ConfigSidebar = ({ visible, onClose }) => {
   // Obtener el modelo seleccionado
   const selected = modelsWithInfo.find(m => m.path === modelConfig.modelPath) || {info:{}};
 
+  // Altura de la cabecera (ajusta si tu header es diferente)
+  const HEADER_HEIGHT = 56;
+
   return (
-    <div className={`config-sidebar ${visible ? 'visible' : 'hidden'}`}>
+    <div
+      className={`config-sidebar ${visible ? 'visible' : 'hidden'}`}
+      style={{
+        position: 'fixed',
+        right: 0,
+        top: headerHidden ? 0 : HEADER_HEIGHT,
+        height: headerHidden ? '100vh' : `calc(100vh - ${HEADER_HEIGHT}px)` ,
+        zIndex: 1000,
+        width: undefined, // no tocar el ancho
+      }}
+    >
       <div className="sidebar-header config-title-gradient">
         <h5 className="config-title-text config-title-text-gradient">{strings.title}</h5>
       </div>
@@ -409,7 +422,7 @@ const ConfigSidebar = ({ visible, onClose }) => {
             min="0"
             max="1"
             placeholder={strings.temperaturePlaceholder}
-            value={modelConfig.temperature || 0.8}
+            value={modelConfig.temperature || 0.3}
             onChange={handleChange}
           />
         </div>

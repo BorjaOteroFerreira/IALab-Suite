@@ -970,12 +970,17 @@
     max-width: 520px;
   }
 
-  .chat-sidebar,
   .config-sidebar {
-    width: 440px !important;
+    width: 360px !important;
     max-width: 520px;
     min-width: 320px;
   }
+
+  .chat-sidebar{
+      width:280px !important;
+      min-width:320px;
+      max-width:520px;
+    }
 }
 
 /* Nuevos estilos para botones de RAG y herramientas */
@@ -999,4 +1004,14 @@
   min-width: unset;
   min-height: unset;
   background: transparent;
+}
+
+.main-flex-content.with-sidebar-padding {
+  padding-left: 320px;
+}
+
+@media (max-width: 768px) {
+  .main-flex-content.with-sidebar-padding {
+    padding-left: 0;
+  }
 }

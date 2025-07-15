@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import './InputArea.css';
-import { Send, Square, Database, Image as ImageIcon, Paperclip, Globe, ChevronUp, Download } from 'lucide-react';
+import { Send, Square, Database, Image as ImageIcon, Paperclip, Globe, ChevronUp, Download, ArrowUp } from 'lucide-react';
 import ToolsSelector from '../../UI/ToolsSelector/ToolsSelector';
 import { useChatContext } from '../../../hooks/useChatContext';
 import { useLanguage } from '../../../context/LanguageContext';
@@ -276,7 +276,7 @@ function InputArea({
                 className="send-button"
                 title={strings.sendMessage}
               >
-                ➤
+                <ArrowUp size={20} />
               </button>
             )}
           </div>

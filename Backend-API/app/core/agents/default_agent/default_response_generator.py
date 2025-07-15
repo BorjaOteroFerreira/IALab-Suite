@@ -60,6 +60,7 @@ class DefaultResponseGenerator:
                     return self.assistant and getattr(self.assistant, 'stop_emit', False)
                 except Exception:
                     return False
+                
             response_completa, total_assistant_tokens = SocketResponseHandler.stream_chat_completion(
                 model=self.model,
                 messages=final_prompt,

@@ -14,7 +14,7 @@ import { useChatContext } from '../../../hooks/useChatContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import './ChatSidebar.css';
 
-const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose }) => {
+const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose, headerHidden }) => {
   const { chatList, fetchChatList } = useChatContext();
   const { getStrings } = useLanguage();
   const strings = getStrings('chatSidebar');
@@ -310,7 +310,11 @@ const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose }) => {
           color: isSelected ? 'white' : '#1f2937',
           transition: 'all 0.2s ease',
           position: 'relative',
-          border: isSelected ? '1px solid #3b82f6' : '1px solid transparent'
+          border: isSelected ? '1px solid #3b82f6' : '1px solid transparent',
+          minHeight: '64px', 
+          height: 'auto', 
+          boxSizing: 'border-box',
+          overflow: 'visible',
         }}
       >
         {selectMode && (
@@ -391,17 +395,8 @@ const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose }) => {
             {/* Indicador de origen */}
             {chat.isFromBackend && (
               <div
-                style={{
-                  background: '#10b981',
-                  color: 'white',
-                  fontSize: '10px',
-                  padding: '2px 6px',
-                  borderRadius: '10px',
-                  fontWeight: '500'
-                }}
                 title="Chat del backend"
               >
-                API
               </div>
             )}
           </div>
@@ -514,11 +509,28 @@ const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose }) => {
     </div>
   );
 
-  // Render principal
-  if (!visible) return null;
+  // Altura de la cabecera (ajusta si tu header es diferente)
+  const HEADER_HEIGHT = 56;
 
+  // Render principal
   return (
-    <div className="chat-sidebar">
+    <div
+      className="chat-sidebar visible"
+      style={{
+        position: 'fixed',
+        left: 0,
+        top: headerHidden ? 0 : HEADER_HEIGHT,
+        height: headerHidden ? '100vh' : `calc(100vh - ${HEADER_HEIGHT}px)` ,
+        zIndex: 1000,
+        background: 'var(--surface-elevated)',
+        boxShadow: '0 0 30px rgba(0,0,0,0.2)',
+        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), top 0.2s',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '0px 32px 32px 32px',
+        transform: visible ? 'translateY(0)' : 'translateY(-100%)',
+      }}
+    >
       {/* Header */}
       <div className="chat-sidebar-header">
         <h2 className="chat-sidebar-title">
@@ -572,7 +584,10 @@ const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose }) => {
         )}
       </div>
       {/* Lista de chats */}
-      <div className="conversations-list">
+      <div 
+        className="conversations-list"
+        style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: 0 }}
+      >
         {/* Favoritos */}
         {favoritesList.length > 0 && (
           <div className="chat-group">
