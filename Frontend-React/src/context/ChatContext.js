@@ -241,7 +241,7 @@ export const ChatProvider = ({ children }) => {
             console.log('📝 Añadiendo mensaje de assistant al historial');
             addMessageToChat('assistant', currentResponseValue);
             
-            // 💾 GUARDADO AUTOMÁTICO: Guardar historial después de completar respuesta
+            // Guardar historial después de completar respuesta
             setTimeout(async () => {
               try {
                 console.log('💾 Iniciando guardado automático tras completar respuesta...');
@@ -359,8 +359,7 @@ export const ChatProvider = ({ children }) => {
         rag
       });
       
-      // ❌ REMOVIDO: El guardado automático ya no ocurre aquí
-      // Solo se guardará cuando se complete la respuesta del asistente
+
       
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
@@ -411,7 +410,7 @@ export const ChatProvider = ({ children }) => {
     setCurrentResponse('');
     currentResponseRef.current = '';
     setTokensCount(0);
-    setChatId(''); // Importante: resetear el chatId
+    setChatId(''); //resetear el chatId
     conversationHistory.current = [{ role: 'system', content: modelConfig.systemMessage }];
     setIsLoading(false);
     console.log('Chat limpiado 🗑️');
@@ -504,7 +503,7 @@ export const ChatProvider = ({ children }) => {
     currentResponse,
     chatList,
     isLoading,
-    savingChat, // Nuevo estado para mostrar cuando se está guardando
+    savingChat, 
     tools,
     rag,
     currentAgent,
