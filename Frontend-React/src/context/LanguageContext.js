@@ -8,7 +8,6 @@ const LANG_META = {
   fr: { name: 'Français', flag: '🇫🇷' },
   pt: { name: 'Português', flag: '🇵🇹' },
   de: { name: 'Deutsch', flag: '🇩🇪' }
-  // Añade más idiomas aquí si es necesario
 };
 
 // Detecta los idiomas por los archivos en src/strings/*/*.js usando require.context

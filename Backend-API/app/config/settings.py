@@ -46,7 +46,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
-    SOCKETIO_CORS_ALLOWED_ORIGINS = []  # Configure specific origins in production
+    SOCKETIO_ASYNC_MODE = 'gevent'
+    SOCKETIO_CORS_ALLOWED_ORIGINS = "*"  # Configure specific origins in production
     SECRET_KEY = os.environ.get('SECRET_KEY')
     
     # Production security headers

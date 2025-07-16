@@ -54,7 +54,6 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
 
   const handleLoadChat = (chatName) => {
     loadChat(chatName);
-    // setChatSidebarVisible(false); // Eliminado para que el sidebar no se cierre al cargar un chat
   };
 
   const handleDeleteChat = (chatName) => {
@@ -74,7 +73,6 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
 
   return (
     <div className="app-layout">
-      {/* Header siempre arriba */}
       <Header
         tools={tools}
         rag={rag}
@@ -91,7 +89,6 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
         onToggleHeader={onToggleHeader}
       />
 
-      {/* Sidebar overlay y sidebar fuera del main-flex-content para overlay real */}
       {chatSidebarVisible && (
         <>
           <div
@@ -121,7 +118,7 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
         </>
       )}
 
-      {/* Contenedor central flex SOLO para mensajes */}
+      {/* Contenedor central flex  para mensajes */}
       <div className="main-flex-content" style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <MessageList
           messages={messages}
@@ -151,8 +148,6 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, textAlign: 'center', fontSize: '0.69rem', color: '#888', zIndex: 1500, pointerEvents: 'none', paddingBottom: '4px' }}>
         Los modelos de lenguaje pueden cometer errores. Considera verificar la información importante. 
       </div>
-      {/* Botones flotantes fuera del input area */}
-      {/* Botón de descarga GGUF ahora está en el header */}
     </div>
   );
 }

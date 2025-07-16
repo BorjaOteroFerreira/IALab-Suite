@@ -980,6 +980,21 @@
   }
 }
 
+/* Landscape móvil y tablets: ajuste para 960px o menos */
+@media (max-width: 960px) and (orientation: landscape) {
+  .app-layout {
+    height: 100vh;
+    height: 100dvh;
+    min-height: -webkit-fill-available;
+    background: linear-gradient(120deg, #191a1a 0%, #23272f 100%) !important;
+  }
+  body, #root {
+    background: linear-gradient(120deg, #191a1a 0%, #23272f 100%) !important;
+  }
+
+
+}
+
 /* Ajustes para pantallas de escritorio */
 @media (min-width: 769px) {
   .main-flex-content > .chat-sidebar,

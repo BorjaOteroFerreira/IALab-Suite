@@ -82,6 +82,7 @@
 }
 
 .message-avatar {
+  display: none !important;
   font-size: 1.5rem;
   width: 2.5rem;
   height: 2.5rem;
@@ -306,12 +307,182 @@
 }
 
 @media (max-width: 700px) {
+  .messages-container {
+    padding: 0.7rem 0.1rem 0.1rem 0.1rem;
+    width: 100vw;
+    box-sizing: border-box;
+    height: calc(100dvh - 110px); /* 105px - 5px */
+    max-height: calc(100dvh - 110px);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .messages-list {
+    max-width: 100vw;
+    width: 100vw;
+    padding-left: 0;
+    padding-right: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .message {
+    padding: 0.7rem 0.5rem;
+    max-width: 100vw;
+    width: 100%;
+    font-size: 0.98em;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .message.user,
+  .message.assistant {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  .message.user .message-content {
+    font-size: 1.1em !important;
+  }
+  .message-avatar {
+    display: none !important;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.1rem;
+    margin-left: -2rem;
+    margin-top: -2.2rem;
+  }
+  .message.user .message-avatar {
+    margin-right: -2rem;
+    margin-top: -2.2rem;
+  }
+  .floating-messages {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    max-width: 98vw;
+    width: 98vw;
+    margin: 6rem auto 0 auto; /* Aumenta el margen superior */
+    padding: 0 0.2rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .welcome-message {
+    text-align: center;
+    margin: 0 auto 1.5rem auto; /* Aumenta el margen inferior */
+    max-width: 98vw;
+    width: 98vw;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0.5rem 0.2rem 0.5rem 0.2rem;
+    position: static;
+    box-sizing: border-box;
+  }
+  .shortcuts-legend {
+    max-width: 98vw;
+    width: 98vw;
+    padding: 0.7rem 0.5rem;
+    font-size: 0.95em;
+    box-sizing: border-box;
+  }
   .shortcuts-legend-floating {
-    left: 0.5rem;
-    bottom: 5.5rem;
-    min-width: 140px;
-    padding: 0.5rem 0.7rem 0.5rem 0.7rem;
-    font-size: 0.85em;
+    position: static;
+    margin-top: 1.3rem; /* Aumenta separación respecto al mensaje de bienvenida */
+    max-width: 98vw;
+    width: 98vw;
+    min-width: 0;
+    text-align: left;
+    font-size: 0.9em;
+    color: rgba(210, 210, 210, 0.82);
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0.2rem 0.5rem 0.2rem;
+    pointer-events: auto;
+    transition: opacity 0.2s;
+    box-sizing: border-box;
+  }
+  .message-divider {
+    margin: 30px 0 0.3rem 0;
+    max-width: 99vw;
+    width: 99vw;
+  }
+  .image-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Ajuste especial para landscape hasta 960px */
+@media (max-width: 960px) and (orientation: landscape) {
+  .messages-container {
+    padding: 0.2rem 1.2rem 0.05rem 1.2rem;
+    width: 100vw;
+    box-sizing: border-box;
+    height: calc(100dvh - 80px);
+    max-height: calc(100dvh - 80px);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: transparent !important;
+  }
+  .messages-list {
+    max-width: 100vw;
+    width: 100vw;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: transparent !important;
+  }
+  .message {
+    padding: 0.3rem 6rem;
+    max-width: 100vw;
+    width: 100%;
+    font-size: 0.68em;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .message.assistant {
+    padding: 0.3rem 6rem;
+  }
+  .message.user,
+  .message.assistant {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  .floating-messages,
+  .welcome-message,
+  .shortcuts-legend,
+  .shortcuts-legend-floating {
+    max-width: 98vw;
+    width: 98vw;
+    box-sizing: border-box;
+  }
+  .message-divider {
+    margin: 20px 0 0.2rem 0;
+    max-width: 99vw;
+    width: 99vw;
   }
 }
 

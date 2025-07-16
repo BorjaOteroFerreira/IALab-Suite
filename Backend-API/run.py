@@ -35,7 +35,8 @@ def main():
         port=port,
         debug=debug,
         use_reloader=use_reloader,
-        allow_unsafe_werkzeug=True
+        allow_unsafe_werkzeug=True,
+
     )
 
 if __name__ == '__main__':
