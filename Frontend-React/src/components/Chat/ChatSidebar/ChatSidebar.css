@@ -259,7 +259,7 @@
 
 /* Header del ChatSidebar con estilo original, fondo y bordes suaves */
 .chat-sidebar-header {
-  padding: 16px;
+  padding-top: 16px;
   border-bottom: none !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -282,12 +282,17 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 5px;
   border-radius: 4px;
   color: #6b7280;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.close-chat-sidebar-btn:hover {
+  background: rgba(235, 236, 248, 0.1);
+  color: #87CEEB;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
 }
 
 .chat-sidebar-search {
@@ -319,7 +324,7 @@
 }
 
 .chat-sidebar-search-input:focus {
-  border-color: #3b82f6;
+  border-color: #87CEEB;
 }
 
 .chat-sidebar-controls {

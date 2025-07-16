@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useChatContext } from '../../../hooks/useChatContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import './ConfigSidebar.css';
+import ConfigSidebarTour from '../../ConfigSidebarTour';
 
 const ConfigSidebar = ({ visible, onClose, headerHidden }) => {
   const { modelConfig, setModelConfig, applyConfig, unloadModel, fetchModelsAndFormats } = useChatContext();
@@ -294,6 +295,7 @@ const ConfigSidebar = ({ visible, onClose, headerHidden }) => {
         width: undefined, // no tocar el ancho
       }}
     >
+      <ConfigSidebarTour onClose={onClose} />
       <div className="sidebar-header config-title-gradient">
         <h5 className="config-title-text config-title-text-gradient">{strings.title}</h5>
       </div>

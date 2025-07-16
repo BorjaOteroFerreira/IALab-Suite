@@ -13,7 +13,7 @@ export const ChatProvider = ({ children }) => {
   const [modelConfig, setModelConfig] = useState({
     modelPath: '',
     format: 'chatml',
-    temperature: 0.8,
+    temperature: 0.3,
     context: 8192,
     systemMessage: 'Eres un asistente en español. Debes responder siempre en español',
     gpuLayers: -1

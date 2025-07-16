@@ -60,12 +60,12 @@ class ToolsManager:
                     "metadata": tool_instance.metadata if tool_instance else None
                 }
         
-        # Si no hay herramientas seleccionadas, seleccionar todas las disponibles por defecto
+        # Si no hay herramientas seleccionadas, seleccionar solo 'serper.dev' si está disponible
         if not self._selected_tools:
-            self._selected_tools = [
-                tool_name for tool_name, info in self._available_tools.items() 
-                if info["available"]
-            ]
+            if 'Serper.dev' in self._available_tools and self._available_tools['Serper.dev']["available"]:
+                self._selected_tools = ['Serper.dev']
+            else:
+                self._selected_tools = []
     
     def set_tools_enabled(self, enabled: bool):
         """Habilitar o deshabilitar el uso de herramientas"""

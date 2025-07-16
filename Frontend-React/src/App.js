@@ -24,7 +24,7 @@ import DownloaderTour from './components/DownloaderTour';
 import ToolSelectorTour from './components/ToolSelectorTour';
 
 // Componente principal de Chat
-function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSidebarVisible, setChatSidebarVisible, configSidebarVisible, setConfigSidebarVisible }) {
+function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSidebarVisible, setChatSidebarVisible, configSidebarVisible, setConfigSidebarVisible, setClearChatRef, setSetToolsRef }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const { getStrings } = useLanguage();
@@ -62,6 +62,15 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
       deleteChat(chatName);
     }
   };
+
+  useEffect(() => {
+    if (setClearChatRef) {
+      setClearChatRef(() => clearChat);
+    }
+    if (setSetToolsRef) {
+      setSetToolsRef(() => setTools);
+    }
+  }, [clearChat, setTools, setClearChatRef, setSetToolsRef]);
 
   return (
     <div className="app-layout">
@@ -140,17 +149,10 @@ function ChatComponent({ onOpenDownloader, headerHidden, onToggleHeader, chatSid
       </div>
       {/* Marca de agua fija en la parte inferior */}
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, textAlign: 'center', fontSize: '0.69rem', color: '#888', zIndex: 1500, pointerEvents: 'none', paddingBottom: '4px' }}>
-        Los modelos de lenguaje pueden cometer errores. Considera verificar la información importante. Ver preferencias de cookies.
+        Los modelos de lenguaje pueden cometer errores. Considera verificar la información importante. 
       </div>
       {/* Botones flotantes fuera del input area */}
-      <button
-        className="header-button floating-downloader-btn-global"
-        title="Descargar modelos GGUF"
-        style={{ position: 'fixed', right: '1.5rem', bottom: 16, zIndex: 2000 }}
-        onClick={onOpenDownloader}
-      >
-        <Download size={22} />
-      </button>
+      {/* Botón de descarga GGUF ahora está en el header */}
     </div>
   );
 }
@@ -167,6 +169,9 @@ function App() {
   const [hasSeenConfigSidebarTour, setHasSeenConfigSidebarTour] = useState(false);
   const [showToolSelectorTour, setShowToolSelectorTour] = useState(false);
   const [hasSeenToolSelectorTour, setHasSeenToolSelectorTour] = useState(false);
+
+  const [clearChatRef, setClearChatRef] = useState(null);
+  const [setToolsRef, setSetToolsRef] = useState(null);
 
   const handleToggleHeader = () => setHeaderHidden(h => !h);
 
@@ -198,6 +203,63 @@ function App() {
     return () => window.removeEventListener('open-tools-selector-ui', handleOpenToolsSelector);
   }, [hasSeenToolSelectorTour]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!e.shiftKey) return;
+      switch (e.key.toLowerCase()) {
+        case 'a':
+          setHeaderHidden(false);
+          setChatSidebarVisible(true);
+          setConfigSidebarVisible(true);
+          break;
+        case 'x':
+          setConfigSidebarVisible(v => !v);
+          break;
+        case 'c':
+          setChatSidebarVisible(v => !v);
+          break;
+        case 'h':
+          setHeaderHidden(v => !v);
+          break;
+        case 'q':
+          setHeaderHidden(true);
+          setChatSidebarVisible(false);
+          setConfigSidebarVisible(false);
+          // Cerrar ToolSelector si está abierto, sin modificar tools
+          window.dispatchEvent(new Event('close-tools-selector-ui'));
+          break;
+        case 'n':
+          if (typeof clearChatRef === 'function') {
+            clearChatRef();
+          } else if (clearChatRef) {
+            clearChatRef();
+          }
+          break;
+        case 'w':
+          // Shift+W: activar tools y abrir ToolSelector
+          if (typeof setToolsRef === 'function') {
+            setToolsRef(true);
+          } else if (setToolsRef) {
+            setToolsRef(true);
+          }
+          window.dispatchEvent(new Event('open-tools-selector-ui'));
+          break;
+        case 'd':
+          // Shift+D: alternar estado de tools
+          if (typeof setToolsRef === 'function') {
+            setToolsRef(v => !v);
+          } else if (setToolsRef) {
+            setToolsRef(v => !v);
+          }
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [clearChatRef, setToolsRef]);
+
   return (
     <SocketProvider>
       <ChatProvider>
@@ -209,6 +271,8 @@ function App() {
           setChatSidebarVisible={setChatSidebarVisible}
           configSidebarVisible={configSidebarVisible}
           setConfigSidebarVisible={setConfigSidebarVisible}
+          setClearChatRef={setClearChatRef}
+          setSetToolsRef={setSetToolsRef}
         />
         {/* Selector de idioma flotante al mismo nivel que el botón de descargas */}
         <div className="floating-language-selector-global" style={{ position: 'fixed', left: '1.5rem', bottom: 16, zIndex: 3001 }}>

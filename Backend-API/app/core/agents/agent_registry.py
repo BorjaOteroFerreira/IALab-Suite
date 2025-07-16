@@ -74,7 +74,7 @@ class AgentRegistry:
   
             
             # Establecer agente por defecto
-            self._current_agent = "default"
+            self._current_agent = "adaptive"
             
             logger.info(f"Agentes registrados: {list(self._agents.keys())}")
             print(f" AGENTES REGISTRADOS: {list(self._agents.keys())}")

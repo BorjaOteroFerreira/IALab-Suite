@@ -14,7 +14,7 @@ const isYoutubeLink = href => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/
 const isTikTokLink = href => /^(https?:\/\/)?(www\.)?tiktok\.com\//.test(href);
 const isSpotifyLink = href => /^(https?:\/\/)?(open\.)?spotify\.com\/(?:[a-zA-Z0-9\-]+\/)?(track|album|playlist|artist)\//.test(href);
 const isSoundCloudLink = href => /^(https?:\/\/)?(www\.)?soundcloud\.com\//.test(href);
-const isDailymotionLink = href => /^(https?:\/\/)?(www\.)?dailymotion\.com\/video\//.test(href);
+const isDailymotionLink = href => /^(https?:\/\/)?(www\.)?dailymotion\.com\/(video|playlist)\//.test(href);
 const isImageLink = href => /\.(jpg|jpeg|png|gif|webp|bmp|svg)([?#].*)?$/i.test(href);
 const isGoogleMapsLink = href => /https?:\/\/(www\.)?maps\.google\.com\/maps\?q=[^\s)]+/i.test(href);
 
@@ -51,6 +51,7 @@ const splitMarkdownWithLinks = markdownInput => {
     spotify: /(https?:\/\/(open\.)?spotify\.com\/(?:[a-zA-Z0-9\-]+\/)?(track|album|playlist|artist)\/[a-zA-Z0-9]+(\?si=[\w-]+)?)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi,
     soundcloud: /(https?:\/\/(www\.)?soundcloud\.com\/[\w\-]+\/[\w\-]+)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi,
     dailymotion: /(https?:\/\/(www\.)?dailymotion\.com\/video\/[\w]+)(?=\s|$|\)|,|\.|!|\?|;|:|"|')/gi,
+    dailymotionPlaylist: /(https?:\/\/(www\.)?dailymotion\.com\/playlist\/[\w]+)(?=\s|$|\)|,|\.|!|\?|;|:|"|')/gi,
     googlemaps: /(https?:\/\/(?:www\.)?maps\.google\.com\/maps\?q=[^\s)]+)(?=\s|$|\)|,|\.|\!|\?|;|:|"|')/gi
   };
   
@@ -63,6 +64,7 @@ const splitMarkdownWithLinks = markdownInput => {
     const spotifyMatches = [...text.matchAll(patterns.spotify)];
     const soundcloudMatches = [...text.matchAll(patterns.soundcloud)];
     const dailymotionMatches = [...text.matchAll(patterns.dailymotion)];
+    const dailymotionPlaylistMatches = [...text.matchAll(patterns.dailymotionPlaylist)];
     const googleMapsMatches = [...text.matchAll(patterns.googlemaps)];
     
     const allMatches = [
@@ -116,6 +118,13 @@ const splitMarkdownWithLinks = markdownInput => {
         matchLength: m[1].length
       })),
       ...dailymotionMatches.map(m => ({ 
+        ...m, 
+        type: 'dailymotion', 
+        url: cleanUrl(m[1]),
+        fullMatch: m[0],
+        matchLength: m[1].length
+      })),
+      ...dailymotionPlaylistMatches.map(m => ({ 
         ...m, 
         type: 'dailymotion', 
         url: cleanUrl(m[1]),

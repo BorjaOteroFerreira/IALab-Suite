@@ -8,7 +8,8 @@ import {
   CheckSquare,
   Square,
   X,
-  Clock
+  Clock,
+  PanelLeft // añadir el icono de ocultación lateral
 } from 'lucide-react';
 import { useChatContext } from '../../../hooks/useChatContext';
 import { useLanguage } from '../../../context/LanguageContext';
@@ -534,13 +535,14 @@ const ChatSidebar = ({ visible, onLoadChat, onDeleteChat, onClose, headerHidden 
       {/* Header */}
       <div className="chat-sidebar-header">
         <h2 className="chat-sidebar-title">
-          Conversaciones ({allChats.length})
+          Conversaciones 
         </h2>
         <button
           onClick={onClose}
           className="close-chat-sidebar-btn"
+          style={{ color : "#87CEEB"}} // azul como el resto de botones
         >
-          <X size={20} />
+          <PanelLeft size={20}  />
         </button>
       </div>
       {/* Barra de búsqueda */}

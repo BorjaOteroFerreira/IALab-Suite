@@ -691,7 +691,7 @@
   
   /* Controles del header en dos filas si es necesario */
   .header-controls {
-    gap: 0.5rem;
+    gap: 0.2rem !important;
     flex-wrap: wrap;
     justify-content: flex-end;
   }
@@ -754,6 +754,8 @@
     transition: transform 0.3s ease !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
+    /* Fondo reforzado para evitar blanco */
+    background: linear-gradient(135deg, #23233a 0%, #3A455B 60%, #4A3B6B 100%) !important;
   }
   
   .chat-sidebar {
@@ -854,9 +856,26 @@
   /* Buttons del header más pequeños */
   .header-button {
     padding: 0.5rem;
-    min-width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    min-width: 32px !important;
+    height: 32px !important;
+    font-size: 0.95rem !important;
+  }
+  
+  /* Botón flotante de descargas dentro del header en móvil */
+  .gguf-fab {
+    position: static !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    font-size: 1.2rem !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    box-shadow: none !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
   }
 }
 
@@ -970,17 +989,12 @@
     max-width: 520px;
   }
 
-  .config-sidebar {
-    width: 360px !important;
+  .config-sidebar, .chat-sidebar {
+    width: 280px !important;
     max-width: 520px;
     min-width: 320px;
   }
 
-  .chat-sidebar{
-      width:280px !important;
-      min-width:320px;
-      max-width:520px;
-    }
 }
 
 /* Nuevos estilos para botones de RAG y herramientas */
@@ -1014,4 +1028,14 @@
   .main-flex-content.with-sidebar-padding {
     padding-left: 0;
   }
+  body, #root {
+  background: linear-gradient(120deg, #191a1a 0%, #23272f 100%) !important;
+  background: linear-gradient(120deg, #191a1a 0%, #23272f 100%) !important;
 }
+  .chat-sidebar,
+  .config-sidebar {
+    background: linear-gradient(135deg, #23233a 0%, #3A455B 60%, #4A3B6B 100%) !important;
+    box-shadow: 0 0 30px 10px #181828cc !important;
+  }
+}
+

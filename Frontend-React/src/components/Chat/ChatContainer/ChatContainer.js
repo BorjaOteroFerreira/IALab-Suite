@@ -222,6 +222,7 @@ const ChatContainer = ({ toggleChatSidebar, toggleConfigSidebar }) => {
           <button onClick={toggleConfigSidebar} title="Configuración">⚙️</button>
           <button title="Ayuda">❔</button>
         </div>
+        {/* El botón flotante de descargas se ha movido a App.js */}
       </div>
     </div>
   );

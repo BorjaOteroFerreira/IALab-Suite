@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Joyride from 'react-joyride';
 
 const steps = [
@@ -40,7 +40,20 @@ const steps = [
   },
 ];
 
-export default function ConfigSidebarTour({ run, onClose }) {
+export default function ConfigSidebarTour({ onClose }) {
+  // Solo mostrar el tour la primera vez que se visita la página
+  const [run, setRun] = useState(() => {
+    return !localStorage.getItem('configSidebarTourSeen');
+  });
+
+  const handleJoyrideCallback = (data) => {
+    if (data.status === 'finished' || data.status === 'skipped') {
+      localStorage.setItem('configSidebarTourSeen', 'true');
+      setRun(false);
+      onClose && onClose();
+    }
+  };
+
   return (
     <Joyride
       steps={steps}
@@ -50,11 +63,7 @@ export default function ConfigSidebarTour({ run, onClose }) {
       showProgress
       locale={{ back: 'Atrás', close: 'Cerrar', last: 'Finalizar', next: 'Siguiente', skip: 'Saltar' }}
       styles={{ options: { zIndex: 3002 } }}
-      callback={(data) => {
-        if (data.status === 'finished' || data.status === 'skipped') {
-          onClose && onClose();
-        }
-      }}
+      callback={handleJoyrideCallback}
     />
   );
 }

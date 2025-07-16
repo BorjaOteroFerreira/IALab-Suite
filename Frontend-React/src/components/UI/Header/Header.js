@@ -76,7 +76,14 @@ function Header({
           >
             <Settings size={22} />
           </button>
-          {/* Botón para ocultar la cabecera eliminado de aquí */}
+          {/* Botón de descarga de modelos GGUF */}
+          <button
+            onClick={onOpenDownloader}
+            className="header-button"
+            title={strings.downloadModelsTooltip || 'Descargar modelos GGUF'}
+          >
+            <Download size={22} />
+          </button>
         </div>
       </header>
       {headerHidden && (
@@ -91,11 +98,27 @@ function Header({
         }}>
           <button
             className="show-header-btn"
-            style={{position: 'absolute', left: '50%', top: '2px', transform: 'translateX(-50%)', background: '#fff', border: '1px solid #ccc', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 3001}}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '2px',
+              transform: 'translateX(-50%)',
+              background: 'none', // sin fondo
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 3001,
+              color: '#87CEEB', // color neon igual que la flecha de ocultar
+            }}
             title={strings.showHeaderTooltip || 'Mostrar cabecera'}
             onClick={onToggleHeader}
           >
-            <ChevronDown size={18} />
+            <ChevronDown size={20} color="#87CEEB" />
           </button>
         </div>
       )}

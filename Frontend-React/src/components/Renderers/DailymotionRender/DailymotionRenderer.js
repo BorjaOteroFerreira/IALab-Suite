@@ -3,13 +3,19 @@ import './DailymotionRender.css';
 
 // Extrae el ID de video de una URL de Dailymotion
 const extractDailymotionVideoId = (url) => {
-  // Ejemplo: https://www.dailymotion.com/video/x8c6ejy
   const pattern = /dailymotion\.com\/video\/([\w]+)/;
   const match = url.match(pattern);
   return match ? match[1] : null;
 };
 
-// Componente para renderizar el iframe de Dailymotion
+// Extrae el ID de playlist de una URL de Dailymotion
+const extractDailymotionPlaylistId = (url) => {
+  const pattern = /dailymotion\.com\/playlist\/([\w]+)/;
+  const match = url.match(pattern);
+  return match ? match[1] : null;
+};
+
+// Componente para renderizar el iframe de Dailymotion Video
 export const DailymotionEmbed = ({ videoId }) => (
   <div className="dailymotion-embed-container">
     <iframe
@@ -22,22 +28,50 @@ export const DailymotionEmbed = ({ videoId }) => (
   </div>
 );
 
+// Componente para renderizar el iframe de Dailymotion Playlist
+export const DailymotionPlaylistEmbed = ({ playlistId }) => (
+  <div className="dailymotion-embed-container">
+    <iframe
+      className="dailymotion-embed-iframe"
+      src={`https://www.dailymotion.com/embed/playlist/${playlistId}`}
+      title="Playlist de Dailymotion"
+      allow="autoplay; encrypted-media"
+      allowFullScreen
+    />
+  </div>
+);
+
 // Renderizador de enlaces para Dailymotion
 export const DailymotionLinkRenderer = ({ href, children }) => {
   const videoId = extractDailymotionVideoId(href);
+  const playlistId = extractDailymotionPlaylistId(href);
+  if (playlistId) {
+    if (!children || (typeof children === 'string' && children.trim() === href.trim())) {
+      return <DailymotionPlaylistEmbed playlistId={playlistId} />;
+    }
+    if (
+      typeof children === 'string' &&
+      extractDailymotionPlaylistId(children.trim()) === playlistId
+    ) {
+      return <DailymotionPlaylistEmbed playlistId={playlistId} />;
+    }
+    return (
+      <>
+        <DailymotionPlaylistEmbed playlistId={playlistId} />
+        <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+      </>
+    );
+  }
   if (videoId) {
-    // Si el texto es igual al href o es la misma URL de Dailymotion
     if (!children || (typeof children === 'string' && children.trim() === href.trim())) {
       return <DailymotionEmbed videoId={videoId} />;
     }
-    // Si el texto es una URL de Dailymotion y su videoId es igual
     if (
       typeof children === 'string' &&
       extractDailymotionVideoId(children.trim()) === videoId
     ) {
       return <DailymotionEmbed videoId={videoId} />;
     }
-    // Si el texto es diferente, muestra el embed y el enlace con el texto
     return (
       <>
         <DailymotionEmbed videoId={videoId} />
